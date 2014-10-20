@@ -1,5 +1,6 @@
 Apache Storm - Applications
 ==========
+This code-sink includes example applications of Apache Storm.
 
 ## Examples
   - WordCount
