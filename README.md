@@ -6,16 +6,13 @@ This code-sink includes example applications of Apache Storm.
   - WordCount
 
 ## Compilation and Execution
-Use Apache Ant to build and run examples
+Use Apache Ant to build and run examples.
 
 ##### Clean all files
 `ant clean`
 
 ##### Build jar file
-`ant jar-gpu`
+`ant jar-cpu`
 
 ##### Submit Task to Storm
-`ant run-gpu`
-
-##### Build and run GPU Kernel
-`ant run-kernel`
+`ant run-cpu`
