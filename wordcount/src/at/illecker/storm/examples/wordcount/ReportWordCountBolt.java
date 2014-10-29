@@ -39,12 +39,10 @@ public class ReportWordCountBolt extends BaseRichBolt {
       .getLogger(ReportWordCountBolt.class);
   private OutputCollector m_collector;
   private Map<String, Long> m_counts;
+  private int m_timerPeriod;
 
-  public ReportWordCountBolt(int period) {
-    m_counts = new HashMap<String, Long>();
-    // Start ReportTimer
-    Timer timer = new Timer();
-    timer.schedule(new ReportTask(), 0, period);
+  public ReportWordCountBolt(int timerPeriod) {
+    m_timerPeriod = timerPeriod;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -54,21 +52,26 @@ public class ReportWordCountBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    this.m_counts = new HashMap<String, Long>();
+    // Start ReportTimer in prepare method
+    // because it has to be in the same JVM than the worker
+    Timer timer = new Timer();
+    timer.schedule(new ReportTask(), 0, this.m_timerPeriod);
   }
 
   public void execute(Tuple tuple) {
     // LOG.info(tuple.toString());
+    // LOG.info("WordCounts: " + m_counts.size());
     String word = tuple.getStringByField("word");
     Long count = tuple.getLongByField("count");
     this.m_counts.put(word, count);
     this.m_collector.ack(tuple);
-    // LOG.info("WordCounts: " + m_counts.size());
   }
 
   class ReportTask extends TimerTask {
     @Override
     public void run() {
-      LOG.info("WordCounts: " + m_counts.size());
+      LOG.info("\nWordCounts: " + m_counts.size());
       if (m_counts.size() > 0) {
         // Sort words
         List<String> keys = new ArrayList<String>();
