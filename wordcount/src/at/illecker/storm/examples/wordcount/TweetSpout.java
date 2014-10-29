@@ -35,8 +35,9 @@ public class TweetSpout extends BaseRichSpout {
 
   public TweetSpout() {
     m_tweets = new ArrayList<String>();
-    m_tweets.add("This is the first tweet.");
-    m_tweets.add("Followed by a second tweet.");
+    m_tweets.add("this is the first tweet");
+    m_tweets.add("followed by a second tweet");
+    m_tweets.add("and a third tweet");
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
