@@ -27,6 +27,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class SplitTweetBolt extends BaseRichBolt {
+  private static final long serialVersionUID = 883934440113385476L;
   private OutputCollector m_collector;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {

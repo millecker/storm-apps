@@ -23,29 +23,32 @@ import backtype.storm.tuple.Fields;
 
 public class WordCountTopology {
 
-  private static final String SENTENCE_SPOUT_ID = "tweet-spout";
+  private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String SPLIT_BOLT_ID = "split-bolt";
   private static final String COUNT_BOLT_ID = "count-bolt";
   private static final String REPORT_BOLT_ID = "report-bolt";
   private static final String TOPOLOGY_NAME = "word-count-topology";
+  private static final int REPORT_PERIOD = 5000;
 
   public static void main(String[] args) throws Exception {
 
     TweetSpout spout = new TweetSpout();
     SplitTweetBolt splitBolt = new SplitTweetBolt();
     WordCountBolt countBolt = new WordCountBolt();
-    ReportWordCountBolt reportBolt = new ReportWordCountBolt();
+    ReportWordCountBolt reportBolt = new ReportWordCountBolt(REPORT_PERIOD);
 
     TopologyBuilder builder = new TopologyBuilder();
 
     // TweetSpout
-    builder.setSpout(SENTENCE_SPOUT_ID, spout);
+    builder.setSpout(TWEET_SPOUT_ID, spout);
+
     // TweetSpout --> SplitTweetBolt
-    builder.setBolt(SPLIT_BOLT_ID, splitBolt)
-        .shuffleGrouping(SENTENCE_SPOUT_ID);
+    builder.setBolt(SPLIT_BOLT_ID, splitBolt).shuffleGrouping(TWEET_SPOUT_ID);
+
     // SplitTweetBolt --> WordCountBolt
     builder.setBolt(COUNT_BOLT_ID, countBolt).fieldsGrouping(SPLIT_BOLT_ID,
         new Fields("word"));
+
     // WordCountBolt --> ReportWordCountBolt
     builder.setBolt(REPORT_BOLT_ID, reportBolt).globalGrouping(COUNT_BOLT_ID);
 

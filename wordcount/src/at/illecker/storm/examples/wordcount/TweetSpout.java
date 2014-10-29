@@ -28,14 +28,15 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 public class TweetSpout extends BaseRichSpout {
+  private static final long serialVersionUID = 3621927972989123163L;
   private SpoutOutputCollector m_collector;
   private List<String> m_tweets;
   private int m_index = 0;
 
   public TweetSpout() {
     m_tweets = new ArrayList<String>();
-    m_tweets.add("my dog has fleas");
-    m_tweets.add("i like cold beverages");
+    m_tweets.add("This is the first tweet.");
+    m_tweets.add("Followed by a second tweet.");
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -54,7 +55,7 @@ public class TweetSpout extends BaseRichSpout {
       m_index = 0;
     }
     try {
-      Thread.sleep(1);
+      Thread.sleep(1); // sleep 1 ms
     } catch (InterruptedException e) {
     }
   }

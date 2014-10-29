@@ -28,6 +28,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class WordCountBolt extends BaseRichBolt {
+  private static final long serialVersionUID = -1587421475240637474L;
   private OutputCollector m_collector;
   private HashMap<String, Long> m_counts = null;
 
