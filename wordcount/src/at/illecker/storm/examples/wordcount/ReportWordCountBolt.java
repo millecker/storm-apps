@@ -38,9 +38,10 @@ public class ReportWordCountBolt extends BaseRichBolt {
   private static final Logger LOG = LoggerFactory
       .getLogger(ReportWordCountBolt.class);
   private OutputCollector m_collector;
-  private final Map<String, Long> m_counts = new HashMap<String, Long>();
+  private Map<String, Long> m_counts;
 
   public ReportWordCountBolt(int period) {
+    m_counts = new HashMap<String, Long>();
     // Start ReportTimer
     Timer timer = new Timer();
     timer.schedule(new ReportTask(), 0, period);

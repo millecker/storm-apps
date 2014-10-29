@@ -28,7 +28,7 @@ public class WordCountTopology {
   private static final String COUNT_BOLT_ID = "count-bolt";
   private static final String REPORT_BOLT_ID = "report-bolt";
   private static final String TOPOLOGY_NAME = "word-count-topology";
-  private static final int REPORT_PERIOD = 5000;
+  private static final int REPORT_PERIOD = 1000;
 
   public static void main(String[] args) throws Exception {
 
