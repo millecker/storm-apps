@@ -370,11 +370,13 @@
 		<!-- Program Arguments -->
 		<!-- set empty if its not available -->
 		<property name="${program.bin.args}" value="" />
+		<property name="${application.args.fixed}" value="" />
 
-		<echo>${program.bin} ${program.bin.args} ${application.main.jar} ${application.args.available}</echo>
+		<echo>${program.bin} ${program.bin.args} ${application.main.jar} ${application.args.fixed} ${application.args.available}</echo>
 		<exec executable="${program.bin}">
 			<arg line="${program.bin.args}" />
 			<arg value="${application.main.jar}" />
+			<arg line="${application.args.fixed}" />
 			<arg line="${application.args.available}" />
 		</exec>
 	</target>
