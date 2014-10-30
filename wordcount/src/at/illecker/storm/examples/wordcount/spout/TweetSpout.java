@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package spout;
+package at.illecker.storm.examples.wordcount.spout;
 
 import java.util.ArrayList;
 import java.util.List;

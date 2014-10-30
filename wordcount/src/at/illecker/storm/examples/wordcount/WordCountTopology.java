@@ -16,10 +16,10 @@
  */
 package at.illecker.storm.examples.wordcount;
 
-import spout.TweetSpout;
 import at.illecker.storm.examples.wordcount.bolt.ReportWordCountBolt;
 import at.illecker.storm.examples.wordcount.bolt.SplitTweetBolt;
 import at.illecker.storm.examples.wordcount.bolt.WordCountBolt;
+import at.illecker.storm.examples.wordcount.spout.TweetSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
