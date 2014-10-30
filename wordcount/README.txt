@@ -11,6 +11,10 @@ ant clean
 ant jar-cpu
 
 # Submit Task to Storm
-ant run-cpu
+ant run-cpu [-DconsumerKey=key \
+ -DconsumerSecret=secret \
+ -DaccessToken=token \
+ -DaccessTokenSecret=secret]
+ [-DkeyWords='word1 word2']
 
 ###############################################################################

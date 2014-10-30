@@ -27,13 +27,13 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
-public class TweetSpout extends BaseRichSpout {
+public class SampleTweetSpout extends BaseRichSpout {
   private static final long serialVersionUID = 3621927972989123163L;
   private SpoutOutputCollector m_collector;
   private List<String> m_tweets;
   private int m_index = 0;
 
-  public TweetSpout() {
+  public SampleTweetSpout() {
     m_tweets = new ArrayList<String>();
     m_tweets.add("this is the first tweet");
     m_tweets.add("followed by a second tweet");
