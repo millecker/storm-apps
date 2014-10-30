@@ -59,9 +59,9 @@ public class TwitterSpout extends BaseRichSpout {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("tweet"));
+    declarer.declare(new Fields("tweet")); // key of output tuples
   }
-  
+
   @Override
   public void open(Map conf, TopologyContext context,
       SpoutOutputCollector collector) {
@@ -71,7 +71,7 @@ public class TwitterSpout extends BaseRichSpout {
     StatusListener listener = new StatusListener() {
       @Override
       public void onStatus(Status status) {
-        queue.offer(status);
+        m_queue.offer(status);
       }
 
       @Override
@@ -100,14 +100,14 @@ public class TwitterSpout extends BaseRichSpout {
         .getInstance();
 
     twitterStream.addListener(listener);
-    twitterStream.setOAuthConsumer(consumerKey, consumerSecret);
-    AccessToken token = new AccessToken(accessToken, accessTokenSecret);
+    twitterStream.setOAuthConsumer(m_consumerKey, m_consumerSecret);
+    AccessToken token = new AccessToken(m_accessToken, m_accessTokenSecret);
     twitterStream.setOAuthAccessToken(token);
 
-    if (keyWords.length == 0) {
+    if (m_keyWords.length == 0) {
       twitterStream.sample();
     } else {
-      FilterQuery query = new FilterQuery().track(keyWords);
+      FilterQuery query = new FilterQuery().track(m_keyWords);
       twitterStream.filter(query);
     }
   }
