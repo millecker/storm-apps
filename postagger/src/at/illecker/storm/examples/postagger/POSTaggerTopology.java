@@ -77,10 +77,13 @@ public class POSTaggerTopology {
       System.exit(1);
     }
 
+    Config conf = new Config();
+
     // Create Spout
     IRichSpout spout;
     if (twitterDir.isDirectory()) {
-      spout = new TwitterFilesSpout(twitterDir);
+      conf.put("twitterDirectory", twitterDir.getAbsolutePath());
+      spout = new TwitterFilesSpout();
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
           accessTokenSecret, keyWords);
@@ -101,7 +104,6 @@ public class POSTaggerTopology {
     // builder.setBolt(REPORT_POSTAGGER_BOLT_ID, reportBolt).globalGrouping(
     // POSTAGGER_BOLT_ID);
 
-    Config conf = new Config();
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
 

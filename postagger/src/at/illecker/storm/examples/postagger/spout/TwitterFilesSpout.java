@@ -46,14 +46,8 @@ public class TwitterFilesSpout extends BaseRichSpout {
       .getLogger(TwitterFilesSpout.class);
   public static final String FILE_EXTENSION = ".gz";
   private SpoutOutputCollector m_collector;
-  private File m_twitterDir;
   private List<Status> m_tweets;
   private int m_index = 0;
-
-  public TwitterFilesSpout(File twitterDir) {
-    m_twitterDir = twitterDir;
-    m_tweets = readTweets(twitterDir);
-  }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     declarer.declare(new Fields("tweet")); // key of output tuples
@@ -62,6 +56,18 @@ public class TwitterFilesSpout extends BaseRichSpout {
   public void open(Map config, TopologyContext context,
       SpoutOutputCollector collector) {
     this.m_collector = collector;
+
+    if (config.get("twitterDirectory") != null) {
+      String twitterDirPath = config.get("twitterDirectory").toString();
+      File twitterDir = new File(twitterDirPath);
+      if (twitterDir.isDirectory()) {
+        m_tweets = readTweets(twitterDir);
+      } else {
+        throw new RuntimeException("Error reading directory " + twitterDirPath);
+      }
+    } else {
+      throw new RuntimeException("TwitterDirectory property was not set!");
+    }
   }
 
   public void nextTuple() {
@@ -71,7 +77,8 @@ public class TwitterFilesSpout extends BaseRichSpout {
       m_index = 0;
     }
     try {
-      Thread.sleep(1); // sleep 1 ms
+      // TODO minimize sleep time
+      Thread.sleep(500); // sleep 1 ms
     } catch (InterruptedException e) {
     }
   }

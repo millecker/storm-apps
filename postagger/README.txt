@@ -23,4 +23,7 @@ ant run-cpu -DtwitterDir=../../twitter
 # Modify file conf/storm_env.ini
 STORM_JAR_JVM_OPTS:-Xmx8g
 
+# Modify file conf/storm.yaml
+worker.childopts: "-Xmx8g"
+
 ###############################################################################
