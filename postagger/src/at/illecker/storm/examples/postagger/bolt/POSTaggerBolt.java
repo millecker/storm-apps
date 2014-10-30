@@ -21,6 +21,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import twitter4j.Status;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -42,7 +43,8 @@ public class POSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    LOG.info(tuple.toString());
+    Status status = (Status) tuple.getValue(0);
+    LOG.info("@" + status.getUser().getScreenName() + " - " + status.getText());
     this.m_collector.ack(tuple);
   }
 }

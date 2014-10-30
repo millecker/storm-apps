@@ -53,7 +53,7 @@ public class ReportPOSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    LOG.info(tuple.toString());
+    // LOG.info(tuple.toString());
   }
 
   class ReportTask extends TimerTask {
