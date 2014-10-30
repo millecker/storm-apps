@@ -24,6 +24,7 @@
 	<!-- ***** Custom settings for local build.xml ***** -->
 	<!-- <property name="output.file" value="" /> -->
 	<property name="output.file-jar" value="${output.file}.jar" />
+	<property name="output.file-tmp-jar" value="${output.file}_tmp.jar" />
 	<property name="output.file-bench-jar" value="${output.file}-Benchmark.jar" />
 	<property name="output.file-bench-tmp-jar" value="${output.file}-Benchmark_tmp.jar" />
 	<property name="output.file-gpu-jar" value="${output.file}-GPU.jar" />
@@ -78,6 +79,7 @@
 	<target name="clean">
 		<delete dir="build" />
 		<delete file="${output.file-jar}" />
+		<delete file="${output.file-tmp-jar}" />
 		<delete file="${output.file-bench-jar}" />
 		<delete file="${output.file-gpu-jar}" />
 		<delete file="${output.file-rb-jar}" />
@@ -286,6 +288,8 @@
 			</manifest>
 		</jar>
 		<echo>Main-Class: ${cpu.class}</echo>
+		<!-- Option 1: Add jar libraries to lib folder in jar -->
+		<!--
 		<echo>Including lib jars: ${libjars.cpu}</echo>
 		<for list="${libjars.cpu}" param="libjar">
 			<sequential>
@@ -299,6 +303,32 @@
 				</exec>
 			</sequential>
 		</for>
+		-->
+		<!-- Option 2: Pack content of jar libraries into destination jar -->
+		<!-- Setup libjar arguments -->
+		<echo>Including lib jars: ${libjars.cpu}</echo>
+		<var name="libjar.args" value="" />
+		<for list="${libjars.cpu}" param="libjar">
+			<sequential>
+				<var name="libjar.args" value="${libjar.args}-libjar ${root}${file.separator}@{libjar} " />
+			</sequential>
+		</for>
+		<!-- Pack additional libraries to libjars.gpu -->
+		<echo>java -Xmx4G -jar ${lib.dir}/pack.jar -mainjar ${output.file-jar} ${libjar.args} -destjar ${output.file-tmp-jar}</echo>
+		<exec executable="java">
+			<arg value="-Xmx4G" />
+			<arg value="-jar" />
+			<arg value="${lib.dir}/pack.jar" />
+			<arg value="-mainjar" />
+			<arg value="${output.file-jar}" />
+			<arg line="${libjar.args}" />
+			<arg value="-destjar" />
+			<arg value="${output.file-tmp-jar}" />
+		</exec>
+		<echo>Delete ${output.file-jar}</echo>
+		<delete file="${output.file-jar}" />
+		<echo>Rename ${output.file-tmp-jar} to ${output.file-jar}</echo>
+		<move file="${output.file-tmp-jar}" tofile="${output.file-jar}" />
 	</target>
 
 	<!-- ****************************************************************** -->
