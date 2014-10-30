@@ -18,6 +18,9 @@ package at.illecker.storm.examples.postagger.bolt;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -26,6 +29,8 @@ import backtype.storm.tuple.Tuple;
 
 public class POSTaggerBolt extends BaseRichBolt {
   private static final long serialVersionUID = 4980829201072337802L;
+  private static final Logger LOG = LoggerFactory
+      .getLogger(POSTaggerBolt.class);
   private OutputCollector m_collector;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -37,6 +42,7 @@ public class POSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-
+    LOG.info(tuple.toString());
+    this.m_collector.ack(tuple);
   }
 }

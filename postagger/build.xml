@@ -15,7 +15,7 @@
 	<property name="program" value="storm" />
 	<property name="program.args" value="jar" />
 	<property name="application.args.fixed" value="${cpu.class}" />
-	<property name="application.args" value="consumerKey consumerSecret accessToken accessTokenSecret keyWords" />
+	<property name="application.args" value="twitterDir consumerKey consumerSecret accessToken accessTokenSecret keyWords" />
 
 	<import file="${root}${file.separator}commonbuild.xml" />
 </project>

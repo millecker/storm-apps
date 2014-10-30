@@ -17,7 +17,6 @@
 package at.illecker.storm.examples.postagger.bolt;
 
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.slf4j.Logger;
@@ -49,8 +48,8 @@ public class ReportPOSTaggerBolt extends BaseRichBolt {
     this.m_collector = collector;
     // Start ReportTimer in prepare method
     // because it has to be in the same JVM than the worker
-    Timer timer = new Timer();
-    timer.schedule(new ReportTask(), 500, this.m_timerPeriod);
+    // Timer timer = new Timer();
+    // timer.schedule(new ReportTask(), 500, this.m_timerPeriod);
   }
 
   public void execute(Tuple tuple) {

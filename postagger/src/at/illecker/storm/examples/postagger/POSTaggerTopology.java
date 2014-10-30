@@ -16,12 +16,12 @@
  */
 package at.illecker.storm.examples.postagger;
 
+import java.io.File;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.postagger.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.postagger.spout.TwitterFilesSpout;
 import at.illecker.storm.examples.postagger.spout.TwitterSpout;
-import at.illecker.storm.examples.wordcount.bolt.ReportWordCountBolt;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -36,6 +36,7 @@ public class POSTaggerTopology {
   private static final int REPORT_PERIOD = 10000;
 
   public static void main(String[] args) throws Exception {
+    String twitterDirPath = "";
     String consumerKey = "";
     String consumerSecret = "";
     String accessToken = "";
@@ -43,31 +44,43 @@ public class POSTaggerTopology {
     String[] keyWords = null;
 
     if (args.length > 0) {
-      if (args.length >= 4) {
-        consumerKey = args[0];
-        System.out.println("TwitterSpout using ConsumerKey: " + consumerKey);
-        consumerSecret = args[1];
-        accessToken = args[2];
-        accessTokenSecret = args[3];
-        if (args.length == 5) {
-          keyWords = args[4].split(" ");
-          System.out.println("TwitterSpout using KeyWords: "
-              + Arrays.toString(keyWords));
+      if (args.length >= 1) {
+        twitterDirPath = args[0];
+        if (args.length >= 5) {
+          consumerKey = args[1];
+          System.out.println("TwitterSpout using ConsumerKey: " + consumerKey);
+          consumerSecret = args[2];
+          accessToken = args[3];
+          accessTokenSecret = args[4];
+          if (args.length == 6) {
+            keyWords = args[5].split(" ");
+            System.out.println("TwitterSpout using KeyWords: "
+                + Arrays.toString(keyWords));
+          }
         }
-      } else {
-        System.out.println("Wrong argument size!");
-        System.out.println("    Argument1=consumerKey");
-        System.out.println("    Argument2=consumerSecret");
-        System.out.println("    Argument3=accessToken");
-        System.out.println("    Argument4=accessTokenSecret");
-        System.out.println("    [Argument5=keyWords]");
       }
+    } else {
+      System.out.println("Wrong argument size!");
+      System.out.println("    Argument1=twitterDir");
+      System.out.println("    Argument2=consumerKey");
+      System.out.println("    Argument3=consumerSecret");
+      System.out.println("    Argument4=accessToken");
+      System.out.println("    Argument5=accessTokenSecret");
+      System.out.println("    [Argument6=keyWords]");
+    }
+
+    // Check twitterDir and consumerKey
+    File twitterDir = new File(twitterDirPath);
+    if ((!twitterDir.isDirectory()) && (consumerKey.isEmpty())) {
+      System.out
+          .println("TwitterDirectory does not exist and consumerKey is empty!");
+      System.exit(1);
     }
 
     // Create Spout
     IRichSpout spout;
-    if (consumerKey.isEmpty()) {
-      spout = new TwitterFilesSpout();
+    if (twitterDir.isDirectory()) {
+      spout = new TwitterFilesSpout(twitterDir);
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
           accessTokenSecret, keyWords);
@@ -75,7 +88,7 @@ public class POSTaggerTopology {
 
     // Create Bolts
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
-    ReportWordCountBolt reportBolt = new ReportWordCountBolt(REPORT_PERIOD);
+    // ReportWordCountBolt reportBolt = new ReportWordCountBolt(REPORT_PERIOD);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -85,8 +98,8 @@ public class POSTaggerTopology {
     builder.setBolt(POSTAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
         TWEET_SPOUT_ID);
     // Set POSTaggerBolt --> ReportPOSTaggerBolt
-    builder.setBolt(REPORT_POSTAGGER_BOLT_ID, reportBolt).globalGrouping(
-        POSTAGGER_BOLT_ID);
+    // builder.setBolt(REPORT_POSTAGGER_BOLT_ID, reportBolt).globalGrouping(
+    // POSTAGGER_BOLT_ID);
 
     Config conf = new Config();
     StormSubmitter
