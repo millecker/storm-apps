@@ -14,50 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount;
+package at.illecker.storm.examples.wordcount.bolt;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import backtype.storm.spout.SpoutOutputCollector;
+import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichSpout;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class TweetSpout extends BaseRichSpout {
-  private static final long serialVersionUID = 3621927972989123163L;
-  private SpoutOutputCollector m_collector;
-  private List<String> m_tweets;
-  private int m_index = 0;
-
-  public TweetSpout() {
-    m_tweets = new ArrayList<String>();
-    m_tweets.add("this is the first tweet");
-    m_tweets.add("followed by a second tweet");
-    m_tweets.add("and a third tweet");
-  }
+public class SplitTweetBolt extends BaseRichBolt {
+  private static final long serialVersionUID = 883934440113385476L;
+  private OutputCollector m_collector;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("tweet")); // key of output tuples
+    declarer.declare(new Fields("word")); // key of output tuples
   }
 
-  public void open(Map config, TopologyContext context,
-      SpoutOutputCollector collector) {
+  public void prepare(Map config, TopologyContext context,
+      OutputCollector collector) {
     this.m_collector = collector;
   }
 
-  public void nextTuple() {
-    this.m_collector.emit(new Values(m_tweets.get(m_index)));
-    m_index++;
-    if (m_index >= m_tweets.size()) {
-      m_index = 0;
+  public void execute(Tuple tuple) {
+    String tweet = tuple.getStringByField("tweet");
+    String[] words = tweet.split(" ");
+    for (String word : words) {
+      this.m_collector.emit(tuple, new Values(word));
     }
-    try {
-      Thread.sleep(1); // sleep 1 ms
-    } catch (InterruptedException e) {
-    }
+    this.m_collector.ack(tuple);
   }
 }

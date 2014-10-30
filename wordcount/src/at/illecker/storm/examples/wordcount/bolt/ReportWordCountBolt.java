@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount;
+package at.illecker.storm.examples.wordcount.bolt;
 
 import java.util.ArrayList;
 import java.util.Collections;

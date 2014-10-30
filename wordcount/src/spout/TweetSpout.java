@@ -14,43 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount;
+package spout;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import backtype.storm.task.OutputCollector;
+import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class WordCountBolt extends BaseRichBolt {
-  private static final long serialVersionUID = -1587421475240637474L;
-  private OutputCollector m_collector;
-  private HashMap<String, Long> m_counts = null;
+public class TweetSpout extends BaseRichSpout {
+  private static final long serialVersionUID = 3621927972989123163L;
+  private SpoutOutputCollector m_collector;
+  private List<String> m_tweets;
+  private int m_index = 0;
+
+  public TweetSpout() {
+    m_tweets = new ArrayList<String>();
+    m_tweets.add("this is the first tweet");
+    m_tweets.add("followed by a second tweet");
+    m_tweets.add("and a third tweet");
+  }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("word", "count")); // keys of output tuples
+    declarer.declare(new Fields("tweet")); // key of output tuples
   }
 
-  public void prepare(Map config, TopologyContext context,
-      OutputCollector collector) {
+  public void open(Map config, TopologyContext context,
+      SpoutOutputCollector collector) {
     this.m_collector = collector;
-    this.m_counts = new HashMap<String, Long>();
   }
 
-  public void execute(Tuple tuple) {
-    String word = tuple.getStringByField("word");
-    Long count = this.m_counts.get(word);
-    if (count == null) {
-      count = 0L;
+  public void nextTuple() {
+    this.m_collector.emit(new Values(m_tweets.get(m_index)));
+    m_index++;
+    if (m_index >= m_tweets.size()) {
+      m_index = 0;
     }
-    count++;
-    this.m_counts.put(word, count);
-    this.m_collector.ack(tuple);
-    this.m_collector.emit(tuple, new Values(word, count));
+    try {
+      Thread.sleep(1); // sleep 1 ms
+    } catch (InterruptedException e) {
+    }
   }
 }

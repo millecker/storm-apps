@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount;
+package at.illecker.storm.examples.wordcount.bolt;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import backtype.storm.task.OutputCollector;
@@ -26,25 +27,30 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class SplitTweetBolt extends BaseRichBolt {
-  private static final long serialVersionUID = 883934440113385476L;
+public class WordCountBolt extends BaseRichBolt {
+  private static final long serialVersionUID = -1587421475240637474L;
   private OutputCollector m_collector;
+  private HashMap<String, Long> m_counts = null;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("word")); // key of output tuples
+    declarer.declare(new Fields("word", "count")); // keys of output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    this.m_counts = new HashMap<String, Long>();
   }
 
   public void execute(Tuple tuple) {
-    String tweet = tuple.getStringByField("tweet");
-    String[] words = tweet.split(" ");
-    for (String word : words) {
-      this.m_collector.emit(tuple, new Values(word));
+    String word = tuple.getStringByField("word");
+    Long count = this.m_counts.get(word);
+    if (count == null) {
+      count = 0L;
     }
+    count++;
+    this.m_counts.put(word, count);
     this.m_collector.ack(tuple);
+    this.m_collector.emit(tuple, new Values(word, count));
   }
 }
