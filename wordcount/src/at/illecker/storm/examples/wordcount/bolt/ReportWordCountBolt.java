@@ -16,11 +16,14 @@
  */
 package at.illecker.storm.examples.wordcount.bolt;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,7 +59,7 @@ public class ReportWordCountBolt extends BaseRichBolt {
     // Start ReportTimer in prepare method
     // because it has to be in the same JVM than the worker
     Timer timer = new Timer();
-    timer.schedule(new ReportTask(), 0, this.m_timerPeriod);
+    timer.schedule(new ReportTask(), 500, this.m_timerPeriod);
   }
 
   public void execute(Tuple tuple) {
@@ -71,17 +74,38 @@ public class ReportWordCountBolt extends BaseRichBolt {
   class ReportTask extends TimerTask {
     @Override
     public void run() {
-      LOG.info("\nWordCounts: " + m_counts.size());
+      LOG.info("\n\n\nWordCounts: " + m_counts.size());
       if (m_counts.size() > 0) {
-        // Sort words
-        List<String> keys = new ArrayList<String>();
-        keys.addAll(m_counts.keySet());
-        Collections.sort(keys);
+        // Sort by word count
+        Map<String, Long> sortedMap = sortByValues(m_counts);
         // Print counts
-        for (String key : keys) {
-          LOG.info(key + " : " + m_counts.get(key));
+        for (Map.Entry<String, Long> entry : sortedMap.entrySet()) {
+          LOG.info(entry.getKey() + " : " + entry.getValue());
         }
       }
     }
+  }
+
+  public static <K extends Comparable, V extends Comparable> Map<K, V> sortByValues(
+      Map<K, V> map) {
+
+    List<Map.Entry<K, V>> entries = new LinkedList<Map.Entry<K, V>>(
+        map.entrySet());
+
+    Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
+      @Override
+      public int compare(Entry<K, V> o1, Entry<K, V> o2) {
+        return o2.getValue().compareTo(o1.getValue());
+      }
+    });
+
+    // LinkedHashMap will keep the keys in the order they are inserted
+    // which is currently sorted on natural ordering
+    Map<K, V> sortedMap = new LinkedHashMap<K, V>();
+    for (Map.Entry<K, V> entry : entries) {
+      sortedMap.put(entry.getKey(), entry.getValue());
+    }
+
+    return sortedMap;
   }
 }

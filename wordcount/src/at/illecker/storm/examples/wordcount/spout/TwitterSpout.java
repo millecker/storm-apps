@@ -68,48 +68,58 @@ public class TwitterSpout extends BaseRichSpout {
     m_collector = collector;
     m_queue = new LinkedBlockingQueue<Status>(1000);
 
-    StatusListener listener = new StatusListener() {
+    TwitterStream twitterStream = new TwitterStreamFactory(
+        new ConfigurationBuilder().setJSONStoreEnabled(true).build())
+        .getInstance();
+
+    // Set Listener
+    twitterStream.addListener(new StatusListener() {
       @Override
       public void onStatus(Status status) {
-        m_queue.offer(status);
+        m_queue.offer(status); // add tweet into queue
       }
 
       @Override
-      public void onDeletionNotice(StatusDeletionNotice sdn) {
+      public void onException(Exception arg0) {
       }
 
       @Override
-      public void onTrackLimitationNotice(int i) {
+      public void onDeletionNotice(StatusDeletionNotice arg0) {
       }
 
       @Override
-      public void onScrubGeo(long l, long l1) {
-      }
-
-      @Override
-      public void onException(Exception ex) {
+      public void onScrubGeo(long arg0, long arg1) {
       }
 
       @Override
       public void onStallWarning(StallWarning arg0) {
       }
-    };
 
-    TwitterStream twitterStream = new TwitterStreamFactory(
-        new ConfigurationBuilder().setJSONStoreEnabled(true).build())
-        .getInstance();
+      @Override
+      public void onTrackLimitationNotice(int arg0) {
+      }
+    });
 
-    twitterStream.addListener(listener);
+    // Set credentials
     twitterStream.setOAuthConsumer(m_consumerKey, m_consumerSecret);
     AccessToken token = new AccessToken(m_accessToken, m_accessTokenSecret);
     twitterStream.setOAuthAccessToken(token);
 
-    if (m_keyWords.length == 0) {
-      twitterStream.sample();
-    } else {
-      FilterQuery query = new FilterQuery().track(m_keyWords);
-      twitterStream.filter(query);
+    // Filter twitter stream
+    FilterQuery tweetFilterQuery = new FilterQuery();
+    if (m_keyWords != null) {
+      tweetFilterQuery.track(m_keyWords);
     }
+
+    // Filter location
+    // https://dev.twitter.com/docs/streaming-apis/parameters#locations
+    tweetFilterQuery.locations(new double[][] { new double[] { -180, -90, },
+        new double[] { 180, 90 } }); // any geotagged tweet
+
+    // Filter language
+    tweetFilterQuery.language(new String[] { "en" });
+
+    twitterStream.filter(tweetFilterQuery);
   }
 
   @Override
@@ -118,7 +128,7 @@ public class TwitterSpout extends BaseRichSpout {
     if (ret == null) {
       Utils.sleep(50);
     } else {
-      m_collector.emit(new Values(ret));
+      m_collector.emit(new Values(ret.getText()));
     }
   }
 
