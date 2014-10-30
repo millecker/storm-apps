@@ -34,6 +34,7 @@ public class POSTaggerTopology {
   private static final String REPORT_POSTAGGER_BOLT_ID = "report-postagger-bolt";
   private static final String TOPOLOGY_NAME = "postagger-topology";
   private static final int REPORT_PERIOD = 10000;
+  public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
     String twitterDirPath = "";
