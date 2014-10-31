@@ -18,7 +18,8 @@ ant run-cpu [ -DtwitterDir=dir \
  -DaccessTokenSecret=secret]
  [-DkeyWords='word1 word2']
 
-ant run-cpu -DtwitterDir=../../twitter
+# Example
+ant clean && ant run-cpu -DtwitterDir=../../twitter2/
 
 # Modify file conf/storm_env.ini
 STORM_JAR_JVM_OPTS:-Xmx8g
