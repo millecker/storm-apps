@@ -58,8 +58,8 @@ public class TwitterFilesSpout extends BaseRichSpout {
       SpoutOutputCollector collector) {
     this.m_collector = collector;
 
-    if (config.get("twitterDirectory") != null) {
-      String twitterDirPath = config.get("twitterDirectory").toString();
+    if (config.get("twitter.dir") != null) {
+      String twitterDirPath = config.get("twitter.dir").toString();
       File twitterDir = new File(twitterDirPath);
       if (twitterDir.isDirectory()) {
         m_tweets = readTweets(twitterDir);
@@ -67,7 +67,7 @@ public class TwitterFilesSpout extends BaseRichSpout {
         throw new RuntimeException("Error reading directory " + twitterDirPath);
       }
     } else {
-      throw new RuntimeException("TwitterDirectory property was not set!");
+      throw new RuntimeException("twitter.dir property was not set!");
     }
   }
 

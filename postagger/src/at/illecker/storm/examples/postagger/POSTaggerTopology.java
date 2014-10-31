@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.postagger.bolt.POSTaggerBolt;
+import at.illecker.storm.examples.postagger.bolt.SplitTweetBolt;
 import at.illecker.storm.examples.postagger.spout.TwitterFilesSpout;
 import at.illecker.storm.examples.postagger.spout.TwitterSpout;
 import backtype.storm.Config;
@@ -30,11 +31,13 @@ import backtype.storm.topology.TopologyBuilder;
 public class POSTaggerTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String POSTAGGER_BOLT_ID = "postagger-bolt";
-  private static final String REPORT_POSTAGGER_BOLT_ID = "report-postagger-bolt";
-  private static final String TOPOLOGY_NAME = "postagger-topology";
+  private static final String SPLIT_TWEET_BOLT_ID = "split-tweet-bolt";
+  private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
+  private static final String REPORT_POS_TAGGER_BOLT_ID = "report-pos-tagger-bolt";
+  private static final String TOPOLOGY_NAME = "pos-tagger-topology";
   private static final int REPORT_PERIOD = 10000;
   public static final String FILTER_LANG = "en";
+  private static final String TAGGER_MODEL = "lib/tagger_models/gate-EN-twitter-fast.model";
 
   public static void main(String[] args) throws Exception {
     String twitterDirPath = "";
@@ -79,11 +82,12 @@ public class POSTaggerTopology {
     }
 
     Config conf = new Config();
+    conf.put("tagger.model", TAGGER_MODEL);
 
     // Create Spout
     IRichSpout spout;
     if (twitterDir.isDirectory()) {
-      conf.put("twitterDirectory", twitterDir.getAbsolutePath());
+      conf.put("twitter.dir", twitterDir.getAbsolutePath());
       spout = new TwitterFilesSpout();
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
@@ -91,19 +95,22 @@ public class POSTaggerTopology {
     }
 
     // Create Bolts
+    SplitTweetBolt splitTweetBolt = new SplitTweetBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
-    // ReportWordCountBolt reportBolt = new ReportWordCountBolt(REPORT_PERIOD);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
     // Set Spout
     builder.setSpout(TWEET_SPOUT_ID, spout);
-    // Set Spout --> POSTaggerBolt
-    builder.setBolt(POSTAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
+    // Set Spout --> SplitTweetBolt
+    builder.setBolt(SPLIT_TWEET_BOLT_ID, splitTweetBolt).shuffleGrouping(
+        TWEET_SPOUT_ID);
+    // Set SplitTweetBolt --> POSTaggerBolt
+    builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
         TWEET_SPOUT_ID);
     // Set POSTaggerBolt --> ReportPOSTaggerBolt
-    // builder.setBolt(REPORT_POSTAGGER_BOLT_ID, reportBolt).globalGrouping(
-    // POSTAGGER_BOLT_ID);
+    // builder.setBolt(REPORT_POS_TAGGER_BOLT_ID, reportBolt).globalGrouping(
+    // POS_TAGGER_BOLT_ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

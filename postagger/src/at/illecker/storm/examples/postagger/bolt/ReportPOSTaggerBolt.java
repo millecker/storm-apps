@@ -59,7 +59,7 @@ public class ReportPOSTaggerBolt extends BaseRichBolt {
   class ReportTask extends TimerTask {
     @Override
     public void run() {
-      LOG.info("\n\n\nPOSTagger: ");
+      LOG.info("\n\n\nPOS Tagger: ");
     }
   }
 }
