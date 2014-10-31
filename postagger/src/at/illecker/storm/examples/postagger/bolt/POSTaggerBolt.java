@@ -65,9 +65,8 @@ public class POSTaggerBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     List<HasWord> sentence = (List<HasWord>) tuple.getValueByField("sentence");
-    // Tag sentence
     List<TaggedWord> taggedSentence = m_tagger.tagSentence(sentence);
-    LOG.info("Tweet: " + sentence.toString() + " Tagged: "
+    LOG.info("Tweet: " + sentence.toString() + " TaggedTweet: "
         + taggedSentence.toString());
     this.m_collector.ack(tuple);
   }

@@ -107,7 +107,7 @@ public class POSTaggerTopology {
         TWEET_SPOUT_ID);
     // Set SplitTweetBolt --> POSTaggerBolt
     builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
-        TWEET_SPOUT_ID);
+        SPLIT_TWEET_BOLT_ID);
     // Set POSTaggerBolt --> ReportPOSTaggerBolt
     // builder.setBolt(REPORT_POS_TAGGER_BOLT_ID, reportBolt).globalGrouping(
     // POS_TAGGER_BOLT_ID);

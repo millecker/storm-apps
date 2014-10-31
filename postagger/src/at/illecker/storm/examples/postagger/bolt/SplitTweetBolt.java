@@ -51,9 +51,9 @@ public class SplitTweetBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Status status = (Status) tuple.getValueByField("tweet");
     String tweetText = status.getText();
-    LOG.info("@" + status.getUser().getScreenName() + " - " + tweetText);
+    // LOG.info("@" + status.getUser().getScreenName() + " - " + tweetText);
     List<HasWord> sentence = Sentence.toWordList(tweetText.split(" "));
-    this.m_collector.emit(tuple, new Values(sentence));
+    this.m_collector.emit(new Values(sentence));
     this.m_collector.ack(tuple);
   }
 }
