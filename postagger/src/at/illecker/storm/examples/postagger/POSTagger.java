@@ -24,6 +24,14 @@ import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
+/**
+ * POS Tagger is based on the Stanford NLP library and the gate-EN-twitter.model
+ *
+ * http://nlp.stanford.edu/software/corenlp.shtml
+ * http://nlp.stanford.edu:8080/corenlp/process
+ * https://gate.ac.uk/wiki/twitter-postagger.html
+ * 
+ */
 public class POSTagger {
 
   private static final String TAGGER_MODEL1 = "lib/tagger_models/gate-EN-twitter.model";
