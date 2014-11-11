@@ -5,6 +5,7 @@ This code-sink includes example applications of Apache Storm.
 ## Examples
   - WordCount
   - POS Tagger
+  - Simple Sentiment Analysis
 
 ## Compilation and Execution
 Use Apache Ant to build and run examples.
