@@ -16,7 +16,11 @@
  */
 package at.illecker.storm.examples.simplesentimentanalysis.bolt;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,7 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
   private static final Logger LOG = LoggerFactory
       .getLogger(SimpleSentimentAnalysisBolt.class);
   private OutputCollector m_collector;
+  private Map<String, Integer> m_wordRatings;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
   }
@@ -45,11 +50,36 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    m_wordRatings = new TreeMap<String, Integer>();
 
     if (config.get("afinn.sentiment.file") != null) {
-      String model = config.get("afinn.sentiment.file").toString();
+      String afinnFile = config.get("afinn.sentiment.file").toString();
       // Load AFINN word ratings
-      // TODO
+      BufferedReader reader = null;
+      try {
+        reader = new BufferedReader(new InputStreamReader(
+            ClassLoader.getSystemResourceAsStream(afinnFile)));
+        String str = "";
+        while ((str = reader.readLine()) != null) {
+          if (str.trim().length() == 0) {
+            continue;
+          }
+          String[] values = str.split("\t");
+          // LOG.info("prepare word: " + values[0] + " rating: " + values[1]);
+          m_wordRatings.put(values[0], Integer.parseInt(values[1]));
+        }
+        LOG.info("Loaded " + m_wordRatings.size() + " words and ratings");
+      } catch (IOException e) {
+        LOG.error(e.getMessage());
+      } finally {
+        try {
+          if (reader != null) {
+            reader.close();
+          }
+        } catch (IOException e) {
+          LOG.error(e.getMessage());
+        }
+      }
     } else {
       throw new RuntimeException("afinn.sentiment.file property was not set!");
     }
@@ -57,8 +87,8 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     String word = tuple.getStringByField("word");
-    int rating = 0;
-    LOG.info("word: " + word + " rating: " + rating);
+    Integer rating = m_wordRatings.get(word);
+    LOG.info("execute word: " + word + " rating: " + rating);
     this.m_collector.ack(tuple);
   }
 }

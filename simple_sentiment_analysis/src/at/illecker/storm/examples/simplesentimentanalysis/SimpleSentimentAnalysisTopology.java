@@ -19,10 +19,10 @@ package at.illecker.storm.examples.simplesentimentanalysis;
 import java.io.File;
 import java.util.Arrays;
 
-import at.illecker.storm.examples.postagger.bolt.SplitTweetBolt;
-import at.illecker.storm.examples.postagger.spout.TwitterFilesSpout;
-import at.illecker.storm.examples.postagger.spout.TwitterSpout;
 import at.illecker.storm.examples.simplesentimentanalysis.bolt.SimpleSentimentAnalysisBolt;
+import at.illecker.storm.examples.simplesentimentanalysis.bolt.SplitTweetBolt;
+import at.illecker.storm.examples.simplesentimentanalysis.spout.TwitterFilesSpout;
+import at.illecker.storm.examples.simplesentimentanalysis.spout.TwitterSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;

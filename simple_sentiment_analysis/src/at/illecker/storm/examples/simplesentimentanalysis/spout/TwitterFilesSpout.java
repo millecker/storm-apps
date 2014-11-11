@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import twitter4j.TwitterObjectFactory;
-import at.illecker.storm.examples.postagger.POSTaggerTopology;
+import at.illecker.storm.examples.simplesentimentanalysis.SimpleSentimentAnalysisTopology;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -134,7 +134,8 @@ public class TwitterFilesSpout extends BaseRichSpout {
               try {
                 Status status = TwitterObjectFactory
                     .createStatus(rawJSONTweets[j]);
-                if (status.getLang().equals(POSTaggerTopology.FILTER_LANG)) {
+                if (status.getLang().equals(
+                    SimpleSentimentAnalysisTopology.FILTER_LANG)) {
                   tweets.add(status);
                   count++;
                 }

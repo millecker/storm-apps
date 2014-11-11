@@ -28,7 +28,7 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
-import at.illecker.storm.examples.postagger.POSTaggerTopology;
+import at.illecker.storm.examples.simplesentimentanalysis.SimpleSentimentAnalysisTopology;
 import backtype.storm.Config;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -118,7 +118,8 @@ public class TwitterSpout extends BaseRichSpout {
         new double[] { 180, 90 } }); // any geotagged tweet
 
     // Filter language
-    tweetFilterQuery.language(new String[] { POSTaggerTopology.FILTER_LANG });
+    tweetFilterQuery
+        .language(new String[] { SimpleSentimentAnalysisTopology.FILTER_LANG });
 
     twitterStream.filter(tweetFilterQuery);
   }
