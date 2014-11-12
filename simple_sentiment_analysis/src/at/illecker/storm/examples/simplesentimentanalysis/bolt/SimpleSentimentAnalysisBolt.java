@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +91,32 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
     Status status = (Status) tuple.getValueByField("tweet");
     String tweetText = status.getText();
     int tweetSentiment = 0;
-    // LOG.info("@" + status.getUser().getScreenName() + " - " + tweetText);
-    tweetText = tweetText.replaceAll("\\p{Punct}|\\n", " ").toLowerCase();
+    LOG.info("User: " + status.getUser().getScreenName() + " Tweet: "
+        + tweetText);
+
+    // Cleanup Tweet (remove @user #hashtag RT)
+    // \\n - newlines
+    // @\\w* - @users
+    // #\\w* - hashtags
+    // \\bRT\\b - Retweets RT
+    // \\p{Punct} - removes smileys
+    // [^@#\\p{L}\\p{N} ]+
+    // URL
+    // (https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/? -
+    Pattern pattern = Pattern
+        .compile("\\n|@\\w*|#\\w*|\\bRT\\b|"
+            + "(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?");
+    tweetText = pattern.matcher(tweetText).replaceAll(" ");
+
+    // Tweet to lower case
+    tweetText = tweetText.toLowerCase();
+
+    LOG.info("User: " + status.getUser().getScreenName() + " Tweet: "
+        + tweetText);
+
+    // TODO check smileys
+
+    // TODO Remove \\p{Punct}
 
     String[] words = tweetText.split(" ");
     for (String word : words) {
@@ -105,8 +130,7 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
       }
     }
 
-    LOG.info("execute tweet: " + tweetText + " tweetSentiment: "
-        + tweetSentiment);
+    LOG.info("Tweet: " + tweetText + " sentiment: " + tweetSentiment);
     this.m_collector.ack(tuple);
   }
 }
