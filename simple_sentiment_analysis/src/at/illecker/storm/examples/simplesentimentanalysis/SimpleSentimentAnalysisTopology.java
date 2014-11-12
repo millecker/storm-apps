@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.simplesentimentanalysis.bolt.SimpleSentimentAnalysisBolt;
-import at.illecker.storm.examples.simplesentimentanalysis.bolt.SplitTweetBolt;
 import at.illecker.storm.examples.simplesentimentanalysis.spout.TwitterFilesSpout;
 import at.illecker.storm.examples.simplesentimentanalysis.spout.TwitterSpout;
 import backtype.storm.Config;
@@ -31,7 +30,6 @@ import backtype.storm.topology.TopologyBuilder;
 public class SimpleSentimentAnalysisTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String SPLIT_TWEET_BOLT_ID = "split-tweet-bolt";
   private static final String SIMPLE_SENTIMENT_ANALYSIS_BOLT_ID = "simple-sentiment-analysis-bolt";
   private static final String TOPOLOGY_NAME = "simple-sentiment-analysis-topology";
   public static final String FILTER_LANG = "en";
@@ -95,19 +93,15 @@ public class SimpleSentimentAnalysisTopology {
     }
 
     // Create Bolts
-    SplitTweetBolt splitTweetBolt = new SplitTweetBolt();
     SimpleSentimentAnalysisBolt simpleSentimentAnalysisBolt = new SimpleSentimentAnalysisBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
     // Set Spout
     builder.setSpout(TWEET_SPOUT_ID, spout);
-    // Set Spout --> SplitTweetBolt
-    builder.setBolt(SPLIT_TWEET_BOLT_ID, splitTweetBolt).shuffleGrouping(
-        TWEET_SPOUT_ID);
-    // Set SplitTweetBolt --> POSTaggerBolt
+    // Set Spout --> SimpleSentimentAnalysisBolt
     builder.setBolt(SIMPLE_SENTIMENT_ANALYSIS_BOLT_ID,
-        simpleSentimentAnalysisBolt).shuffleGrouping(SPLIT_TWEET_BOLT_ID);
+        simpleSentimentAnalysisBolt).shuffleGrouping(TWEET_SPOUT_ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

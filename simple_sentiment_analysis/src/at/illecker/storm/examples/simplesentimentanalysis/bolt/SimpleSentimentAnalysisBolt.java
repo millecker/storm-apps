@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import twitter4j.Status;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -86,9 +87,26 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    String word = tuple.getStringByField("word");
-    Integer rating = m_wordRatings.get(word);
-    LOG.info("execute word: " + word + " rating: " + rating);
+    Status status = (Status) tuple.getValueByField("tweet");
+    String tweetText = status.getText();
+    int tweetSentiment = 0;
+    // LOG.info("@" + status.getUser().getScreenName() + " - " + tweetText);
+    tweetText = tweetText.replaceAll("\\p{Punct}|\\n", " ").toLowerCase();
+
+    String[] words = tweetText.split(" ");
+    for (String word : words) {
+      word = word.trim();
+      if (!word.isEmpty()) {
+        Integer rating = m_wordRatings.get(word);
+        // LOG.info("execute word: " + word + " rating: " + rating);
+        if (rating != null) {
+          tweetSentiment += rating;
+        }
+      }
+    }
+
+    LOG.info("execute tweet: " + tweetText + " tweetSentiment: "
+        + tweetSentiment);
     this.m_collector.ack(tuple);
   }
 }
