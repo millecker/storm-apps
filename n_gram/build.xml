@@ -1,0 +1,22 @@
+<project>
+	<property name="root" value=".." />
+	<property name="rootbeer.version" value="" />
+	<property name="rootbeer.args" value="" />
+	<property name="output.file" value="NGram" />
+	<property name="libjars.gpu" value="" />
+	<property name="libjars.cpu" value="${lib}${file.separator}twitter4j-core-4.0.2.jar" />
+	<property name="libfiles.cpu" value="" />
+	<property name="libjars.bench" value="" />
+	<property name="rootbeer.package.dir" value="" />
+	<property name="rootbeer.classes" value="" />
+	<property name="kernel.class" value="" />
+	<property name="gpu.class" value="" />
+	<property name="cpu.class" value="at.illecker.storm.examples.ngram.NGramTopology" />
+	<property name="bench.class" value="" />
+	<property name="program" value="storm" />
+	<property name="program.args" value="jar" />
+	<property name="application.args.fixed" value="${cpu.class}" />
+	<property name="application.args" value="twitterDir consumerKey consumerSecret accessToken accessTokenSecret keyWords" />
+
+	<import file="${root}${file.separator}commonbuild.xml" />
+</project>
