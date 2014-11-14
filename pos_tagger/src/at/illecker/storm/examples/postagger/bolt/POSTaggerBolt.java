@@ -41,9 +41,11 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
  * 
  */
 public class POSTaggerBolt extends BaseRichBolt {
+  public static String CONF_TAGGER_MODEL_FILE = "tagger.model.file";
   private static final long serialVersionUID = -8171288984418423575L;
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
+
   private OutputCollector m_collector;
   private MaxentTagger m_tagger;
 
@@ -54,12 +56,13 @@ public class POSTaggerBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
-    if (config.get("tagger.model") != null) {
-      String model = config.get("tagger.model").toString();
+    if (config.get(CONF_TAGGER_MODEL_FILE) != null) {
+      String model = config.get(CONF_TAGGER_MODEL_FILE).toString();
       // Load tagger and model
       m_tagger = new MaxentTagger(model);
     } else {
-      throw new RuntimeException("tagger.model property was not set!");
+      throw new RuntimeException(CONF_TAGGER_MODEL_FILE
+          + " property was not set!");
     }
   }
 
