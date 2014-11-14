@@ -18,11 +18,11 @@ package at.illecker.storm.examples.wordcount;
 
 import java.util.Arrays;
 
+import at.illecker.storm.examples.util.spout.TwitterSpout;
 import at.illecker.storm.examples.wordcount.bolt.ReportWordCountBolt;
 import at.illecker.storm.examples.wordcount.bolt.SplitTweetBolt;
 import at.illecker.storm.examples.wordcount.bolt.WordCountBolt;
 import at.illecker.storm.examples.wordcount.spout.SampleTweetSpout;
-import at.illecker.storm.examples.wordcount.spout.TwitterSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -37,6 +37,7 @@ public class WordCountTopology {
   private static final String REPORT_BOLT_ID = "report-bolt";
   private static final String TOPOLOGY_NAME = "word-count-topology";
   private static final int REPORT_PERIOD = 10000;
+  private static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
     String consumerKey = "";
@@ -73,7 +74,7 @@ public class WordCountTopology {
       spout = new SampleTweetSpout();
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
-          accessTokenSecret, keyWords);
+          accessTokenSecret, keyWords, FILTER_LANG);
     }
 
     // Create Bolts
