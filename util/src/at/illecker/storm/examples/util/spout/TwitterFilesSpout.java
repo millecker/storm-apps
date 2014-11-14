@@ -41,7 +41,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 public class TwitterFilesSpout extends BaseRichSpout {
-  public static final String TWITTER_DIR = "twitter.dir";
+  public static final String CONF_TWITTER_DIR = "twitter.dir";
   public static final String FILE_EXTENSION = ".gz";
   private static final long serialVersionUID = -4277696098291748609L;
   private static final Logger LOG = LoggerFactory
@@ -64,8 +64,8 @@ public class TwitterFilesSpout extends BaseRichSpout {
       SpoutOutputCollector collector) {
     this.m_collector = collector;
 
-    if (config.get(TWITTER_DIR) != null) {
-      String twitterDirPath = config.get(TWITTER_DIR).toString();
+    if (config.get(CONF_TWITTER_DIR) != null) {
+      String twitterDirPath = config.get(CONF_TWITTER_DIR).toString();
       File twitterDir = new File(twitterDirPath);
       if (twitterDir.isDirectory()) {
         m_tweets = readTweets(twitterDir);
@@ -73,7 +73,7 @@ public class TwitterFilesSpout extends BaseRichSpout {
         throw new RuntimeException("Error reading directory " + twitterDirPath);
       }
     } else {
-      throw new RuntimeException(TWITTER_DIR + " property was not set!");
+      throw new RuntimeException(CONF_TWITTER_DIR + " property was not set!");
     }
   }
 
