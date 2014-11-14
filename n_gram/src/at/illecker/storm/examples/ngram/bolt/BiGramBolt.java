@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.ngram.bolt;
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -29,13 +28,11 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.ling.Sentence;
 
 public class BiGramBolt extends BaseRichBolt {
   private static final long serialVersionUID = 7554959448481890289L;
   private static final Logger LOG = LoggerFactory.getLogger(BiGramBolt.class);
+
   private OutputCollector m_collector;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -50,10 +47,10 @@ public class BiGramBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Status status = (Status) tuple.getValueByField("tweet");
     String tweetText = status.getText();
-    // LOG.info("@" + status.getUser().getScreenName() + " - " + tweetText);
-    List<HasWord> sentence = Sentence.toWordList(tweetText.split(" "));
+    LOG.info("User: " + status.getUser().getScreenName() + " Tweet: "
+        + tweetText);
 
-    this.m_collector.emit(new Values(sentence));
+    // this.m_collector.emit(new Values(sentence));
     this.m_collector.ack(tuple);
   }
 }
