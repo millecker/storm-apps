@@ -42,6 +42,7 @@
     <property name="application.args" value="arg0 arg1 arg2" />
     -->
 	<!-- if properties were already defined, it has no effect! -->
+  <property name="util.src.dir" value="" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="" />
 	<property name="libjars.bench" value="" />
@@ -105,7 +106,14 @@
 	<!-- ****************************************************************** -->
 	<target name="compile">
 		<mkdir dir="${build.dir}" />
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="master-classpath" includeantruntime="false" />
+		<if>
+      <equals arg1="${util.src.dir}" arg2="" />
+      <else>
+        <echo>Compile util: ${util.src.dir}</echo>
+        <javac srcdir="${util.src.dir}" destdir="${build.dir}" classpathref="master-classpath" includeantruntime="false" />
+      </else>
+    </if>
+    <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="master-classpath" includeantruntime="false" />
 	</target>
 
 	<!-- ****************************************************************** -->
