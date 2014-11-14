@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount.spout;
+package at.illecker.storm.examples.util.spout;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -38,7 +38,8 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
 public class TwitterSpout extends BaseRichSpout {
-  private static final long serialVersionUID = -6034380175814078633L;
+  private static final long serialVersionUID = 1208142390795660693L;
+
   private SpoutOutputCollector m_collector;
   private LinkedBlockingQueue<Status> m_queue = null;
   private TwitterStream m_twitterStream;
@@ -47,14 +48,17 @@ public class TwitterSpout extends BaseRichSpout {
   private String m_accessToken;
   private String m_accessTokenSecret;
   private String[] m_keyWords;
+  private String m_filterLanguage;
 
   public TwitterSpout(String consumerKey, String consumerSecret,
-      String accessToken, String accessTokenSecret, String[] keyWords) {
+      String accessToken, String accessTokenSecret, String[] keyWords,
+      String filterLanguage) {
     this.m_consumerKey = consumerKey;
     this.m_consumerSecret = consumerSecret;
     this.m_accessToken = accessToken;
     this.m_accessTokenSecret = accessTokenSecret;
     this.m_keyWords = keyWords;
+    this.m_filterLanguage = filterLanguage; // "en"
   }
 
   @Override
@@ -117,7 +121,7 @@ public class TwitterSpout extends BaseRichSpout {
         new double[] { 180, 90 } }); // any geotagged tweet
 
     // Filter language
-    tweetFilterQuery.language(new String[] { "en" });
+    tweetFilterQuery.language(new String[] { m_filterLanguage });
 
     twitterStream.filter(tweetFilterQuery);
   }

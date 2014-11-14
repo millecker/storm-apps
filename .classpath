@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="util/src"/>
 	<classpathentry kind="src" path="wordcount/src"/>
 	<classpathentry kind="src" path="pos_tagger/src"/>
 	<classpathentry kind="src" path="simple_sentiment_analysis/src"/>
