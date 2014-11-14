@@ -40,9 +40,11 @@ import backtype.storm.tuple.Tuple;
  * 
  */
 public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
+  public static String CONF_WORD_LIST_FILE = "afinn.sentiment.file";
   private static final long serialVersionUID = -5959679287318116521L;
   private static final Logger LOG = LoggerFactory
       .getLogger(SimpleSentimentAnalysisBolt.class);
+
   private OutputCollector m_collector;
   private Map<String, Integer> m_wordRatings;
 
@@ -54,8 +56,8 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
     this.m_collector = collector;
     m_wordRatings = new TreeMap<String, Integer>();
 
-    if (config.get("afinn.sentiment.file") != null) {
-      String afinnFile = config.get("afinn.sentiment.file").toString();
+    if (config.get(CONF_WORD_LIST_FILE) != null) {
+      String afinnFile = config.get(CONF_WORD_LIST_FILE).toString();
       // Load AFINN word ratings
       BufferedReader reader = null;
       try {
@@ -83,7 +85,7 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
         }
       }
     } else {
-      throw new RuntimeException("afinn.sentiment.file property was not set!");
+      throw new RuntimeException(CONF_WORD_LIST_FILE + " property was not set!");
     }
   }
 

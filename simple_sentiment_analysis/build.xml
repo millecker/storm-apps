@@ -3,6 +3,7 @@
 	<property name="rootbeer.version" value="" />
 	<property name="rootbeer.args" value="" />
 	<property name="output.file" value="SimpleSentimentAnalysis" />
+	<property name="util.src.dir" value="../util/src" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar" />
 	<property name="libfiles.cpu" value="${lib}${file.separator}tagger_models${file.separator}AFINN${file.separator}AFINN-111.txt" />

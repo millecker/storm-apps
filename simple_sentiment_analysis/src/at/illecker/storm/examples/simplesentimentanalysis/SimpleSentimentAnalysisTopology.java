@@ -20,8 +20,8 @@ import java.io.File;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.simplesentimentanalysis.bolt.SimpleSentimentAnalysisBolt;
-import at.illecker.storm.examples.simplesentimentanalysis.spout.TwitterFilesSpout;
-import at.illecker.storm.examples.simplesentimentanalysis.spout.TwitterSpout;
+import at.illecker.storm.examples.util.spout.TwitterFilesSpout;
+import at.illecker.storm.examples.util.spout.TwitterSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -80,16 +80,17 @@ public class SimpleSentimentAnalysisTopology {
     }
 
     Config conf = new Config();
-    conf.put("afinn.sentiment.file", AFINN_SENTIMENT_FILE);
+    conf.put(SimpleSentimentAnalysisBolt.CONF_WORD_LIST_FILE,
+        AFINN_SENTIMENT_FILE);
 
     // Create Spout
     IRichSpout spout;
     if (twitterDir.isDirectory()) {
-      conf.put("twitter.dir", twitterDir.getAbsolutePath());
-      spout = new TwitterFilesSpout();
+      conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
+      spout = new TwitterFilesSpout(FILTER_LANG);
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
-          accessTokenSecret, keyWords);
+          accessTokenSecret, keyWords, FILTER_LANG);
     }
 
     // Create Bolts
