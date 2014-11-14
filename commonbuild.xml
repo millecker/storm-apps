@@ -45,6 +45,7 @@
   <property name="util.src.dir" value="" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="" />
+  <property name="libfiles.cpu" value="" />
 	<property name="libjars.bench" value="" />
 	<property name="rootbeer.package.dir" value="" />
 	<property name="rootbeer.class" value="" />
@@ -321,19 +322,24 @@
 		<echo>Rename ${output.file-tmp-jar} to ${output.file-jar}</echo>
 		<move file="${output.file-tmp-jar}" tofile="${output.file-jar}" />
 		<!-- 2) Add additional files into destination jar -->
-		<echo>Including files: ${libfiles.cpu}</echo>
-		<for list="${libfiles.cpu}" param="libjar">
-			<sequential>
-				<echo>jar uf ${output.file-jar} -C ${root} @{libjar}</echo>
-				<exec executable="jar">
-					<arg value="uf" />
-					<arg value="${output.file-jar}" />
-					<arg value="-C" />
-					<arg value="${root}" />
-					<arg value="@{libjar}" />
-				</exec>
-			</sequential>
-		</for>
+    <if>
+      <equals arg1="${libfiles.cpu}" arg2="" />
+      <else>
+        <echo>Including files: ${libfiles.cpu}</echo>
+        <for list="${libfiles.cpu}" param="libjar">
+          <sequential>
+            <echo>jar uf ${output.file-jar} -C ${root} @{libjar}</echo>
+            <exec executable="jar">
+              <arg value="uf" />
+              <arg value="${output.file-jar}" />
+              <arg value="-C" />
+              <arg value="${root}" />
+              <arg value="@{libjar}" />
+            </exec>
+          </sequential>
+        </for>
+      </else>
+    </if>
 	</target>
 
 	<!-- ****************************************************************** -->
