@@ -9,7 +9,7 @@ This code-sink includes example applications of Apache Storm.
   - [N-Gram (Bigram)](n_gram)
 
 ## Compilation and Execution
-Use Apache Ant to build and run the applications.<br>
+Use [Apache Ant](http://ant.apache.org) to build and run the applications.<br>
 Further details are explained in the *README* file of each application. 
 
 ##### Clean all files
