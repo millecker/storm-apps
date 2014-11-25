@@ -3,10 +3,10 @@ Apache Storm - Applications
 This code-sink includes example applications of Apache Storm.
 
 ## Applications
-  - WordCount
-  - POS Tagger based on the [Stanford NLP](http://nlp.stanford.edu/software/corenlp.shtml) and the [GATE Twitter model](https://gate.ac.uk/wiki/twitter-postagger.html)
-  - Simple Sentiment Analysis based on [AFINN](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010) affective word list
-  - N-Gram (Bigram)
+  - [WordCount](wordcount)
+  - [POS Tagger](pos_tagger) based on the [Stanford NLP](http://nlp.stanford.edu/software/corenlp.shtml) and the [GATE Twitter model](https://gate.ac.uk/wiki/twitter-postagger.html)
+  - [Simple Sentiment Analysis](simple_sentiment_analysis) based on [AFINN](http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010) affective word list
+  - [N-Gram (Bigram)](n_gram)
 
 ## Compilation and Execution
 Use Apache Ant to build and run the applications.
