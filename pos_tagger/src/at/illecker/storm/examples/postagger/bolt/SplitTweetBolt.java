@@ -18,6 +18,7 @@ package at.illecker.storm.examples.postagger.bolt;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,12 @@ public class SplitTweetBolt extends BaseRichBolt {
     Status status = (Status) tuple.getValueByField("tweet");
     String tweetText = status.getText();
     // LOG.info("@" + status.getUser().getScreenName() + " - " + tweetText);
+
+    // Cleanup Tweet
+    // \\n - newlines
+    Pattern pattern = Pattern.compile("\\n");
+    tweetText = pattern.matcher(tweetText).replaceAll(" ");
+
     List<HasWord> sentence = Sentence.toWordList(tweetText.split(" "));
     this.m_collector.emit(new Values(sentence));
     this.m_collector.ack(tuple);

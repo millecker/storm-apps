@@ -34,8 +34,6 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
  */
 public class POSTagger {
 
-  private static final String TAGGER_MODEL1 = "lib/tagger_models/gate-EN-twitter.model";
-  private static final String TAGGER_MODEL2 = "lib/tagger_models/gate-EN-twitter-fast.model";
   private static final String TWEET_TEXT = "ikr smh he asked fir yo last name so he can add u on fb lololol";
   private static final int TEST_ROUNDS = 1;
 
@@ -47,8 +45,8 @@ public class POSTagger {
     List<Long> tagger2SentenceTimes = new ArrayList<Long>();
 
     // Load tagger and models
-    MaxentTagger tagger1 = new MaxentTagger(TAGGER_MODEL1);
-    MaxentTagger tagger2 = new MaxentTagger(TAGGER_MODEL2);
+    MaxentTagger tagger1 = new MaxentTagger(POSTaggerTopology.TAGGER_MODEL);
+    MaxentTagger tagger2 = new MaxentTagger(POSTaggerTopology.TAGGER_MODEL_FAST);
 
     // Test tagger1 via strings
     String taggedText1 = "";

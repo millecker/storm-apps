@@ -35,7 +35,8 @@ public class POSTaggerTopology {
   private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
   private static final String TOPOLOGY_NAME = "pos-tagger-topology";
   public static final String FILTER_LANG = "en";
-  private static final String TAGGER_MODEL = "lib/tagger_models/gate-EN-twitter-fast.model";
+  public static final String TAGGER_MODEL = "resources/gate-EN-twitter.model";
+  public static final String TAGGER_MODEL_FAST = "resources/gate-EN-twitter-fast.model";
 
   public static void main(String[] args) throws Exception {
     String twitterDirPath = "";
@@ -80,7 +81,7 @@ public class POSTaggerTopology {
     }
 
     Config conf = new Config();
-    conf.put(POSTaggerBolt.CONF_TAGGER_MODEL_FILE, TAGGER_MODEL);
+    conf.put(POSTaggerBolt.CONF_TAGGER_MODEL_FILE, TAGGER_MODEL_FAST);
 
     // Create Spout
     IRichSpout spout;
