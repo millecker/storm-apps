@@ -1,2 +1,6 @@
-AFINN-*.txt
+twitter.txt
+twitter/
+twitter2/
 gate-*.model
+AFINN-*.txt
+SentStrength_Data_Sept2011_*.txt
