@@ -27,15 +27,19 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
+/*
+ * Simple Sentiment Analysis based on the AFINN affective word list
+ * AFINN by Finn Årup Nielsen
+ * http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010
+ * 
+ */
 public class SimpleSentimentAnalysisTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String SIMPLE_SENTIMENT_ANALYSIS_BOLT_ID = "simple-sentiment-analysis-bolt";
   private static final String TOPOLOGY_NAME = "simple-sentiment-analysis-topology";
   public static final String FILTER_LANG = "en";
-  // AFINN by Finn Årup Nielsen
-  // http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010
-  public static final String AFINN_SENTIMENT_FILE = "lib/tagger_models/AFINN/AFINN-111.txt";
+  public static final String AFINN_SENTIMENT_FILE = "resources/AFINN-111.txt";
 
   public static void main(String[] args) throws Exception {
     String twitterDirPath = "";

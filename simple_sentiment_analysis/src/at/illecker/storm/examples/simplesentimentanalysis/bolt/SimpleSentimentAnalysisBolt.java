@@ -34,8 +34,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 
 /**
- * Simple Sentiment Analysis Bolt is based on AFINN from Finn Årup Nielsen
- *
+ * Simple Sentiment Analysis Bolt based on AFINN from Finn Årup Nielsen
  * http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010
  * 
  */
@@ -92,7 +91,6 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Status status = (Status) tuple.getValueByField("tweet");
     String tweetText = status.getText();
-    int tweetSentiment = 0;
     LOG.info("User: " + status.getUser().getScreenName() + " Tweet: "
         + tweetText);
 
@@ -120,19 +118,23 @@ public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
 
     // TODO Remove \\p{Punct}
 
+    String tweetSentiment = "";
+    int totalTweetSentiment = 0;
     String[] words = tweetText.split(" ");
     for (String word : words) {
       word = word.trim();
       if (!word.isEmpty()) {
         Integer rating = m_wordRatings.get(word);
         // LOG.info("execute word: " + word + " rating: " + rating);
+        tweetSentiment += word + "/" + ((rating != null) ? rating : "NA") + " ";
         if (rating != null) {
-          tweetSentiment += rating;
+          totalTweetSentiment += rating;
         }
       }
     }
 
-    LOG.info("Tweet: " + tweetText + " sentiment: " + tweetSentiment);
+    LOG.info("Tweet: " + tweetSentiment + " totalTweetSentiment: "
+        + totalTweetSentiment);
     this.m_collector.ack(tuple);
   }
 }
