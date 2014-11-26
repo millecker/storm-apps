@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="pos_tagger/src"/>
 	<classpathentry kind="src" path="simple_sentiment_analysis/src"/>
 	<classpathentry kind="src" path="n_gram/src"/>
+	<classpathentry kind="src" path="sentiment_analysis/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/storm-core-0.9.2-incubating.jar" sourcepath="/Users/bafu/.m2/repository/org/apache/storm/storm-core/0.9.2-incubating/storm-core-0.9.2-incubating-sources.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.7.jar"/>
