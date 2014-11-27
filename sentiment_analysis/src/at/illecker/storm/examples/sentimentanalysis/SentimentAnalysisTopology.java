@@ -91,7 +91,7 @@ public class SentimentAnalysisTopology {
 
     // Create Spout
     IRichSpout spout;
-    if (referenceFile.isDirectory()) {
+    if (referenceFile.isFile()) {
       conf.put(JsonFileSpout.CONF_JSON_FILE, referenceFile.getAbsolutePath());
       spout = new JsonFileSpout();
     } else {

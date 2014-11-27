@@ -18,6 +18,10 @@ package at.illecker.storm.examples.sentimentanalysis.bolt;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import at.illecker.storm.examples.util.spout.JsonFileSpout;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -26,8 +30,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class TweetFeatureExtractorBolt extends BaseRichBolt {
-  private static final long serialVersionUID = -4970120275385658915L;
+  private static final long serialVersionUID = -8934114541268126264L;
   private OutputCollector m_collector;
+  private static final Logger LOG = LoggerFactory
+      .getLogger(TweetFeatureExtractorBolt.class);
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     declarer.declare(new Fields("tweet")); // key of output tuples
@@ -41,6 +47,8 @@ public class TweetFeatureExtractorBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Map<String, String> element = (Map<String, String>) tuple
         .getValueByField("jsonElement");
+
+    LOG.info("JsonElement: " + element);
 
     // this.m_collector.emit(tuple, new Values(word));
     this.m_collector.ack(tuple);
