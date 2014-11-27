@@ -42,7 +42,7 @@ public class JsonFileSpout extends BaseRichSpout {
       .getLogger(JsonFileSpout.class);
 
   private SpoutOutputCollector m_collector;
-  private List<Map<String, String>> m_elements;
+  private List<Map<String, Object>> m_elements;
   private int m_index = 0;
 
   public JsonFileSpout() {
@@ -83,13 +83,13 @@ public class JsonFileSpout extends BaseRichSpout {
     }
   }
 
-  private static List<Map<String, String>> parseJson(File jsonFile) {
+  private static List<Map<String, Object>> parseJson(File jsonFile) {
     LOG.info("Load file " + jsonFile.getAbsolutePath());
     BufferedReader br = null;
     try {
       br = new BufferedReader(new FileReader(jsonFile));
       GsonBuilder builder = new GsonBuilder();
-      List<Map<String, String>> elements = (List<Map<String, String>>) builder
+      List<Map<String, Object>> elements = (List<Map<String, Object>>) builder
           .create().fromJson(br, Object.class);
       LOG.info("Loaded " + " elements: " + elements.size());
       return elements;

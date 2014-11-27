@@ -21,13 +21,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.spout.JsonFileSpout;
+import at.illecker.storm.examples.sentimentanalysis.util.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 public class TweetFeatureExtractorBolt extends BaseRichBolt {
   private static final long serialVersionUID = -8934114541268126264L;
@@ -45,12 +46,36 @@ public class TweetFeatureExtractorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Map<String, String> element = (Map<String, String>) tuple
+    Map<String, Object> element = (Map<String, Object>) tuple
         .getValueByField("jsonElement");
 
-    LOG.info("JsonElement: " + element);
+    long id = Long.parseLong((String) element.get("id"));
+    double score_amt = (Double) element.get("score_amt");
+    double score_amt2 = (Double) element.get("score_amt_wrong");
+    double score_mislove = (Double) element.get("score_mislove");
+    double score_mislove2 = (Double) element.get("score_mislove2");
+    double score_afinn = (Double) element.get("sentiment_afinn");
+    double score_sentistrength = (Double) element.get("sentistrength");
+    double score_sentistrength_pos = (Double) element
+        .get("sentistrength_positive");
+    double score_sentistrength_neg = (Double) element
+        .get("sentistrength_negative");
+    // sentiment_afinn_nonzero=-2.0,
+    // sentiment_afinn_quant=-1.0,
+    // sentiment_afinn_extreme=-2.0,
+    // sentiment_afinn_sum=-4.0
 
-    // this.m_collector.emit(tuple, new Values(word));
+    if ((score_amt != score_amt2) || (score_mislove != score_mislove2)) {
+      LOG.error("Inconsistency: " + element.toString());
+    }
+
+    Tweet tweet = new Tweet(id, (String) element.get("text"), score_amt,
+        score_mislove, score_afinn, score_sentistrength,
+        score_sentistrength_pos, score_sentistrength_neg);
+    // LOG.info(tweet.toString());
+
+    this.m_collector.emit(tuple, new Values(tweet));
+
     this.m_collector.ack(tuple);
   }
 }
