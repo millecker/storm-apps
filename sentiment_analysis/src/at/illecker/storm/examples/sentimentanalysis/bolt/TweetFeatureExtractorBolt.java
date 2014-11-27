@@ -32,9 +32,10 @@ import backtype.storm.tuple.Values;
 
 public class TweetFeatureExtractorBolt extends BaseRichBolt {
   private static final long serialVersionUID = -8934114541268126264L;
-  private OutputCollector m_collector;
   private static final Logger LOG = LoggerFactory
       .getLogger(TweetFeatureExtractorBolt.class);
+
+  private OutputCollector m_collector;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     declarer.declare(new Fields("tweet")); // key of output tuples
@@ -75,7 +76,6 @@ public class TweetFeatureExtractorBolt extends BaseRichBolt {
     // LOG.info(tweet.toString());
 
     this.m_collector.emit(tuple, new Values(tweet));
-
     this.m_collector.ack(tuple);
   }
 }

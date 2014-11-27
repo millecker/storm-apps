@@ -19,8 +19,8 @@ package at.illecker.storm.examples.sentimentanalysis;
 import java.io.File;
 import java.util.Arrays;
 
+import at.illecker.storm.examples.sentimentanalysis.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.SentenceSplitterBolt;
-import at.illecker.storm.examples.sentimentanalysis.bolt.SentimentAnalysisBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.TweetFeatureExtractorBolt;
 import at.illecker.storm.examples.util.spout.JsonFileSpout;
 import at.illecker.storm.examples.util.spout.TwitterSpout;
@@ -41,9 +41,11 @@ public class SentimentAnalysisTopology {
   private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String TWEET_FEATURE_EXTRACTOR_BOLT_ID = "tweet-feature-extractor-bolt";
   private static final String SENTENCE_SPLITTER_BOLT_ID = "sentence-splitter-bolt";
+  private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
   private static final String TOPOLOGY_NAME = "sentiment-analysis-topology";
 
   public static final String FILTER_LANG = "en";
+  public static final String POS_TAGGER_MODEL = "resources/gate-EN-twitter-fast.model";
   public static final String SENTIMENT_WORD_LIST_AFINN = "resources/AFINN-111.txt";
 
   public static void main(String[] args) throws Exception {
@@ -89,8 +91,9 @@ public class SentimentAnalysisTopology {
     }
 
     Config conf = new Config();
-    conf.put(SentimentAnalysisBolt.CONF_WORD_LIST_FILE,
-        SENTIMENT_WORD_LIST_AFINN);
+    conf.put(POSTaggerBolt.CONF_TAGGER_MODEL_FILE, POS_TAGGER_MODEL);
+    // conf.put(SentimentAnalysisBolt.CONF_WORD_LIST_FILE,
+    // SENTIMENT_WORD_LIST_AFINN);
 
     // Create Spout
     IRichSpout spout;
@@ -105,6 +108,7 @@ public class SentimentAnalysisTopology {
     // Create Bolts
     TweetFeatureExtractorBolt tweetFeatureExtractorBolt = new TweetFeatureExtractorBolt();
     SentenceSplitterBolt sentenceSplitterBolt = new SentenceSplitterBolt();
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -119,6 +123,10 @@ public class SentimentAnalysisTopology {
     // TweetFeatureExtractorBolt --> SentenceSplitterBolt
     builder.setBolt(SENTENCE_SPLITTER_BOLT_ID, sentenceSplitterBolt)
         .shuffleGrouping(TWEET_FEATURE_EXTRACTOR_BOLT_ID);
+
+    // SentenceSplitterBolt --> POSTaggerBolt
+    builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
+        SENTENCE_SPLITTER_BOLT_ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

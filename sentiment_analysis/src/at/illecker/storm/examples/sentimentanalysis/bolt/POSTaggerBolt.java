@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.sentimentanalysis.bolt;
 
-import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
@@ -32,36 +31,54 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.process.DocumentPreprocessor;
+import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
-public class SentenceSplitterBolt extends BaseRichBolt {
-  private static final long serialVersionUID = -3578781604328198756L;
+/**
+ * POSTaggerBolt is based on the Stanford NLP library and the
+ * gate-EN-twitter-fast.model
+ *
+ * http://nlp.stanford.edu/software/corenlp.shtml
+ * http://nlp.stanford.edu:8080/corenlp/process
+ * https://gate.ac.uk/wiki/twitter-postagger.html
+ * 
+ */
+public class POSTaggerBolt extends BaseRichBolt {
+  public static String CONF_TAGGER_MODEL_FILE = "tagger.model.file";
+  private static final long serialVersionUID = -2524877140212376549L;
   private static final Logger LOG = LoggerFactory
-      .getLogger(SentenceSplitterBolt.class);
+      .getLogger(POSTaggerBolt.class);
 
   private OutputCollector m_collector;
+  private MaxentTagger m_tagger;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("splittedTweet")); // key of output tuples
+    declarer.declare(new Fields("taggedTweet")); // key of output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+
+    if (config.get(CONF_TAGGER_MODEL_FILE) != null) {
+      String model = config.get(CONF_TAGGER_MODEL_FILE).toString();
+      // Load Tagger and model
+      m_tagger = new MaxentTagger(model);
+    } else {
+      throw new RuntimeException(CONF_TAGGER_MODEL_FILE
+          + " property was not set!");
+    }
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("tweet");
-    // LOG.info(tweet.toString());
+    Tweet tweet = (Tweet) tuple.getValueByField("splittedTweet");
+    LOG.info(tweet.toString());
 
-    // TODO parse emoticons
-
-    DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(
-        tweet.getText()));
-
-    for (List<HasWord> sentence : dp) {
-      tweet.addSentence(sentence);
-      // LOG.info(sentence.toString());
+    for (List<HasWord> sentence : tweet.getSentences()) {
+      List<TaggedWord> taggedSentence = m_tagger.tagSentence(sentence);
+      tweet.addTaggedSentence(taggedSentence);
+      LOG.info("Tweet: " + sentence.toString() + " TaggedTweet: "
+          + taggedSentence.toString());
     }
 
     this.m_collector.emit(tuple, new Values(tweet));
