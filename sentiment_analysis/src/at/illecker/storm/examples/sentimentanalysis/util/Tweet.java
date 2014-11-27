@@ -17,6 +17,10 @@
 package at.illecker.storm.examples.sentimentanalysis.util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.stanford.nlp.ling.HasWord;
 
 public class Tweet implements Serializable {
   private static final long serialVersionUID = 4933096091291791733L;
@@ -28,6 +32,7 @@ public class Tweet implements Serializable {
   private double m_score_sentistrength;
   private double m_score_sentistrength_pos;
   private double m_score_sentistrength_neg;
+  private List<List<HasWord>> m_sentences;
 
   public Tweet(long id, String text, double score_amt, double score_mislove,
       double score_afinn, double score_sentistrength,
@@ -40,6 +45,7 @@ public class Tweet implements Serializable {
     this.m_score_sentistrength = score_sentistrength;
     this.m_score_sentistrength_pos = score_sentistrength_pos;
     this.m_score_sentistrength_neg = score_sentistrength_neg;
+    this.m_sentences = new ArrayList<List<HasWord>>();
   }
 
   public long getId() {
@@ -72,6 +78,14 @@ public class Tweet implements Serializable {
 
   public double getScoreSentiStrengthNeg() {
     return m_score_sentistrength_neg;
+  }
+
+  public void addSentence(List<HasWord> sentence) {
+    m_sentences.add(sentence);
+  }
+
+  public List<List<HasWord>> getSentences() {
+    return m_sentences;
   }
 
   @Override

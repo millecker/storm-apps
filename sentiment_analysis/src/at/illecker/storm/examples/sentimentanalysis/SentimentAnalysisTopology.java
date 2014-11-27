@@ -19,6 +19,7 @@ package at.illecker.storm.examples.sentimentanalysis;
 import java.io.File;
 import java.util.Arrays;
 
+import at.illecker.storm.examples.sentimentanalysis.bolt.SentenceSplitterBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.SentimentAnalysisBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.TweetFeatureExtractorBolt;
 import at.illecker.storm.examples.util.spout.JsonFileSpout;
@@ -39,7 +40,9 @@ public class SentimentAnalysisTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String TWEET_FEATURE_EXTRACTOR_BOLT_ID = "tweet-feature-extractor-bolt";
+  private static final String SENTENCE_SPLITTER_BOLT_ID = "sentence-splitter-bolt";
   private static final String TOPOLOGY_NAME = "sentiment-analysis-topology";
+
   public static final String FILTER_LANG = "en";
   public static final String SENTIMENT_WORD_LIST_AFINN = "resources/AFINN-111.txt";
 
@@ -101,6 +104,7 @@ public class SentimentAnalysisTopology {
 
     // Create Bolts
     TweetFeatureExtractorBolt tweetFeatureExtractorBolt = new TweetFeatureExtractorBolt();
+    SentenceSplitterBolt sentenceSplitterBolt = new SentenceSplitterBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -111,6 +115,10 @@ public class SentimentAnalysisTopology {
     // Set Spout --> TweetFeatureExtractorBolt
     builder.setBolt(TWEET_FEATURE_EXTRACTOR_BOLT_ID, tweetFeatureExtractorBolt)
         .shuffleGrouping(TWEET_SPOUT_ID);
+
+    // TweetFeatureExtractorBolt --> SentenceSplitterBolt
+    builder.setBolt(SENTENCE_SPLITTER_BOLT_ID, sentenceSplitterBolt)
+        .shuffleGrouping(TWEET_FEATURE_EXTRACTOR_BOLT_ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
