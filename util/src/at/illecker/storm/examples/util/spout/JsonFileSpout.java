@@ -76,9 +76,9 @@ public class JsonFileSpout extends BaseRichSpout {
       m_index = 0;
     }
     try {
-      Thread.sleep(1000); // for development
       // TODO minimize sleep time
-      // sleep 1 ms
+      // default sleep 1 ms
+      Thread.sleep(1000); // for development
     } catch (InterruptedException e) {
     }
   }

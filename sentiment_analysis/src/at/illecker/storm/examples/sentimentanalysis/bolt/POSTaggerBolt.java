@@ -72,13 +72,14 @@ public class POSTaggerBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     Tweet tweet = (Tweet) tuple.getValueByField("splittedTweet");
-    LOG.info(tweet.toString());
+    // LOG.info(tweet.toString());
 
+    // POS tagging of sentences
     for (List<HasWord> sentence : tweet.getSentences()) {
       List<TaggedWord> taggedSentence = m_tagger.tagSentence(sentence);
       tweet.addTaggedSentence(taggedSentence);
-      LOG.info("Tweet: " + sentence.toString() + " TaggedTweet: "
-          + taggedSentence.toString());
+      // LOG.info("Tweet: " + sentence.toString() + " TaggedTweet: "
+      // + taggedSentence.toString());
     }
 
     this.m_collector.emit(tuple, new Values(tweet));

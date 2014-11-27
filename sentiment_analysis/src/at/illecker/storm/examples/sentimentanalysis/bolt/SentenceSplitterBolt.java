@@ -56,6 +56,7 @@ public class SentenceSplitterBolt extends BaseRichBolt {
 
     // TODO parse emoticons
 
+    // split tweet into sentences
     DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(
         tweet.getText()));
 
