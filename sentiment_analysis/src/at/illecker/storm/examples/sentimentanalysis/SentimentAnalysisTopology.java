@@ -48,7 +48,8 @@ public class SentimentAnalysisTopology {
 
   public static final String FILTER_LANG = "en";
   public static final String POS_TAGGER_MODEL = "resources/gate-EN-twitter-fast.model";
-  public static final String SENTIMENT_WORD_LIST = "resources/AFINN-111.txt";
+  public static final String SENTIMENT_WORD_LIST1 = "resources/AFINN-111.txt";
+  public static final String SENTIMENT_WORD_LIST2 = "resources/SentStrength_Data_Sept2011_EmotionLookupTable.txt";
 
   public static void main(String[] args) throws Exception {
     String referenceFilePath = "";
@@ -94,7 +95,10 @@ public class SentimentAnalysisTopology {
 
     Config conf = new Config();
     conf.put(POSTaggerBolt.CONF_TAGGER_MODEL_FILE, POS_TAGGER_MODEL);
-    conf.put(PolarityDetectionBolt.CONF_WORD_LIST_FILE, SENTIMENT_WORD_LIST);
+    conf.put(PolarityDetectionBolt.CONF_SENTIMENT_WORD_LIST1_FILE,
+        SENTIMENT_WORD_LIST1);
+    conf.put(PolarityDetectionBolt.CONF_SENTIMENT_WORD_LIST2_FILE,
+        SENTIMENT_WORD_LIST2);
 
     // Create Spout
     IRichSpout spout;

@@ -16,17 +16,14 @@
  */
 package at.illecker.storm.examples.sentimentanalysis.bolt;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.sentimentanalysis.util.Tweet;
+import at.illecker.storm.examples.sentimentanalysis.util.WordListMap;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -39,13 +36,15 @@ import edu.stanford.nlp.ling.TaggedWord;
  * 
  */
 public class PolarityDetectionBolt extends BaseRichBolt {
-  public static String CONF_WORD_LIST_FILE = "word.list.file";
+  public static String CONF_SENTIMENT_WORD_LIST1_FILE = "word.list1.file";
+  public static String CONF_SENTIMENT_WORD_LIST2_FILE = "word.list2.file";
   private static final long serialVersionUID = -549704444828609491L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PolarityDetectionBolt.class);
 
   private OutputCollector m_collector;
-  private Map<String, Double> m_wordRatings;
+  private WordListMap<Double> m_wordRatings1;
+  private WordListMap<Double> m_wordRatings2;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
   }
@@ -53,38 +52,17 @@ public class PolarityDetectionBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
-    m_wordRatings = new TreeMap<String, Double>();
 
-    if (config.get(CONF_WORD_LIST_FILE) != null) {
-      String wordlist = config.get(CONF_WORD_LIST_FILE).toString();
-      // Load AFINN word ratings
-      BufferedReader reader = null;
-      try {
-        reader = new BufferedReader(new InputStreamReader(
-            ClassLoader.getSystemResourceAsStream(wordlist)));
-        String str = "";
-        while ((str = reader.readLine()) != null) {
-          if (str.trim().length() == 0) {
-            continue;
-          }
-          String[] values = str.split("\t");
-          // LOG.info("prepare word: " + values[0] + " rating: " + values[1]);
-          m_wordRatings.put(values[0], Double.parseDouble(values[1]));
-        }
-        LOG.info("Loaded " + m_wordRatings.size() + " words and ratings");
-      } catch (IOException e) {
-        LOG.error(e.getMessage());
-      } finally {
-        try {
-          if (reader != null) {
-            reader.close();
-          }
-        } catch (IOException e) {
-          LOG.error(e.getMessage());
-        }
-      }
-    } else {
-      throw new RuntimeException(CONF_WORD_LIST_FILE + " property was not set!");
+    if (config.get(CONF_SENTIMENT_WORD_LIST1_FILE) != null) {
+      m_wordRatings1 = WordListMap.loadWordRatings(config.get(
+          CONF_SENTIMENT_WORD_LIST1_FILE).toString());
+    }
+    if (config.get(CONF_SENTIMENT_WORD_LIST2_FILE) != null) {
+      m_wordRatings2 = WordListMap.loadWordRatings(config.get(
+          CONF_SENTIMENT_WORD_LIST2_FILE).toString());
+    }
+    if ((m_wordRatings1 == null) && (m_wordRatings2 == null)) {
+      throw new RuntimeException("No word lists available!");
     }
   }
 
@@ -110,11 +88,20 @@ public class PolarityDetectionBolt extends BaseRichBolt {
       double sentenceSentiment = 0;
       for (TaggedWord taggedWord : taggedSentence) {
         String word = taggedWord.word().toLowerCase().trim();
-        Double rating = m_wordRatings.get(word);
-        sentimentSentence += word + "/" + ((rating != null) ? rating : "NA")
-            + " ";
-        if (rating != null) {
-          sentenceSentiment += rating;
+        Double rating1 = null;
+        if (m_wordRatings1 != null) {
+          rating1 = m_wordRatings1.matchKey(word);
+        }
+        Double rating2 = null;
+        if (m_wordRatings2 != null) {
+          rating2 = m_wordRatings2.matchKey(word);
+        }
+
+        sentimentSentence += word + "/" + ((rating1 != null) ? rating1 : "NA")
+            + "|" + ((rating2 != null) ? rating2 : "NA") + " ";
+
+        if (rating1 != null) {
+          sentenceSentiment += rating1;
         }
       }
       tweetSentiment += sentenceSentiment;
