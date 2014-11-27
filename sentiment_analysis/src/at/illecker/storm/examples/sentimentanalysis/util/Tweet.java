@@ -21,31 +21,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class Tweet implements Serializable {
   private static final long serialVersionUID = 4933096091291791733L;
   private long m_id;
   private String m_text = "";
-  private double m_score_amt;
-  private double m_score_mislove;
-  private double m_score_afinn;
-  private double m_score_sentistrength;
-  private double m_score_sentistrength_pos;
-  private double m_score_sentistrength_neg;
+  private double m_scoreAMT;
+  private double m_scoreMislove;
+  private double m_scoreAfinn;
+  private double m_scoreSentiStrength;
+  private double m_scoreSentiStrengthPos;
+  private double m_scoreSentiStrengthNeg;
   private List<List<HasWord>> m_sentences;
+  private List<List<TaggedWord>> m_taggedSentences;
 
-  public Tweet(long id, String text, double score_amt, double score_mislove,
-      double score_afinn, double score_sentistrength,
-      double score_sentistrength_pos, double score_sentistrength_neg) {
+  public Tweet(long id, String text, double scoreAMT, double scoreMislove,
+      double scoreAfinn, double scoreSentiStrength,
+      double scoreSentiStrengthPos, double scoreSentiStrengthNeg) {
     this.m_id = id;
     this.m_text = text;
-    this.m_score_amt = score_amt;
-    this.m_score_mislove = score_mislove;
-    this.m_score_afinn = score_afinn;
-    this.m_score_sentistrength = score_sentistrength;
-    this.m_score_sentistrength_pos = score_sentistrength_pos;
-    this.m_score_sentistrength_neg = score_sentistrength_neg;
+    this.m_scoreAMT = scoreAMT;
+    this.m_scoreMislove = scoreMislove;
+    this.m_scoreAfinn = scoreAfinn;
+    this.m_scoreSentiStrength = scoreSentiStrength;
+    this.m_scoreSentiStrengthPos = scoreSentiStrengthPos;
+    this.m_scoreSentiStrengthNeg = scoreSentiStrengthNeg;
     this.m_sentences = new ArrayList<List<HasWord>>();
+    this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
   }
 
   public long getId() {
@@ -57,27 +60,27 @@ public class Tweet implements Serializable {
   }
 
   public double getScoreAMT() {
-    return m_score_amt;
+    return m_scoreAMT;
   }
 
   public double getScoreMislove() {
-    return m_score_mislove;
+    return m_scoreMislove;
   }
 
   public double getScoreAFINN() {
-    return m_score_afinn;
+    return m_scoreAfinn;
   }
 
   public double getScoreSentiStrength() {
-    return m_score_sentistrength;
+    return m_scoreSentiStrength;
   }
 
   public double getScoreSentiStrengthPos() {
-    return m_score_sentistrength_pos;
+    return m_scoreSentiStrengthPos;
   }
 
   public double getScoreSentiStrengthNeg() {
-    return m_score_sentistrength_neg;
+    return m_scoreSentiStrengthNeg;
   }
 
   public void addSentence(List<HasWord> sentence) {
@@ -88,14 +91,21 @@ public class Tweet implements Serializable {
     return m_sentences;
   }
 
+  public void addTaggedSentence(List<TaggedWord> sentence) {
+    m_taggedSentences.add(sentence);
+  }
+
+  public List<List<TaggedWord>> getTaggedSentences() {
+    return m_taggedSentences;
+  }
+
   @Override
   public String toString() {
-    return "Tweet [m_id=" + m_id + ", m_text=" + m_text + ", m_score_amt="
-        + m_score_amt + ", m_score_mislove=" + m_score_mislove
-        + ", m_score_afinn=" + m_score_afinn + ", m_score_sentistrength="
-        + m_score_sentistrength + ", m_score_sentistrength_pos="
-        + m_score_sentistrength_pos + ", m_score_sentistrength_neg="
-        + m_score_sentistrength_neg + "]";
+    return "Tweet [id=" + m_id + ", text=" + m_text + ", scoreAMT="
+        + m_scoreAMT + ", scoreMislove=" + m_scoreMislove + ", scoreAfinn="
+        + m_scoreAfinn + ", scoreSentiStrength=" + m_scoreSentiStrength
+        + ", scoreSentiStrengthPositive=" + m_scoreSentiStrengthPos
+        + ", scoreSentiStrengthNegative=" + m_scoreSentiStrengthNeg + "]";
   }
 
 }
