@@ -22,6 +22,7 @@ import java.util.Arrays;
 import at.illecker.storm.examples.sentimentanalysis.bolt.JsonTweetExtractorBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.PolarityDetectionBolt;
+import at.illecker.storm.examples.sentimentanalysis.bolt.PreprocessorBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.SentenceSplitterBolt;
 import at.illecker.storm.examples.util.spout.JsonFileSpout;
 import at.illecker.storm.examples.util.spout.TwitterSpout;
@@ -41,6 +42,7 @@ public class SentimentAnalysisTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String JSON_TWEET_EXTRACTOR_BOLT_ID = "json-tweet-extractor-bolt";
+  private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
   private static final String SENTENCE_SPLITTER_BOLT_ID = "sentence-splitter-bolt";
   private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
   private static final String POLARITY_DETECTION_BOLT_ID = "polarity-detection-bolt";
@@ -112,6 +114,7 @@ public class SentimentAnalysisTopology {
 
     // Create Bolts
     JsonTweetExtractorBolt jsonTweetExtractorBolt = new JsonTweetExtractorBolt();
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
     SentenceSplitterBolt sentenceSplitterBolt = new SentenceSplitterBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
     PolarityDetectionBolt polarityDetectionBolt = new PolarityDetectionBolt();
@@ -126,9 +129,13 @@ public class SentimentAnalysisTopology {
     builder.setBolt(JSON_TWEET_EXTRACTOR_BOLT_ID, jsonTweetExtractorBolt)
         .shuffleGrouping(TWEET_SPOUT_ID);
 
-    // TweetFeatureExtractorBolt --> SentenceSplitterBolt
+    // JsonTweetExtractorBolt --> PreprocessorBolt
+    builder.setBolt(PREPROCESSOR_BOLT_ID, preprocessorBolt).shuffleGrouping(
+        JSON_TWEET_EXTRACTOR_BOLT_ID);
+
+    // PreprocessorBolt --> SentenceSplitterBolt
     builder.setBolt(SENTENCE_SPLITTER_BOLT_ID, sentenceSplitterBolt)
-        .shuffleGrouping(JSON_TWEET_EXTRACTOR_BOLT_ID);
+        .shuffleGrouping(PREPROCESSOR_BOLT_ID);
 
     // SentenceSplitterBolt --> POSTaggerBolt
     builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(

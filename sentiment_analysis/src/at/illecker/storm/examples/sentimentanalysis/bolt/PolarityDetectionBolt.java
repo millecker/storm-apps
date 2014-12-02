@@ -70,16 +70,6 @@ public class PolarityDetectionBolt extends BaseRichBolt {
     Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
     LOG.info(tweet.toString());
 
-    // Cleanup Tweet (remove @user #hashtag RT)
-    // \\n - newlines
-    // @\\w* - @users
-    // #\\w* - hashtags
-    // \\bRT\\b - Retweets RT
-    // \\p{Punct} - removes smileys
-    // [^@#\\p{L}\\p{N} ]+
-    // URL
-    // (https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/? -
-
     double tweetSentiment = 0;
     for (List<TaggedWord> taggedSentence : tweet.getTaggedSentences()) {
       LOG.info("TaggedTweet: " + taggedSentence.toString());

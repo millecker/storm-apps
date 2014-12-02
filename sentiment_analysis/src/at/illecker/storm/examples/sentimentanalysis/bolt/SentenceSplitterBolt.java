@@ -51,12 +51,10 @@ public class SentenceSplitterBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("tweet");
+    Tweet tweet = (Tweet) tuple.getValueByField("preprocessedTweet");
     // LOG.info(tweet.toString());
 
-    // TODO parse emoticons
-
-    // split tweet into sentences
+    // Split tweet into sentences
     DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(
         tweet.getText()));
 
