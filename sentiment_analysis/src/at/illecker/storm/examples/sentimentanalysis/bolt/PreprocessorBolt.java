@@ -30,10 +30,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class TweetFeatureExtractorBolt extends BaseRichBolt {
+public class PreprocessorBolt extends BaseRichBolt {
   private static final long serialVersionUID = -8934114541268126264L;
   private static final Logger LOG = LoggerFactory
-      .getLogger(TweetFeatureExtractorBolt.class);
+      .getLogger(PreprocessorBolt.class);
 
   private OutputCollector m_collector;
 
