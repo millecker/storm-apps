@@ -47,7 +47,7 @@ public class PreprocessorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("preprocessedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField("tweet");
     // LOG.info(tweet.toString());
 
     // STEP 1
