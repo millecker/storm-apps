@@ -32,7 +32,7 @@ import backtype.storm.tuple.Tuple;
 import edu.stanford.nlp.ling.TaggedWord;
 
 /**
- * PolarityDetectorBolt
+ * Polarity Detector Bolt
  * 
  */
 public class PolarityDetectionBolt extends BaseRichBolt {
@@ -68,16 +68,22 @@ public class PolarityDetectionBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
-    LOG.info(tweet.toString());
+    // LOG.info(tweet.toString());
 
-    double tweetSentiment = 0;
+    double tweetSentiment1 = 0;
+    double tweetSentiment2 = 0;
+    int tweetWords = 0;
     for (List<TaggedWord> taggedSentence : tweet.getTaggedSentences()) {
-      LOG.info("TaggedTweet: " + taggedSentence.toString());
+      // LOG.info("TaggedSentence: " + taggedSentence.toString());
 
-      String sentimentSentence = "";
-      double sentenceSentiment = 0;
+      String sentimentSentenceString = "";
+      double sentenceSentiment1 = 0;
+      double sentenceSentiment2 = 0;
+      int sentenceWords = 0;
       for (TaggedWord taggedWord : taggedSentence) {
         String word = taggedWord.word().toLowerCase().trim();
+        sentenceWords++;
+
         Double rating1 = null;
         if (m_wordRatings1 != null) {
           rating1 = m_wordRatings1.matchKey(word);
@@ -87,17 +93,37 @@ public class PolarityDetectionBolt extends BaseRichBolt {
           rating2 = m_wordRatings2.matchKey(word);
         }
 
-        sentimentSentence += word + "/" + ((rating1 != null) ? rating1 : "NA")
-            + "|" + ((rating2 != null) ? rating2 : "NA") + " ";
-
+        // Update sentiment sum
         if (rating1 != null) {
-          sentenceSentiment += rating1;
+          sentenceSentiment1 += rating1;
         }
+        if (rating2 != null) {
+          sentenceSentiment2 += rating2;
+        }
+
+        sentimentSentenceString += word + "/"
+            + ((rating1 != null) ? rating1 : "NA") + "|"
+            + ((rating2 != null) ? rating2 : "NA") + " ";
       }
-      tweetSentiment += sentenceSentiment;
-      LOG.info("SentimentSentence: " + sentimentSentence
-          + " totalTweetSentiment: " + sentenceSentiment);
+      tweetWords += sentenceWords;
+      tweetSentiment1 += sentenceSentiment1;
+      tweetSentiment2 += sentenceSentiment2;
+
+      // Debug
+      LOG.info("TaggedSentence: " + taggedSentence.toString()
+          + " SentimentSentence: " + sentimentSentenceString + " Words: "
+          + sentenceWords + " SentenceSentiment1: " + sentenceSentiment1
+          + " SentimentScore1: " + (sentenceSentiment1 / sentenceWords)
+          + " SentenceSentiment2: " + sentenceSentiment2 + " SentimentScore2: "
+          + (sentenceSentiment2 / sentenceWords));
     }
+
+    // Debug
+    LOG.info("Tweet: " + tweet.toString() + " Words: " + tweetWords
+        + " TweetSentiment1: " + tweetSentiment1 + " SentimentScore1: "
+        + (tweetSentiment1 / tweetWords) + " TweetSentiment2: "
+        + tweetSentiment2 + " SentimentScore2: "
+        + (tweetSentiment2 / tweetWords));
 
     this.m_collector.ack(tuple);
   }
