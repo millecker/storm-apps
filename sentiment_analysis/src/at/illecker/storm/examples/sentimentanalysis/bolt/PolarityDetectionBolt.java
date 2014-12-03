@@ -81,6 +81,17 @@ public class PolarityDetectionBolt extends BaseRichBolt {
       double sentenceSentiment2 = 0;
       int sentenceWords = 0;
       for (TaggedWord taggedWord : taggedSentence) {
+        // See tags http://www.clips.ua.ac.be/pages/mbsp-tags
+        // Skip punctuations
+        if (taggedWord.tag().equals(".") || taggedWord.tag().equals(",")
+            || taggedWord.tag().equals(":")) {
+          continue;
+        }
+        // Skip cardinal numbers and symbols
+        if (taggedWord.tag().equals("CD") || taggedWord.tag().equals("SYM")) {
+          continue;
+        }
+
         String word = taggedWord.word().toLowerCase().trim();
         sentenceWords++;
 
