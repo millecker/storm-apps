@@ -31,10 +31,11 @@ import edu.mit.jwi.item.POS;
 
 public class WordNet {
 
-  public static final String workingDirPath = System.getProperty("user.dir");
-  public static final String wordNetDirPath = workingDirPath + File.separator;
-  public static final String wordNetDictPath = workingDirPath + File.separator
-      + "resources" + File.separator + "wn3.1.dict.tar.gz";
+  public static final String WORKING_DIR_PATH = System.getProperty("user.dir");
+  public static final String WORD_NET_DIR_PATH = WORKING_DIR_PATH
+      + File.separator;
+  public static final String WORD_NET_DICT_PATH = WORD_NET_DIR_PATH
+      + File.separator + "resources" + File.separator + "wn3.1.dict.tar.gz";
 
   public static void testDictionary(File wordNetDirPath) throws IOException,
       InterruptedException {
@@ -83,16 +84,16 @@ public class WordNet {
 
   public static void main(String[] args) {
     try {
-      System.out.println("WordNetDict: " + wordNetDictPath);
-      System.out.println("WordNetDir: " + wordNetDirPath);
+      System.out.println("WORD_NET_DICT_PATH: " + WORD_NET_DICT_PATH);
+      System.out.println("WORD_NET_DIR_PATH: " + WORD_NET_DIR_PATH);
 
-      File wordNetDir = new File(wordNetDirPath + "dict");
+      File wordNetDir = new File(WORD_NET_DIR_PATH + "dict");
       if (wordNetDir.exists()) {
         FileUtil.delete(wordNetDir);
       }
 
       // extract tar.gz file
-      FileUtil.extractTarGz(wordNetDictPath, wordNetDirPath);
+      FileUtil.extractTarGz(WORD_NET_DICT_PATH, WORD_NET_DIR_PATH);
 
       testDictionary(wordNetDir);
 
