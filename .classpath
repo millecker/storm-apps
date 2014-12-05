@@ -14,5 +14,8 @@
 	<classpathentry kind="lib" path="lib/stanford-corenlp-3.4.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/libsvm-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-compress-1.9.jar"/>
+	<classpathentry kind="lib" path="lib/edu.mit.jwi_2.3.3_jdk.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
