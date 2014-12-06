@@ -45,16 +45,17 @@ public class FileUtil {
     TarArchiveEntry entry = null;
     // read Tar entries
     while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-      LOG.info("Extracting: " + entry.getName());
+      LOG.info("Extracting: " + outDir + File.separator + entry.getName());
 
       if (entry.isDirectory()) { // create directory
-        File f = new File(outDir + entry.getName());
+        File f = new File(outDir + File.separator + entry.getName());
         f.mkdirs();
       } else { // decompress file
         int count;
         byte data[] = new byte[BUFFER_SIZE];
 
-        FileOutputStream fos = new FileOutputStream(outDir + entry.getName());
+        FileOutputStream fos = new FileOutputStream(outDir + File.separator
+            + entry.getName());
         BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
         while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
           dest.write(data, 0, count);
