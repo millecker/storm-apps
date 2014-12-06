@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.FileUtil;
-import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.IRAMDictionary;
 import edu.mit.jwi.RAMDictionary;
 import edu.mit.jwi.data.ILoadPolicy;
@@ -46,6 +45,7 @@ import edu.stanford.nlp.process.DocumentPreprocessor;
 
 public class WordNet {
 
+  public static final int MAX_DEPTH_OF_HIERARCHY = 16;
   public static final String WORD_NET_DICT_PATH = System
       .getProperty("user.dir")
       + File.separator
@@ -106,6 +106,14 @@ public class WordNet {
     return m_wordnetStemmer.findStems(wordString, wordPOS);
   }
 
+  public String getLemma(ISynset synset) {
+    return synset.getWord(0).getLemma();
+  }
+
+  public String getLemma(ISynsetID synsetID) {
+    return getLemma(m_dict.getSynset(synsetID));
+  }
+
   public IIndexWord getIndexWord(String wordString, POS wordPOS) {
     List<String> stems = findStems(wordString, wordPOS);
     if (stems != null) {
@@ -132,7 +140,13 @@ public class WordNet {
     return indexWords;
   }
 
-  public Set<ISynset> convertIndexWordToSynsetSet(IIndexWord indexWord) {
+  public ISynset getSynset(String wordString, POS wordPOS) {
+    IWordID wordID = m_dict.getIndexWord(wordString, wordPOS).getWordIDs()
+        .get(0);
+    return m_dict.getWord(wordID).getSynset();
+  }
+
+  public Set<ISynset> getSynsets(IIndexWord indexWord) {
     Set<ISynset> synsets = new HashSet<ISynset>();
     for (IWordID wordID : indexWord.getWordIDs()) {
       synsets.add(m_dict.getSynset(wordID.getSynsetID()));
@@ -140,7 +154,7 @@ public class WordNet {
     return synsets;
   }
 
-  public Set<ISynset> convertIndexWordSetToSynsetSet(Set<IIndexWord> indexWords) {
+  public Set<ISynset> getSynsets(Set<IIndexWord> indexWords) {
     Set<ISynset> synsets = new HashSet<ISynset>();
     for (IIndexWord indexWord : indexWords) {
       for (IWordID wordID : indexWord.getWordIDs()) {
@@ -150,14 +164,14 @@ public class WordNet {
     return synsets;
   }
 
-  public List<ISynsetID> getAllAncestors(ISynset synset) {
+  public List<ISynsetID> getAncestors(ISynset synset) {
     List<ISynsetID> list = new ArrayList<ISynsetID>();
     list.addAll(synset.getRelatedSynsets(Pointer.HYPERNYM));
     list.addAll(synset.getRelatedSynsets(Pointer.HYPERNYM_INSTANCE));
     return list;
   }
 
-  public List<ISynsetID> getAllChildren(ISynset synset) {
+  public List<ISynsetID> getChildren(ISynset synset) {
     List<ISynsetID> list = new ArrayList<ISynsetID>();
     list.addAll(synset.getRelatedSynsets(Pointer.HYPONYM));
     list.addAll(synset.getRelatedSynsets(Pointer.HYPONYM_INSTANCE));
@@ -166,7 +180,7 @@ public class WordNet {
 
   public List<List<ISynset>> getPathsToRoot(ISynset synset) {
     List<List<ISynset>> pathsToRoot = null;
-    List<ISynsetID> ancestors = getAllAncestors(synset);
+    List<ISynsetID> ancestors = getAncestors(synset);
 
     if (ancestors.isEmpty()) {
       pathsToRoot = new ArrayList<List<ISynset>>();
@@ -198,7 +212,7 @@ public class WordNet {
     return pathsToRoot;
   }
 
-  private ISynset findCCPFromVector(List<ISynset> pathToRoot1,
+  private ISynset findClosestCommonParent(List<ISynset> pathToRoot1,
       List<ISynset> pathToRoot2) {
     int i = 0;
     int j = 0;
@@ -225,7 +239,10 @@ public class WordNet {
     return null;
   }
 
-  public ISynset findCCP(ISynset synset1, ISynset synset2) {
+  public ISynset findClosestCommonParent(ISynset synset1, ISynset synset2) {
+    if ((synset1 == null) || (synset2 == null)) {
+      return null;
+    }
     if (synset1.equals(synset2)) {
       return synset1;
     }
@@ -238,7 +255,7 @@ public class WordNet {
     for (List<ISynset> pathToRoot1 : pathsToRoot1) {
       for (List<ISynset> pathToRoot2 : pathsToRoot2) {
 
-        ISynset synset = findCCPFromVector(pathToRoot1, pathToRoot2);
+        ISynset synset = findClosestCommonParent(pathToRoot1, pathToRoot2);
 
         int j = pathToRoot1.size() - (pathToRoot1.indexOf(synset) + 1);
         if (j >= i) {
@@ -254,7 +271,8 @@ public class WordNet {
   public ISynset disambiguateWordSenses(String sentence, String wordString,
       POS wordPOS) {
     IIndexWord indexWord = getIndexWord(wordString, wordPOS);
-    Set<ISynset> synsets = convertIndexWordToSynsetSet(indexWord);
+    Set<ISynset> synsets = getSynsets(indexWord);
+
     ISynset resultSynset = null;
     double bestScore = 0;
     for (ISynset synset : synsets) {
@@ -265,9 +283,9 @@ public class WordNet {
           double score = 0;
           IIndexWord indexWordLocal = getIndexWord(word.word(), wordPOS); // TODO
                                                                           // wordPOS!
-          Set<ISynset> synsetsLocal = convertIndexWordToSynsetSet(indexWordLocal);
+          Set<ISynset> synsetsLocal = getSynsets(indexWordLocal);
           for (ISynset synsetLocal : synsetsLocal) {
-            double sim = similarity(synsetLocal, synset);
+            double sim = shortestPathDistance(synsetLocal, synset);
             if (sim > 0) {
               score += sim;
             }
@@ -282,12 +300,18 @@ public class WordNet {
     return resultSynset;
   }
 
+  /**
+   * max_depth()
+   * 
+   * @param synset
+   * @return
+   */
   public int depth(ISynset synset) {
     if (synset == null) {
       return 0;
     }
 
-    List<ISynsetID> ancestors = getAllAncestors(synset);
+    List<ISynsetID> ancestors = getAncestors(synset);
     if (ancestors.isEmpty()) {
       return 0;
     }
@@ -296,30 +320,133 @@ public class WordNet {
     for (ISynsetID ancestor : ancestors) {
       ISynset ancestorSynset = m_dict.getSynset(ancestor);
       int j = depth(ancestorSynset);
-      i = i > j ? i : j;
+      i = (i > j) ? i : j;
     }
 
     return i + 1;
   }
 
-  public int distance(ISynset synset1, ISynset synset2) {
-    ISynset ccp = findCCP(synset1, synset2);
+  /**
+   * Shortest Path Distance
+   * 
+   * Returns the distance of the shortest path linking the two synsets (if one
+   * exists).
+   * 
+   * For each synset, all the ancestor nodes and their distances are recorded
+   * and compared. The ancestor node common to both synsets that can be reached
+   * with the minimum number of traversals is used. If no ancestor nodes are
+   * common, null is returned. If a node is compared with itself 0 is returned.
+   * 
+   * @param synset1
+   * @param synset2
+   * @return The number of edges in the shortest path connecting the two nodes,
+   *         or null if no path exists.
+   */
+  public Integer shortestPathDistance(ISynset synset1, ISynset synset2) {
+    Integer distance = null;
+    if (synset1.equals(synset2)) {
+      return 0;
+    }
 
-    System.out.println(depth(synset1));
-    System.out.println(depth(synset2));
-    System.out.println(depth(ccp));
+    ISynset ccp = findClosestCommonParent(synset1, synset2);
+    if (ccp != null) {
+      distance = depth(synset1) + depth(synset2) - 2 * depth(ccp);
 
-    return depth(synset1) + depth(synset2) - 2 * depth(ccp);
+      // Debug
+      String w1 = synset1.getWords().get(0).getLemma();
+      String w2 = synset2.getWords().get(0).getLemma();
+      String w3 = ccp.getWords().get(0).getLemma();
+      System.out.println("maxDepth(" + w1 + "): " + depth(synset1));
+      System.out.println("maxDepth(" + w2 + "): " + depth(synset2));
+      System.out.println("maxDepth(" + w3 + "): " + depth(ccp));
+      System.out.println("distance(" + w1 + "," + w2 + "): " + distance);
+    }
+    return distance;
   }
 
-  public double similarity(ISynset synset1, ISynset synset2) {
-    int MAX_DEPTH = 16;
-    double distance = distance(synset1, synset2);
-    int depth1 = depth(synset1);
-    int depth2 = depth(synset2);
-    double t = distance / (depth1 + depth2);
+  /**
+   * Path Distance Similarity
+   * 
+   * Return a score denoting how similar two word senses are, based on the
+   * shortest path that connects the senses in the is-a (hypernym/hypnoym)
+   * taxonomy.
+   * 
+   * The score is in the range 0 to 1, except in those cases where a path cannot
+   * be found (will only be true for verbs as there are many distinct verb
+   * taxonomies), in which case null is returned.
+   * 
+   * A score of 1 represents identity i.e. comparing a sense with itself will
+   * return 1.
+   * 
+   * @param synset1
+   * @param synset2
+   * @return A score denoting the similarity of the two ``Synset`` objects,
+   *         normally between 0 and 1. null is returned if no connecting path
+   *         could be found. 1 is returned if a ``Synset`` is compared with
+   *         itself.
+   */
+  public Double pathSimilarity(ISynset synset1, ISynset synset2) {
+    Integer distance = shortestPathDistance(synset1, synset2);
+    Double pathSimilarity = null;
+    if (distance != null) {
+      if (distance < 0) {
+        throw new IllegalArgumentException("Distance value is negative!");
+      }
+      pathSimilarity = 1 / ((double) distance + 1);
 
-    return Math.log(t) / Math.log(1 / (2 * (MAX_DEPTH + 1)));
+      // Debug
+      String w1 = synset1.getWords().get(0).getLemma();
+      String w2 = synset2.getWords().get(0).getLemma();
+      System.out.println("maxDepth(" + w1 + "): " + depth(synset1));
+      System.out.println("maxDepth(" + w2 + "): " + depth(synset2));
+      System.out.println("distance: " + distance);
+      System.out.println("pathSimilarity(" + w1 + "," + w2 + "): "
+          + pathSimilarity);
+    } else {
+      // TODO simulate_root=True
+    }
+    return pathSimilarity;
+  }
+
+  /**
+   * Leacock Chodorow Similarity
+   * 
+   * Return a score denoting how similar two word senses are, based on the
+   * shortest path that connects the senses and the maximum depth of the
+   * taxonomy in which the senses occur. The relationship is given as -log(p/2d)
+   * where p is the shortest path length and d is the taxonomy depth.
+   * 
+   * @param synset1
+   * @param synset2
+   * @return A score denoting the similarity of the two ``Synset`` objects,
+   *         normally greater than 0. null is returned if no connecting path
+   *         could be found. If a ``Synset`` is compared with itself, the
+   *         maximum score is returned, which varies depending on the taxonomy
+   *         depth.
+   */
+  public Double lchSimilarity(ISynset synset1, ISynset synset2) {
+    Integer distance = shortestPathDistance(synset1, synset2);
+    Double lchSimilarity = null;
+    if (distance != null) {
+      if (distance < 0) {
+        throw new IllegalArgumentException("Distance value is negative!");
+      }
+      if (distance == 0) {
+        distance = 1;
+      }
+
+      lchSimilarity = Math.log((2 * MAX_DEPTH_OF_HIERARCHY)
+          / ((double) distance));
+
+      // Debug
+      String w1 = synset1.getWords().get(0).getLemma();
+      String w2 = synset2.getWords().get(0).getLemma();
+      System.out.println("lchSimilarity(" + w1 + "," + w2 + "): "
+          + lchSimilarity);
+    } else {
+      // TODO simulate_root=True
+    }
+    return lchSimilarity;
   }
 
   /**
@@ -333,19 +460,18 @@ public class WordNet {
    *         represents identity i.e. comparing a sense with itself will return
    *         1.
    */
-
   public double similarity(String word1String, POS word1POS,
       String word2String, POS word2POS) {
-    IIndexWord idxWord1 = getIndexWord(word1String, word1POS);
-    Set<ISynset> synsets1 = convertIndexWordToSynsetSet(idxWord1);
+    IIndexWord indexWord1 = getIndexWord(word1String, word1POS);
+    Set<ISynset> synsets1 = getSynsets(indexWord1);
 
-    IIndexWord idxWord2 = getIndexWord(word2String, word2POS);
-    Set<ISynset> synsets2 = convertIndexWordToSynsetSet(idxWord2);
+    IIndexWord indexWord2 = getIndexWord(word2String, word2POS);
+    Set<ISynset> synsets2 = getSynsets(indexWord2);
 
     double maxSim = 0;
     for (ISynset synset1 : synsets1) {
       for (ISynset synset2 : synsets2) {
-        double sim = similarity(synset1, synset2);
+        double sim = pathSimilarity(synset1, synset2);
         if ((sim > 0) && (sim > maxSim)) {
           maxSim = sim;
         }
@@ -354,44 +480,128 @@ public class WordNet {
     return maxSim;
   }
 
+  /**
+   * testWordNet implementation
+   */
   public void testWordNet() {
-    // treking across Wordnet
-    trek(m_dict);
+    // Performance test - treking across Wordnet
+    trek();
 
-    System.out.println("wn.synsets('dog')");
+    // ************************************************************************
+    // Misc Tests
+    // ************************************************************************
+    System.out.println("\nwn.synsets('dog')");
     Set<IIndexWord> indexWords = getAllIndexWords("dog");
     for (IIndexWord indexWord : indexWords) {
+      System.out.println("indexWords: ");
       for (IWordID wordID : indexWord.getWordIDs()) {
         IWord word = m_dict.getWord(wordID);
         System.out.println(word.getSynset());
       }
     }
 
-    System.out.println("wn.synsets('dog', pos=wn.VERB)");
-    IIndexWord indexWord = m_dict.getIndexWord("dog", POS.VERB);
+    System.out.println("\nwn.synsets('dog', pos=wn.NOUN)");
+    IIndexWord indexWord = m_dict.getIndexWord("dog", POS.NOUN);
     IWordID wordID = indexWord.getWordIDs().get(0);
     IWord word = m_dict.getWord(wordID);
     System.out.println("Id = " + wordID);
     System.out.println("Lemma = " + word.getLemma());
     System.out.println("Gloss = " + word.getSynset().getGloss());
 
-    String stemmingWord = "gone";
-    List<String> test = m_wordnetStemmer.findStems(stemmingWord, POS.NOUN);
-    for (int i = 0; i < test.size(); i++) {
-      System.out.println("stems of +" + stemmingWord + ": " + test.get(i));
+    System.out
+        .println("\ndog = wn.synset('dog.n.01') dog.hypernyms - ancestors");
+    List<ISynsetID> ancestors = getAncestors(getSynset("dog", POS.NOUN));
+    for (ISynsetID ancestor : ancestors) {
+      ISynset synset = m_dict.getSynset(ancestor);
+      System.out.println(synset);
     }
+
+    System.out.println("\ndog = wn.synset('dog.n.01') dog.hyponyms - children");
+    List<ISynsetID> children = getChildren(getSynset("dog", POS.NOUN));
+    for (ISynsetID child : children) {
+      ISynset synset = m_dict.getSynset(child);
+      System.out.println(synset);
+    }
+
+    // ************************************************************************
+    // Test similarities
+    // ************************************************************************
+    Double pathSimilarity = null;
+    Double lchSimilarity = null;
+
+    System.out.println("\nwn.path_similarity(dog, dog) = 1.0");
+    pathSimilarity = pathSimilarity(getSynset("dog", POS.NOUN),
+        getSynset("dog", POS.NOUN));
+    System.out.println("pathSimilarity: " + pathSimilarity);
+
+    System.out.println("\nwn.lch_similarity(dog, dog) = 3.63758");
+    lchSimilarity = lchSimilarity(getSynset("dog", POS.NOUN),
+        getSynset("dog", POS.NOUN));
+    System.out.println("lchSimilarity: " + lchSimilarity);
+
+    System.out.println("\nwn.path_similarity(dog, cat) = 0.2");
+    pathSimilarity = pathSimilarity(getSynset("dog", POS.NOUN),
+        getSynset("cat", POS.NOUN));
+    System.out.println("pathSimilarity: " + pathSimilarity);
+
+    System.out.println("\nwn.lch_similarity(dog, cat) = 2.02814");
+    lchSimilarity = lchSimilarity(getSynset("dog", POS.NOUN),
+        getSynset("cat", POS.NOUN));
+    System.out.println("lchSimilarity: " + lchSimilarity);
+
+    System.out.println("\nwn.path_similarity(hit, slap) = 0.14285");
+    pathSimilarity = pathSimilarity(getSynset("hit", POS.VERB),
+        getSynset("slap", POS.VERB));
+    System.out.println("pathSimilarity: " + pathSimilarity);
+
+    System.out.println("\nwn.lch_similarity(hit, slap) = 1.31218");
+    lchSimilarity = lchSimilarity(getSynset("hit", POS.VERB),
+        getSynset("slap", POS.VERB));
+    System.out.println("lchSimilarity: " + lchSimilarity);
+
+    // ************************************************************************
+    // Test stemming
+    // ************************************************************************
+    System.out.println("\nStemming test...");
+    String[] stemmingWords = { "cats", "running", "ran", "cactus", "cactuses",
+        "community", "communities" };
+    POS[] stemmingPOS = { POS.NOUN, POS.VERB, POS.VERB, POS.NOUN, POS.NOUN,
+        POS.NOUN, POS.NOUN };
+    String[] stemmingResults = { "cat", "run", "run", "cactus", "cactus",
+        "community", "community" };
+
+    for (int i = 0; i < stemmingWords.length; i++) {
+      List<String> stemResults = m_wordnetStemmer.findStems(stemmingWords[i],
+          stemmingPOS[i]);
+      for (String stemResult : stemResults) {
+        System.out.println("stems of \"" + stemmingWords[i] + "\": "
+            + stemResult);
+        // verify result
+        if (!stemResult.equals(stemmingResults[i])) {
+          System.err.println("Wrong stemming result of \"" + stemmingWords[i]
+              + "\" result: \"" + stemResult + "\" expected: \""
+              + stemmingResults[i] + "\"");
+        }
+      }
+    }
+
   }
 
-  public void trek(IDictionary dict) {
+  /**
+   * Treking across Wordnet for performance measurements
+   * 
+   */
+  private void trek() {
     int tickNext = 0;
     int tickSize = 20000;
     int seen = 0;
     System.out.print("Treking across Wordnet");
     long t = System.currentTimeMillis();
     for (POS pos : POS.values()) {
-      for (Iterator<IIndexWord> i = dict.getIndexWordIterator(pos); i.hasNext();) {
+      for (Iterator<IIndexWord> i = m_dict.getIndexWordIterator(pos); i
+          .hasNext();) {
         for (IWordID wid : i.next().getWordIDs()) {
-          seen += dict.getWord(wid).getSynset().getWords().size();
+          seen += m_dict.getWord(wid).getSynset().getWords().size();
           if (seen > tickNext) {
             System.out.print(".");
             tickNext = seen + tickSize;
