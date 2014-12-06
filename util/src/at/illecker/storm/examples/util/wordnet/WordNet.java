@@ -18,7 +18,6 @@ package at.illecker.storm.examples.util.wordnet;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,8 +39,7 @@ import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
 import edu.mit.jwi.item.Pointer;
 import edu.mit.jwi.morph.WordnetStemmer;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.process.DocumentPreprocessor;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class WordNet {
 
@@ -268,45 +266,14 @@ public class WordNet {
     return resultSynset;
   }
 
-  public ISynset disambiguateWordSenses(String sentence, String wordString,
-      POS wordPOS) {
-    IIndexWord indexWord = getIndexWord(wordString, wordPOS);
-    Set<ISynset> synsets = getSynsets(indexWord);
-
-    ISynset resultSynset = null;
-    double bestScore = 0;
-    for (ISynset synset : synsets) {
-      DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(
-          sentence));
-      for (List<HasWord> words : dp) {
-        for (HasWord word : words) {
-          double score = 0;
-          IIndexWord indexWordLocal = getIndexWord(word.word(), wordPOS); // TODO
-                                                                          // wordPOS!
-          Set<ISynset> synsetsLocal = getSynsets(indexWordLocal);
-          for (ISynset synsetLocal : synsetsLocal) {
-            double sim = shortestPathDistance(synsetLocal, synset);
-            if (sim > 0) {
-              score += sim;
-            }
-          }
-          if (score > bestScore) {
-            bestScore = score;
-            resultSynset = synset;
-          }
-        }
-      }
-    }
-    return resultSynset;
-  }
-
   /**
-   * max_depth()
+   * maxDepth
    * 
    * @param synset
-   * @return
+   * @return The length of the longest hypernym path from this synset to the
+   *         root.
    */
-  public int depth(ISynset synset) {
+  public int maxDepth(ISynset synset) {
     if (synset == null) {
       return 0;
     }
@@ -319,7 +286,7 @@ public class WordNet {
     int i = 0;
     for (ISynsetID ancestor : ancestors) {
       ISynset ancestorSynset = m_dict.getSynset(ancestor);
-      int j = depth(ancestorSynset);
+      int j = maxDepth(ancestorSynset);
       i = (i > j) ? i : j;
     }
 
@@ -350,15 +317,15 @@ public class WordNet {
 
     ISynset ccp = findClosestCommonParent(synset1, synset2);
     if (ccp != null) {
-      distance = depth(synset1) + depth(synset2) - 2 * depth(ccp);
+      distance = maxDepth(synset1) + maxDepth(synset2) - 2 * maxDepth(ccp);
 
       // Debug
       String w1 = synset1.getWords().get(0).getLemma();
       String w2 = synset2.getWords().get(0).getLemma();
       String w3 = ccp.getWords().get(0).getLemma();
-      System.out.println("maxDepth(" + w1 + "): " + depth(synset1));
-      System.out.println("maxDepth(" + w2 + "): " + depth(synset2));
-      System.out.println("maxDepth(" + w3 + "): " + depth(ccp));
+      System.out.println("maxDepth(" + w1 + "): " + maxDepth(synset1));
+      System.out.println("maxDepth(" + w2 + "): " + maxDepth(synset2));
+      System.out.println("maxDepth(" + w3 + "): " + maxDepth(ccp));
       System.out.println("distance(" + w1 + "," + w2 + "): " + distance);
     }
     return distance;
@@ -397,8 +364,8 @@ public class WordNet {
       // Debug
       String w1 = synset1.getWords().get(0).getLemma();
       String w2 = synset2.getWords().get(0).getLemma();
-      System.out.println("maxDepth(" + w1 + "): " + depth(synset1));
-      System.out.println("maxDepth(" + w2 + "): " + depth(synset2));
+      System.out.println("maxDepth(" + w1 + "): " + maxDepth(synset1));
+      System.out.println("maxDepth(" + w2 + "): " + maxDepth(synset2));
       System.out.println("distance: " + distance);
       System.out.println("pathSimilarity(" + w1 + "," + w2 + "): "
           + pathSimilarity);
@@ -478,6 +445,41 @@ public class WordNet {
       }
     }
     return maxSim;
+  }
+
+  /**
+   * 
+   * @param sentence
+   * @param wordString
+   * @param wordPOS
+   * @return
+   */
+  public ISynset disambiguateWordSenses(List<TaggedWord> sentence,
+      String wordString, POS wordPOS) {
+    IIndexWord indexWord = getIndexWord(wordString, wordPOS);
+    Set<ISynset> synsets = getSynsets(indexWord);
+
+    ISynset resultSynset = null;
+    double bestScore = 0;
+    for (ISynset synset : synsets) {
+      for (TaggedWord taggedWord : sentence) {
+        double score = 0;
+        IIndexWord indexWordLocal = getIndexWord(taggedWord.word(),
+            POSTag.convertString(taggedWord.tag()));
+        Set<ISynset> synsetsLocal = getSynsets(indexWordLocal);
+        for (ISynset synsetLocal : synsetsLocal) {
+          double sim = shortestPathDistance(synsetLocal, synset);
+          if (sim > 0) {
+            score += sim;
+          }
+        }
+        if (score > bestScore) {
+          bestScore = score;
+          resultSynset = synset;
+        }
+      }
+    }
+    return resultSynset;
   }
 
   /**
