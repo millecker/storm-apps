@@ -61,8 +61,8 @@ public class WordNet {
     try {
       File wordNetDict = new File(WORD_NET_DICT_PATH);
       m_wordNetDir = new File(wordNetDict.getParent() + File.separator + "dict");
-      LOG.info("wordNetDictionary: " + wordNetDict.getAbsolutePath());
-      LOG.info("wordNetExtractLocation: " + m_wordNetDir.getAbsolutePath());
+      LOG.info("WordNet Dictionary: " + wordNetDict.getAbsolutePath());
+      LOG.info("WordNet Extract Location: " + m_wordNetDir.getAbsolutePath());
 
       // check if extract location does exist
       if (m_wordNetDir.exists()) {
@@ -79,8 +79,8 @@ public class WordNet {
       // load into memory
       long t = System.currentTimeMillis();
       m_dict.load(true);
-      LOG.info("Loaded Wordnet into memory in (%1d msec)\n",
-          System.currentTimeMillis() - t);
+      LOG.info("Loaded Wordnet into memory in "
+          + (System.currentTimeMillis() - t) + " msec\n");
 
       m_wordnetStemmer = new WordnetStemmer(m_dict);
 
