@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="lib/libsvm-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.9.jar"/>
 	<classpathentry kind="lib" path="lib/edu.mit.jwi_2.3.3_jdk.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
