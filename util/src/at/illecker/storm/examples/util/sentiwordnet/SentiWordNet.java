@@ -14,17 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util;
+package at.illecker.storm.examples.util.sentiwordnet;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import at.illecker.storm.examples.util.wordnet.POSTag;
+import at.illecker.storm.examples.util.wordnet.WordNet;
+import edu.mit.jwi.item.POS;
 
 public class SentiWordNet {
 
@@ -37,10 +42,13 @@ public class SentiWordNet {
   private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
 
   private static SentiWordNet instance = new SentiWordNet(); // singleton
+  private static WordNet m_wordnet;
   private Map<String, Double> m_dictionary;
 
   private SentiWordNet() {
-    LOG.info("sentiWordNetDictionary: " + SENTI_WORD_NET_DICT_PATH);
+    m_wordnet = WordNet.getInstance();
+
+    LOG.info("loadDictionary: " + SENTI_WORD_NET_DICT_PATH);
     try {
       m_dictionary = loadDict(SENTI_WORD_NET_DICT_PATH);
     } catch (IOException e) {
@@ -52,59 +60,67 @@ public class SentiWordNet {
     return instance;
   }
 
-  public Map<String, Double> loadDict(String pathToSWN) throws IOException {
+  private Map<String, Double> loadDict(String sentiWordNetDictPath)
+      throws IOException {
     // This is our main dictionary representation
     Map<String, Double> dictionary = new HashMap<String, Double>();
 
     // From String to list of doubles.
     HashMap<String, HashMap<Integer, Double>> tempDictionary = new HashMap<String, HashMap<Integer, Double>>();
 
-    BufferedReader csv = null;
+    BufferedReader br = null;
     try {
-      csv = new BufferedReader(new FileReader(pathToSWN));
-      int lineNumber = 0;
+      br = new BufferedReader(new FileReader(sentiWordNetDictPath));
 
+      int lineNumber = 0;
       String line;
-      while ((line = csv.readLine()) != null) {
+      // POS ID PosScore NegScore SynsetTerms Desc
+      // a \t 00003131 \t 0 \t 0 \t adductive#1 adducting#1 adducent#1 \t desc
+      while ((line = br.readLine()) != null) {
+        line = line.trim();
         lineNumber++;
 
-        if (!line.trim().startsWith("#")) {
+        if ((line.length() > 0) && (line.charAt(0) != '#')) {
           String[] data = line.split("\t");
-          // Example line
-          // POS ID PosScore NegScore SynsetTerms Desc
-          // a\t00003131\t0\t0\tadductive#1 adducting#1 adducent#1\tespecially
-          // of muscles;
-
-          // Is it a valid line? Otherwise, through exception.
+          // check tab format
           if (data.length != 6) {
-            throw new IllegalArgumentException(
-                "Incorrect tabulation format in file, line: " + lineNumber);
+            LOG.error("Incorrect tabulation format in file "
+                + sentiWordNetDictPath + ", line: " + lineNumber);
           }
 
-          String wordTypeMarker = data[0];
+          POS posTag = POSTag.parseString(data[0]);
+          double posScore = Double.parseDouble(data[2]);
+          double negScore = Double.parseDouble(data[3]);
+          Double synsetScore = posScore - negScore;
+          String synonyms = data[4];
 
-          // Calculate synset score as score = PosS - NegS
-          Double synsetScore = Double.parseDouble(data[2])
-              - Double.parseDouble(data[3]);
+          if (synsetScore != 0.0) {
+            for (String synonymToken : synonyms.split(" ")) {
+              // word#position
+              String[] synonym = synonymToken.split("#");
+              String word = synonym[0];
+              int position = Integer.parseInt(synonym[1]);
 
-          // Get all Synset terms
-          String[] synTermsSplit = data[4].split(" ");
-          for (String synTermSplit : synTermsSplit) {
-            // Get synterm and synterm rank
-            String[] synTermAndRank = synTermSplit.split("#");
-            String synTerm = synTermAndRank[0] + "#" + wordTypeMarker;
+              String synTerm = word + "#" + posTag.getTag();
 
-            int synTermRank = Integer.parseInt(synTermAndRank[1]);
-            // What we get here is a map of the type:
-            // term -> {score of synset#1, score of synset#2...}
+              // Add map to term if it doesn't have one
+              if (!tempDictionary.containsKey(synTerm)) {
+                tempDictionary.put(synTerm, new HashMap<Integer, Double>());
+              }
 
-            // Add map to term if it doesn't have one
-            if (!tempDictionary.containsKey(synTerm)) {
-              tempDictionary.put(synTerm, new HashMap<Integer, Double>());
+              // Add map to term if it doesn't have one
+              if (!tempDictionary.containsKey(synTerm)) {
+                tempDictionary.put(synTerm, new HashMap<Integer, Double>());
+              }
+
+              // Add synset link to synterm
+              tempDictionary.get(synTerm).put(position, synsetScore);
+
+              List<String> stemmedWords = m_wordnet.findStems(word, posTag);
+              for (String stemmedWord : stemmedWords) {
+                // TODO
+              }
             }
-
-            // Add synset link to synterm
-            tempDictionary.get(synTerm).put(synTermRank, synsetScore);
           }
         }
       }
@@ -112,6 +128,7 @@ public class SentiWordNet {
       // Go through all the terms.
       for (Map.Entry<String, HashMap<Integer, Double>> entry : tempDictionary
           .entrySet()) {
+
         String word = entry.getKey();
         Map<Integer, Double> synSetScoreMap = entry.getValue();
 
@@ -132,26 +149,37 @@ public class SentiWordNet {
 
       return dictionary;
 
-    } catch (Exception e) {
+    } catch (IOException e) {
       e.printStackTrace();
     } finally {
-      if (csv != null) {
-        csv.close();
+      if (br != null) {
+        br.close();
       }
     }
+
     return null;
   }
 
-  public double extract(String word, String pos) {
-    return m_dictionary.get(word + "#" + pos);
+  public void close() {
+    try {
+      m_wordnet.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public Double getScore(String word, String posTag) {
+    return m_dictionary.get(word + "#" + posTag);
   }
 
   public static void main(String[] args) {
     SentiWordNet sentiwordnet = SentiWordNet.getInstance();
 
-    System.out.println("good#a " + sentiwordnet.extract("good", "a"));
-    System.out.println("bad#a " + sentiwordnet.extract("bad", "a"));
-    System.out.println("blue#a " + sentiwordnet.extract("blue", "a"));
-    System.out.println("blue#n " + sentiwordnet.extract("blue", "n"));
+    System.out.println("good#a " + sentiwordnet.getScore("good", "a"));
+    System.out.println("bad#a " + sentiwordnet.getScore("bad", "a"));
+    System.out.println("blue#a " + sentiwordnet.getScore("blue", "a"));
+    System.out.println("blue#n " + sentiwordnet.getScore("blue", "n"));
+
+    sentiwordnet.close();
   }
 }
