@@ -23,18 +23,38 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SentiWordNet {
 
-  public static final String WORKING_DIR_PATH = System.getProperty("user.dir");
-  public static final String SENTI_WORD_NET_DICT_PATH = WORKING_DIR_PATH
-      + File.separator + "resources" + File.separator
+  public static final String SENTI_WORD_NET_DICT_PATH = System
+      .getProperty("user.dir")
+      + File.separator
+      + "resources"
+      + File.separator
       + "SentiWordNet_3.0.0_20130122.txt";
+  private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
 
+  private static SentiWordNet instance = new SentiWordNet(); // singleton
   private Map<String, Double> m_dictionary;
 
-  public SentiWordNet(String pathToSWN) throws IOException {
+  private SentiWordNet() {
+    LOG.info("sentiWordNetDictionary: " + SENTI_WORD_NET_DICT_PATH);
+    try {
+      m_dictionary = loadDict(SENTI_WORD_NET_DICT_PATH);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static SentiWordNet getInstance() {
+    return instance;
+  }
+
+  public Map<String, Double> loadDict(String pathToSWN) throws IOException {
     // This is our main dictionary representation
-    m_dictionary = new HashMap<String, Double>();
+    Map<String, Double> dictionary = new HashMap<String, Double>();
 
     // From String to list of doubles.
     HashMap<String, HashMap<Integer, Double>> tempDictionary = new HashMap<String, HashMap<Integer, Double>>();
@@ -107,8 +127,11 @@ public class SentiWordNet {
         }
         score /= sum;
 
-        m_dictionary.put(word, score);
+        dictionary.put(word, score);
       }
+
+      return dictionary;
+
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -116,6 +139,7 @@ public class SentiWordNet {
         csv.close();
       }
     }
+    return null;
   }
 
   public double extract(String word, String pos) {
@@ -123,18 +147,11 @@ public class SentiWordNet {
   }
 
   public static void main(String[] args) {
-    System.out.println("SENTI_WORD_NET_DICT_PATH: " + SENTI_WORD_NET_DICT_PATH);
+    SentiWordNet sentiwordnet = SentiWordNet.getInstance();
 
-    try {
-      SentiWordNet sentiwordnet = new SentiWordNet(SENTI_WORD_NET_DICT_PATH);
-
-      System.out.println("good#a " + sentiwordnet.extract("good", "a"));
-      System.out.println("bad#a " + sentiwordnet.extract("bad", "a"));
-      System.out.println("blue#a " + sentiwordnet.extract("blue", "a"));
-      System.out.println("blue#n " + sentiwordnet.extract("blue", "n"));
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    System.out.println("good#a " + sentiwordnet.extract("good", "a"));
+    System.out.println("bad#a " + sentiwordnet.extract("bad", "a"));
+    System.out.println("blue#a " + sentiwordnet.extract("blue", "a"));
+    System.out.println("blue#n " + sentiwordnet.extract("blue", "n"));
   }
 }
