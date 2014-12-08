@@ -19,7 +19,6 @@ package at.illecker.storm.examples.util.unsupervised;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,18 +48,20 @@ public class UnsupervisedSentimentAnalysis {
   private static UnsupervisedSentimentAnalysis instance = new UnsupervisedSentimentAnalysis();
   private static WordNet m_wordnet;
   private static SentiWordNet m_sentiwordnet;
-  private WordListMap<Double> m_wordRatings1; // AFINN
-  private WordListMap<Double> m_wordRatings2; // SentStrength
+  // AFINN word list (minValue -5 and maxValue +5)
+  private WordListMap<Double> m_wordList1;
+  // SentStrength word list (minValue -5 and maxValue +5)
+  private WordListMap<Double> m_wordList2;
 
   private UnsupervisedSentimentAnalysis() {
     m_wordnet = WordNet.getInstance();
     m_sentiwordnet = SentiWordNet.getInstance();
 
     try {
-      m_wordRatings1 = WordListMap.loadWordRatings(new FileInputStream(
-          SENTIMENT_WORD_LIST1));
-      m_wordRatings2 = WordListMap.loadWordRatings(new FileInputStream(
-          SENTIMENT_WORD_LIST2));
+      m_wordList1 = WordListMap.loadWordRatings(new FileInputStream(
+          SENTIMENT_WORD_LIST1), -5, 5);
+      m_wordList2 = WordListMap.loadWordRatings(new FileInputStream(
+          SENTIMENT_WORD_LIST2), -5, 5);
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();

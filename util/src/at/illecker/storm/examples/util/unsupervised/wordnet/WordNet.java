@@ -51,8 +51,8 @@ public class WordNet {
       + File.separator
       + "wordnet" + File.separator + "wn3.1.dict.tar.gz";
   private static final Logger LOG = LoggerFactory.getLogger(WordNet.class);
+  private static final WordNet instance = new WordNet();
 
-  private static WordNet instance = new WordNet(); // singleton
   private IRAMDictionary m_dict;
   private File m_wordNetDir;
   private WordnetStemmer m_wordnetStemmer;

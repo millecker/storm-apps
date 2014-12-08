@@ -39,9 +39,9 @@ public class SentiWordNet {
       + File.separator
       + "wordlists" + File.separator + "SentiWordNet_3.0.0_20130122.txt";
   private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
+  private static final SentiWordNet instance = new SentiWordNet();
 
-  private static SentiWordNet instance = new SentiWordNet(); // singleton
-  private static WordNet m_wordnet;
+  private WordNet m_wordnet;
   private Map<String, HashMap<Integer, SentiValue>> m_dict;
   private Map<String, Double> m_dictWeighted;
 
