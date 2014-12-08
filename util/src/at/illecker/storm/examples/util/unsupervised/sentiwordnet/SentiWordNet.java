@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.sentiwordnet;
+package at.illecker.storm.examples.util.unsupervised.sentiwordnet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,8 +26,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.wordnet.POSTag;
-import at.illecker.storm.examples.util.wordnet.WordNet;
+import at.illecker.storm.examples.util.unsupervised.wordnet.POSTag;
+import at.illecker.storm.examples.util.unsupervised.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
 
 public class SentiWordNet {
