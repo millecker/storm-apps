@@ -49,7 +49,7 @@ public class WordNet {
       + File.separator
       + "resources"
       + File.separator
-      + "wn3.1.dict.tar.gz";
+      + "wordnet" + File.separator + "wn3.1.dict.tar.gz";
   private static final Logger LOG = LoggerFactory.getLogger(WordNet.class);
 
   private static WordNet instance = new WordNet(); // singleton
@@ -382,6 +382,16 @@ public class WordNet {
    * shortest path that connects the senses and the maximum depth of the
    * taxonomy in which the senses occur. The relationship is given as -log(p/2d)
    * where p is the shortest path length and d is the taxonomy depth.
+   * 
+   * lch(c1,c2) = - log(minPathLength(c1,c2) / 2 * depth of the hierarchy)
+   * lch(c1,c2) = - log(minPL(c1,c2) / 2 * depth) = log(2*depth / minPL(c1,c2))
+   * 
+   * minPathLength is measured in nodes, i.e. the distance of a node to itself
+   * is 0! This would cause a logarithm error (or a division by zero)). Thus we
+   * changed the behaviour in order to return a distance of 1, if the nodes are
+   * equal or neighbors.
+   * 
+   * double relatedness = Math.log( (2*depthOfHierarchy) / (pathLength + 1) );
    * 
    * @param synset1
    * @param synset2

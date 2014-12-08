@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -38,40 +37,33 @@ public class SentiWordNet {
       + File.separator
       + "resources"
       + File.separator
-      + "SentiWordNet_3.0.0_20130122.txt";
+      + "wordlists" + File.separator + "SentiWordNet_3.0.0_20130122.txt";
   private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
 
   private static SentiWordNet instance = new SentiWordNet(); // singleton
   private static WordNet m_wordnet;
-  private Map<String, Double> m_dictionary;
+  private Map<String, HashMap<Integer, SentiValue>> m_dict;
+  private Map<String, Double> m_dictWeighted;
 
   private SentiWordNet() {
     m_wordnet = WordNet.getInstance();
 
     LOG.info("loadDictionary: " + SENTI_WORD_NET_DICT_PATH);
-    try {
-      m_dictionary = loadDict(SENTI_WORD_NET_DICT_PATH);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    m_dict = loadDict(SENTI_WORD_NET_DICT_PATH);
+    m_dictWeighted = calcAvgWeightScores();
   }
 
   public static SentiWordNet getInstance() {
     return instance;
   }
 
-  private Map<String, Double> loadDict(String sentiWordNetDictPath)
-      throws IOException {
-    // This is our main dictionary representation
-    Map<String, Double> dictionary = new HashMap<String, Double>();
+  private Map<String, HashMap<Integer, SentiValue>> loadDict(
+      String sentiWordNetDictPath) {
 
-    // From String to list of doubles.
-    HashMap<String, HashMap<Integer, Double>> tempDictionary = new HashMap<String, HashMap<Integer, Double>>();
-
+    Map<String, HashMap<Integer, SentiValue>> dict = new HashMap<String, HashMap<Integer, SentiValue>>();
     BufferedReader br = null;
     try {
       br = new BufferedReader(new FileReader(sentiWordNetDictPath));
-
       int lineNumber = 0;
       String line;
       // POS ID PosScore NegScore SynsetTerms Desc
@@ -103,61 +95,62 @@ public class SentiWordNet {
 
               String synTerm = word + "#" + posTag.getTag();
 
-              // Add map to term if it doesn't have one
-              if (!tempDictionary.containsKey(synTerm)) {
-                tempDictionary.put(synTerm, new HashMap<Integer, Double>());
+              if (!dict.containsKey(synTerm)) {
+                dict.put(synTerm, new HashMap<Integer, SentiValue>());
               }
 
-              // Add map to term if it doesn't have one
-              if (!tempDictionary.containsKey(synTerm)) {
-                tempDictionary.put(synTerm, new HashMap<Integer, Double>());
-              }
+              dict.get(synTerm).put(position,
+                  new SentiValue(posScore, negScore));
 
-              // Add synset link to synterm
-              tempDictionary.get(synTerm).put(position, synsetScore);
-
-              List<String> stemmedWords = m_wordnet.findStems(word, posTag);
-              for (String stemmedWord : stemmedWords) {
-                // TODO
-              }
+              // TODO
+              /*
+               * List<String> stemmedWords = m_wordnet.findStems(word, posTag);
+               * for (String stemmedWord : stemmedWords) { }
+               */
             }
           }
         }
       }
 
-      // Go through all the terms.
-      for (Map.Entry<String, HashMap<Integer, Double>> entry : tempDictionary
-          .entrySet()) {
-
-        String word = entry.getKey();
-        Map<Integer, Double> synSetScoreMap = entry.getValue();
-
-        // Calculate weighted average. Weight the synsets according to
-        // their rank.
-        // Score= 1/2*first + 1/3*second + 1/4*third ..... etc.
-        // Sum = 1/1 + 1/2 + 1/3 ...
-        double score = 0.0;
-        double sum = 0.0;
-        for (Map.Entry<Integer, Double> setScore : synSetScoreMap.entrySet()) {
-          score += setScore.getValue() / (double) setScore.getKey();
-          sum += 1.0 / (double) setScore.getKey();
-        }
-        score /= sum;
-
-        dictionary.put(word, score);
-      }
-
-      return dictionary;
+      return dict;
 
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
       if (br != null) {
-        br.close();
+        try {
+          br.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
-
     return null;
+  }
+
+  public Map<String, Double> calcAvgWeightScores() {
+    Map<String, Double> dictWeighted = new HashMap<String, Double>();
+
+    for (Map.Entry<String, HashMap<Integer, SentiValue>> entry : m_dict
+        .entrySet()) {
+      String synTerm = entry.getKey();
+      Map<Integer, SentiValue> synSetScoreMap = entry.getValue();
+
+      // Calculate weighted average
+      // Weight the synsets according to their rank
+      // Score = 1/2*first + 1/3*second + 1/4*third ...
+      // Sum = 1/1 + 1/2 + 1/3 ...
+      double score = 0.0;
+      double sum = 0.0;
+      for (Map.Entry<Integer, SentiValue> synset : synSetScoreMap.entrySet()) {
+        score += synset.getValue().getScore() / (double) synset.getKey();
+        sum += 1.0 / (double) synset.getKey();
+      }
+      score /= sum;
+
+      dictWeighted.put(synTerm, score);
+    }
+    return dictWeighted;
   }
 
   public void close() {
@@ -168,18 +161,74 @@ public class SentiWordNet {
     }
   }
 
-  public Double getScore(String word, String posTag) {
-    return m_dictionary.get(word + "#" + posTag);
+  public Map<Integer, SentiValue> getSentiValues(String word, char posTag) {
+    return m_dict.get(word + "#" + posTag);
+  }
+
+  public Map<Integer, SentiValue> getSentiValues(String word, POS posTag) {
+    return getSentiValues(word, posTag.getTag());
+  }
+
+  public SentiValue getSentiValue(String word, char posTag, int position) {
+    HashMap<Integer, SentiValue> values = m_dict.get(word + "#" + posTag);
+    if ((values != null) && (values.size() > position)) {
+      return values.get(position);
+    }
+    return null;
+  }
+
+  public SentiValue getSentiValue(String word, POS posTag, int position) {
+    return getSentiValue(word, posTag.getTag(), position);
+  }
+
+  public SentiValue getSentiValue(String word, char posTag) {
+    return getSentiValue(word, posTag, 1);
+  }
+
+  public SentiValue getSentiValue(String word, POS posTag) {
+    return getSentiValue(word, posTag.getTag(), 1);
+  }
+
+  public Double getScore(String word, char posTag) {
+    SentiValue sentiValue = getSentiValue(word, posTag, 1);
+    if (sentiValue != null) {
+      return sentiValue.getScore();
+    }
+    return null;
+  }
+
+  public Double getScore(String word, POS posTag) {
+    return getScore(word, posTag.getTag());
+  }
+
+  public Double getAvgScore(String word, char posTag) {
+    return m_dictWeighted.get(word + "#" + posTag);
+  }
+
+  public Double getAvgScore(String word, POS posTag) {
+    return getAvgScore(word, posTag.getTag());
   }
 
   public static void main(String[] args) {
-    SentiWordNet sentiwordnet = SentiWordNet.getInstance();
+    SentiWordNet swn = SentiWordNet.getInstance();
 
-    System.out.println("good#a " + sentiwordnet.getScore("good", "a"));
-    System.out.println("bad#a " + sentiwordnet.getScore("bad", "a"));
-    System.out.println("blue#a " + sentiwordnet.getScore("blue", "a"));
-    System.out.println("blue#n " + sentiwordnet.getScore("blue", "n"));
+    printScores(swn, "good", 'a');
+    printScores(swn, "bad", 'a');
+    printScores(swn, "blue", 'a');
+    printScores(swn, "blue", 'n');
 
-    sentiwordnet.close();
+    swn.close();
+  }
+
+  public static void printScores(SentiWordNet swn, String word, char posTag) {
+    System.out.println(word + "#" + posTag + ": " + swn.getScore(word, posTag));
+    System.out.println("avg(" + word + "#" + posTag + ") "
+        + swn.getAvgScore(word, posTag));
+    Map<Integer, SentiValue> values = swn.getSentiValues(word, posTag);
+    if (values != null) {
+      for (Map.Entry<Integer, SentiValue> val : values.entrySet()) {
+        System.out.println("\t" + val.getKey() + "\t" + val.getValue());
+      }
+    }
   }
 }
