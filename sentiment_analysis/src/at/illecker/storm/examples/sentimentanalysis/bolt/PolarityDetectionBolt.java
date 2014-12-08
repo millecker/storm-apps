@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.sentimentanalysis.util.Tweet;
-import at.illecker.storm.examples.sentimentanalysis.util.WordListMap;
+import at.illecker.storm.examples.util.unsupervised.WordListMap;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
