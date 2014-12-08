@@ -54,12 +54,14 @@ public class PolarityDetectionBolt extends BaseRichBolt {
     this.m_collector = collector;
 
     if (config.get(CONF_SENTIMENT_WORD_LIST1_FILE) != null) {
-      m_wordRatings1 = WordListMap.loadWordRatings(config.get(
-          CONF_SENTIMENT_WORD_LIST1_FILE).toString());
+      m_wordRatings1 = WordListMap.loadWordRatings(ClassLoader
+          .getSystemResourceAsStream(config.get(CONF_SENTIMENT_WORD_LIST1_FILE)
+              .toString()));
     }
     if (config.get(CONF_SENTIMENT_WORD_LIST2_FILE) != null) {
-      m_wordRatings2 = WordListMap.loadWordRatings(config.get(
-          CONF_SENTIMENT_WORD_LIST2_FILE).toString());
+      m_wordRatings2 = WordListMap.loadWordRatings(ClassLoader
+          .getSystemResourceAsStream(config.get(CONF_SENTIMENT_WORD_LIST2_FILE)
+              .toString()));
     }
     if ((m_wordRatings1 == null) && (m_wordRatings2 == null)) {
       throw new RuntimeException("No word lists available!");

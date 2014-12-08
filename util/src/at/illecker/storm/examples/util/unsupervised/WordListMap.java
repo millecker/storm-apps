@@ -18,6 +18,7 @@ package at.illecker.storm.examples.util.unsupervised;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,12 +81,11 @@ public class WordListMap<V> extends TreeMap<String, V> {
     return result;
   }
 
-  public static WordListMap<Double> loadWordRatings(String file) {
+  public static WordListMap<Double> loadWordRatings(InputStream is) {
     WordListMap<Double> wordListMap = new WordListMap<Double>();
     BufferedReader reader = null;
     try {
-      reader = new BufferedReader(new InputStreamReader(
-          ClassLoader.getSystemResourceAsStream(file)));
+      reader = new BufferedReader(new InputStreamReader(is));
       String str = "";
       while ((str = reader.readLine()) != null) {
         if (str.trim().length() == 0) {
@@ -95,7 +95,7 @@ public class WordListMap<V> extends TreeMap<String, V> {
         // LOG.info("Add Key: '" + values[0] + "' Value: '" + values[1] + "'");
         wordListMap.put(values[0], Double.parseDouble(values[1]));
       }
-      LOG.info("Loaded " + wordListMap.size() + " items from " + file);
+      LOG.info("Loaded " + wordListMap.size() + " items");
       return wordListMap;
 
     } catch (IOException e) {
