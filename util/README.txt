@@ -2,9 +2,14 @@
 ##### Util Package                                                        #####
 ###############################################################################
 
-# Including common spouts and bolts
+# Including common spouts
 
+ - JsonFileSpout
  - TwitterSpout
  - TwitterFilesSpout
+ 
+# Unsupervised Sentiment Analysis
+
+# File Utils
 
 ###############################################################################
