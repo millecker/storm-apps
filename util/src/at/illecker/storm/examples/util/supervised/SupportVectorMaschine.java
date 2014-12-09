@@ -16,15 +16,28 @@
  */
 package at.illecker.storm.examples.util.supervised;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.List;
 
 import libsvm.svm;
 import libsvm.svm_model;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
+import at.illecker.storm.examples.util.FileUtil;
+import at.illecker.storm.examples.util.Tweet;
 
 public class SupportVectorMaschine {
+
+  public static final String TRAIN_DATA = System.getProperty("user.dir")
+      + File.separator + "resources" + File.separator + "tweets"
+      + File.separator + "svm" + File.separator + "trainingInput.txt";
+  public static final String TEST_DATA = System.getProperty("user.dir")
+      + File.separator + "resources" + File.separator + "tweets"
+      + File.separator + "svm" + File.separator + "testingInput.txt";
 
   public static void test() {
     // http://stackoverflow.com/questions/10792576/libsvm-java-implementation
@@ -130,7 +143,17 @@ public class SupportVectorMaschine {
   }
 
   public static void main(String[] args) {
-    test();
-  }
+    // test();
 
+    try {
+      List<Tweet> trainTweets = FileUtil.readTweets(new FileInputStream(
+          TRAIN_DATA));
+      List<Tweet> testTweets = FileUtil.readTweets(new FileInputStream(
+          TEST_DATA));
+
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+
+  }
 }

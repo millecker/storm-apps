@@ -18,11 +18,16 @@ package at.illecker.storm.examples.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -65,6 +70,57 @@ public class FileUtil {
     }
     // close input stream
     tarIn.close();
+  }
+
+  public static List<Tweet> readTweets(InputStream is) {
+    List<Tweet> tweets = new ArrayList<Tweet>();
+    InputStreamReader isr = null;
+    BufferedReader br = null;
+    try {
+      isr = new InputStreamReader(is, "UTF-8");
+      br = new BufferedReader(isr);
+      String line = "";
+      while ((line = br.readLine()) != null) {
+        String[] values = line.split("\t");
+        long id = Long.parseLong(values[0]);
+        String text = values[1];
+        String posTags = values[2]; // ignore
+        String label = values[3].toLowerCase().trim();
+        double score = 0;
+        if (label.equals("negative")) {
+          score = -1;
+        } else if (label.equals("neutral")) {
+          score = 0;
+        } else if (label.equals("positive")) {
+          score = 1;
+        }
+        tweets.add(new Tweet(id, text, score));
+      }
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (br != null) {
+        try {
+          br.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (isr != null) {
+        try {
+          isr.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
+    LOG.info("Loaded total " + " tweets: " + tweets.size());
+    return tweets;
   }
 
   public static void delete(File f) throws IOException {
