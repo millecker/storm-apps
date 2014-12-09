@@ -80,7 +80,7 @@ public class WordNet {
       long t = System.currentTimeMillis();
       m_dict.load(true);
       LOG.info("Loaded Wordnet into memory in "
-          + (System.currentTimeMillis() - t) + " msec\n");
+          + (System.currentTimeMillis() - t) + " msec");
 
       m_wordnetStemmer = new WordnetStemmer(m_dict);
 
