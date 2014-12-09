@@ -22,7 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.sentimentanalysis.util.SentimentTweet;
 import at.illecker.storm.examples.util.unsupervised.WordListMap;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -69,7 +69,8 @@ public class PolarityDetectionBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
+    SentimentTweet tweet = (SentimentTweet) tuple
+        .getValueByField("taggedTweet");
     // LOG.info(tweet.toString());
 
     double tweetSentiment1 = 0;

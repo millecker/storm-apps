@@ -24,29 +24,17 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class Tweet implements Serializable {
-  private static final long serialVersionUID = 4933096091291791733L;
+  private static final long serialVersionUID = -8470454779538779332L;
   private long m_id;
   private String m_text = "";
-  private double m_scoreAMT;
-  private double m_scoreMislove;
-  private double m_scoreAfinn;
-  private double m_scoreSentiStrength;
-  private double m_scoreSentiStrengthPos;
-  private double m_scoreSentiStrengthNeg;
+  private double m_score = 0;
   private List<List<HasWord>> m_sentences;
   private List<List<TaggedWord>> m_taggedSentences;
 
-  public Tweet(long id, String text, double scoreAMT, double scoreMislove,
-      double scoreAfinn, double scoreSentiStrength,
-      double scoreSentiStrengthPos, double scoreSentiStrengthNeg) {
+  public Tweet(long id, String text, double score) {
     this.m_id = id;
     this.m_text = text;
-    this.m_scoreAMT = scoreAMT;
-    this.m_scoreMislove = scoreMislove;
-    this.m_scoreAfinn = scoreAfinn;
-    this.m_scoreSentiStrength = scoreSentiStrength;
-    this.m_scoreSentiStrengthPos = scoreSentiStrengthPos;
-    this.m_scoreSentiStrengthNeg = scoreSentiStrengthNeg;
+    this.m_score = score;
     this.m_sentences = new ArrayList<List<HasWord>>();
     this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
   }
@@ -59,28 +47,8 @@ public class Tweet implements Serializable {
     return m_text;
   }
 
-  public double getScoreAMT() {
-    return m_scoreAMT;
-  }
-
-  public double getScoreMislove() {
-    return m_scoreMislove;
-  }
-
-  public double getScoreAFINN() {
-    return m_scoreAfinn;
-  }
-
-  public double getScoreSentiStrength() {
-    return m_scoreSentiStrength;
-  }
-
-  public double getScoreSentiStrengthPos() {
-    return m_scoreSentiStrengthPos;
-  }
-
-  public double getScoreSentiStrengthNeg() {
-    return m_scoreSentiStrengthNeg;
+  public double getScore() {
+    return m_score;
   }
 
   public void addSentence(List<HasWord> sentence) {
@@ -101,11 +69,7 @@ public class Tweet implements Serializable {
 
   @Override
   public String toString() {
-    return "Tweet [id=" + m_id + ", text=" + m_text + ", scoreAMT="
-        + m_scoreAMT + ", scoreMislove=" + m_scoreMislove + ", scoreAfinn="
-        + m_scoreAfinn + ", scoreSentiStrength=" + m_scoreSentiStrength
-        + ", scoreSentiStrengthPositive=" + m_scoreSentiStrengthPos
-        + ", scoreSentiStrengthNegative=" + m_scoreSentiStrengthNeg + "]";
+    return "Tweet [id=" + m_id + ", text=" + m_text + ", score=" + m_score
+        + "]";
   }
-
 }

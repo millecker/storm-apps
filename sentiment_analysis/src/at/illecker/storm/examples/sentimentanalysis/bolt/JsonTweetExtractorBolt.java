@@ -21,7 +21,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.sentimentanalysis.util.SentimentTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -70,8 +70,8 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
       LOG.error("Inconsistency: " + element.toString());
     }
 
-    Tweet tweet = new Tweet(id, (String) element.get("text"), score_amt,
-        score_mislove, score_afinn, score_sentistrength,
+    SentimentTweet tweet = new SentimentTweet(id, (String) element.get("text"),
+        score_amt, score_mislove, score_afinn, score_sentistrength,
         score_sentistrength_pos, score_sentistrength_neg);
     // LOG.info(tweet.toString());
 
