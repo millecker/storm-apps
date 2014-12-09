@@ -27,6 +27,7 @@ import libsvm.svm_model;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
+import at.illecker.storm.examples.util.SimpleFeatureVectorGenerator;
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
 
@@ -150,6 +151,16 @@ public class SupportVectorMaschine {
           TRAIN_DATA));
       List<Tweet> testTweets = FileUtil.readTweets(new FileInputStream(
           TEST_DATA));
+
+      // Generate feature vectors
+      SimpleFeatureVectorGenerator sfvg = new SimpleFeatureVectorGenerator();
+
+      for (Tweet tweet : trainTweets) {
+        tweet.genFeatureVector(sfvg);
+      }
+      for (Tweet tweet : testTweets) {
+        tweet.genFeatureVector(sfvg);
+      }
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();

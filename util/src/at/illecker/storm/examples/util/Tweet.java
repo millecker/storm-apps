@@ -30,6 +30,7 @@ public class Tweet implements Serializable {
   private double m_score = 0;
   private List<List<HasWord>> m_sentences;
   private List<List<TaggedWord>> m_taggedSentences;
+  private double[] m_featureVector;
 
   public Tweet(long id, String text, double score) {
     this.m_id = id;
@@ -51,6 +52,10 @@ public class Tweet implements Serializable {
     return m_score;
   }
 
+  public double[] getFeatureVector() {
+    return m_featureVector;
+  }
+
   public void addSentence(List<HasWord> sentence) {
     m_sentences.add(sentence);
   }
@@ -65,6 +70,10 @@ public class Tweet implements Serializable {
 
   public List<List<TaggedWord>> getTaggedSentences() {
     return m_taggedSentences;
+  }
+
+  public void genFeatureVector(FeatureVectorGenerator featureVectorGen) {
+    m_featureVector = featureVectorGen.calculateFeatureVector(this);
   }
 
   @Override
