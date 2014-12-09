@@ -27,8 +27,8 @@ import libsvm.svm_model;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
-import at.illecker.storm.examples.util.FileUtil;
 import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.util.io.FileUtil;
 
 public class SupportVectorMaschine {
 

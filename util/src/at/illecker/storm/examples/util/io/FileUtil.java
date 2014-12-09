@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util;
+package at.illecker.storm.examples.util.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,6 +34,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import at.illecker.storm.examples.util.Tweet;
 
 public class FileUtil {
   public static final int BUFFER_SIZE = 2048;
@@ -119,7 +121,7 @@ public class FileUtil {
         }
       }
     }
-    LOG.info("Loaded total " + " tweets: " + tweets.size());
+    LOG.info("Loaded total " + tweets.size() + " tweets");
     return tweets;
   }
 
