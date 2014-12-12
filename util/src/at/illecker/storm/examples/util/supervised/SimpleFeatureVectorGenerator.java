@@ -24,17 +24,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Tweet;
-import at.illecker.storm.examples.util.unsupervised.UnsupervisedSentimentAnalysis;
+import at.illecker.storm.examples.util.unsupervised.util.POSTagger;
+import at.illecker.storm.examples.util.unsupervised.util.SentimentWordLists;
+import at.illecker.storm.examples.util.unsupervised.util.Tokenizer;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(SimpleFeatureVectorGenerator.class);
   private static final SimpleFeatureVectorGenerator instance = new SimpleFeatureVectorGenerator();
-  private UnsupervisedSentimentAnalysis m_unsupervisedSentimentAnalysis;
+  private SentimentWordLists m_sentimentWordLists;
 
   private SimpleFeatureVectorGenerator() {
-    m_unsupervisedSentimentAnalysis = UnsupervisedSentimentAnalysis
-        .getInstance();
+    m_sentimentWordLists = SentimentWordLists.getInstance();
   }
 
   public static SimpleFeatureVectorGenerator getInstance() {
@@ -43,8 +45,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   @Override
   public double[] calculateFeatureVector(Tweet tweet) {
-    double tweetSentiment = m_unsupervisedSentimentAnalysis
-        .getTweetSentiment(tweet);
+    double tweetSentiment = m_sentimentWordLists.getTweetSentiment(tweet);
     LOG.info("tweetSentiment: " + tweetSentiment);
 
     return new double[] { tweetSentiment };
@@ -84,13 +85,20 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   }
 
   public static void main(String[] args) {
-    List<Tweet> tweets = getTestTweets();
+    POSTagger posTagger = POSTagger.getInstance();
+    SimpleFeatureVectorGenerator sfvg = SimpleFeatureVectorGenerator
+        .getInstance();
 
-    FeatureVectorGenerator fvg = new SimpleFeatureVectorGenerator();
-    for (Tweet tweet : tweets) {
+    for (Tweet tweet : getTestTweets()) {
       System.out.println("Tweet: " + tweet);
+
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+
+      tweet.addTaggedSentence(taggedSentence);
+
       System.out.println("FeatureVector: "
-          + Arrays.toString(fvg.calculateFeatureVector(tweet)));
+          + Arrays.toString(sfvg.calculateFeatureVector(tweet)));
     }
   }
 }
