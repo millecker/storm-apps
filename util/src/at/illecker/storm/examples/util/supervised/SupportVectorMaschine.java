@@ -28,6 +28,10 @@ import libsvm.svm_model;
 import libsvm.svm_node;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
 import edu.stanford.nlp.ling.HasWord;
@@ -47,6 +51,9 @@ public class SupportVectorMaschine {
   public static final String TAGGER_MODEL = System.getProperty("user.dir")
       + File.separator + "resources" + File.separator + "POSmodels"
       + File.separator + "gate-EN-twitter-fast.model";
+
+  private static final Logger LOG = LoggerFactory
+      .getLogger(SupportVectorMaschine.class);
 
   public static void test() {
     // http://stackoverflow.com/questions/10792576/libsvm-java-implementation
@@ -153,6 +160,7 @@ public class SupportVectorMaschine {
 
   public static void processTweets(MaxentTagger posTagger,
       FeatureVectorGenerator fvg, List<Tweet> tweets) {
+
     for (Tweet tweet : tweets) {
       // Sentence Tokenizer
       DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(
@@ -175,7 +183,7 @@ public class SupportVectorMaschine {
 
       System.out.println("Tweet: " + tweet);
       System.out.println("FeatureVector: "
-          + Arrays.toString(fvg.calculateFeatureVector(tweet)));
+          + Arrays.toString(tweet.getFeatureVector()));
 
       // TODO
       return;
@@ -184,18 +192,24 @@ public class SupportVectorMaschine {
 
   public static void main(String[] args) {
     try {
+      LOG.info("Read Train Data from " + TRAIN_DATA);
       List<Tweet> trainTweets = FileUtil.readTweets(new FileInputStream(
           TRAIN_DATA));
+      LOG.info("Read Test Data from " + TEST_DATA);
       List<Tweet> testTweets = FileUtil.readTweets(new FileInputStream(
           TEST_DATA));
 
       // POS Tagger
+      LOG.info("Load POS Tagger...");
       MaxentTagger posTagger = new MaxentTagger(TAGGER_MODEL);
 
       // Generate feature vectors
-      SimpleFeatureVectorGenerator sfvg = new SimpleFeatureVectorGenerator();
+      LOG.info("Load SimpleFeatureVectorGenerator...");
+      SimpleFeatureVectorGenerator sfvg = SimpleFeatureVectorGenerator
+          .getInstance();
 
       // Train tweets
+      LOG.info("Process Train data...");
       processTweets(posTagger, sfvg, trainTweets);
 
       // Test tweets

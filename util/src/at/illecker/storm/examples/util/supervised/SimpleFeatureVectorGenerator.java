@@ -20,14 +20,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.util.unsupervised.UnsupervisedSentimentAnalysis;
 
 public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
+  private static final Logger LOG = LoggerFactory
+      .getLogger(SimpleFeatureVectorGenerator.class);
+  private static final SimpleFeatureVectorGenerator instance = new SimpleFeatureVectorGenerator();
+  private UnsupervisedSentimentAnalysis m_unsupervisedSentimentAnalysis;
+
+  private SimpleFeatureVectorGenerator() {
+    m_unsupervisedSentimentAnalysis = UnsupervisedSentimentAnalysis
+        .getInstance();
+  }
+
+  public static SimpleFeatureVectorGenerator getInstance() {
+    return instance;
+  }
 
   @Override
   public double[] calculateFeatureVector(Tweet tweet) {
+    double tweetSentiment = m_unsupervisedSentimentAnalysis
+        .getTweetSentiment(tweet);
+    LOG.info("tweetSentiment: " + tweetSentiment);
 
-    return null;
+    return new double[] { tweetSentiment };
   }
 
   public static List<Tweet> getTestTweets() {
@@ -65,6 +85,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   public static void main(String[] args) {
     List<Tweet> tweets = getTestTweets();
+
     FeatureVectorGenerator fvg = new SimpleFeatureVectorGenerator();
     for (Tweet tweet : tweets) {
       System.out.println("Tweet: " + tweet);
