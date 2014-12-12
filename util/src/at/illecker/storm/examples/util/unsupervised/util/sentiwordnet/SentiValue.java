@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.unsupervised.sentiwordnet;
+package at.illecker.storm.examples.util.unsupervised.util.sentiwordnet;
 
 public class SentiValue {
 
