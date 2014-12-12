@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -123,6 +125,46 @@ public class FileUtil {
     }
     LOG.info("Loaded total " + tweets.size() + " tweets");
     return tweets;
+  }
+
+  public static Map<String, String> readFile(InputStream is, String splitRegex) {
+    Map<String, String> table = new HashMap<String, String>();
+    InputStreamReader isr = null;
+    BufferedReader br = null;
+    try {
+      isr = new InputStreamReader(is, "UTF-8");
+      br = new BufferedReader(isr);
+      String line = "";
+      while ((line = br.readLine()) != null) {
+        String[] values = line.split(splitRegex, 2);
+        table.put(values[0].trim(), values[1].trim());
+        // LOG.info("Add entry key: '" + values[0].trim() + "' value: '"
+        // + values[1].trim() + "'");
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (br != null) {
+        try {
+          br.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (isr != null) {
+        try {
+          isr.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
+    LOG.info("Loaded total " + table.size() + " entries");
+    return table;
   }
 
   public static void delete(File f) throws IOException {
