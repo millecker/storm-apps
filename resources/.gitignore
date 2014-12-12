@@ -4,3 +4,4 @@ twitter*
 *.json
 *.tar.gz
 *.csv
+*.regex
