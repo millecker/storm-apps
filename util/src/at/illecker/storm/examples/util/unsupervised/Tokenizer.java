@@ -16,28 +16,42 @@
  */
 package at.illecker.storm.examples.util.unsupervised;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.Word;
+import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
+import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 public class Tokenizer {
-  private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
   public static List<String> tokenize(String text) {
     List<String> tokens = new ArrayList<String>();
     // split at one ore more blanks
     String[] inputTokens = text.split("\\s+");
     for (String inputToken : inputTokens) {
-      // LOG.info("inputToken : '" + inputToken + "'");
       tokens.add(inputToken);
     }
     return tokens;
   }
 
+  public static List<List<HasWord>> tokenizeSentences(String text) {
+    TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
+        .newTokenizerFactory();
+    tokenizer.setOptions("ptb3Escaping=false");
+
+    return MaxentTagger.tokenizeText(new StringReader(text), tokenizer);
+  }
+
   public static void main(String[] args) {
-    Tokenizer
-        .tokenize("Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)");
+    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
+    System.out.println("text: '" + text + "'");
+    List<String> tokens = Tokenizer.tokenize(text);
+    for (String token : tokens) {
+      System.out.println("token: '" + token + "'");
+    }
   }
 }
