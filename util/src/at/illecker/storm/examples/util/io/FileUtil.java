@@ -28,8 +28,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -165,6 +167,44 @@ public class FileUtil {
     }
     LOG.info("Loaded total " + table.size() + " entries");
     return table;
+  }
+
+  public static Set<String> readFile(InputStream is) {
+    Set<String> set = new HashSet<String>();
+    InputStreamReader isr = null;
+    BufferedReader br = null;
+    try {
+      isr = new InputStreamReader(is, "UTF-8");
+      br = new BufferedReader(isr);
+      String line = "";
+      while ((line = br.readLine()) != null) {
+        set.add(line.trim());
+        // LOG.info("Add entry: '" + line.trim() + "'");
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (br != null) {
+        try {
+          br.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (isr != null) {
+        try {
+          isr.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
+    LOG.info("Loaded total " + set.size() + " entries");
+    return set;
   }
 
   public static void delete(File f) throws IOException {
