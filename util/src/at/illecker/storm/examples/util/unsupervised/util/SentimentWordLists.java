@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.unsupervised;
+package at.illecker.storm.examples.util.unsupervised.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,15 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Tweet;
-import at.illecker.storm.examples.util.unsupervised.sentiwordnet.SentiWordNet;
-import at.illecker.storm.examples.util.unsupervised.wordnet.POSTag;
-import at.illecker.storm.examples.util.unsupervised.wordnet.WordNet;
+import at.illecker.storm.examples.util.unsupervised.util.wordnet.POSTag;
+import at.illecker.storm.examples.util.unsupervised.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class UnsupervisedSentimentAnalysis {
-
+public class SentimentWordLists {
   public static final String SENTIMENT_WORD_LIST1 = System
       .getProperty("user.dir")
       + File.separator
@@ -42,30 +40,33 @@ public class UnsupervisedSentimentAnalysis {
       + "wordlists"
       + File.separator
       + "SentStrength_Data_Sept2011_EmotionLookupTable.txt";
+
   public static final String SENTIMENT_WORD_LIST2 = System
       .getProperty("user.dir")
       + File.separator
       + "resources"
       + File.separator
       + "wordlists" + File.separator + "AFINN-111.txt";
-  private static final Logger LOG = LoggerFactory
-      .getLogger(UnsupervisedSentimentAnalysis.class);
 
-  private static UnsupervisedSentimentAnalysis instance = new UnsupervisedSentimentAnalysis();
+  private static final Logger LOG = LoggerFactory
+      .getLogger(SentimentWordLists.class);
+  private static final SentimentWordLists instance = new SentimentWordLists();
+
   private WordNet m_wordnet;
-  private SentiWordNet m_sentiwordnet;
-  // AFINN word list (minValue -5 and maxValue +5)
-  private WordListMap<Double> m_wordList1;
   // SentStrength word list (minValue -5 and maxValue +5)
+  private WordListMap<Double> m_wordList1;
+  // AFINN word list (minValue -5 and maxValue +5)
   private WordListMap<Double> m_wordList2;
 
-  private UnsupervisedSentimentAnalysis() {
+  private SentimentWordLists() {
     m_wordnet = WordNet.getInstance();
-    m_sentiwordnet = SentiWordNet.getInstance();
 
     try {
+      LOG.info("Load SentStrength word list from: " + SENTIMENT_WORD_LIST1);
       m_wordList1 = WordListMap.loadWordRatings(new FileInputStream(
           SENTIMENT_WORD_LIST1), -5, 5);
+
+      LOG.info("Load AFINN word list from: " + SENTIMENT_WORD_LIST1);
       m_wordList2 = WordListMap.loadWordRatings(new FileInputStream(
           SENTIMENT_WORD_LIST2), -5, 5);
 
@@ -74,7 +75,7 @@ public class UnsupervisedSentimentAnalysis {
     }
   }
 
-  public static UnsupervisedSentimentAnalysis getInstance() {
+  public static SentimentWordLists getInstance() {
     return instance;
   }
 
@@ -110,6 +111,9 @@ public class UnsupervisedSentimentAnalysis {
         }
       }
     }
+    // LOG.info("getWordSentimentWithStemming('" + word + "'\'" + posTag +
+    // "'): "
+    // + sentimentScore);
     return sentimentScore;
   }
 
@@ -143,21 +147,30 @@ public class UnsupervisedSentimentAnalysis {
   }
 
   public double getTweetSentiment(Tweet tweet) {
-    double totalScore = 0;
+    double tweetScore = 0;
+    int count = 0;
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
-      totalScore += getTaggedSentenceSentiment(sentence);
+      double sentenceScore = getTaggedSentenceSentiment(sentence);
+      if (sentenceScore != 0) {
+        tweetScore += sentenceScore;
+        count++;
+      }
     }
-    return totalScore;
-  }
-
-  public void close() {
-    m_sentiwordnet.close();
+    return (count > 0) ? tweetScore / count : 0;
   }
 
   public static void main(String[] args) {
-    UnsupervisedSentimentAnalysis analysis = UnsupervisedSentimentAnalysis
-        .getInstance();
+    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
 
-    analysis.close();
+    POSTagger posTagger = POSTagger.getInstance();
+    List<String> tokens = Tokenizer.tokenize(text);
+    List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+
+    SentimentWordLists sentimentWordLists = SentimentWordLists.getInstance();
+
+    System.out.println("text: '" + text + "'");
+    double sentimentScore = sentimentWordLists
+        .getTaggedSentenceSentiment(taggedSentence);
+    System.out.println("sentimentScore: " + sentimentScore);
   }
 }
