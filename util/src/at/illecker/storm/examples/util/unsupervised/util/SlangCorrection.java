@@ -34,7 +34,7 @@ public class SlangCorrection {
 
   public static final String SLANG_WORD_LIST2 = System.getProperty("user.dir")
       + File.separator + "resources" + File.separator + "wordlists"
-      + File.separator + "orth.en.csv";
+      + File.separator + "GATE_slang.en.csv";
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SlangCorrection.class);

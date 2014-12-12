@@ -19,8 +19,6 @@ package at.illecker.storm.examples.util.unsupervised.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +36,23 @@ public class POSTagger {
   private static final Logger LOG = LoggerFactory.getLogger(POSTagger.class);
   private static final POSTagger instance = new POSTagger();
 
-  // Standford POS Tagger
-  private MaxentTagger m_posTagger;
+  private MaxentTagger m_posTagger; // Standford POS Tagger
+  private NameEntities m_nameEntities;
+  private SlangCorrection m_slangCorrection;
+  private Interjections m_interjections;
 
   private POSTagger() {
     // Load POS Tagger
     LOG.info("Load POSTagger with model: " + TAGGER_MODEL);
     TaggerConfig posTaggerConf = new TaggerConfig("-model", TAGGER_MODEL);
     m_posTagger = new MaxentTagger(TAGGER_MODEL, posTaggerConf, false);
+
+    // Load NameEntities
+    m_nameEntities = NameEntities.getInstance();
+    // Load SlangCorrection
+    m_slangCorrection = SlangCorrection.getInstance();
+    // Load Interjections
+    m_interjections = Interjections.getInstance();
   }
 
   public static POSTagger getInstance() {
@@ -57,7 +64,9 @@ public class POSTagger {
 
     for (String token : tokens) {
       TaggedWord preTaggedToken = new TaggedWord(token);
+      String tokenLowerCase = token.toLowerCase();
 
+      // set custom tags
       if (token.indexOf("#") == 0) {
         preTaggedToken.setTag("HT");
       }
@@ -74,32 +83,26 @@ public class POSTagger {
         preTaggedToken.setTag("RT");
       }
 
-      // Slang correction
-/*
-      String replacement;
-      String token_lc = token.toLowerCase();
-      if (corrections.containsKey(token_lc)) {
-        replacement = (String) corrections.get(token_lc);
-        System.err.println("Correcting " + token + " to " + replacement);
-        token = replacement;
-        preTaggedToken = new TaggedWord(replacement);
-      }
-
-      for (Pattern interjection_pattern : interjections) {
-        Matcher m = interjection_pattern.matcher(token.toLowerCase());
-        if (m.find()) {
-          System.err.println("Interjection labelled for " + token);
-          preTaggedToken.setTag("UH");
-          break;
-        }
-      }
-
-      String token_lc = token.toLowerCase();
-      if (nes.contains(token_lc)) {
-        System.out.println("NE labelled for " + token);
+      // Name entities
+      if (m_nameEntities.isNameEntity(tokenLowerCase)) {
+        LOG.info("NE labelled for " + token);
         preTaggedToken.setTag("NNP");
       }
-*/
+
+      // Slang correction
+      String correction = m_slangCorrection.getCorrection(tokenLowerCase);
+      if (correction != null) {
+        LOG.info("Correcting " + token + " to " + correction);
+        token = correction;
+        preTaggedToken = new TaggedWord(correction);
+      }
+
+      // Interjections
+      if (m_interjections.isInterjection(tokenLowerCase)) {
+        LOG.info("Interjection labelled for " + token);
+        preTaggedToken.setTag("UH");
+      }
+
       untaggedTokens.add(preTaggedToken);
     }
 
