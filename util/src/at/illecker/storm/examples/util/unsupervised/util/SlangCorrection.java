@@ -76,7 +76,7 @@ public class SlangCorrection {
         correctionStr = m_slangWordList2.get(slangString);
       }
     }
-    LOG.info("getCorrection('" + slangString + "'): " + correctionStr);
+    // LOG.info("getCorrection('" + slangString + "'): " + correctionStr);
     return correctionStr;
   }
 

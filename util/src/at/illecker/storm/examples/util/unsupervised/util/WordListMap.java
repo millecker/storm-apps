@@ -126,8 +126,8 @@ public class WordListMap<V> extends TreeMap<String, V> {
 
         wordListMap.put(values[0], value, normalizedValue);
       }
-      LOG.info("Loaded " + wordListMap.size() + " items [maxValue: "
-          + actualMaxValue + ", minValue:" + actualMinValue + "]");
+      LOG.info("Loaded " + wordListMap.size() + " items [minValue: "
+          + actualMinValue + ", maxValue:" + actualMaxValue + "]");
 
       if (minValue != actualMinValue) {
         LOG.error("minValue is incorrect! actual minValue: " + actualMinValue

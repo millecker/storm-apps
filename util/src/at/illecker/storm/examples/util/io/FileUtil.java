@@ -138,6 +138,9 @@ public class FileUtil {
       br = new BufferedReader(isr);
       String line = "";
       while ((line = br.readLine()) != null) {
+        if (line.trim().length() == 0) {
+          continue;
+        }
         String[] values = line.split(splitRegex, 2);
         table.put(values[0].trim(), values[1].trim());
         // LOG.info("Add entry key: '" + values[0].trim() + "' value: '"
@@ -169,6 +172,83 @@ public class FileUtil {
     return table;
   }
 
+  public static Map<String, Double> readFile(InputStream is, String splitRegex,
+      boolean normalize, double minValue, double maxValue) {
+    Map<String, Double> map = new HashMap<String, Double>();
+    InputStreamReader isr = null;
+    BufferedReader br = null;
+    double actualMaxValue = Double.MIN_VALUE;
+    double actualMinValue = Double.MAX_VALUE;
+    try {
+      isr = new InputStreamReader(is, "UTF-8");
+      br = new BufferedReader(isr);
+      String line = "";
+      while ((line = br.readLine()) != null) {
+        if (line.trim().length() == 0) {
+          continue;
+        }
+        String[] values = line.split(splitRegex, 2);
+        String key = values[0].trim();
+        double value = Double.parseDouble(values[1].trim());
+
+        if (normalize) {
+          // Feature scaling
+          double normalizedValue = (value - minValue) / (maxValue - minValue);
+          // LOG.info("Add Key: '" + values[0] + "' Value: '" + values[1]
+          // + "' normalizedValue: '" + normalizedValue + "'");
+
+          // check min and max values
+          if (value > actualMaxValue) {
+            actualMaxValue = value;
+          }
+          if (value < actualMinValue) {
+            actualMinValue = value;
+          }
+
+          value = normalizedValue;
+        }
+
+        map.put(key, value);
+        // LOG.info("Add entry key: '" + key + "' value: '" + value + "'");
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (br != null) {
+        try {
+          br.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (isr != null) {
+        try {
+          isr.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
+    LOG.info("Loaded total " + map.size() + " entries");
+    if (normalize) {
+      if (minValue != actualMinValue) {
+        LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
+            + " given minValue: " + minValue
+            + " (normalized values might be wrong!)");
+      }
+      if (maxValue != actualMaxValue) {
+        LOG.error("maxValue is incorrect! actual maxValue: " + actualMaxValue
+            + " given maxValue: " + maxValue
+            + " (normalized values might be wrong!)");
+      }
+    }
+    return map;
+  }
+
   public static Set<String> readFile(InputStream is) {
     Set<String> set = new HashSet<String>();
     InputStreamReader isr = null;
@@ -178,6 +258,9 @@ public class FileUtil {
       br = new BufferedReader(isr);
       String line = "";
       while ((line = br.readLine()) != null) {
+        if (line.trim().length() == 0) {
+          continue;
+        }
         set.add(line.trim());
         // LOG.info("Add entry: '" + line.trim() + "'");
       }
