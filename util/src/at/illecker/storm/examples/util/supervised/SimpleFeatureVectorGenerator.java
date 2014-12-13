@@ -45,10 +45,17 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   @Override
   public double[] calculateFeatureVector(Tweet tweet) {
-    double tweetSentiment = m_sentimentWordLists.getTweetSentiment(tweet);
+    Double tweetSentiment = m_sentimentWordLists.getTweetSentiment(tweet);
     LOG.info("tweetSentiment: " + tweetSentiment);
 
+    if (tweetSentiment == null) {
+      tweetSentiment = -1d;
+    }
     return new double[] { tweetSentiment };
+  }
+
+  public void close() {
+    m_sentimentWordLists.close();
   }
 
   public static List<Tweet> getTestTweets() {
@@ -63,23 +70,13 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
             1));
     tweets
         .add(new Tweet(
-            264259830590603264L,
-            "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
-            0));
-    tweets
-        .add(new Tweet(
             259724822978904064L,
             "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56",
-            0));
+            0.5));
     tweets
         .add(new Tweet(
-            243725520724967424L,
-            "If you're on the Isle of Man next Thurs , I'll be talking about Safe House and signing books at Waterstones from 6.30 pm . @WaterstonesIoM",
-            0));
-    tweets
-        .add(new Tweet(
-            243725520724967424L,
-            "If you're on the Isle of Man next Thurs , I'll be talking about Safe House and signing books at Waterstones from 6.30 pm . @WaterstonesIoM",
+            264259830590603264L,
+            "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
             0));
     return tweets;
   }
@@ -90,15 +87,16 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
         .getInstance();
 
     for (Tweet tweet : getTestTweets()) {
-      System.out.println("Tweet: " + tweet);
-
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
       List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
 
       tweet.addTaggedSentence(taggedSentence);
 
+      System.out.println("Tweet: " + tweet);
       System.out.println("FeatureVector: "
           + Arrays.toString(sfvg.calculateFeatureVector(tweet)));
     }
+
+    sfvg.close();
   }
 }

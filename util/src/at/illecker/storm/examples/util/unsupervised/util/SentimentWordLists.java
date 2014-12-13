@@ -147,7 +147,7 @@ public class SentimentWordLists {
     return sentimentScore;
   }
 
-  public double getSentenceSentiment(List<HasWord> sentence) {
+  public Double getSentenceSentiment(List<HasWord> sentence) {
     double sentenceScore = 0;
     int count = 0;
     for (HasWord w : sentence) {
@@ -158,10 +158,10 @@ public class SentimentWordLists {
         count++;
       }
     }
-    return (count > 0) ? sentenceScore / count : 0;
+    return (count > 0) ? sentenceScore / count : null;
   }
 
-  public double getTaggedSentenceSentiment(List<TaggedWord> sentence) {
+  public Double getTaggedSentenceSentiment(List<TaggedWord> sentence) {
     double sentenceScore = 0;
     int count = 0;
     for (TaggedWord w : sentence) {
@@ -173,24 +173,24 @@ public class SentimentWordLists {
         count++;
       }
     }
-    return (count > 0) ? sentenceScore / count : 0;
+    return (count > 0) ? sentenceScore / count : null;
   }
 
-  public double getTweetSentiment(Tweet tweet) {
+  public Double getTweetSentiment(Tweet tweet) {
     double tweetScore = 0;
     int count = 0;
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
-      double sentenceScore = getTaggedSentenceSentiment(sentence);
-      if (sentenceScore != 0) {
+      Double sentenceScore = getTaggedSentenceSentiment(sentence);
+      if (sentenceScore != null) {
         tweetScore += sentenceScore;
         count++;
       }
     }
-    return (count > 0) ? tweetScore / count : 0;
+    return (count > 0) ? tweetScore / count : null;
   }
 
   public static void main(String[] args) {
-    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
+    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :))";
 
     POSTagger posTagger = POSTagger.getInstance();
     List<String> tokens = Tokenizer.tokenize(text);
@@ -199,7 +199,7 @@ public class SentimentWordLists {
     SentimentWordLists sentimentWordLists = SentimentWordLists.getInstance();
 
     System.out.println("text: '" + text + "'");
-    double sentimentScore = sentimentWordLists
+    Double sentimentScore = sentimentWordLists
         .getTaggedSentenceSentiment(taggedSentence);
     System.out.println("sentimentScore: " + sentimentScore);
 
