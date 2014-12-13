@@ -19,7 +19,6 @@ package at.illecker.storm.examples.util.supervised;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,10 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
-import edu.stanford.nlp.ling.HasWord;
+import at.illecker.storm.examples.util.unsupervised.util.POSTagger;
+import at.illecker.storm.examples.util.unsupervised.util.Tokenizer;
 import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.process.DocumentPreprocessor;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 public class SupportVectorMaschine {
 
@@ -47,10 +45,6 @@ public class SupportVectorMaschine {
   public static final String TEST_DATA = System.getProperty("user.dir")
       + File.separator + "resources" + File.separator + "tweets"
       + File.separator + "svm" + File.separator + "testingInput.txt";
-
-  public static final String TAGGER_MODEL = System.getProperty("user.dir")
-      + File.separator + "resources" + File.separator + "POSmodels"
-      + File.separator + "gate-EN-twitter-fast.model";
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
@@ -158,35 +152,23 @@ public class SupportVectorMaschine {
     return v;
   }
 
-  public static void processTweets(MaxentTagger posTagger,
+  public static void processTweets(POSTagger posTagger,
       FeatureVectorGenerator fvg, List<Tweet> tweets) {
 
     for (Tweet tweet : tweets) {
-      // Sentence Tokenizer
-      DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(
-          tweet.getText()));
-      for (List<HasWord> sentence : dp) {
-        tweet.addSentence(sentence);
-        // System.out.println(sentence.toString());
-      }
+      // Tokenizer
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
       // POS Tagging
-      for (List<HasWord> sentence : tweet.getSentences()) {
-        List<TaggedWord> taggedSentence = posTagger.tagSentence(sentence);
-        tweet.addTaggedSentence(taggedSentence);
-        // System.out.println("Tweet: " + sentence.toString() + " TaggedTweet: "
-        // + taggedSentence.toString());
-      }
+      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+      tweet.addTaggedSentence(taggedSentence);
+
+      System.out.println("Tweet: " + tweet);
 
       // Generate Feature Vector
       tweet.genFeatureVector(fvg);
-
-      System.out.println("Tweet: " + tweet);
       System.out.println("FeatureVector: "
           + Arrays.toString(tweet.getFeatureVector()));
-
-      // TODO
-      return;
     }
   }
 
@@ -199,14 +181,13 @@ public class SupportVectorMaschine {
       List<Tweet> testTweets = FileUtil.readTweets(new FileInputStream(
           TEST_DATA));
 
-      // POS Tagger
-      LOG.info("Load POS Tagger...");
-      MaxentTagger posTagger = new MaxentTagger(TAGGER_MODEL);
-
       // Generate feature vectors
       LOG.info("Load SimpleFeatureVectorGenerator...");
       SimpleFeatureVectorGenerator sfvg = SimpleFeatureVectorGenerator
           .getInstance();
+
+      // Load POS Tagger
+      POSTagger posTagger = POSTagger.getInstance();
 
       // Train tweets
       LOG.info("Process Train data...");
@@ -214,6 +195,8 @@ public class SupportVectorMaschine {
 
       // Test tweets
       // processTweets(posTagger, sfvg, testTweets);
+
+      sfvg.close();
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
