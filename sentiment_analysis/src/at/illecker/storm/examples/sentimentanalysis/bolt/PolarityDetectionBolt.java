@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.sentimentanalysis.util.SentimentTweet;
+import at.illecker.storm.examples.util.io.FileUtil;
 import at.illecker.storm.examples.util.unsupervised.util.WordListMap;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -54,14 +55,14 @@ public class PolarityDetectionBolt extends BaseRichBolt {
     this.m_collector = collector;
 
     if (config.get(CONF_SENTIMENT_WORD_LIST1_FILE) != null) {
-      m_wordRatings1 = WordListMap.loadWordRatings(
+      m_wordRatings1 = FileUtil.readWordRatings(
           ClassLoader.getSystemResourceAsStream(config.get(
-              CONF_SENTIMENT_WORD_LIST1_FILE).toString()), -5, 5);
+              CONF_SENTIMENT_WORD_LIST1_FILE).toString()), "\t", -5, 5);
     }
     if (config.get(CONF_SENTIMENT_WORD_LIST2_FILE) != null) {
-      m_wordRatings2 = WordListMap.loadWordRatings(
+      m_wordRatings2 = FileUtil.readWordRatings(
           ClassLoader.getSystemResourceAsStream(config.get(
-              CONF_SENTIMENT_WORD_LIST2_FILE).toString()), -5, 5);
+              CONF_SENTIMENT_WORD_LIST2_FILE).toString()), "\t", -5, 5);
     }
     if ((m_wordRatings1 == null) && (m_wordRatings2 == null)) {
       throw new RuntimeException("No word lists available!");

@@ -78,8 +78,8 @@ public class SentimentWordLists {
 
     try {
       LOG.info("Load SentStrength word list from: " + SENTIMENT_WORD_LIST1);
-      m_wordList1 = WordListMap.loadWordRatings(new FileInputStream(
-          SENTIMENT_WORD_LIST1), -5, 5);
+      m_wordList1 = FileUtil.readWordRatings(new FileInputStream(
+          SENTIMENT_WORD_LIST1), "\t", -5, 5);
 
       LOG.info("Load AFINN word list from: " + SENTIMENT_WORD_LIST1);
       m_wordList2 = FileUtil.readFile(
@@ -119,6 +119,9 @@ public class SentimentWordLists {
     // check SentStrength word list
     if (sentimentScore == null) {
       sentimentScore = m_wordList1.matchKey(word, true);
+      if (sentimentScore != null) {
+        LOG.info("hit in SentStrength word list...");
+      }
     }
 
     LOG.info("getWordSentiment('" + word + "'): " + sentimentScore);
@@ -208,13 +211,14 @@ public class SentimentWordLists {
   }
 
   public static void main(String[] args) {
-    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :))";
+    String text = "Gas by my monster house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
+
+    List<String> tokens = Tokenizer.tokenize(text);
 
     POSTagger posTagger = POSTagger.getInstance();
-    List<String> tokens = Tokenizer.tokenize(text);
-    List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
-
     SentimentWordLists sentimentWordLists = SentimentWordLists.getInstance();
+
+    List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
 
     System.out.println("text: '" + text + "'");
     Double sentimentScore = sentimentWordLists

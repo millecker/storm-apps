@@ -16,10 +16,6 @@
  */
 package at.illecker.storm.examples.util.unsupervised.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -85,74 +81,18 @@ public class WordListMap<V> extends TreeMap<String, V> {
     if (result == null) {
       String matchingKey = searchForMatchingKey(key);
       if (matchingKey != null) {
-        // LOG.info("Found match: " + key + "*" + " for " + searchKey);
+        // LOG.info("Found match: " + key + "*" + " for " + key);
         if (normalizedValue) {
           result = m_normalizedValues.get(key + "*");
         } else {
           result = super.get(key + "*");
         }
       }
+    } else {
+      if (normalizedValue) {
+        result = m_normalizedValues.get(key);
+      }
     }
     return result;
-  }
-
-  public static WordListMap<Double> loadWordRatings(InputStream is,
-      double minValue, double maxValue) {
-    WordListMap<Double> wordListMap = new WordListMap<Double>();
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new InputStreamReader(is));
-      String str = "";
-      double actualMaxValue = Double.MIN_VALUE;
-      double actualMinValue = Double.MAX_VALUE;
-      while ((str = reader.readLine()) != null) {
-        if (str.trim().length() == 0) {
-          continue;
-        }
-        String[] values = str.split("\t");
-        double value = Double.parseDouble(values[1]);
-        // Feature scaling
-        double normalizedValue = (value - minValue) / (maxValue - minValue);
-        // LOG.info("Add Key: '" + values[0] + "' Value: '" + values[1]
-        // + "' normalizedValue: '" + normalizedValue + "'");
-
-        // check min and max values
-        if (value > actualMaxValue) {
-          actualMaxValue = value;
-        }
-        if (value < actualMinValue) {
-          actualMinValue = value;
-        }
-
-        wordListMap.put(values[0], value, normalizedValue);
-      }
-      LOG.info("Loaded " + wordListMap.size() + " items [minValue: "
-          + actualMinValue + ", maxValue:" + actualMaxValue + "]");
-
-      if (minValue != actualMinValue) {
-        LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
-            + " given minValue: " + minValue
-            + " (normalized values might be wrong!)");
-      }
-      if (maxValue != actualMaxValue) {
-        LOG.error("maxValue is incorrect! actual maxValue: " + actualMaxValue
-            + " given maxValue: " + maxValue
-            + " (normalized values might be wrong!)");
-      }
-
-      return wordListMap;
-
-    } catch (IOException e) {
-      LOG.error(e.getMessage());
-    } finally {
-      try {
-        if (reader != null) {
-          reader.close();
-        }
-      } catch (IOException e) {
-        LOG.error(e.getMessage());
-      }
-    }
-    return null;
   }
 }

@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.util.unsupervised.util.WordListMap;
 
 public class FileUtil {
   public static final int BUFFER_SIZE = 2048;
@@ -47,6 +48,11 @@ public class FileUtil {
 
   public static void extractTarGz(String inputTarGz, String outDir)
       throws IOException {
+    FileUtil.extractTarGz(inputTarGz, outDir, false);
+  }
+
+  public static void extractTarGz(String inputTarGz, String outDir,
+      boolean logging) throws IOException {
 
     FileInputStream fin = new FileInputStream(inputTarGz);
     BufferedInputStream in = new BufferedInputStream(fin);
@@ -56,8 +62,9 @@ public class FileUtil {
     TarArchiveEntry entry = null;
     // read Tar entries
     while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-      LOG.info("Extracting: " + outDir + File.separator + entry.getName());
-
+      if (logging) {
+        LOG.info("Extracting: " + outDir + File.separator + entry.getName());
+      }
       if (entry.isDirectory()) { // create directory
         File f = new File(outDir + File.separator + entry.getName());
         f.mkdirs();
@@ -90,7 +97,7 @@ public class FileUtil {
         String[] values = line.split("\t");
         long id = Long.parseLong(values[0]);
         String text = values[1];
-        String posTags = values[2]; // ignore
+        // String posTags = values[2]; // ignore
         String label = values[3].toLowerCase().trim();
         double score = 0;
         if (label.equals("negative")) {
@@ -130,6 +137,11 @@ public class FileUtil {
   }
 
   public static Map<String, String> readFile(InputStream is, String splitRegex) {
+    return readFile(is, splitRegex, false);
+  }
+
+  public static Map<String, String> readFile(InputStream is, String splitRegex,
+      boolean logging) {
     Map<String, String> table = new HashMap<String, String>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -143,8 +155,10 @@ public class FileUtil {
         }
         String[] values = line.split(splitRegex, 2);
         table.put(values[0].trim(), values[1].trim());
-        // LOG.info("Add entry key: '" + values[0].trim() + "' value: '"
-        // + values[1].trim() + "'");
+        if (logging) {
+          LOG.info("Add entry key: '" + values[0].trim() + "' value: '"
+              + values[1].trim() + "'");
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -174,6 +188,11 @@ public class FileUtil {
 
   public static Map<String, Double> readFile(InputStream is, String splitRegex,
       boolean normalize, double minValue, double maxValue) {
+    return readFile(is, splitRegex, normalize, minValue, maxValue, false);
+  }
+
+  public static Map<String, Double> readFile(InputStream is, String splitRegex,
+      boolean normalize, double minValue, double maxValue, boolean logging) {
     Map<String, Double> map = new HashMap<String, Double>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -194,8 +213,11 @@ public class FileUtil {
         if (normalize) {
           // Feature scaling
           double normalizedValue = (value - minValue) / (maxValue - minValue);
-          // LOG.info("Add Key: '" + values[0] + "' Value: '" + values[1]
-          // + "' normalizedValue: '" + normalizedValue + "'");
+
+          if (logging) {
+            LOG.info("Add Key: '" + key + "' Value: '" + value
+                + "' normalizedValue: '" + normalizedValue + "'");
+          }
 
           // check min and max values
           if (value > actualMaxValue) {
@@ -209,10 +231,12 @@ public class FileUtil {
         }
 
         map.put(key, value);
-        // LOG.info("Add entry key: '" + key + "' value: '" + value + "'");
+        if (logging) {
+          LOG.info("Add entry key: '" + key + "' value: '" + value + "'");
+        }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage());
     } finally {
       if (br != null) {
         try {
@@ -233,7 +257,9 @@ public class FileUtil {
         }
       }
     }
-    LOG.info("Loaded total " + map.size() + " entries");
+    LOG.info("Loaded total " + map.size() + " items [minValue: "
+        + actualMinValue + ", maxValue: " + actualMaxValue + "]");
+
     if (normalize) {
       if (minValue != actualMinValue) {
         LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
@@ -249,7 +275,93 @@ public class FileUtil {
     return map;
   }
 
+  public static WordListMap<Double> readWordRatings(InputStream is,
+      String splitRegex, double minValue, double maxValue) {
+    return readWordRatings(is, splitRegex, minValue, maxValue, false);
+  }
+
+  public static WordListMap<Double> readWordRatings(InputStream is,
+      String splitRegex, double minValue, double maxValue, boolean logging) {
+    WordListMap<Double> wordListMap = new WordListMap<Double>();
+    InputStreamReader isr = null;
+    BufferedReader br = null;
+    double actualMaxValue = Double.MIN_VALUE;
+    double actualMinValue = Double.MAX_VALUE;
+    try {
+      isr = new InputStreamReader(is, "UTF-8");
+      br = new BufferedReader(isr);
+      String line = "";
+      while ((line = br.readLine()) != null) {
+        if (line.trim().length() == 0) {
+          continue;
+        }
+        String[] values = line.split(splitRegex);
+        String key = values[0].trim();
+        double value = Double.parseDouble(values[1].trim());
+
+        // Feature scaling
+        double normalizedValue = (value - minValue) / (maxValue - minValue);
+
+        if (logging) {
+          LOG.info("Add Key: '" + key + "' Value: '" + value
+              + "' normalizedValue: '" + normalizedValue + "'");
+        }
+        // check min and max values
+        if (value > actualMaxValue) {
+          actualMaxValue = value;
+        }
+        if (value < actualMinValue) {
+          actualMinValue = value;
+        }
+
+        wordListMap.put(key, value, normalizedValue);
+      }
+      LOG.info("Loaded " + wordListMap.size() + " items [minValue: "
+          + actualMinValue + ", maxValue: " + actualMaxValue + "]");
+
+      if (minValue != actualMinValue) {
+        LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
+            + " given minValue: " + minValue
+            + " (normalized values might be wrong!)");
+      }
+      if (maxValue != actualMaxValue) {
+        LOG.error("maxValue is incorrect! actual maxValue: " + actualMaxValue
+            + " given maxValue: " + maxValue
+            + " (normalized values might be wrong!)");
+      }
+
+      return wordListMap;
+
+    } catch (IOException e) {
+      LOG.error(e.getMessage());
+    } finally {
+      if (br != null) {
+        try {
+          br.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (isr != null) {
+        try {
+          isr.close();
+        } catch (IOException ignore) {
+        }
+      }
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
+    return null;
+  }
+
   public static Set<String> readFile(InputStream is) {
+    return FileUtil.readFile(is, false);
+  }
+
+  public static Set<String> readFile(InputStream is, boolean logging) {
     Set<String> set = new HashSet<String>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -262,7 +374,9 @@ public class FileUtil {
           continue;
         }
         set.add(line.trim());
-        // LOG.info("Add entry: '" + line.trim() + "'");
+        if (logging) {
+          LOG.info("Add entry: '" + line.trim() + "'");
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -290,14 +404,20 @@ public class FileUtil {
     return set;
   }
 
-  public static void delete(File f) throws IOException {
-    LOG.info("Delete: " + f.getAbsolutePath());
-    if (f.isDirectory()) {
-      for (File c : f.listFiles())
-        delete(c);
+  public static void delete(File file) throws IOException {
+    FileUtil.delete(file, false);
+  }
+
+  public static void delete(File file, boolean logging) throws IOException {
+    if (logging) {
+      LOG.info("Delete: " + file.getAbsolutePath());
     }
-    if (!f.delete()) {
-      throw new FileNotFoundException("Failed to delete file: " + f);
+    if (file.isDirectory()) {
+      for (File c : file.listFiles())
+        delete(c, logging);
+    }
+    if (!file.delete()) {
+      throw new FileNotFoundException("Failed to delete file: " + file);
     }
   }
 }
