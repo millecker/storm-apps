@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,7 @@ public class SentimentWordLists {
     if (sentimentScore == null) {
       sentimentScore = m_wordList1.matchKey(word, true);
       if (sentimentScore != null) {
-        LOG.info("hit in wordlist1");
+        LOG.info("hit in SentStrength word list");
       }
     }
 
@@ -128,9 +129,15 @@ public class SentimentWordLists {
   }
 
   public Double getWordSentimentWithStemming(String word, POS posTag) {
+    // ignore all except valid POS Tags (NOUN, VERB, ADJECTIVE, ADVERB)
+    // ignore punctuations
+    if ((posTag == null) || (Pattern.matches("^\\p{Punct}+$", word))) {
+      return null;
+    }
     Double sentimentScore = getWordSentiment(word);
     // use word stemming
     if (sentimentScore == null) {
+      LOG.info(" findStems for (" + word + "," + posTag + ")");
       List<String> stemmedWords = m_wordnet.findStems(word, posTag);
       for (String stemmedWord : stemmedWords) {
         if (!stemmedWord.equals(word)) {
@@ -180,6 +187,7 @@ public class SentimentWordLists {
     double tweetScore = 0;
     int count = 0;
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
+      LOG.info("taggedSentence: " + sentence.toString());
       Double sentenceScore = getTaggedSentenceSentiment(sentence);
       if (sentenceScore != null) {
         tweetScore += sentenceScore;
