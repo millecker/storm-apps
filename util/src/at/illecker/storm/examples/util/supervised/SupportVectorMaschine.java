@@ -173,6 +173,7 @@ public class SupportVectorMaschine {
   }
 
   public static void main(String[] args) {
+    SimpleFeatureVectorGenerator sfvg = null;
     try {
       LOG.info("Read Train Data from " + TRAIN_DATA);
       List<Tweet> trainTweets = FileUtil.readTweets(new FileInputStream(
@@ -183,8 +184,7 @@ public class SupportVectorMaschine {
 
       // Generate feature vectors
       LOG.info("Load SimpleFeatureVectorGenerator...");
-      SimpleFeatureVectorGenerator sfvg = SimpleFeatureVectorGenerator
-          .getInstance();
+      sfvg = SimpleFeatureVectorGenerator.getInstance();
 
       // Load POS Tagger
       POSTagger posTagger = POSTagger.getInstance();
@@ -196,10 +196,12 @@ public class SupportVectorMaschine {
       // Test tweets
       // processTweets(posTagger, sfvg, testTweets);
 
-      sfvg.close();
-
     } catch (FileNotFoundException e) {
       e.printStackTrace();
+    } finally {
+      if (sfvg != null) {
+        sfvg.close();
+      }
     }
   }
 }
