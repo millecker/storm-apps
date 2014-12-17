@@ -18,6 +18,7 @@ package at.illecker.storm.examples.util.unsupervised.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -62,16 +63,31 @@ public class POSTagger {
   public List<TaggedWord> tagSentence(List<String> tokens) {
     List<TaggedWord> untaggedTokens = new ArrayList<TaggedWord>();
 
-    for (String token : tokens) {
+    Iterator<String> iter = tokens.iterator();
+    while (iter.hasNext()) {
+      String token = iter.next();
       TaggedWord preTaggedToken = new TaggedWord(token);
       String tokenLowerCase = token.toLowerCase();
 
       // set custom tags
       if (token.indexOf("#") == 0) {
         preTaggedToken.setTag("HT");
+        if ((token.length() == 1) && (iter.hasNext())) {
+          String nextToken = iter.next();
+          preTaggedToken.setWord(preTaggedToken.word() + nextToken);
+          token = nextToken;
+        }
       }
       if (token.indexOf("@") == 0) {
         preTaggedToken.setTag("USR");
+        if ((token.length() == 1) && (iter.hasNext())) {
+          String nextToken = iter.next();
+          preTaggedToken.setWord(preTaggedToken.word() + nextToken);
+          token = nextToken;
+          if (preTaggedToken.word().indexOf("#") == 0) {
+            preTaggedToken.setTag("HT");
+          }
+        }
       }
       if ((token.indexOf(".com") > -1) || (token.indexOf("http:") == 0)
           || (token.indexOf("www.") == 0)) {
@@ -85,14 +101,14 @@ public class POSTagger {
 
       // Name entities
       if (m_nameEntities.isNameEntity(tokenLowerCase)) {
-        LOG.info("NE labelled for " + token);
+        LOG.info("NameEntity labelled for " + token);
         preTaggedToken.setTag("NNP");
       }
 
       // Slang correction
       String correction = m_slangCorrection.getCorrection(tokenLowerCase);
       if (correction != null) {
-        LOG.info("Correcting " + token + " to " + correction);
+        LOG.info("SlangCorrecting from " + token + " to " + correction);
         token = correction;
         preTaggedToken = new TaggedWord(correction);
       }
@@ -106,6 +122,7 @@ public class POSTagger {
       untaggedTokens.add(preTaggedToken);
     }
 
+    LOG.info("tagSentence: " + untaggedTokens.toString());
     return m_posTagger.tagSentence(untaggedTokens, true);
   }
 
