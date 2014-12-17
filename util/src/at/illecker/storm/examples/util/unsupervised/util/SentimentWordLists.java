@@ -119,25 +119,36 @@ public class SentimentWordLists {
     // check SentStrength word list
     if (sentimentScore == null) {
       sentimentScore = m_wordList1.matchKey(word, true);
-      if (sentimentScore != null) {
-        LOG.info("hit in SentStrength word list");
-      }
     }
 
     LOG.info("getWordSentiment('" + word + "'): " + sentimentScore);
     return sentimentScore;
   }
 
-  public Double getWordSentimentWithStemming(String word, POS posTag) {
-    // ignore all except valid POS Tags (NOUN, VERB, ADJECTIVE, ADVERB)
-    // ignore punctuations
-    if ((posTag == null) || (Pattern.matches("^\\p{Punct}+$", word))) {
+  public Double getWordSentimentWithStemming(String word, String pennTag) {
+    // convert pennTag to POS (NOUN, VERB, ADJECTIVE, ADVERB)
+    POS posTag = POSTag.convertString(pennTag);
+
+    // check for Hashtags
+    if (pennTag.equals("HT") && (word.length() > 1)) {
+      if (word.indexOf('@') == 1) {
+        word = word.substring(2); // check for #@ HASHTAG_USER
+      } else {
+        word = word.substring(1);
+      }
+    } else if (pennTag.equals("UH")) {
+      if (word.length() == 1) {
+        return null; // ignore single char interjection
+      }
+    } else if ((posTag == null) || (Pattern.matches("^\\p{Punct}+$", word))) {
+      // ignore punctuation and all non valid POS tags
       return null;
     }
+
     Double sentimentScore = getWordSentiment(word);
-    // use word stemming
+    // use word stemming if sentimentScore is null
     if (sentimentScore == null) {
-      LOG.info(" findStems for (" + word + "," + posTag + ")");
+      // LOG.info(" findStems for (" + word + "," + posTag + ")");
       List<String> stemmedWords = m_wordnet.findStems(word, posTag);
       for (String stemmedWord : stemmedWords) {
         if (!stemmedWord.equals(word)) {
@@ -173,8 +184,7 @@ public class SentimentWordLists {
     int count = 0;
     for (TaggedWord w : sentence) {
       String word = w.word().toLowerCase().trim();
-      Double wordSentiment = getWordSentimentWithStemming(word,
-          POSTag.convertString(w.tag()));
+      Double wordSentiment = getWordSentimentWithStemming(word, w.tag());
       if (wordSentiment != null) {
         sentenceScore += wordSentiment;
         count++;
