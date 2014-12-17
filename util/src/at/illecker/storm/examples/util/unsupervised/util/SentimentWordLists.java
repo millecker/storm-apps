@@ -219,9 +219,9 @@ public class SentimentWordLists {
   }
 
   public double[] getTweetSentiment(Tweet tweet) {
-    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, AVG, MAX_POS_SCORE,
+    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
     // MAX_NEG_SCORE]
-    double[] tweetScore = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+    double[] tweetScore = new double[] { 0, 0, 0, 0, 0, 0, 0 };
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
       LOG.info("taggedSentence: " + sentence.toString());
       double[] sentenceScore = getTaggedSentenceSentiment(sentence);
@@ -231,9 +231,8 @@ public class SentimentWordLists {
         tweetScore[2] += sentenceScore[2]; // NEG_COUNT
         tweetScore[3] += sentenceScore[3]; // SUM
         tweetScore[4] += sentenceScore[4]; // COUNT
-        tweetScore[5] = tweetScore[3] / tweetScore[4]; // AVG
-        tweetScore[6] = sentenceScore[5]; // MAX_POS_SCORE
-        tweetScore[7] = sentenceScore[6]; // MAX_NEG_SCORE
+        tweetScore[5] = sentenceScore[5]; // MAX_POS_SCORE
+        tweetScore[6] = sentenceScore[6]; // MAX_NEG_SCORE
       }
     }
     return (tweetScore[4] > 0) ? tweetScore : null;
