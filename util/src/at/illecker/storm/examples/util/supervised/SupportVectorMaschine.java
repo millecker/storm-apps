@@ -45,73 +45,51 @@ public class SupportVectorMaschine {
   public static final String TEST_DATA = System.getProperty("user.dir")
       + File.separator + "resources" + File.separator + "tweets"
       + File.separator + "svm" + File.separator + "testingInput.txt";
-
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
 
-  public static void test() {
-    // http://stackoverflow.com/questions/10792576/libsvm-java-implementation
-    double[][] train = new double[100][];
-    double[][] test = new double[10][];
+  public static void processTweets(POSTagger posTagger,
+      FeatureVectorGenerator fvg, List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      // Tokenizer
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
-    for (int i = 0; i < train.length; i++) {
-      if (i + 1 > (train.length / 2)) { // 50% positive
-        double[] vals = { 1, 0, i + i };
-        train[i] = vals;
-      } else {
-        double[] vals = { 0, 0, i - i - i - 2 }; // 50% negative
-        train[i] = vals;
-      }
-    }
+      // POS Tagging
+      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+      tweet.addTaggedSentence(taggedSentence);
 
-    System.out.println("Training Set:");
-    for (int i = 0; i < train.length; i++) {
-      System.out.println("  " + Arrays.toString(train[i]));
-    }
+      LOG.info("Tweet: " + tweet);
 
-    for (int i = 0; i < test.length; i++) {
-      if (i + 1 > (test.length / 2)) { // 50% positive
-        double[] vals = { 1, 0, i + i + train.length };
-        test[i] = vals;
-      } else {
-        double[] vals = { 0, 0, i - i - i - 2 }; // 50% negative
-        test[i] = vals;
-      }
-    }
-
-    System.out.println("Testing Set:");
-    for (int i = 0; i < test.length; i++) {
-      System.out.println("  " + Arrays.toString(test[i]));
-    }
-
-    System.out.println("Train model...");
-    svm_model model = svmTrain(train);
-
-    System.out.println("Evaluate model...");
-    for (int i = 0; i < test.length; i++) {
-      evaluate(test[i], model);
+      // Generate Feature Vector
+      tweet.genFeatureVector(fvg);
+      LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
     }
   }
 
-  private static svm_model svmTrain(double[][] train) {
+  private static svm_model svmTrain(List<Tweet> trainTweets) {
+    int dataCount = trainTweets.size();
+
     svm_problem prob = new svm_problem();
-    int dataCount = train.length;
     prob.y = new double[dataCount];
     prob.l = dataCount;
     prob.x = new svm_node[dataCount][];
 
     for (int i = 0; i < dataCount; i++) {
-      double[] features = train[i]; // feature vector
-      prob.x[i] = new svm_node[features.length - 1];
-      for (int j = 1; j < features.length; j++) {
+      Tweet tweet = trainTweets.get(i);
+      double[] features = tweet.getFeatureVector();
+      // set feature vector
+      prob.x[i] = new svm_node[features.length];
+      for (int j = 0; j < features.length; j++) {
         svm_node node = new svm_node();
         node.index = j;
         node.value = features[j];
-        prob.x[i][j - 1] = node;
+        prob.x[i][j] = node;
       }
-      prob.y[i] = features[0];
+      // set class
+      prob.y[i] = tweet.getScore();
     }
 
+    // setup SVM parameter
     svm_parameter param = new svm_parameter();
     param.probability = 1;
     param.gamma = 0.5;
@@ -127,49 +105,31 @@ public class SupportVectorMaschine {
     return model;
   }
 
-  private static double evaluate(double[] features, svm_model model) {
-    svm_node[] nodes = new svm_node[features.length - 1];
-    for (int i = 1; i < features.length; i++) {
+  private static double evaluate(Tweet tweet, svm_model svmModel,
+      int totalClasses) {
+    double[] features = tweet.getFeatureVector();
+    svm_node[] nodes = new svm_node[features.length];
+    for (int i = 0; i < features.length; i++) {
       svm_node node = new svm_node();
       node.index = i;
       node.value = features[i];
-
-      nodes[i - 1] = node;
+      nodes[i] = node;
     }
 
-    int totalClasses = 2;
     int[] labels = new int[totalClasses];
-    svm.svm_get_labels(model, labels);
+    svm.svm_get_labels(svmModel, labels);
 
     double[] prob_estimates = new double[totalClasses];
-    double v = svm.svm_predict_probability(model, nodes, prob_estimates);
+    double predictedClass = svm.svm_predict_probability(svmModel, nodes,
+        prob_estimates);
 
     for (int i = 0; i < totalClasses; i++) {
-      System.out.print("(" + labels[i] + ":" + prob_estimates[i] + ")");
+      LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
+          + prob_estimates[i]);
     }
-    System.out.println("(Actual:" + features[0] + " Prediction:" + v + ")");
+    LOG.info("TweetScore:" + tweet.getScore() + " Prediction:" + predictedClass);
 
-    return v;
-  }
-
-  public static void processTweets(POSTagger posTagger,
-      FeatureVectorGenerator fvg, List<Tweet> tweets) {
-
-    for (Tweet tweet : tweets) {
-      // Tokenizer
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
-
-      // POS Tagging
-      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
-      tweet.addTaggedSentence(taggedSentence);
-
-      System.out.println("Tweet: " + tweet);
-
-      // Generate Feature Vector
-      tweet.genFeatureVector(fvg);
-      System.out.println("FeatureVector: "
-          + Arrays.toString(tweet.getFeatureVector()));
-    }
+    return predictedClass;
   }
 
   public static void main(String[] args) {
@@ -190,11 +150,28 @@ public class SupportVectorMaschine {
       POSTagger posTagger = POSTagger.getInstance();
 
       // Train tweets
-      LOG.info("Process Train data...");
+      LOG.info("Prepare Train data...");
       processTweets(posTagger, sfvg, trainTweets);
 
       // Test tweets
-      // processTweets(posTagger, sfvg, testTweets);
+      LOG.info("Prepare Test data...");
+      processTweets(posTagger, sfvg, testTweets);
+
+      // classes 1 = positive, 0 = neutral, -1 = negative
+      svm_model svmModel = svmTrain(trainTweets);
+
+      long countMatches = 0;
+      for (Tweet tweet : testTweets) {
+        double predictedClass = evaluate(tweet, svmModel, 3);
+        if (predictedClass == tweet.getScore()) {
+          countMatches++;
+        }
+      }
+
+      LOG.info("Total test tweets: " + testTweets.size());
+      LOG.info("Matches: " + countMatches);
+      double accuracy = countMatches / testTweets.size();
+      LOG.info("Accuracy: " + accuracy);
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
