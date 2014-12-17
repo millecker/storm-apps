@@ -119,9 +119,9 @@ public class SentimentWordLists {
     // check SentStrength word list
     if (sentimentScore == null) {
       sentimentScore = m_wordList1.matchKey(word, true);
-      if (sentimentScore != null) {
-        LOG.info("hit in SentStrength word list...");
-      }
+      // if (sentimentScore != null) {
+      // LOG.info("hit in SentStrength word list...");
+      // }
     }
 
     LOG.info("getWordSentiment('" + word + "'): " + sentimentScore);
@@ -146,6 +146,10 @@ public class SentimentWordLists {
     } else if ((posTag == null) || (Pattern.matches("^\\p{Punct}+$", word))) {
       // ignore punctuation and all non valid POS tags
       return null;
+    }
+
+    if (!pennTag.equals("UH")) {
+      word = word.toLowerCase();
     }
 
     Double sentimentScore = getWordSentiment(word);
@@ -186,8 +190,7 @@ public class SentimentWordLists {
     double sentenceScore = 0;
     int count = 0;
     for (TaggedWord w : sentence) {
-      String word = w.word().toLowerCase().trim();
-      Double wordSentiment = getWordSentimentWithStemming(word, w.tag());
+      Double wordSentiment = getWordSentimentWithStemming(w.word(), w.tag());
       if (wordSentiment != null) {
         sentenceScore += wordSentiment;
         count++;
