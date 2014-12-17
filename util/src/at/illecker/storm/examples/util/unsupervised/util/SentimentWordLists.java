@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -186,31 +187,56 @@ public class SentimentWordLists {
     return (count > 0) ? sentenceScore / count : null;
   }
 
-  public Double getTaggedSentenceSentiment(List<TaggedWord> sentence) {
-    double sentenceScore = 0;
-    int count = 0;
+  public double[] getTaggedSentenceSentiment(List<TaggedWord> sentence) {
+    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
+    // MAX_NEG_SCORE]
+    double[] sentenceScore = new double[] { 0, 0, 0, 0, 0, 0, 0.5 };
     for (TaggedWord w : sentence) {
       Double wordSentiment = getWordSentimentWithStemming(w.word(), w.tag());
       if (wordSentiment != null) {
-        sentenceScore += wordSentiment;
-        count++;
+        // POS, NEUTRAL and NEG COUNT
+        if (wordSentiment < 0.45) {
+          sentenceScore[2]++; // NEGATIV
+          if (wordSentiment < sentenceScore[6]) {
+            sentenceScore[6] = wordSentiment; // MAX_NEG_SCORE
+          }
+        } else if (wordSentiment > 0.55) {
+          sentenceScore[0]++; // POSITIV
+          if (wordSentiment > sentenceScore[5]) {
+            sentenceScore[5] = wordSentiment; // MAX_POS_SCORE
+          }
+        } else if ((wordSentiment <= 0.55) && (wordSentiment >= 0.45)) {
+          sentenceScore[1]++; // NEUTRAL
+        }
+        // SUM
+        sentenceScore[3] += wordSentiment;
+        // COUNT
+        sentenceScore[4]++;
       }
     }
-    return (count > 0) ? sentenceScore / count : null;
+
+    return (sentenceScore[4] > 0) ? sentenceScore : null;
   }
 
-  public Double getTweetSentiment(Tweet tweet) {
-    double tweetScore = 0;
-    int count = 0;
+  public double[] getTweetSentiment(Tweet tweet) {
+    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, AVG, MAX_POS_SCORE,
+    // MAX_NEG_SCORE]
+    double[] tweetScore = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
       LOG.info("taggedSentence: " + sentence.toString());
-      Double sentenceScore = getTaggedSentenceSentiment(sentence);
+      double[] sentenceScore = getTaggedSentenceSentiment(sentence);
       if (sentenceScore != null) {
-        tweetScore += sentenceScore;
-        count++;
+        tweetScore[0] += sentenceScore[0]; // POS_COUNT
+        tweetScore[1] += sentenceScore[1]; // NEUTRAL_COUNT
+        tweetScore[2] += sentenceScore[2]; // NEG_COUNT
+        tweetScore[3] += sentenceScore[3]; // SUM
+        tweetScore[4] += sentenceScore[4]; // COUNT
+        tweetScore[5] = tweetScore[3] / tweetScore[4]; // AVG
+        tweetScore[6] = sentenceScore[5]; // MAX_POS_SCORE
+        tweetScore[7] = sentenceScore[6]; // MAX_NEG_SCORE
       }
     }
-    return (count > 0) ? tweetScore / count : null;
+    return (tweetScore[4] > 0) ? tweetScore : null;
   }
 
   public static void main(String[] args) {
@@ -224,9 +250,11 @@ public class SentimentWordLists {
     List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
 
     System.out.println("text: '" + text + "'");
-    Double sentimentScore = sentimentWordLists
+    double sentimentScore[] = sentimentWordLists
         .getTaggedSentenceSentiment(taggedSentence);
-    System.out.println("sentimentScore: " + sentimentScore);
+    System.out
+        .println("sentimentScore[POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE, MAX_NEG_SCORE]"
+            + Arrays.toString(sentimentScore));
 
     sentimentWordLists.close();
   }
