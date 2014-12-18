@@ -45,8 +45,8 @@ public class SentimentWordLists {
 
   private Configuration m_conf;
   private WordNet m_wordnet;
-  private Map<String, Double> m_wordList;
-  private WordListMap<Double> m_wordListMap;
+  private Map<String, Double> m_wordList = null;
+  private WordListMap<Double> m_wordListMap = null;
 
   private SentimentWordLists() {
     m_conf = Configuration.getInstance();
@@ -114,10 +114,12 @@ public class SentimentWordLists {
   public Double getWordSentiment(String word) {
     Double sentimentScore = null;
     // First check word lists
-    sentimentScore = m_wordList.get(word);
+    if (m_wordList != null) {
+      sentimentScore = m_wordList.get(word);
+    }
 
     // Second check word list maps including regex
-    if (sentimentScore == null) {
+    if ((sentimentScore == null) && (m_wordListMap != null)) {
       sentimentScore = m_wordListMap.matchKey(word);
     }
 

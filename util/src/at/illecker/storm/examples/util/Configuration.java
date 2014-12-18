@@ -138,6 +138,19 @@ public class Configuration {
     return nameEntities;
   }
 
+  public Map<String, Properties> getInterjections() {
+    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
+        + File.separator;
+    Map<String, Properties> interjections = new HashMap<String, Properties>();
+
+    // Add GATE interjections including regex patterns
+    Properties props = new Properties();
+    props.put("containsRegex", Boolean.valueOf(true));
+    interjections.put(wordListDir + "GATE_interjections.regex", props);
+
+    return interjections;
+  }
+
   public String getPOSTaggingModel() {
     String modelDir = m_workingDir + File.separator + CONF_MODEL_PATH
         + File.separator;
