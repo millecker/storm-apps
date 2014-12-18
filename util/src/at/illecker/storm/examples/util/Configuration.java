@@ -18,8 +18,10 @@ package at.illecker.storm.examples.util;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +119,23 @@ public class Configuration {
     slangWordLists.put(wordListDir + "GATE_slang.en.csv", props);
 
     return slangWordLists;
+  }
+
+  public Set<String> getNameEntities() {
+    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
+        + File.separator;
+    Set<String> nameEntities = new HashSet<String>();
+
+    // Add GATE cities
+    nameEntities.add(wordListDir + "GATE_cities.txt");
+
+    // Add GATE corps
+    nameEntities.add(wordListDir + "GATE_corps.txt");
+
+    // Add GATE names
+    nameEntities.add(wordListDir + "GATE_names.txt");
+
+    return nameEntities;
   }
 
   public String getPOSTaggingModel() {
