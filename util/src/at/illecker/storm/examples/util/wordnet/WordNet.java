@@ -27,6 +27,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.FileUtil;
 import edu.mit.jwi.IRAMDictionary;
 import edu.mit.jwi.RAMDictionary;
@@ -42,24 +43,20 @@ import edu.mit.jwi.morph.WordnetStemmer;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class WordNet {
-
   public static final int MAX_DEPTH_OF_HIERARCHY = 16;
-  public static final String WORD_NET_DICT_PATH = System
-      .getProperty("user.dir")
-      + File.separator
-      + "resources"
-      + File.separator
-      + "wordnet" + File.separator + "wn3.1.dict.tar.gz";
   private static final Logger LOG = LoggerFactory.getLogger(WordNet.class);
   private static final WordNet instance = new WordNet();
 
+  private Configuration m_conf;
   private IRAMDictionary m_dict;
   private File m_wordNetDir;
   private WordnetStemmer m_wordnetStemmer;
 
   private WordNet() {
+    m_conf = Configuration.getInstance();
     try {
-      File wordNetDict = new File(WORD_NET_DICT_PATH);
+      String wordNetDictPath = m_conf.getWordNetDict();
+      File wordNetDict = new File(wordNetDictPath);
       m_wordNetDir = new File(wordNetDict.getParent() + File.separator + "dict");
       LOG.info("WordNet Dictionary: " + wordNetDict.getAbsolutePath());
       LOG.info("WordNet Extract Location: " + m_wordNetDir.getAbsolutePath());
