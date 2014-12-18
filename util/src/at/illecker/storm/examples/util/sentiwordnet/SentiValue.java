@@ -51,5 +51,4 @@ public class SentiValue {
     return "SentiValue [posScore=" + m_posScore + ", negScore=" + m_negScore
         + ", objScore=" + m_objScore + ", score=" + m_score + "]";
   }
-
 }

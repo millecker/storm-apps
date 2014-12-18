@@ -167,6 +167,12 @@ public class Configuration {
     return wordNetDir + "wn3.1.dict.tar.gz";
   }
 
+  public String getSentiWordNetDict() {
+    String wordNetDir = m_workingDir + File.separator + CONF_WORD_NET_PATH
+        + File.separator;
+    return wordNetDir + "SentiWordNet_3.0.0_20130122.txt";
+  }
+
   @Override
   public String toString() {
     return "Configuration [classPath=" + m_classPath + ", runningFromJar="

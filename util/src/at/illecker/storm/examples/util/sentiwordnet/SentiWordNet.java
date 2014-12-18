@@ -17,7 +17,6 @@
 package at.illecker.storm.examples.util.sentiwordnet;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,30 +25,27 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
 
 public class SentiWordNet {
-
-  public static final String SENTI_WORD_NET_DICT_PATH = System
-      .getProperty("user.dir")
-      + File.separator
-      + "resources"
-      + File.separator
-      + "wordlists" + File.separator + "SentiWordNet_3.0.0_20130122.txt";
   private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
   private static final SentiWordNet instance = new SentiWordNet();
 
+  private Configuration m_conf;
   private WordNet m_wordnet;
   private Map<String, HashMap<Integer, SentiValue>> m_dict;
   private Map<String, Double> m_dictWeighted;
 
   private SentiWordNet() {
+    m_conf = Configuration.getInstance();
+    String sentiWordNetDictPath = m_conf.getSentiWordNetDict();
     m_wordnet = WordNet.getInstance();
 
-    LOG.info("loadDictionary: " + SENTI_WORD_NET_DICT_PATH);
-    m_dict = loadDict(SENTI_WORD_NET_DICT_PATH);
+    LOG.info("loadDictionary: " + sentiWordNetDictPath);
+    m_dict = loadDict(sentiWordNetDictPath);
     m_dictWeighted = calcAvgWeightScores();
   }
 
@@ -209,17 +205,6 @@ public class SentiWordNet {
     return getAvgScore(word, posTag.getTag());
   }
 
-  public static void main(String[] args) {
-    SentiWordNet swn = SentiWordNet.getInstance();
-
-    printScores(swn, "good", 'a');
-    printScores(swn, "bad", 'a');
-    printScores(swn, "blue", 'a');
-    printScores(swn, "blue", 'n');
-
-    swn.close();
-  }
-
   public static void printScores(SentiWordNet swn, String word, char posTag) {
     System.out.println(word + "#" + posTag + ": " + swn.getScore(word, posTag));
     System.out.println("avg(" + word + "#" + posTag + ") "
@@ -230,5 +215,16 @@ public class SentiWordNet {
         System.out.println("\t" + val.getKey() + "\t" + val.getValue());
       }
     }
+  }
+
+  public static void main(String[] args) {
+    SentiWordNet swn = SentiWordNet.getInstance();
+
+    printScores(swn, "good", 'a');
+    printScores(swn, "bad", 'a');
+    printScores(swn, "blue", 'a');
+    printScores(swn, "blue", 'n');
+
+    swn.close();
   }
 }
