@@ -187,12 +187,12 @@ public class FileUtil {
   }
 
   public static Map<String, Double> readFile(InputStream is, String splitRegex,
-      boolean normalize, double minValue, double maxValue) {
-    return readFile(is, splitRegex, normalize, minValue, maxValue, false);
+      boolean featureScaling, double minValue, double maxValue) {
+    return readFile(is, splitRegex, featureScaling, minValue, maxValue, false);
   }
 
   public static Map<String, Double> readFile(InputStream is, String splitRegex,
-      boolean normalize, double minValue, double maxValue, boolean logging) {
+      boolean featureScaling, double minValue, double maxValue, boolean logging) {
     Map<String, Double> map = new HashMap<String, Double>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -210,7 +210,7 @@ public class FileUtil {
         String key = values[0].trim();
         double value = Double.parseDouble(values[1].trim());
 
-        if (normalize) {
+        if (featureScaling) {
           // Feature scaling
           double normalizedValue = (value - minValue) / (maxValue - minValue);
 
@@ -260,7 +260,7 @@ public class FileUtil {
     LOG.info("Loaded total " + map.size() + " items [minValue: "
         + actualMinValue + ", maxValue: " + actualMaxValue + "]");
 
-    if (normalize) {
+    if (featureScaling) {
       if (minValue != actualMinValue) {
         LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
             + " given minValue: " + minValue
@@ -275,13 +275,16 @@ public class FileUtil {
     return map;
   }
 
-  public static WordListMap<Double> readWordRatings(InputStream is,
-      String splitRegex, double minValue, double maxValue) {
-    return readWordRatings(is, splitRegex, minValue, maxValue, false);
+  public static WordListMap<Double> readWordListMap(InputStream is,
+      String splitRegex, boolean featureScaling, double minValue,
+      double maxValue) {
+    return readWordListMap(is, splitRegex, featureScaling, minValue, maxValue,
+        false);
   }
 
-  public static WordListMap<Double> readWordRatings(InputStream is,
-      String splitRegex, double minValue, double maxValue, boolean logging) {
+  public static WordListMap<Double> readWordListMap(InputStream is,
+      String splitRegex, boolean featureScaling, double minValue,
+      double maxValue, boolean logging) {
     WordListMap<Double> wordListMap = new WordListMap<Double>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -299,35 +302,41 @@ public class FileUtil {
         String key = values[0].trim();
         double value = Double.parseDouble(values[1].trim());
 
-        // Feature scaling
-        double normalizedValue = (value - minValue) / (maxValue - minValue);
+        if (featureScaling) {
+          // Feature scaling
+          double normalizedValue = (value - minValue) / (maxValue - minValue);
 
-        if (logging) {
-          LOG.info("Add Key: '" + key + "' Value: '" + value
-              + "' normalizedValue: '" + normalizedValue + "'");
-        }
-        // check min and max values
-        if (value > actualMaxValue) {
-          actualMaxValue = value;
-        }
-        if (value < actualMinValue) {
-          actualMinValue = value;
-        }
+          if (logging) {
+            LOG.info("Add Key: '" + key + "' Value: '" + value
+                + "' normalizedValue: '" + normalizedValue + "'");
+          }
 
-        wordListMap.put(key, value, normalizedValue);
+          // check min and max values
+          if (value > actualMaxValue) {
+            actualMaxValue = value;
+          }
+          if (value < actualMinValue) {
+            actualMinValue = value;
+          }
+
+          value = normalizedValue;
+        }
+        wordListMap.put(key, value);
       }
       LOG.info("Loaded " + wordListMap.size() + " items [minValue: "
           + actualMinValue + ", maxValue: " + actualMaxValue + "]");
 
-      if (minValue != actualMinValue) {
-        LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
-            + " given minValue: " + minValue
-            + " (normalized values might be wrong!)");
-      }
-      if (maxValue != actualMaxValue) {
-        LOG.error("maxValue is incorrect! actual maxValue: " + actualMaxValue
-            + " given maxValue: " + maxValue
-            + " (normalized values might be wrong!)");
+      if (featureScaling) {
+        if (minValue != actualMinValue) {
+          LOG.error("minValue is incorrect! actual minValue: " + actualMinValue
+              + " given minValue: " + minValue
+              + " (normalized values might be wrong!)");
+        }
+        if (maxValue != actualMaxValue) {
+          LOG.error("maxValue is incorrect! actual maxValue: " + actualMaxValue
+              + " given maxValue: " + maxValue
+              + " (normalized values might be wrong!)");
+        }
       }
 
       return wordListMap;

@@ -65,10 +65,10 @@ public class SentimentWordLists {
         if (containsRegex) {
           LOG.info("Load WordListMap including Regex from: " + file);
           if (m_wordListMap == null) {
-            m_wordListMap = FileUtil.readWordRatings(new FileInputStream(file),
+            m_wordListMap = FileUtil.readWordListMap(new FileInputStream(file),
                 separator, featureScaling, minValue, maxValue);
           } else {
-            WordListMap<Double> wordListMap = FileUtil.readWordRatings(
+            WordListMap<Double> wordListMap = FileUtil.readWordListMap(
                 new FileInputStream(file), separator, featureScaling, minValue,
                 maxValue);
             for (Map.Entry<String, Double> entry : wordListMap.entrySet()) {
@@ -118,7 +118,7 @@ public class SentimentWordLists {
 
     // Second check word list maps including regex
     if (sentimentScore == null) {
-      sentimentScore = m_wordListMap.matchKey(word, true);
+      sentimentScore = m_wordListMap.matchKey(word);
     }
 
     if (LOGGING) {

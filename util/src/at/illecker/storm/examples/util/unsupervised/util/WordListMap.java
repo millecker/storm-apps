@@ -19,9 +19,7 @@ package at.illecker.storm.examples.util.unsupervised.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -33,7 +31,6 @@ public class WordListMap<V> extends TreeMap<String, V> {
 
   private List<String> m_startStrings = new ArrayList<String>();
   private boolean m_startStringsIsSorted = false;
-  private Map<String, V> m_normalizedValues = new HashMap<String, V>();
 
   @Override
   public V put(String key, V value) {
@@ -45,11 +42,6 @@ public class WordListMap<V> extends TreeMap<String, V> {
       m_startStringsIsSorted = false;
     }
     return super.put(key, value);
-  }
-
-  public V put(String key, V value, V normalizedValue) {
-    m_normalizedValues.put(key, normalizedValue);
-    return put(key, value);
   }
 
   private String searchForMatchingKey(String key) {
@@ -76,21 +68,13 @@ public class WordListMap<V> extends TreeMap<String, V> {
     return null;
   }
 
-  public V matchKey(String key, boolean normalizedValue) {
+  public V matchKey(String key) {
     V result = super.get(key);
     if (result == null) {
       String matchingKey = searchForMatchingKey(key);
       if (matchingKey != null) {
         // LOG.info("Found match: " + key + "*" + " for " + key);
-        if (normalizedValue) {
-          result = m_normalizedValues.get(key + "*");
-        } else {
-          result = super.get(key + "*");
-        }
-      }
-    } else {
-      if (normalizedValue) {
-        result = m_normalizedValues.get(key);
+        result = super.get(key + "*");
       }
     }
     return result;
