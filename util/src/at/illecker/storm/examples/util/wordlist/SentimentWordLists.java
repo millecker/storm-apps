@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.unsupervised.util;
+package at.illecker.storm.examples.util.wordlist;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,8 +31,10 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
-import at.illecker.storm.examples.util.unsupervised.util.wordnet.POSTag;
-import at.illecker.storm.examples.util.unsupervised.util.wordnet.WordNet;
+import at.illecker.storm.examples.util.tagger.POSTagger;
+import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.wordnet.POSTag;
+import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;

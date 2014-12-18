@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Tweet;
-import at.illecker.storm.examples.util.unsupervised.util.WordListMap;
+import at.illecker.storm.examples.util.wordlist.WordListMap;
 
 public class FileUtil {
   public static final int BUFFER_SIZE = 2048;

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.sentimentanalysis.util.SentimentTweet;
 import at.illecker.storm.examples.util.io.FileUtil;
-import at.illecker.storm.examples.util.unsupervised.util.WordListMap;
+import at.illecker.storm.examples.util.wordlist.WordListMap;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -55,14 +55,14 @@ public class PolarityDetectionBolt extends BaseRichBolt {
     this.m_collector = collector;
 
     if (config.get(CONF_SENTIMENT_WORD_LIST1_FILE) != null) {
-      m_wordRatings1 = FileUtil.readWordRatings(
+      m_wordRatings1 = FileUtil.readWordListMap(
           ClassLoader.getSystemResourceAsStream(config.get(
-              CONF_SENTIMENT_WORD_LIST1_FILE).toString()), "\t", -5, 5);
+              CONF_SENTIMENT_WORD_LIST1_FILE).toString()), "\t", false, -5, 5);
     }
     if (config.get(CONF_SENTIMENT_WORD_LIST2_FILE) != null) {
-      m_wordRatings2 = FileUtil.readWordRatings(
+      m_wordRatings2 = FileUtil.readWordListMap(
           ClassLoader.getSystemResourceAsStream(config.get(
-              CONF_SENTIMENT_WORD_LIST2_FILE).toString()), "\t", -5, 5);
+              CONF_SENTIMENT_WORD_LIST2_FILE).toString()), "\t", false, -5, 5);
     }
     if ((m_wordRatings1 == null) && (m_wordRatings2 == null)) {
       throw new RuntimeException("No word lists available!");
@@ -101,11 +101,11 @@ public class PolarityDetectionBolt extends BaseRichBolt {
 
         Double rating1 = null;
         if (m_wordRatings1 != null) {
-          rating1 = m_wordRatings1.matchKey(word, false);
+          rating1 = m_wordRatings1.matchKey(word);
         }
         Double rating2 = null;
         if (m_wordRatings2 != null) {
-          rating2 = m_wordRatings2.matchKey(word, false);
+          rating2 = m_wordRatings2.matchKey(word);
         }
 
         // Update sentiment sum

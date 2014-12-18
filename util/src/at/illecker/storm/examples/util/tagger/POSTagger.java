@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.unsupervised.util;
+package at.illecker.storm.examples.util.tagger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,6 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.wordlist.Interjections;
+import at.illecker.storm.examples.util.wordlist.NameEntities;
+import at.illecker.storm.examples.util.wordlist.SlangCorrection;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.tagger.maxent.TaggerConfig;

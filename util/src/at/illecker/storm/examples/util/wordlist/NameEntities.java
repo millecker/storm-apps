@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.unsupervised.util;
+package at.illecker.storm.examples.util.wordlist;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

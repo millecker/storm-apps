@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.supervised;
+package at.illecker.storm.examples.util.svm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Tweet;
-import at.illecker.storm.examples.util.unsupervised.util.POSTagger;
-import at.illecker.storm.examples.util.unsupervised.util.SentimentWordLists;
-import at.illecker.storm.examples.util.unsupervised.util.Tokenizer;
+import at.illecker.storm.examples.util.tagger.POSTagger;
+import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {

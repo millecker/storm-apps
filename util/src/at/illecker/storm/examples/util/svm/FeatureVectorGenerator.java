@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.supervised;
+package at.illecker.storm.examples.util.svm;
 
 import at.illecker.storm.examples.util.Tweet;
 
