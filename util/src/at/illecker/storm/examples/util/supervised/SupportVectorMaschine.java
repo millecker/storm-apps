@@ -45,8 +45,10 @@ public class SupportVectorMaschine {
   public static final String TEST_DATA = System.getProperty("user.dir")
       + File.separator + "resources" + File.separator + "tweets"
       + File.separator + "svm" + File.separator + "testingInput.txt";
+
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
+  private static final boolean LOGGING = false;
 
   public static svm_parameter getSVMParameter() {
     // setup SVM parameter
@@ -136,11 +138,15 @@ public class SupportVectorMaschine {
       List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
       tweet.addTaggedSentence(taggedSentence);
 
-      LOG.info("Tweet: " + tweet);
+      if (LOGGING) {
+        LOG.info("Tweet: " + tweet);
+      }
 
       // Generate Feature Vector
       tweet.genFeatureVector(fvg);
-      LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
+      if (LOGGING) {
+        LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
+      }
     }
   }
 

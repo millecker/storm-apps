@@ -32,6 +32,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(SimpleFeatureVectorGenerator.class);
+  private static final boolean LOGGING = false;
   private static final SimpleFeatureVectorGenerator instance = new SimpleFeatureVectorGenerator();
   private SentimentWordLists m_sentimentWordLists;
 
@@ -88,13 +89,15 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
       tweetSentiment[2] = tweetSentiment[2] / tweetSentiment[4];
       tweetSentiment[3] = tweetSentiment[3] / tweetSentiment[4]; // AVG
     }
-
-    LOG.info("tweetSentiment: " + Arrays.toString(tweetSentiment));
     resultFeatureVector = tweetSentiment;
 
     double[] posTags = countPOSTags(tweet);
-    LOG.info("POStags: " + Arrays.toString(posTags));
     resultFeatureVector = concat(resultFeatureVector, posTags);
+
+    if (LOGGING) {
+      LOG.info("tweetSentiment: " + Arrays.toString(tweetSentiment));
+      LOG.info("POStags: " + Arrays.toString(posTags));
+    }
 
     return resultFeatureVector;
   }

@@ -35,6 +35,7 @@ public class POSTagger {
       + File.separator + "gate-EN-twitter-fast.model";
 
   private static final Logger LOG = LoggerFactory.getLogger(POSTagger.class);
+  private static final boolean LOGGING = false;
   private static final POSTagger instance = new POSTagger();
 
   private MaxentTagger m_posTagger; // Standford POS Tagger
@@ -101,28 +102,36 @@ public class POSTagger {
 
       // Name entities
       if (m_nameEntities.isNameEntity(tokenLowerCase)) {
-        LOG.info("NameEntity labelled for " + token);
+        if (LOGGING) {
+          LOG.info("NameEntity labelled for " + token);
+        }
         preTaggedToken.setTag("NNP");
       }
 
       // Slang correction
       String correction = m_slangCorrection.getCorrection(tokenLowerCase);
       if (correction != null) {
-        LOG.info("SlangCorrecting from " + token + " to " + correction);
+        if (LOGGING) {
+          LOG.info("SlangCorrecting from " + token + " to " + correction);
+        }
         token = correction;
         preTaggedToken = new TaggedWord(correction);
       }
 
       // Interjections
       if (m_interjections.isInterjection(tokenLowerCase)) {
-        LOG.info("Interjection labelled for " + token);
+        if (LOGGING) {
+          LOG.info("Interjection labelled for " + token);
+        }
         preTaggedToken.setTag("UH");
       }
 
       untaggedTokens.add(preTaggedToken);
     }
 
-    LOG.info("tagSentence: " + untaggedTokens.toString());
+    if (LOGGING) {
+      LOG.info("tagSentence: " + untaggedTokens.toString());
+    }
     return m_posTagger.tagSentence(untaggedTokens, true);
   }
 

@@ -64,6 +64,7 @@ public class SentimentWordLists {
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentWordLists.class);
+  private static final boolean LOGGING = false;
   private static final SentimentWordLists instance = new SentimentWordLists();
 
   private WordNet m_wordnet;
@@ -120,12 +121,16 @@ public class SentimentWordLists {
     // check SentStrength word list
     if (sentimentScore == null) {
       sentimentScore = m_wordList1.matchKey(word, true);
-      // if (sentimentScore != null) {
-      // LOG.info("hit in SentStrength word list...");
-      // }
+      if (LOGGING) {
+        if (sentimentScore != null) {
+          LOG.info("hit in SentStrength word list...");
+        }
+      }
     }
 
-    LOG.info("getWordSentiment('" + word + "'): " + sentimentScore);
+    if (LOGGING) {
+      LOG.info("getWordSentiment('" + word + "'): " + sentimentScore);
+    }
     return sentimentScore;
   }
 
@@ -156,7 +161,9 @@ public class SentimentWordLists {
     Double sentimentScore = getWordSentiment(word);
     // use word stemming if sentimentScore is null
     if (sentimentScore == null) {
-      // LOG.info(" findStems for (" + word + "," + posTag + ")");
+      if (LOGGING) {
+        LOG.info(" findStems for (" + word + "," + posTag + ")");
+      }
       List<String> stemmedWords = m_wordnet.findStems(word, posTag);
       for (String stemmedWord : stemmedWords) {
         if (!stemmedWord.equals(word)) {
@@ -167,9 +174,10 @@ public class SentimentWordLists {
         }
       }
     }
-    // LOG.info("getWordSentimentWithStemming('" + word + "'\'" + posTag +
-    // "'): "
-    // + sentimentScore);
+    if (LOGGING) {
+      LOG.info("getWordSentimentWithStemming('" + word + "'\'" + posTag
+          + "'): " + sentimentScore);
+    }
     return sentimentScore;
   }
 
@@ -223,7 +231,9 @@ public class SentimentWordLists {
     // MAX_NEG_SCORE]
     double[] tweetScore = new double[] { 0, 0, 0, 0, 0, 0, 0 };
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
-      LOG.info("taggedSentence: " + sentence.toString());
+      if (LOGGING) {
+        LOG.info("taggedSentence: " + sentence.toString());
+      }
       double[] sentenceScore = getTaggedSentenceSentiment(sentence);
       if (sentenceScore != null) {
         tweetScore[0] += sentenceScore[0]; // POS_COUNT
