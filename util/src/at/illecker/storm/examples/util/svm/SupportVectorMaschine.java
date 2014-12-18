@@ -20,7 +20,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import libsvm.svm;
 import libsvm.svm_model;
@@ -51,7 +58,7 @@ public class SupportVectorMaschine {
       .getLogger(SupportVectorMaschine.class);
   private static final boolean LOGGING = false;
 
-  public static svm_parameter getSVMParameter() {
+  public static svm_parameter svmParameter() {
     svm_parameter param = new svm_parameter();
     param.svm_type = svm_parameter.C_SVC; // default
     param.kernel_type = svm_parameter.RBF;
@@ -68,12 +75,11 @@ public class SupportVectorMaschine {
     return param;
   }
 
-  public static svm_model svmTrain(List<Tweet> trainTweets,
-      svm_parameter svmParam) {
+  public static svm_problem svmProblem(List<Tweet> trainTweets) {
     int dataCount = trainTweets.size();
 
     svm_problem svmProb = new svm_problem();
-    svmProb.y = new double[dataCount]; // classes
+    svmProb.y = new double[dataCount];
     svmProb.l = dataCount;
     svmProb.x = new svm_node[dataCount][];
 
@@ -90,7 +96,7 @@ public class SupportVectorMaschine {
         svmProb.x[i][j] = node;
       }
 
-      // end node
+      // set end node
       svm_node node = new svm_node();
       node.index = -1;
       svmProb.x[i][features.length] = node;
@@ -99,6 +105,10 @@ public class SupportVectorMaschine {
       svmProb.y[i] = tweet.getScore();
     }
 
+    return svmProb;
+  }
+
+  public static svm_model svmTrain(svm_problem svmProb, svm_parameter svmParam) {
     String paramCheck = svm.svm_check_parameter(svmProb, svmParam);
     if (paramCheck != null) {
       LOG.error("svm_check_parameter: " + paramCheck);
@@ -107,12 +117,75 @@ public class SupportVectorMaschine {
     return svm.svm_train(svmProb, svmParam);
   }
 
-  public static double evaluate(Tweet tweet, svm_model svmModel,
-      int totalClasses) {
-    return SupportVectorMaschine.evaluate(tweet, svmModel, totalClasses, false);
+  public static double svmCrossValidation(svm_problem svmProb,
+      svm_parameter svmParam) {
+    double[] target = new double[svmProb.l];
+    svm.svm_cross_validation(svmProb, svmParam, 3, target);
+
+    double correctCounter = 0;
+    for (int i = 0; i < target.length; i++) {
+      if (target[i] == svmProb.y[i]) {
+        correctCounter++;
+      }
+    }
+
+    return correctCounter / (double) svmProb.l;
   }
 
-  public static double evaluate(Tweet tweet, svm_model svmModel,
+  private static class FindParameterCallable implements Callable<double[]> {
+    private svm_problem m_svmProb;
+    private svm_parameter m_svmParam;
+    private long m_id;
+
+    public FindParameterCallable(svm_problem svmProb, svm_parameter svmParam,
+        long id) {
+      m_svmProb = svmProb;
+      m_svmParam = svmParam;
+      m_id = id;
+    }
+
+    @Override
+    public double[] call() throws Exception {
+      double accuracy = svmCrossValidation(m_svmProb, m_svmParam);
+      return new double[] { m_id, accuracy, m_svmParam.C, m_svmParam.gamma };
+    }
+  }
+
+  public static void findParamters(final svm_problem svmProb) {
+    int cores = Runtime.getRuntime().availableProcessors();
+    ExecutorService executorService = Executors.newFixedThreadPool(cores);
+    Set<Callable<double[]>> callables = new HashSet<Callable<double[]>>();
+
+    for (int i = 0; i < 11; i++) {
+      svm_parameter svmParam = svmParameter();
+      svmParam.C = Math.pow(2, -5 + (i * 2));
+      svmParam.gamma = Math.pow(2, -15 + (i * 2));
+      callables.add(new FindParameterCallable(svmProb, svmParam, i));
+    }
+
+    try {
+      List<Future<double[]>> futures = executorService.invokeAll(callables);
+      for (Future<double[]> future : futures) {
+        double[] result = future.get();
+        LOG.info("findParamters[" + result[0] + "] C=" + result[2] + " gamma="
+            + result[3] + " accuracy: " + result[1]);
+      }
+    } catch (InterruptedException e) {
+      LOG.error(e.getMessage());
+    } catch (ExecutionException e) {
+      LOG.error(e.getMessage());
+    }
+
+    executorService.shutdown();
+  }
+
+  public static double svmEvaluate(Tweet tweet, svm_model svmModel,
+      int totalClasses) {
+    return SupportVectorMaschine.svmEvaluate(tweet, svmModel, totalClasses,
+        false);
+  }
+
+  public static double svmEvaluate(Tweet tweet, svm_model svmModel,
       int totalClasses, boolean logging) {
 
     double[] features = tweet.getFeatureVector();
@@ -216,12 +289,18 @@ public class SupportVectorMaschine {
 
       // classes 1 = positive, 0 = neutral, -1 = negative
       int totalClasses = 3;
-      svm_parameter svmParam = getSVMParameter();
-      svm_model svmModel = svmTrain(trainTweets, svmParam);
+      svm_parameter svmParam = svmParameter();
+      svm_problem svmProb = svmProblem(trainTweets);
+
+      findParamters(svmProb);
+      // TODO
+      System.exit(1);
+
+      svm_model svmModel = svmTrain(svmProb, svmParam);
 
       long countMatches = 0;
       for (Tweet tweet : testTweets) {
-        double predictedClass = evaluate(tweet, svmModel, totalClasses);
+        double predictedClass = svmEvaluate(tweet, svmModel, totalClasses);
         if (predictedClass == tweet.getScore()) {
           countMatches++;
         }
