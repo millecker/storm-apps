@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -428,5 +430,39 @@ public class FileUtil {
     if (!file.delete()) {
       throw new FileNotFoundException("Failed to delete file: " + file);
     }
+  }
+
+  public static void serializeTweets(List<Tweet> tweets, String file) {
+    try {
+      FileOutputStream fos = new FileOutputStream(file);
+      ObjectOutputStream oos = new ObjectOutputStream(fos);
+      oos.writeObject(tweets);
+      oos.close();
+      fos.close();
+      LOG.info("Serialized tweets in " + file);
+    } catch (FileNotFoundException fnfe) {
+      LOG.error(fnfe.getMessage());
+    } catch (IOException ioe) {
+      LOG.error(ioe.getMessage());
+    }
+  }
+
+  public static List<Tweet> deserializeTweets(String file) {
+    List<Tweet> tweets = null;
+    try {
+      FileInputStream fis = new FileInputStream(file);
+      ObjectInputStream ois = new ObjectInputStream(fis);
+      tweets = (List<Tweet>) ois.readObject();
+      ois.close();
+      fis.close();
+      LOG.info("Deserialized tweets from " + file);
+    } catch (FileNotFoundException fnfe) {
+      LOG.error(fnfe.getMessage());
+    } catch (IOException ioe) {
+      LOG.error(ioe.getMessage());
+    } catch (ClassNotFoundException c) {
+      LOG.error(c.getMessage());
+    }
+    return tweets;
   }
 }

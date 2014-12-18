@@ -5,3 +5,4 @@ twitter*
 *.tar.gz
 *.csv
 *.regex
+*.ser
