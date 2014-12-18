@@ -19,6 +19,7 @@ package at.illecker.storm.examples.util.unsupervised.util;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,17 +38,19 @@ public class SlangCorrection {
   private SlangCorrection() {
     m_conf = Configuration.getInstance();
     try {
-      Map<String, String> slangWordListPaths = m_conf.getSlangWordlists();
-      for (Map.Entry<String, String> slangWordListEntry : slangWordListPaths
+      Map<String, Properties> slangWordLists = m_conf.getSlangWordlists();
+      for (Map.Entry<String, Properties> slangWordListEntry : slangWordLists
           .entrySet()) {
-        LOG.info("Load SlangLookupTable from: " + slangWordListEntry.getKey());
+        String file = slangWordListEntry.getKey();
+        String separator = slangWordListEntry.getValue().getProperty(
+            "separator");
+        LOG.info("Load SlangLookupTable from: " + file);
         if (m_slangWordList == null) {
-          m_slangWordList = FileUtil.readFile(new FileInputStream(
-              slangWordListEntry.getKey()), slangWordListEntry.getValue());
+          m_slangWordList = FileUtil.readFile(new FileInputStream(file),
+              separator);
         } else {
           Map<String, String> slangWordList = FileUtil.readFile(
-              new FileInputStream(slangWordListEntry.getKey()),
-              slangWordListEntry.getValue());
+              new FileInputStream(file), separator);
           for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
             if (!m_slangWordList.containsKey(entry.getKey())) {
               m_slangWordList.put(entry.getKey(), entry.getValue());

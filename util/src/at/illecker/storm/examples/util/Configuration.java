@@ -19,6 +19,7 @@ package at.illecker.storm.examples.util;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,15 +57,63 @@ public class Configuration {
     return instance;
   }
 
-  public Map<String, String> getSlangWordlists() {
+  public Map<String, Properties> getWordlists() {
     String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
         + File.separator;
-    Map<String, String> slangWordLists = new HashMap<String, String>();
+    Map<String, Properties> wordLists = new HashMap<String, Properties>();
+
+    // Add AFINN word list using Regex = false
+    // AFINN word list (minValue -5 and maxValue +5)
+    Properties props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-5));
+    props.put("maxValue", Double.valueOf(5));
+    wordLists.put(wordListDir + "AFINN-111.txt", props);
+
+    // Add SentStrength EmoticonLookupTable using Regex = false
+    // SentStrength emoticons (minValue -1 and maxValue +1)
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-1));
+    props.put("maxValue", Double.valueOf(1));
+
+    wordLists.put(wordListDir
+        + "SentStrength_Data_Sept2011_EmoticonLookupTable.txt", props);
+
+    // Add SentStrength EmotionLookupTable using Regex = true
+    // SentStrength word list (minValue -5 and maxValue +5)
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsRegex", Boolean.valueOf(true));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-5));
+    props.put("maxValue", Double.valueOf(5));
+    wordLists.put(wordListDir
+        + "SentStrength_Data_Sept2011_EmotionLookupTable.txt", props);
+
+    return wordLists;
+  }
+
+  public Map<String, Properties> getSlangWordlists() {
+    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
+        + File.separator;
+    Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
+
     // Add SentStrength SlangLookupTable
+    Properties props = new Properties();
+    props.put("separator", "\t");
     slangWordLists.put(wordListDir
-        + "SentStrength_Data_Sept2011_SlangLookupTable.txt", "\t");
+        + "SentStrength_Data_Sept2011_SlangLookupTable.txt", props);
+
     // Add GATE SlangLookupTable orth.en
-    slangWordLists.put(wordListDir + "GATE_slang.en.csv", ",");
+    props = new Properties();
+    props.put("separator", ",");
+    slangWordLists.put(wordListDir + "GATE_slang.en.csv", props);
+
     return slangWordLists;
   }
 

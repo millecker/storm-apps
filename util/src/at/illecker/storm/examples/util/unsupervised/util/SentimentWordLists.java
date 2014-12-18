@@ -16,18 +16,19 @@
  */
 package at.illecker.storm.examples.util.unsupervised.util;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
 import at.illecker.storm.examples.util.unsupervised.util.wordnet.POSTag;
@@ -37,60 +38,62 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SentimentWordLists {
-  public static final String SENTIMENT_WORD_LIST1 = System
-      .getProperty("user.dir")
-      + File.separator
-      + "resources"
-      + File.separator
-      + "wordlists"
-      + File.separator
-      + "SentStrength_Data_Sept2011_EmotionLookupTable.txt";
-
-  public static final String SENTIMENT_WORD_LIST2 = System
-      .getProperty("user.dir")
-      + File.separator
-      + "resources"
-      + File.separator
-      + "wordlists" + File.separator + "AFINN-111.txt";
-
-  public static final String SENTIMENT_WORD_LIST3 = System
-      .getProperty("user.dir")
-      + File.separator
-      + "resources"
-      + File.separator
-      + "wordlists"
-      + File.separator
-      + "SentStrength_Data_Sept2011_EmoticonLookupTable.txt";
-
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentWordLists.class);
   private static final boolean LOGGING = false;
   private static final SentimentWordLists instance = new SentimentWordLists();
 
+  private Configuration m_conf;
   private WordNet m_wordnet;
-  // SentStrength word list (minValue -5 and maxValue +5)
-  private WordListMap<Double> m_wordList1;
-  // AFINN word list (minValue -5 and maxValue +5)
-  private Map<String, Double> m_wordList2;
-  // SentStrength emoticons (minValue -1 and maxValue +1)
-  private Map<String, Double> m_wordList3;
+  private Map<String, Double> m_wordList;
+  private WordListMap<Double> m_wordListMap;
 
   private SentimentWordLists() {
+    m_conf = Configuration.getInstance();
     m_wordnet = WordNet.getInstance();
-
     try {
-      LOG.info("Load SentStrength word list from: " + SENTIMENT_WORD_LIST1);
-      m_wordList1 = FileUtil.readWordRatings(new FileInputStream(
-          SENTIMENT_WORD_LIST1), "\t", -5, 5);
+      Map<String, Properties> wordLists = m_conf.getWordlists();
+      for (Map.Entry<String, Properties> wordListEntry : wordLists.entrySet()) {
+        String file = wordListEntry.getKey();
+        Properties props = wordListEntry.getValue();
+        String separator = props.getProperty("separator");
+        boolean containsRegex = (Boolean) props.get("containsRegex");
+        boolean featureScaling = (Boolean) props.get("featureScaling");
+        double minValue = (Double) props.get("minValue");
+        double maxValue = (Double) props.get("maxValue");
 
-      LOG.info("Load AFINN word list from: " + SENTIMENT_WORD_LIST1);
-      m_wordList2 = FileUtil.readFile(
-          new FileInputStream(SENTIMENT_WORD_LIST2), "\t", true, -5, 5);
-
-      LOG.info("Load SentStrength emoticons from: " + SENTIMENT_WORD_LIST3);
-      m_wordList3 = FileUtil.readFile(
-          new FileInputStream(SENTIMENT_WORD_LIST3), "\t", true, -1, 1);
-
+        if (containsRegex) {
+          LOG.info("Load WordListMap including Regex from: " + file);
+          if (m_wordListMap == null) {
+            m_wordListMap = FileUtil.readWordRatings(new FileInputStream(file),
+                separator, featureScaling, minValue, maxValue);
+          } else {
+            WordListMap<Double> wordListMap = FileUtil.readWordRatings(
+                new FileInputStream(file), separator, featureScaling, minValue,
+                maxValue);
+            for (Map.Entry<String, Double> entry : wordListMap.entrySet()) {
+              if (!m_wordListMap.containsKey(entry.getKey())) {
+                m_wordListMap.put(entry.getKey(), entry.getValue());
+              }
+            }
+          }
+        } else {
+          LOG.info("Load WordList from: " + file);
+          if (m_wordList == null) {
+            m_wordList = FileUtil.readFile(new FileInputStream(file),
+                separator, featureScaling, minValue, maxValue);
+          } else {
+            Map<String, Double> wordList = FileUtil.readFile(
+                new FileInputStream(file), separator, featureScaling, minValue,
+                maxValue);
+            for (Map.Entry<String, Double> entry : wordList.entrySet()) {
+              if (!m_wordList.containsKey(entry.getKey())) {
+                m_wordList.put(entry.getKey(), entry.getValue());
+              }
+            }
+          }
+        }
+      }
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -110,22 +113,12 @@ public class SentimentWordLists {
 
   public Double getWordSentiment(String word) {
     Double sentimentScore = null;
-    // check AFINN word list
-    sentimentScore = m_wordList2.get(word);
+    // First check word lists
+    sentimentScore = m_wordList.get(word);
 
-    // check Emoticons
+    // Second check word list maps including regex
     if (sentimentScore == null) {
-      sentimentScore = m_wordList3.get(word);
-    }
-
-    // check SentStrength word list
-    if (sentimentScore == null) {
-      sentimentScore = m_wordList1.matchKey(word, true);
-      if (LOGGING) {
-        if (sentimentScore != null) {
-          LOG.info("hit in SentStrength word list...");
-        }
-      }
+      sentimentScore = m_wordListMap.matchKey(word, true);
     }
 
     if (LOGGING) {
