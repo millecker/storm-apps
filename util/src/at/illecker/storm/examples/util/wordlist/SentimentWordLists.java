@@ -97,7 +97,7 @@ public class SentimentWordLists {
         }
       }
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage());
     }
   }
 

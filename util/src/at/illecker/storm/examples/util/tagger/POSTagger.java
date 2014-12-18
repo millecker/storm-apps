@@ -28,6 +28,7 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.NameEntities;
 import at.illecker.storm.examples.util.wordlist.SlangCorrection;
+import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.tagger.maxent.TaggerConfig;
@@ -47,16 +48,20 @@ public class POSTagger {
     m_conf = Configuration.getInstance();
     // Load POS Tagger
     String taggingModel = m_conf.getPOSTaggingModel();
-    LOG.info("Load POSTagger with model: " + taggingModel);
-    TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
-    m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
+    try {
+      LOG.info("Load POSTagger with model: " + taggingModel);
+      TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
+      m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
 
-    // Load NameEntities
-    m_nameEntities = NameEntities.getInstance();
-    // Load SlangCorrection
-    m_slangCorrection = SlangCorrection.getInstance();
-    // Load Interjections
-    m_interjections = Interjections.getInstance();
+      // Load NameEntities
+      m_nameEntities = NameEntities.getInstance();
+      // Load SlangCorrection
+      m_slangCorrection = SlangCorrection.getInstance();
+      // Load Interjections
+      m_interjections = Interjections.getInstance();
+    } catch (RuntimeIOException e) {
+      LOG.error(e.getMessage());
+    }
   }
 
   public static POSTagger getInstance() {

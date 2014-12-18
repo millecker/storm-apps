@@ -82,9 +82,9 @@ public class WordNet {
       m_wordnetStemmer = new WordnetStemmer(m_dict);
 
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage());
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage());
     }
   }
 
@@ -93,7 +93,9 @@ public class WordNet {
   }
 
   public void close() throws IOException {
-    m_dict.close();
+    if (m_dict != null) {
+      m_dict.close();
+    }
     FileUtil.delete(m_wordNetDir);
   }
 

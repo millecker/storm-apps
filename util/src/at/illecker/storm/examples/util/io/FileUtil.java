@@ -428,7 +428,7 @@ public class FileUtil {
         delete(c, logging);
     }
     if (!file.delete()) {
-      throw new FileNotFoundException("Failed to delete file: " + file);
+      LOG.error("Failed to delete file: " + file);
     }
   }
 
