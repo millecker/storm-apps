@@ -48,6 +48,84 @@ public class SupportVectorMaschine {
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
 
+  public static svm_parameter getSVMParameter() {
+    // setup SVM parameter
+    svm_parameter param = new svm_parameter();
+    param.probability = 1;
+    param.gamma = 0.5;
+    param.nu = 0.5;
+    param.C = 1;
+    param.svm_type = svm_parameter.C_SVC;
+    param.kernel_type = svm_parameter.LINEAR;
+    param.cache_size = 20000;
+    param.eps = 0.001;
+    return param;
+  }
+
+  public static svm_model svmTrain(List<Tweet> trainTweets,
+      svm_parameter svmParam) {
+    int dataCount = trainTweets.size();
+
+    svm_problem prob = new svm_problem();
+    prob.y = new double[dataCount]; // classes
+    prob.l = dataCount;
+    prob.x = new svm_node[dataCount][];
+
+    for (int i = 0; i < dataCount; i++) {
+      Tweet tweet = trainTweets.get(i);
+      double[] features = tweet.getFeatureVector();
+
+      // set feature vector
+      prob.x[i] = new svm_node[features.length];
+      for (int j = 0; j < features.length; j++) {
+        svm_node node = new svm_node();
+        node.index = j;
+        node.value = features[j];
+        prob.x[i][j] = node;
+      }
+      // set class
+      prob.y[i] = tweet.getScore();
+    }
+
+    return svm.svm_train(prob, svmParam);
+  }
+
+  public static double evaluate(Tweet tweet, svm_model svmModel,
+      int totalClasses) {
+    return SupportVectorMaschine.evaluate(tweet, svmModel, totalClasses, false);
+  }
+
+  public static double evaluate(Tweet tweet, svm_model svmModel,
+      int totalClasses, boolean logging) {
+
+    double[] features = tweet.getFeatureVector();
+    svm_node[] nodes = new svm_node[features.length];
+    for (int i = 0; i < features.length; i++) {
+      svm_node node = new svm_node();
+      node.index = i;
+      node.value = features[i];
+      nodes[i] = node;
+    }
+
+    int[] labels = new int[totalClasses];
+    svm.svm_get_labels(svmModel, labels);
+
+    double[] probEstimates = new double[totalClasses];
+    double predictedClass = svm.svm_predict_probability(svmModel, nodes,
+        probEstimates);
+
+    if (logging) {
+      for (int i = 0; i < totalClasses; i++) {
+        LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
+            + probEstimates[i]);
+      }
+      LOG.info("TweetScore:" + tweet.getScore() + " Prediction:"
+          + predictedClass);
+    }
+
+    return predictedClass;
+  }
+
   public static void processTweets(POSTagger posTagger,
       FeatureVectorGenerator fvg, List<Tweet> tweets) {
     for (Tweet tweet : tweets) {
@@ -64,72 +142,6 @@ public class SupportVectorMaschine {
       tweet.genFeatureVector(fvg);
       LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
     }
-  }
-
-  private static svm_model svmTrain(List<Tweet> trainTweets) {
-    int dataCount = trainTweets.size();
-
-    svm_problem prob = new svm_problem();
-    prob.y = new double[dataCount];
-    prob.l = dataCount;
-    prob.x = new svm_node[dataCount][];
-
-    for (int i = 0; i < dataCount; i++) {
-      Tweet tweet = trainTweets.get(i);
-      double[] features = tweet.getFeatureVector();
-      // set feature vector
-      prob.x[i] = new svm_node[features.length];
-      for (int j = 0; j < features.length; j++) {
-        svm_node node = new svm_node();
-        node.index = j;
-        node.value = features[j];
-        prob.x[i][j] = node;
-      }
-      // set class
-      prob.y[i] = tweet.getScore();
-    }
-
-    // setup SVM parameter
-    svm_parameter param = new svm_parameter();
-    param.probability = 1;
-    param.gamma = 0.5;
-    param.nu = 0.5;
-    param.C = 1;
-    param.svm_type = svm_parameter.C_SVC;
-    param.kernel_type = svm_parameter.LINEAR;
-    param.cache_size = 20000;
-    param.eps = 0.001;
-
-    svm_model model = svm.svm_train(prob, param);
-
-    return model;
-  }
-
-  private static double evaluate(Tweet tweet, svm_model svmModel,
-      int totalClasses) {
-    double[] features = tweet.getFeatureVector();
-    svm_node[] nodes = new svm_node[features.length];
-    for (int i = 0; i < features.length; i++) {
-      svm_node node = new svm_node();
-      node.index = i;
-      node.value = features[i];
-      nodes[i] = node;
-    }
-
-    int[] labels = new int[totalClasses];
-    svm.svm_get_labels(svmModel, labels);
-
-    double[] prob_estimates = new double[totalClasses];
-    double predictedClass = svm.svm_predict_probability(svmModel, nodes,
-        prob_estimates);
-
-    for (int i = 0; i < totalClasses; i++) {
-      LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
-          + prob_estimates[i]);
-    }
-    LOG.info("TweetScore:" + tweet.getScore() + " Prediction:" + predictedClass);
-
-    return predictedClass;
   }
 
   public static void main(String[] args) {
@@ -158,11 +170,13 @@ public class SupportVectorMaschine {
       processTweets(posTagger, sfvg, testTweets);
 
       // classes 1 = positive, 0 = neutral, -1 = negative
-      svm_model svmModel = svmTrain(trainTweets);
+      int totalClasses = 3;
+      svm_parameter svmParam = getSVMParameter();
+      svm_model svmModel = svmTrain(trainTweets, svmParam);
 
       long countMatches = 0;
       for (Tweet tweet : testTweets) {
-        double predictedClass = evaluate(tweet, svmModel, 3);
+        double predictedClass = evaluate(tweet, svmModel, totalClasses);
         if (predictedClass == tweet.getScore()) {
           countMatches++;
         }
@@ -170,7 +184,7 @@ public class SupportVectorMaschine {
 
       LOG.info("Total test tweets: " + testTweets.size());
       LOG.info("Matches: " + countMatches);
-      double accuracy = countMatches / testTweets.size();
+      double accuracy = (double) countMatches / (double) testTweets.size();
       LOG.info("Accuracy: " + accuracy);
 
     } catch (FileNotFoundException e) {
