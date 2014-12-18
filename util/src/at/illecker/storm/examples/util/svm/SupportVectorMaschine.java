@@ -39,28 +39,32 @@ import edu.stanford.nlp.ling.TaggedWord;
 
 public class SupportVectorMaschine {
 
-  public static final String TRAIN_DATA = System.getProperty("user.dir")
+  public static final String SVM_DIR = System.getProperty("user.dir")
       + File.separator + "resources" + File.separator + "tweets"
-      + File.separator + "svm" + File.separator + "trainingInput.txt";
-  public static final String TEST_DATA = System.getProperty("user.dir")
-      + File.separator + "resources" + File.separator + "tweets"
-      + File.separator + "svm" + File.separator + "testingInput.txt";
+      + File.separator + "svm" + File.separator;
+  public static final String TRAIN_DATA = SVM_DIR + "trainingInput.txt";
+  public static final String TEST_DATA = SVM_DIR + "testingInput.txt";
+  public static final String TRAIN_FILE = SVM_DIR + "trainingInput.ser";
+  public static final String TEST_FILE = SVM_DIR + "testingInput.ser";
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
   private static final boolean LOGGING = false;
 
   public static svm_parameter getSVMParameter() {
-    // setup SVM parameter
     svm_parameter param = new svm_parameter();
+    param.svm_type = svm_parameter.C_SVC; // default
+    param.kernel_type = svm_parameter.RBF;
+    // 1 means model with probability information is obtained
     param.probability = 1;
-    param.gamma = 0.5;
-    param.nu = 0.5;
-    param.C = 1;
-    param.svm_type = svm_parameter.C_SVC;
-    param.kernel_type = svm_parameter.LINEAR;
-    param.cache_size = 20000;
-    param.eps = 0.001;
+    // C = 2^−5, 2^−3, ..., 2^15
+    param.C = 10; // cost of constraints violation default 1
+    // gamma = 2^−15, 2^−13, ..., 2^3
+    param.gamma = 0.5; // default 1/num_features
+    param.nu = 0.5; // default 0.5
+    param.eps = 0.001; // stopping criterion
+    param.cache_size = 20000; // kernel cache specified in megabytes
+
     return param;
   }
 
@@ -68,28 +72,39 @@ public class SupportVectorMaschine {
       svm_parameter svmParam) {
     int dataCount = trainTweets.size();
 
-    svm_problem prob = new svm_problem();
-    prob.y = new double[dataCount]; // classes
-    prob.l = dataCount;
-    prob.x = new svm_node[dataCount][];
+    svm_problem svmProb = new svm_problem();
+    svmProb.y = new double[dataCount]; // classes
+    svmProb.l = dataCount;
+    svmProb.x = new svm_node[dataCount][];
 
     for (int i = 0; i < dataCount; i++) {
       Tweet tweet = trainTweets.get(i);
       double[] features = tweet.getFeatureVector();
 
       // set feature vector
-      prob.x[i] = new svm_node[features.length];
+      svmProb.x[i] = new svm_node[features.length + 1];
       for (int j = 0; j < features.length; j++) {
         svm_node node = new svm_node();
         node.index = j;
         node.value = features[j];
-        prob.x[i][j] = node;
+        svmProb.x[i][j] = node;
       }
+
+      // end node
+      svm_node node = new svm_node();
+      node.index = -1;
+      svmProb.x[i][features.length] = node;
+
       // set class
-      prob.y[i] = tweet.getScore();
+      svmProb.y[i] = tweet.getScore();
     }
 
-    return svm.svm_train(prob, svmParam);
+    String paramCheck = svm.svm_check_parameter(svmProb, svmParam);
+    if (paramCheck != null) {
+      LOG.error("svm_check_parameter: " + paramCheck);
+    }
+
+    return svm.svm_train(svmProb, svmParam);
   }
 
   public static double evaluate(Tweet tweet, svm_model svmModel,
@@ -152,28 +167,52 @@ public class SupportVectorMaschine {
 
   public static void main(String[] args) {
     SimpleFeatureVectorGenerator sfvg = null;
+    POSTagger posTagger = null;
     try {
-      LOG.info("Read Train Data from " + TRAIN_DATA);
-      List<Tweet> trainTweets = FileUtil.readTweets(new FileInputStream(
-          TRAIN_DATA));
-      LOG.info("Read Test Data from " + TEST_DATA);
-      List<Tweet> testTweets = FileUtil.readTweets(new FileInputStream(
-          TEST_DATA));
 
-      // Generate feature vectors
-      LOG.info("Load SimpleFeatureVectorGenerator...");
-      sfvg = SimpleFeatureVectorGenerator.getInstance();
-
-      // Load POS Tagger
-      POSTagger posTagger = POSTagger.getInstance();
-
-      // Train tweets
+      // Prepare Train tweets
+      List<Tweet> trainTweets = null;
       LOG.info("Prepare Train data...");
-      processTweets(posTagger, sfvg, trainTweets);
+      List<Tweet> trainedTweets = FileUtil.deserializeTweets(TRAIN_FILE);
+      if (trainedTweets == null) {
+        // Generate feature vectors
+        if (sfvg == null) {
+          LOG.info("Load SimpleFeatureVectorGenerator...");
+          sfvg = SimpleFeatureVectorGenerator.getInstance();
+        }
+        // Load POS Tagger
+        if (posTagger == null) {
+          posTagger = POSTagger.getInstance();
+        }
+        LOG.info("Read train tweets from " + TRAIN_DATA);
+        trainTweets = FileUtil.readTweets(new FileInputStream(TRAIN_DATA));
+        processTweets(posTagger, sfvg, trainTweets);
+        FileUtil.serializeTweets(trainTweets, TRAIN_FILE);
+      } else {
+        trainTweets = trainedTweets;
+      }
 
-      // Test tweets
+      // Prepare Test tweets
+      List<Tweet> testTweets = null;
       LOG.info("Prepare Test data...");
-      processTweets(posTagger, sfvg, testTweets);
+      List<Tweet> testedTweets = FileUtil.deserializeTweets(TEST_FILE);
+      if (trainedTweets == null) {
+        // Generate feature vectors
+        if (sfvg == null) {
+          LOG.info("Load SimpleFeatureVectorGenerator...");
+          sfvg = SimpleFeatureVectorGenerator.getInstance();
+        }
+        // Load POS Tagger
+        if (posTagger == null) {
+          posTagger = POSTagger.getInstance();
+        }
+        LOG.info("Read test tweets from " + TEST_DATA);
+        testTweets = FileUtil.readTweets(new FileInputStream(TEST_DATA));
+        processTweets(posTagger, sfvg, testTweets);
+        FileUtil.serializeTweets(testTweets, TEST_FILE);
+      } else {
+        testTweets = testedTweets;
+      }
 
       // classes 1 = positive, 0 = neutral, -1 = negative
       int totalClasses = 3;
