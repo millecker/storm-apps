@@ -32,6 +32,8 @@ public class Configuration {
 
   private static final String CONF_WORD_LIST_PATH = "resources"
       + File.separator + "wordlists";
+  public static final String CONF_MODEL_PATH = "resources" + File.separator
+      + "models";
 
   private String m_userDir;
   private String m_workingDir;
@@ -115,6 +117,12 @@ public class Configuration {
     slangWordLists.put(wordListDir + "GATE_slang.en.csv", props);
 
     return slangWordLists;
+  }
+
+  public String getPOSTaggingModel() {
+    String modelDir = m_workingDir + File.separator + CONF_MODEL_PATH
+        + File.separator;
+    return modelDir + "gate-EN-twitter-fast.model";
   }
 
   @Override

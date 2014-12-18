@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.unsupervised.util;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,30 +23,29 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.tagger.maxent.TaggerConfig;
 
 public class POSTagger {
-
-  public static final String TAGGER_MODEL = System.getProperty("user.dir")
-      + File.separator + "resources" + File.separator + "POSmodels"
-      + File.separator + "gate-EN-twitter-fast.model";
-
   private static final Logger LOG = LoggerFactory.getLogger(POSTagger.class);
   private static final boolean LOGGING = false;
   private static final POSTagger instance = new POSTagger();
 
+  private Configuration m_conf;
   private MaxentTagger m_posTagger; // Standford POS Tagger
   private NameEntities m_nameEntities;
   private SlangCorrection m_slangCorrection;
   private Interjections m_interjections;
 
   private POSTagger() {
+    m_conf = Configuration.getInstance();
     // Load POS Tagger
-    LOG.info("Load POSTagger with model: " + TAGGER_MODEL);
-    TaggerConfig posTaggerConf = new TaggerConfig("-model", TAGGER_MODEL);
-    m_posTagger = new MaxentTagger(TAGGER_MODEL, posTaggerConf, false);
+    String taggingModel = m_conf.getPOSTaggingModel();
+    LOG.info("Load POSTagger with model: " + taggingModel);
+    TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
+    m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
 
     // Load NameEntities
     m_nameEntities = NameEntities.getInstance();
