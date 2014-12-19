@@ -135,19 +135,24 @@ public class SupportVectorMaschine {
   private static class FindParameterCallable implements Callable<double[]> {
     private svm_problem m_svmProb;
     private svm_parameter m_svmParam;
-    private long m_id;
+    private long m_i;
+    private long m_j;
 
     public FindParameterCallable(svm_problem svmProb, svm_parameter svmParam,
-        long id) {
+        long i, long j) {
       m_svmProb = svmProb;
       m_svmParam = svmParam;
-      m_id = id;
+      m_i = i;
+      m_j = j;
     }
 
     @Override
     public double[] call() throws Exception {
+      long startTime = System.currentTimeMillis();
       double accuracy = svmCrossValidation(m_svmProb, m_svmParam);
-      return new double[] { m_id, accuracy, m_svmParam.C, m_svmParam.gamma };
+      long estimatedTime = System.currentTimeMillis() - startTime;
+      return new double[] { m_i, m_j, accuracy, m_svmParam.C, m_svmParam.gamma,
+          estimatedTime };
     }
   }
 
@@ -156,19 +161,22 @@ public class SupportVectorMaschine {
     ExecutorService executorService = Executors.newFixedThreadPool(cores);
     Set<Callable<double[]>> callables = new HashSet<Callable<double[]>>();
 
-    for (int i = 0; i < 11; i++) {
-      svm_parameter svmParam = svmParameter();
-      svmParam.C = Math.pow(2, -5 + (i * 2));
-      svmParam.gamma = Math.pow(2, -15 + (i * 2));
-      callables.add(new FindParameterCallable(svmProb, svmParam, i));
+    for (int i = 0; i < 10; i++) { // i < 11
+      for (int j = 0; j < 9; j++) {
+        svm_parameter svmParam = svmParameter();
+        svmParam.C = Math.pow(2, -5 + (i * 2));
+        svmParam.gamma = Math.pow(2, -15 + (j * 2));
+        callables.add(new FindParameterCallable(svmProb, svmParam, i, j));
+      }
     }
 
     try {
       List<Future<double[]>> futures = executorService.invokeAll(callables);
       for (Future<double[]> future : futures) {
         double[] result = future.get();
-        LOG.info("findParamters[" + result[0] + "] C=" + result[2] + " gamma="
-            + result[3] + " accuracy: " + result[1]);
+        LOG.info("findParamters[" + result[0] + "," + result[1] + "] C="
+            + result[3] + " gamma=" + result[4] + " accuracy: " + result[2]
+            + " time: " + result[5] + " ms");
       }
     } catch (InterruptedException e) {
       LOG.error(e.getMessage());
