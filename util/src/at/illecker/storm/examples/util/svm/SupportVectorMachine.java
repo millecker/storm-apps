@@ -50,7 +50,7 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class SupportVectorMaschine {
+public class SupportVectorMachine {
   public static final Configuration CONFIG = Configuration.getInstance();
   public static final String DATASET_PATH = CONFIG.getDataSetPath()
       + File.separator + "dataset3" + File.separator;
@@ -60,7 +60,7 @@ public class SupportVectorMaschine {
   public static final String TEST_FILE = DATASET_PATH + "testingInput.ser";
 
   private static final Logger LOG = LoggerFactory
-      .getLogger(SupportVectorMaschine.class);
+      .getLogger(SupportVectorMachine.class);
   private static final boolean LOGGING = false;
 
   public static svm_parameter getDefaultParameter() {
@@ -228,7 +228,7 @@ public class SupportVectorMaschine {
 
   public static double evaluate(Tweet tweet, svm_model svmModel,
       int totalClasses, ScoreClassifier scoreClassifier) {
-    return SupportVectorMaschine.evaluate(tweet, svmModel, totalClasses,
+    return SupportVectorMachine.evaluate(tweet, svmModel, totalClasses,
         scoreClassifier, false);
   }
 
