@@ -21,15 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
-import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class Tweet implements Serializable {
-  private static final long serialVersionUID = 9104947415982847510L;
+  private static final long serialVersionUID = 4547113316137760131L;
   private long m_id;
   private String m_text = "";
   private double m_score = 0;
-  private List<List<HasWord>> m_sentences;
+  private List<List<String>> m_sentences;
   private List<List<TaggedWord>> m_taggedSentences;
   private double[] m_featureVector;
 
@@ -37,7 +36,7 @@ public class Tweet implements Serializable {
     this.m_id = id;
     this.m_text = text;
     this.m_score = score;
-    this.m_sentences = new ArrayList<List<HasWord>>();
+    this.m_sentences = new ArrayList<List<String>>();
     this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
   }
 
@@ -57,11 +56,11 @@ public class Tweet implements Serializable {
     return m_featureVector;
   }
 
-  public void addSentence(List<HasWord> sentence) {
+  public void addSentence(List<String> sentence) {
     m_sentences.add(sentence);
   }
 
-  public List<List<HasWord>> getSentences() {
+  public List<List<String>> getSentences() {
     return m_sentences;
   }
 
