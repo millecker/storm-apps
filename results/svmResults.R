@@ -23,11 +23,11 @@ if (is.na(args[1])) {
   inputCSV <- args[1]
 }
 
-# argument precision
+# argument roundPrecision
 if (is.na(args[2])) {
-  precision <- 2
+  roundPrecision <- 2
 } else {
-  precision <- as.numeric(args[2]);
+  roundPrecision <- as.numeric(args[2]);
 }
 
 # read CSV file
@@ -36,9 +36,9 @@ svmResults <- read.csv(inputCSV, sep=";")
 # order by accuracy
 orderedsvmResults <- svmResults[order(-svmResults$accuracy),] 
 # convert msec to seconds
-orderedsvmResults <- transform(orderedsvmResults, time_sec = orderedsvmResults$time / 1000)
+orderedsvmResults <- transform(orderedsvmResults, time_sec = orderedsvmResults$time_ms / 1000)
 # round accuracy to build groups
-orderedsvmResults$accuracy_group <- round(orderedsvmResults$accuracy, digits = precision)
+orderedsvmResults$accuracy_group <- round(orderedsvmResults$accuracy, digits = roundPrecision)
 orderedsvmResults
 
 ggplot(orderedsvmResults, aes(x=C, y=gamma, colour=accuracy_group)) + 
