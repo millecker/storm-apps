@@ -41,6 +41,10 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.FileUtil;
 import at.illecker.storm.examples.util.io.SerializationUtil;
+import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
+import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
+import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
+import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -76,7 +80,8 @@ public class SupportVectorMaschine {
     return param;
   }
 
-  public static svm_problem generateProblem(List<Tweet> trainTweets) {
+  public static svm_problem generateProblem(List<? extends Tweet> trainTweets,
+      ScoreClassifier scoreClassifier) {
     int dataCount = trainTweets.size();
 
     svm_problem svmProb = new svm_problem();
@@ -103,7 +108,7 @@ public class SupportVectorMaschine {
       svmProb.x[i][features.length] = node;
 
       // set class
-      svmProb.y[i] = tweet.getScore();
+      svmProb.y[i] = scoreClassifier.classfyScore(tweet.getScore());
     }
 
     return svmProb;
@@ -325,7 +330,8 @@ public class SupportVectorMaschine {
       // classes 1 = positive, 0 = neutral, -1 = negative
       int totalClasses = 3;
       svm_parameter svmParam = getDefaultParameter();
-      svm_problem svmProb = generateProblem(trainTweets);
+      svm_problem svmProb = generateProblem(trainTweets,
+          new IdentityScoreClassifier());
 
       // Optional parameter search of C and gamma
       if (parameterSearch) {

@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import at.illecker.storm.examples.util.svm.FeatureVectorGenerator;
+import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
