@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.sentimentanalysis.bolt;
+package at.illecker.storm.examples.util.bolt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.tweet.SentimentTweet;
+import at.illecker.storm.examples.util.io.preprocessor.Preprocessor;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -30,58 +32,34 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
-/**
- * POSTaggerBolt is based on the Stanford NLP library and the
- * gate-EN-twitter-fast.model
- *
- * http://nlp.stanford.edu/software/corenlp.shtml
- * http://nlp.stanford.edu:8080/corenlp/process
- * https://gate.ac.uk/wiki/twitter-postagger.html
- * 
- */
-public class POSTaggerBolt extends BaseRichBolt {
-  public static String CONF_TAGGER_MODEL_FILE = "tagger.model.file";
-  private static final long serialVersionUID = -2524877140212376549L;
+public class PreprocessorBolt extends BaseRichBolt {
+  private static final long serialVersionUID = 5767153574646034298L;
   private static final Logger LOG = LoggerFactory
-      .getLogger(POSTaggerBolt.class);
+      .getLogger(PreprocessorBolt.class);
 
   private OutputCollector m_collector;
-  private MaxentTagger m_tagger;
+  private Preprocessor m_preprocessor;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("taggedTweet")); // key of output tuples
+    declarer.declare(new Fields("preprocessedTweet")); // key of output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
-
-    if (config.get(CONF_TAGGER_MODEL_FILE) != null) {
-      String model = config.get(CONF_TAGGER_MODEL_FILE).toString();
-      // Load Tagger and model
-      m_tagger = new MaxentTagger(model);
-    } else {
-      throw new RuntimeException(CONF_TAGGER_MODEL_FILE
-          + " property was not set!");
-    }
+    this.m_preprocessor = Preprocessor.getInstance();
   }
 
   public void execute(Tuple tuple) {
-    SentimentTweet tweet = (SentimentTweet) tuple
-        .getValueByField("splittedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField("splittedTweet");
     // LOG.info(tweet.toString());
 
-    // POS tagging of sentences
-    for (List<HasWord> sentence : tweet.getSentences()) {
-      List<TaggedWord> taggedSentence = m_tagger.tagSentence(sentence);
-      tweet.addTaggedSentence(taggedSentence);
-      // LOG.info("Tweet: " + sentence.toString() + " TaggedTweet: "
-      // + taggedSentence.toString());
+    List<List<String>> preprocessedSentences = new ArrayList<List<String>>();
+    for (List<String> sentence : tweet.getSentences()) {
+      preprocessedSentences.add(m_preprocessor.preprocess(sentence));
     }
+    tweet.replaceSentences(preprocessedSentences);
 
     this.m_collector.emit(tuple, new Values(tweet));
     this.m_collector.ack(tuple);

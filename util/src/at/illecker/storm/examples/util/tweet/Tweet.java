@@ -64,6 +64,10 @@ public class Tweet implements Serializable {
     return m_sentences;
   }
 
+  public void replaceSentences(List<List<String>> sentences) {
+    m_sentences = sentences;
+  }
+
   public void addTaggedSentence(List<TaggedWord> sentence) {
     m_taggedSentences.add(sentence);
   }
