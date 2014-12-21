@@ -137,7 +137,8 @@ public class SupportVectorMaschine {
     return correctCounter / (double) svmProb.l;
   }
 
-  public static void coarseGrainedParamterSearch(svm_problem svmProb) {
+  public static void coarseGrainedParamterSearch(svm_problem svmProb,
+      svm_parameter svmParam) {
     // coarse grained paramter search
     int maxC = 11;
     double[] c = new double[maxC];
@@ -152,7 +153,7 @@ public class SupportVectorMaschine {
       gamma[j] = Math.pow(2, -15 + (j * 2));
     }
 
-    paramterSearch(svmProb, c, gamma);
+    paramterSearch(svmProb, svmParam, c, gamma);
   }
 
   private static class FindParameterCallable implements Callable<double[]> {
@@ -179,15 +180,14 @@ public class SupportVectorMaschine {
     }
   }
 
-  public static void paramterSearch(svm_problem svmProb, double[] c,
-      double[] gamma) {
+  public static void paramterSearch(svm_problem svmProb,
+      svm_parameter svmParam, double[] c, double[] gamma) {
     int cores = Runtime.getRuntime().availableProcessors();
     ExecutorService executorService = Executors.newFixedThreadPool(cores);
     Set<Callable<double[]>> callables = new HashSet<Callable<double[]>>();
 
     for (int i = 0; i < c.length; i++) {
       for (int j = 0; j < gamma.length; j++) {
-        svm_parameter svmParam = getDefaultParameter();
         svmParam.C = c[i];
         svmParam.gamma = gamma[j];
         callables.add(new FindParameterCallable(svmProb, svmParam, i, j));
@@ -227,12 +227,13 @@ public class SupportVectorMaschine {
   }
 
   public static double evaluate(Tweet tweet, svm_model svmModel,
-      int totalClasses) {
-    return SupportVectorMaschine.evaluate(tweet, svmModel, totalClasses, false);
+      int totalClasses, ScoreClassifier scoreClassifier) {
+    return SupportVectorMaschine.evaluate(tweet, svmModel, totalClasses,
+        scoreClassifier, false);
   }
 
   public static double evaluate(Tweet tweet, svm_model svmModel,
-      int totalClasses, boolean logging) {
+      int totalClasses, ScoreClassifier scoreClassifier, boolean logging) {
 
     double[] features = tweet.getFeatureVector();
     svm_node[] nodes = new svm_node[features.length];
@@ -255,8 +256,8 @@ public class SupportVectorMaschine {
         LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
             + probEstimates[i]);
       }
-      LOG.info("TweetScore:" + tweet.getScore() + " Prediction:"
-          + predictedClass);
+      LOG.info("TweetClass:" + scoreClassifier.classfyScore(tweet.getScore())
+          + " Prediction:" + predictedClass);
     }
 
     return predictedClass;
@@ -327,8 +328,6 @@ public class SupportVectorMaschine {
         SerializationUtil.serializeList(testTweets, TEST_FILE);
       }
 
-      // classes 1 = positive, 0 = neutral, -1 = negative
-      int totalClasses = 3;
       svm_parameter svmParam = getDefaultParameter();
       svm_problem svmProb = generateProblem(trainTweets,
           new IdentityScoreClassifier());
@@ -336,7 +335,7 @@ public class SupportVectorMaschine {
       // Optional parameter search of C and gamma
       if (parameterSearch) {
         // 1) coarse grained paramter search
-        coarseGrainedParamterSearch(svmProb);
+        coarseGrainedParamterSearch(svmProb, svmParam);
 
         // 2) fine grained paramter search
         // C = 2^5, 2^6, ..., 2^13
@@ -350,11 +349,15 @@ public class SupportVectorMaschine {
           gamma[j] = Math.pow(2, -10 + j);
         }
 
-        paramterSearch(svmProb, c, gamma);
+        paramterSearch(svmProb, svmParam, c, gamma);
 
       } else {
 
-        // after parameter search
+        int totalClasses = 3;
+        // classes 1 = positive, 0 = neutral, -1 = negative
+        IdentityScoreClassifier isc = new IdentityScoreClassifier();
+
+        // after parameter search use best C and gamma values
         svmParam.C = Math.pow(2, 6);
         svmParam.gamma = Math.pow(2, -5);
 
@@ -363,8 +366,8 @@ public class SupportVectorMaschine {
 
         long countMatches = 0;
         for (Tweet tweet : testTweets) {
-          double predictedClass = evaluate(tweet, model, totalClasses);
-          if (predictedClass == tweet.getScore()) {
+          double predictedClass = evaluate(tweet, model, totalClasses, isc);
+          if (predictedClass == isc.classfyScore(tweet.getScore())) {
             countMatches++;
           }
         }
