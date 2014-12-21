@@ -17,7 +17,9 @@
 package at.illecker.storm.examples.util.wordnet;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,11 +56,16 @@ public class WordNet {
 
   private WordNet() {
     m_conf = Configuration.getInstance();
+    InputStream is = null;
     try {
       String wordNetDictPath = m_conf.getWordNetDict();
-      File wordNetDict = new File(wordNetDictPath);
-      m_wordNetDir = new File(wordNetDict.getParent() + File.separator + "dict");
-      LOG.info("WordNet Dictionary: " + wordNetDict.getAbsolutePath());
+      if (m_conf.isRunningWithinJar()) {
+        is = ClassLoader.getSystemResourceAsStream(wordNetDictPath);
+      } else {
+        is = new FileInputStream(wordNetDictPath);
+        LOG.info("WordNet Dictionary: " + wordNetDictPath);
+      }
+      m_wordNetDir = new File(m_conf.getTempDir() + File.separator + "dict");
       LOG.info("WordNet Extract Location: " + m_wordNetDir.getAbsolutePath());
 
       // check if extract location does exist
@@ -67,8 +74,7 @@ public class WordNet {
       }
 
       // extract tar.gz file
-      FileUtil.extractTarGz(wordNetDict.getAbsolutePath(),
-          m_wordNetDir.getParent());
+      FileUtil.extractTarGz(is, m_wordNetDir.getParent(), true);
 
       m_dict = new RAMDictionary(m_wordNetDir, ILoadPolicy.NO_LOAD);
       m_dict.open();

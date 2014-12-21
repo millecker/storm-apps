@@ -45,21 +45,24 @@ public class Configuration {
 
   private String m_userDir;
   private String m_workingDir;
+  private String m_tempDir;
   private String m_classPath;
-  private boolean m_runningFromJar;
+  private boolean m_runningWithinJar;
 
   private Configuration() {
     m_userDir = System.getProperty("user.dir");
+    m_tempDir = System.getProperty("java.io.tmpdir");
 
     m_classPath = Configuration.class.getResource("Configuration.class")
         .toString();
     if (m_classPath.startsWith("jar:")) {
       LOG.info("Running within a jar file...");
-      m_runningFromJar = true;
+      m_runningWithinJar = true;
+      m_workingDir = "";
     } else {
       LOG.info("Running outside of a jar file...");
-      m_runningFromJar = false;
-      m_workingDir = m_userDir;
+      m_runningWithinJar = false;
+      m_workingDir = m_userDir + File.separator;
     }
   }
 
@@ -67,9 +70,16 @@ public class Configuration {
     return instance;
   }
 
+  public boolean isRunningWithinJar() {
+    return m_runningWithinJar;
+  }
+
+  public String getTempDir() {
+    return m_tempDir;
+  }
+
   public Map<String, Properties> getWordlists() {
-    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
-        + File.separator;
+    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
     Map<String, Properties> wordLists = new HashMap<String, Properties>();
 
     // Add AFINN word list using Regex = false
@@ -109,8 +119,7 @@ public class Configuration {
   }
 
   public Map<String, Properties> getSlangWordlists() {
-    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
-        + File.separator;
+    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
 
     // Add SentStrength SlangLookupTable
@@ -128,8 +137,7 @@ public class Configuration {
   }
 
   public Set<String> getNameEntities() {
-    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
-        + File.separator;
+    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
     Set<String> nameEntities = new HashSet<String>();
 
     // Add GATE cities
@@ -145,8 +153,7 @@ public class Configuration {
   }
 
   public Map<String, Properties> getInterjections() {
-    String wordListDir = m_workingDir + File.separator + CONF_WORD_LIST_PATH
-        + File.separator;
+    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
     // Add GATE interjections including regex patterns
@@ -158,31 +165,28 @@ public class Configuration {
   }
 
   public String getPOSTaggingModel() {
-    String modelDir = m_workingDir + File.separator + CONF_MODEL_PATH
-        + File.separator;
+    String modelDir = m_workingDir + CONF_MODEL_PATH + File.separator;
     return modelDir + "gate-EN-twitter-fast.model";
   }
 
   public String getWordNetDict() {
-    String wordNetDir = m_workingDir + File.separator + CONF_WORD_NET_PATH
-        + File.separator;
+    String wordNetDir = m_workingDir + CONF_WORD_NET_PATH + File.separator;
     return wordNetDir + "wn3.1.dict.tar.gz";
   }
 
   public String getSentiWordNetDict() {
-    String wordNetDir = m_workingDir + File.separator + CONF_WORD_NET_PATH
-        + File.separator;
+    String wordNetDir = m_workingDir + CONF_WORD_NET_PATH + File.separator;
     return wordNetDir + "SentiWordNet_3.0.0_20130122.txt";
   }
 
   public String getDataSetPath() {
-    return m_workingDir + File.separator + CONF_DATASET_PATH + File.separator;
+    return m_workingDir + CONF_DATASET_PATH + File.separator;
   }
 
   @Override
   public String toString() {
-    return "Configuration [classPath=" + m_classPath + ", runningFromJar="
-        + m_runningFromJar + ", workingDir=" + m_workingDir + "]";
+    return "Configuration [classPath=" + m_classPath + ", runningWithinJar="
+        + m_runningWithinJar + ", workingDir=" + m_workingDir + "]";
   }
 
   public static void main(String[] args) {

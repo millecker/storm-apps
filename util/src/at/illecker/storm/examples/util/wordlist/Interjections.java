@@ -18,6 +18,8 @@ package at.illecker.storm.examples.util.wordlist;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -44,16 +46,21 @@ public class Interjections {
 
   private Interjections() {
     m_conf = Configuration.getInstance();
+    InputStream is = null;
     try {
       Map<String, Properties> interjectionFiles = m_conf.getInterjections();
       for (Map.Entry<String, Properties> interjectionEntry : interjectionFiles
           .entrySet()) {
         String file = interjectionEntry.getKey();
+        if (m_conf.isRunningWithinJar()) {
+          is = ClassLoader.getSystemResourceAsStream(file);
+        } else {
+          is = new FileInputStream(file);
+        }
         Boolean containsRegex = (Boolean) interjectionEntry.getValue().get(
             "containsRegex");
 
-        Set<String> interjections = FileUtil
-            .readFile(new FileInputStream(file));
+        Set<String> interjections = FileUtil.readFile(is);
 
         if (containsRegex) {
           LOG.info("Load Interjections including regex patterns from: " + file);
@@ -72,9 +79,15 @@ public class Interjections {
           m_interjections.addAll(interjections);
         }
       }
-
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage());
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
     }
   }
 

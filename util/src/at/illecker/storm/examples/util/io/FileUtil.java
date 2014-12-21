@@ -47,14 +47,13 @@ public class FileUtil {
 
   public static void extractTarGz(String inputTarGz, String outDir)
       throws IOException {
-    FileUtil.extractTarGz(inputTarGz, outDir, false);
+    FileUtil.extractTarGz(new FileInputStream(inputTarGz), outDir, false);
   }
 
-  public static void extractTarGz(String inputTarGz, String outDir,
+  public static void extractTarGz(InputStream inputTarGzStream, String outDir,
       boolean logging) throws IOException {
 
-    FileInputStream fin = new FileInputStream(inputTarGz);
-    BufferedInputStream in = new BufferedInputStream(fin);
+    BufferedInputStream in = new BufferedInputStream(inputTarGzStream);
     GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
     TarArchiveInputStream tarIn = new TarArchiveInputStream(gzIn);
 

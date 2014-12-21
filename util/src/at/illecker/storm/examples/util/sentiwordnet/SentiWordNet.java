@@ -17,8 +17,11 @@
 package at.illecker.storm.examples.util.sentiwordnet;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,12 +44,31 @@ public class SentiWordNet {
 
   private SentiWordNet() {
     m_conf = Configuration.getInstance();
-    String sentiWordNetDictPath = m_conf.getSentiWordNetDict();
-    m_wordnet = WordNet.getInstance();
+    String sentiWordNetDict = m_conf.getSentiWordNetDict();
+    InputStream is = null;
+    try {
+      if (m_conf.isRunningWithinJar()) {
+        is = ClassLoader.getSystemResourceAsStream(sentiWordNetDict);
+      } else {
+        is = new FileInputStream(sentiWordNetDict);
+        LOG.info("loadDictionary: " + sentiWordNetDict);
+      }
 
-    LOG.info("loadDictionary: " + sentiWordNetDictPath);
-    m_dict = loadDict(sentiWordNetDictPath);
-    m_dictWeighted = calcAvgWeightScores();
+      m_wordnet = WordNet.getInstance();
+
+      m_dict = loadDict(is);
+      m_dictWeighted = calcAvgWeightScores();
+
+    } catch (FileNotFoundException e) {
+      LOG.error(e.getMessage());
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
   }
 
   public static SentiWordNet getInstance() {
@@ -54,12 +76,12 @@ public class SentiWordNet {
   }
 
   private Map<String, HashMap<Integer, SentiValue>> loadDict(
-      String sentiWordNetDictPath) {
+      InputStream sentiWordNetDict) {
 
     Map<String, HashMap<Integer, SentiValue>> dict = new HashMap<String, HashMap<Integer, SentiValue>>();
     BufferedReader br = null;
     try {
-      br = new BufferedReader(new FileReader(sentiWordNetDictPath));
+      br = new BufferedReader(new InputStreamReader(sentiWordNetDict));
       int lineNumber = 0;
       String line;
       // POS ID PosScore NegScore SynsetTerms Desc
@@ -72,8 +94,7 @@ public class SentiWordNet {
           String[] data = line.split("\t");
           // check tab format
           if (data.length != 6) {
-            LOG.error("Incorrect tabulation format in file "
-                + sentiWordNetDictPath + ", line: " + lineNumber);
+            LOG.error("Incorrect tabulation format, line: " + lineNumber);
           }
 
           POS posTag = POSTag.parseString(data[0]);

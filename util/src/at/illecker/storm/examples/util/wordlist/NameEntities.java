@@ -18,6 +18,8 @@ package at.illecker.storm.examples.util.wordlist;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -35,19 +37,30 @@ public class NameEntities {
 
   private NameEntities() {
     m_conf = Configuration.getInstance();
+    InputStream is = null;
     try {
       for (String nameEntityFile : m_conf.getNameEntities()) {
         LOG.info("Load NameEntities from: " + nameEntityFile);
-        if (m_nameEntities == null) {
-          m_nameEntities = FileUtil
-              .readFile(new FileInputStream(nameEntityFile));
+        if (m_conf.isRunningWithinJar()) {
+          is = ClassLoader.getSystemResourceAsStream(nameEntityFile);
         } else {
-          m_nameEntities.addAll(FileUtil.readFile(new FileInputStream(
-              nameEntityFile)));
+          is = new FileInputStream(nameEntityFile);
+        }
+        if (m_nameEntities == null) {
+          m_nameEntities = FileUtil.readFile(is);
+        } else {
+          m_nameEntities.addAll(FileUtil.readFile(is));
         }
       }
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      LOG.error(e.getMessage());
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
     }
   }
 

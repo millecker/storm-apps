@@ -18,6 +18,8 @@ package at.illecker.storm.examples.util.wordlist;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
@@ -37,20 +39,24 @@ public class SlangCorrection {
 
   private SlangCorrection() {
     m_conf = Configuration.getInstance();
+    InputStream is = null;
     try {
       Map<String, Properties> slangWordLists = m_conf.getSlangWordlists();
       for (Map.Entry<String, Properties> slangWordListEntry : slangWordLists
           .entrySet()) {
         String file = slangWordListEntry.getKey();
+        if (m_conf.isRunningWithinJar()) {
+          is = ClassLoader.getSystemResourceAsStream(file);
+        } else {
+          is = new FileInputStream(file);
+        }
         String separator = slangWordListEntry.getValue().getProperty(
             "separator");
         LOG.info("Load SlangLookupTable from: " + file);
         if (m_slangWordList == null) {
-          m_slangWordList = FileUtil.readFile(new FileInputStream(file),
-              separator);
+          m_slangWordList = FileUtil.readFile(is, separator);
         } else {
-          Map<String, String> slangWordList = FileUtil.readFile(
-              new FileInputStream(file), separator);
+          Map<String, String> slangWordList = FileUtil.readFile(is, separator);
           for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
             if (!m_slangWordList.containsKey(entry.getKey())) {
               m_slangWordList.put(entry.getKey(), entry.getValue());
@@ -60,6 +66,13 @@ public class SlangCorrection {
       }
     } catch (FileNotFoundException e) {
       LOG.error(e.getMessage());
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
     }
   }
 
