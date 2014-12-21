@@ -16,8 +16,16 @@
  */
 package at.illecker.storm.examples.util.tweet;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SentimentTweet extends Tweet {
-  private static final long serialVersionUID = 5040446561123932812L;
+  private static final long serialVersionUID = 1392290892466436212L;
+  private static final Logger LOG = LoggerFactory
+      .getLogger(SentimentTweet.class);
+
   private double m_scoreMislove;
   private double m_scoreAfinn;
   private double m_scoreSentiStrength;
@@ -62,5 +70,31 @@ public class SentimentTweet extends Tweet {
         + m_scoreAfinn + ", scoreSentiStrength=" + m_scoreSentiStrength
         + ", scoreSentiStrengthPositive=" + m_scoreSentiStrengthPos
         + ", scoreSentiStrengthNegative=" + m_scoreSentiStrengthNeg + "]";
+  }
+
+  public static SentimentTweet fromJsonElement(Map<String, Object> element) {
+    long id = Long.parseLong((String) element.get("id"));
+    double score_amt = (Double) element.get("score_amt");
+    double score_amt2 = (Double) element.get("score_amt_wrong");
+    double score_mislove = (Double) element.get("score_mislove");
+    double score_mislove2 = (Double) element.get("score_mislove2");
+    double score_afinn = (Double) element.get("sentiment_afinn");
+    double score_sentistrength = (Double) element.get("sentistrength");
+    double score_sentistrength_pos = (Double) element
+        .get("sentistrength_positive");
+    double score_sentistrength_neg = (Double) element
+        .get("sentistrength_negative");
+    // sentiment_afinn_nonzero=-2.0,
+    // sentiment_afinn_quant=-1.0,
+    // sentiment_afinn_extreme=-2.0,
+    // sentiment_afinn_sum=-4.0
+
+    if ((score_amt != score_amt2) || (score_mislove != score_mislove2)) {
+      LOG.error("Inconsistency: " + element.toString());
+    }
+
+    return new SentimentTweet(id, (String) element.get("text"), score_amt,
+        score_mislove, score_afinn, score_sentistrength,
+        score_sentistrength_pos, score_sentistrength_neg);
   }
 }

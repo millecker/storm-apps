@@ -50,29 +50,7 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
     Map<String, Object> element = (Map<String, Object>) tuple
         .getValueByField("jsonElement");
 
-    long id = Long.parseLong((String) element.get("id"));
-    double score_amt = (Double) element.get("score_amt");
-    double score_amt2 = (Double) element.get("score_amt_wrong");
-    double score_mislove = (Double) element.get("score_mislove");
-    double score_mislove2 = (Double) element.get("score_mislove2");
-    double score_afinn = (Double) element.get("sentiment_afinn");
-    double score_sentistrength = (Double) element.get("sentistrength");
-    double score_sentistrength_pos = (Double) element
-        .get("sentistrength_positive");
-    double score_sentistrength_neg = (Double) element
-        .get("sentistrength_negative");
-    // sentiment_afinn_nonzero=-2.0,
-    // sentiment_afinn_quant=-1.0,
-    // sentiment_afinn_extreme=-2.0,
-    // sentiment_afinn_sum=-4.0
-
-    if ((score_amt != score_amt2) || (score_mislove != score_mislove2)) {
-      LOG.error("Inconsistency: " + element.toString());
-    }
-
-    SentimentTweet tweet = new SentimentTweet(id, (String) element.get("text"),
-        score_amt, score_mislove, score_afinn, score_sentistrength,
-        score_sentistrength_pos, score_sentistrength_neg);
+    SentimentTweet tweet = SentimentTweet.fromJsonElement(element);
     // LOG.info(tweet.toString());
 
     this.m_collector.emit(tuple, new Values(tweet));
