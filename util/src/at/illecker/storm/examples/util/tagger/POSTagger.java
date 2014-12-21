@@ -24,10 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.io.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.NameEntities;
-import at.illecker.storm.examples.util.wordlist.SlangCorrection;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
@@ -41,27 +41,26 @@ public class POSTagger {
   private Configuration m_conf;
   private MaxentTagger m_posTagger; // Standford POS Tagger
   private NameEntities m_nameEntities;
-  private SlangCorrection m_slangCorrection;
   private Interjections m_interjections;
 
   private POSTagger() {
     m_conf = Configuration.getInstance();
+
     // Load POS Tagger
     String taggingModel = m_conf.getPOSTaggingModel();
     try {
       LOG.info("Load POSTagger with model: " + taggingModel);
       TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
       m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
-
-      // Load NameEntities
-      m_nameEntities = NameEntities.getInstance();
-      // Load SlangCorrection
-      m_slangCorrection = SlangCorrection.getInstance();
-      // Load Interjections
-      m_interjections = Interjections.getInstance();
     } catch (RuntimeIOException e) {
       LOG.error(e.getMessage());
     }
+
+    // Load NameEntities
+    m_nameEntities = NameEntities.getInstance();
+
+    // Load Interjections
+    m_interjections = Interjections.getInstance();
   }
 
   public static POSTagger getInstance() {
@@ -116,16 +115,6 @@ public class POSTagger {
         preTaggedToken.setTag("NNP");
       }
 
-      // Slang correction
-      String correction = m_slangCorrection.getCorrection(tokenLowerCase);
-      if (correction != null) {
-        if (LOGGING) {
-          LOG.info("SlangCorrecting from " + token + " to " + correction);
-        }
-        token = correction;
-        preTaggedToken = new TaggedWord(correction);
-      }
-
       // Interjections
       if (m_interjections.isInterjection(tokenLowerCase)) {
         if (LOGGING) {
@@ -144,13 +133,16 @@ public class POSTagger {
   }
 
   public static void main(String[] args) {
-    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
+    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . lol :)";
     System.out.println("text: '" + text + "'");
 
     POSTagger posTagger = POSTagger.getInstance();
+    Preprocessor preProcessor = Preprocessor.getInstance();
 
     List<String> tokens = Tokenizer.tokenize(text);
-    List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+    List<String> preprocessedTokens = preProcessor.preprocess(tokens);
+
+    List<TaggedWord> taggedSentence = posTagger.tagSentence(preprocessedTokens);
     for (TaggedWord w : taggedSentence) {
       System.out.println("token: '" + w.word() + "' tag: '" + w.tag() + "'");
     }
