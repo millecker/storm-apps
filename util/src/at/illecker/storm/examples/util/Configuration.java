@@ -38,6 +38,8 @@ public class Configuration {
       + File.separator + "wordlists";
   private static final String CONF_WORD_NET_PATH = "resources" + File.separator
       + "wordnet";
+  private static final String CONF_DATASET_PATH = "resources" + File.separator
+      + "datasets";
 
   public static boolean CONF_LOGGING = false;
 
@@ -171,6 +173,10 @@ public class Configuration {
     String wordNetDir = m_workingDir + File.separator + CONF_WORD_NET_PATH
         + File.separator;
     return wordNetDir + "SentiWordNet_3.0.0_20130122.txt";
+  }
+
+  public String getDataSetPath() {
+    return m_workingDir + File.separator + CONF_DATASET_PATH + File.separator;
   }
 
   @Override

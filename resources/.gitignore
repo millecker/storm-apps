@@ -1,4 +1,4 @@
-twitter*
+datasets/
 *.model
 *.txt
 *.json

@@ -38,6 +38,7 @@ import libsvm.svm_problem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
 import at.illecker.storm.examples.util.tagger.POSTagger;
@@ -46,13 +47,14 @@ import edu.stanford.nlp.ling.TaggedWord;
 
 public class SupportVectorMaschine {
 
-  public static final String SVM_DIR = System.getProperty("user.dir")
-      + File.separator + "resources" + File.separator + "tweets"
-      + File.separator + "svm" + File.separator;
-  public static final String TRAIN_DATA = SVM_DIR + "trainingInput.txt";
-  public static final String TEST_DATA = SVM_DIR + "testingInput.txt";
-  public static final String TRAIN_FILE = SVM_DIR + "trainingInput.ser";
-  public static final String TEST_FILE = SVM_DIR + "testingInput.ser";
+  public static final String DATASET_PATH = Configuration.getInstance()
+      .getDataSetPath();
+  public static final String DATASET3_PATH = DATASET_PATH + File.separator
+      + "dataset3" + File.separator;
+  public static final String TRAIN_DATA = DATASET3_PATH + "trainingInput.txt";
+  public static final String TEST_DATA = DATASET3_PATH + "testingInput.txt";
+  public static final String TRAIN_FILE = DATASET3_PATH + "trainingInput.ser";
+  public static final String TEST_FILE = DATASET3_PATH + "testingInput.ser";
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
