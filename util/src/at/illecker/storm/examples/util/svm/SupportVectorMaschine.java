@@ -46,15 +46,13 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SupportVectorMaschine {
-
-  public static final String DATASET_PATH = Configuration.getInstance()
-      .getDataSetPath();
-  public static final String DATASET3_PATH = DATASET_PATH + File.separator
-      + "dataset3" + File.separator;
-  public static final String TRAIN_DATA = DATASET3_PATH + "trainingInput.txt";
-  public static final String TEST_DATA = DATASET3_PATH + "testingInput.txt";
-  public static final String TRAIN_FILE = DATASET3_PATH + "trainingInput.ser";
-  public static final String TEST_FILE = DATASET3_PATH + "testingInput.ser";
+  public static final Configuration CONFIG = Configuration.getInstance();
+  public static final String DATASET_PATH = CONFIG.getDataSetPath()
+      + File.separator + "dataset3" + File.separator;
+  public static final String TRAIN_DATA = DATASET_PATH + "trainingInput.txt";
+  public static final String TEST_DATA = DATASET_PATH + "testingInput.txt";
+  public static final String TRAIN_FILE = DATASET_PATH + "trainingInput.ser";
+  public static final String TEST_FILE = DATASET_PATH + "testingInput.ser";
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMaschine.class);
