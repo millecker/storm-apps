@@ -212,6 +212,10 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
 
       } else {
 
+        // after parameter search
+        svmParam.C = 0.5;
+        svmParam.gamma = Math.pow(2, 3);
+
         // train model
         svm_model model = SupportVectorMachine.train(svmProb, svmParam);
 
