@@ -188,9 +188,10 @@ public class SupportVectorMachine {
 
     for (int i = 0; i < c.length; i++) {
       for (int j = 0; j < gamma.length; j++) {
-        svmParam.C = c[i];
-        svmParam.gamma = gamma[j];
-        callables.add(new FindParameterCallable(svmProb, svmParam, i, j));
+        svm_parameter param = (svm_parameter) svmParam.clone();
+        param.C = c[i];
+        param.gamma = gamma[j];
+        callables.add(new FindParameterCallable(svmProb, param, i, j));
       }
     }
 
