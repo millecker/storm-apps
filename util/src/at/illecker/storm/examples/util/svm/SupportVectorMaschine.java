@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
+import at.illecker.storm.examples.util.io.SerializationUtil;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -254,7 +255,8 @@ public class SupportVectorMaschine {
       // Prepare Train tweets
       List<Tweet> trainTweets = null;
       LOG.info("Prepare Train data...");
-      List<Tweet> trainedTweets = FileUtil.deserializeTweets(TRAIN_FILE);
+      List<Tweet> trainedTweets = SerializationUtil
+          .deserializeTweets(TRAIN_FILE);
       if (trainedTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
@@ -268,7 +270,7 @@ public class SupportVectorMaschine {
         LOG.info("Read train tweets from " + TRAIN_DATA);
         trainTweets = FileUtil.readTweets(new FileInputStream(TRAIN_DATA));
         processTweets(posTagger, sfvg, trainTweets);
-        FileUtil.serializeTweets(trainTweets, TRAIN_FILE);
+        SerializationUtil.serializeTweets(trainTweets, TRAIN_FILE);
       } else {
         trainTweets = trainedTweets;
       }
@@ -276,7 +278,7 @@ public class SupportVectorMaschine {
       // Prepare Test tweets
       List<Tweet> testTweets = null;
       LOG.info("Prepare Test data...");
-      List<Tweet> testedTweets = FileUtil.deserializeTweets(TEST_FILE);
+      List<Tweet> testedTweets = SerializationUtil.deserializeTweets(TEST_FILE);
       if (trainedTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
@@ -290,7 +292,7 @@ public class SupportVectorMaschine {
         LOG.info("Read test tweets from " + TEST_DATA);
         testTweets = FileUtil.readTweets(new FileInputStream(TEST_DATA));
         processTweets(posTagger, sfvg, testTweets);
-        FileUtil.serializeTweets(testTweets, TEST_FILE);
+        SerializationUtil.serializeTweets(testTweets, TEST_FILE);
       } else {
         testTweets = testedTweets;
       }
