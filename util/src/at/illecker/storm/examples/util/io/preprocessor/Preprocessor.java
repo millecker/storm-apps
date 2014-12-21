@@ -42,6 +42,36 @@ public class Preprocessor {
     return instance;
   }
 
+  // STEP 1
+  // First unify all URLs, e-mail addresses and user names by replacing them
+  // with unique tokens.
+  // All hash marks were stripped from words, and emoticons were mapped to
+  // special tokens representing their emotion categories
+  // These special tokens were then added to the polarity lexicons used by
+  // SO-CAL.
+
+  // STEP 2
+  // Social media specific slang expressions and abbreviations like “2 b” (for
+  // “to be”) or “im- sry” (for “I am sorry”) were translated to their ap-
+  // propriate standard language forms. For this, we used a dictionary of
+  // 5,424 expressions that we gathered from publicly available resources.
+  // http://www.noslang.com/dictionary/
+  // http://onlineslangdictionary.com/
+  // http: //www.urbandictionary.com/
+
+  // STEP 3
+  // Tackles two typical spelling phenomena:
+  // a) the omission of final g in gerund forms (goin), and
+  // b) elongations of characters (suuuper).
+  // For the former, we appended the character g to words ending with -in if
+  // these words are unknown to vo- cabulary,4 while the corresponding
+  // ‘g’-forms are in- vocabulary words (IVW). For the latter problem, we
+  // first tried to subsequently remove each repeat- ing character until we
+  // hit an IVW. For cases re- sisting this treatment, we adopted the method
+  // sug- gested by (Brody/Diakopoulos, 2011) and generated a squeezed form of
+  // the prolongated word, subse- quently looking it up in a probability table
+  // that has previously been gathered from a training corpus.
+
   public List<String> preprocess(List<String> tokens) {
     // LOG.info("preprocess: " + tokens.toString());
     List<String> processedTokens = new ArrayList<String>();
