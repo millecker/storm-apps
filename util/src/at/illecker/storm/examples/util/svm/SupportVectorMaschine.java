@@ -254,7 +254,7 @@ public class SupportVectorMaschine {
 
       // Prepare Train tweets
       LOG.info("Prepare Train data...");
-      List<Tweet> trainTweets = SerializationUtil.deserializeList(TRAIN_FILE);
+      List<Tweet> trainTweets = SerializationUtil.deserialize(TRAIN_FILE);
       if (trainTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
@@ -273,7 +273,7 @@ public class SupportVectorMaschine {
 
       // Prepare Test tweets
       LOG.info("Prepare Test data...");
-      List<Tweet> testTweets = SerializationUtil.deserializeList(TEST_FILE);
+      List<Tweet> testTweets = SerializationUtil.deserialize(TEST_FILE);
       if (testTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {

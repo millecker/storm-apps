@@ -32,6 +32,17 @@ public class SerializationUtil {
   private static final Logger LOG = LoggerFactory
       .getLogger(SerializationUtil.class);
 
+  public static <T extends Serializable> void serializeList(List<T> objects,
+      String fileName) {
+    // Assume List is Serializable
+    // e.g., LinkedList or ArrayList
+    if (objects instanceof java.io.Serializable) {
+      SerializationUtil.serialize((Serializable) objects, fileName);
+    } else {
+      LOG.error("List is not serializable!");
+    }
+  }
+
   public static <T extends Serializable> void serialize(T object,
       String fileName) {
     try {
@@ -65,20 +76,5 @@ public class SerializationUtil {
       LOG.error("ClassNotFoundException: " + c.getMessage());
     }
     return object;
-  }
-
-  public static <T extends Serializable> void serializeList(List<T> objects,
-      String fileName) {
-    // Assume List is Serializable
-    // e.g., LinkedList or ArrayList
-    if (objects instanceof java.io.Serializable) {
-      SerializationUtil.serialize((Serializable) objects, fileName);
-    } else {
-      LOG.error("List is not serializable!");
-    }
-  }
-
-  public static <T extends Serializable> List<T> deserializeList(String fileName) {
-    return SerializationUtil.deserialize(fileName);
   }
 }
