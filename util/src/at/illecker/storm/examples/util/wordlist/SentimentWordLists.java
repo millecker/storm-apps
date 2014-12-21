@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtil;
+import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -74,10 +74,10 @@ public class SentimentWordLists {
         if (containsRegex) {
           LOG.info("Load WordListMap including Regex from: " + file);
           if (m_wordListMap == null) {
-            m_wordListMap = FileUtil.readWordListMap(is, separator,
+            m_wordListMap = FileUtils.readWordListMap(is, separator,
                 featureScaling, minValue, maxValue);
           } else {
-            WordListMap<Double> wordListMap = FileUtil.readWordListMap(is,
+            WordListMap<Double> wordListMap = FileUtils.readWordListMap(is,
                 separator, featureScaling, minValue, maxValue);
             for (Map.Entry<String, Double> entry : wordListMap.entrySet()) {
               if (!m_wordListMap.containsKey(entry.getKey())) {
@@ -88,10 +88,10 @@ public class SentimentWordLists {
         } else {
           LOG.info("Load WordList from: " + file);
           if (m_wordList == null) {
-            m_wordList = FileUtil.readFile(is, separator, featureScaling,
+            m_wordList = FileUtils.readFile(is, separator, featureScaling,
                 minValue, maxValue);
           } else {
-            Map<String, Double> wordList = FileUtil.readFile(is, separator,
+            Map<String, Double> wordList = FileUtils.readFile(is, separator,
                 featureScaling, minValue, maxValue);
             for (Map.Entry<String, Double> entry : wordList.entrySet()) {
               if (!m_wordList.containsKey(entry.getKey())) {

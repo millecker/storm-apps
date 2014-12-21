@@ -30,7 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtil;
+import at.illecker.storm.examples.util.io.FileUtils;
+import at.illecker.storm.examples.util.io.IOUtils;
 import edu.mit.jwi.IRAMDictionary;
 import edu.mit.jwi.RAMDictionary;
 import edu.mit.jwi.data.ILoadPolicy;
@@ -70,11 +71,11 @@ public class WordNet {
 
       // check if extract location does exist
       if (m_wordNetDir.exists()) {
-        FileUtil.delete(m_wordNetDir);
+        IOUtils.delete(m_wordNetDir);
       }
 
       // extract tar.gz file
-      FileUtil.extractTarGz(is, m_wordNetDir.getParent(), true);
+      FileUtils.extractTarGz(is, m_wordNetDir.getParent(), true);
 
       m_dict = new RAMDictionary(m_wordNetDir, ILoadPolicy.NO_LOAD);
       m_dict.open();
@@ -102,7 +103,7 @@ public class WordNet {
     if (m_dict != null) {
       m_dict.close();
     }
-    FileUtil.delete(m_wordNetDir);
+    IOUtils.delete(m_wordNetDir);
   }
 
   public List<String> findStems(String wordString, POS wordPOS) {

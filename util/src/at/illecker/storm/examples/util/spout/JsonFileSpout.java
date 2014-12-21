@@ -23,7 +23,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.io.JsonUtil;
+import at.illecker.storm.examples.util.io.JsonUtils;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -56,7 +56,7 @@ public class JsonFileSpout extends BaseRichSpout {
       String jsonFilePath = config.get(CONF_JSON_FILE).toString();
       File jsonFile = new File(jsonFilePath);
       if (jsonFile.isFile()) {
-        m_elements = JsonUtil.readJsonFile(jsonFile);
+        m_elements = JsonUtils.readJsonFile(jsonFile);
       } else {
         throw new RuntimeException("Error reading directory " + jsonFile);
       }

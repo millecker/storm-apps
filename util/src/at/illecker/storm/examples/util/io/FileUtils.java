@@ -41,13 +41,13 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordlist.WordListMap;
 
-public class FileUtil {
+public class FileUtils {
   public static final int BUFFER_SIZE = 2048;
-  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
   public static void extractTarGz(String inputTarGz, String outDir)
       throws IOException {
-    FileUtil.extractTarGz(new FileInputStream(inputTarGz), outDir, false);
+    FileUtils.extractTarGz(new FileInputStream(inputTarGz), outDir, false);
   }
 
   public static void extractTarGz(InputStream inputTarGzStream, String outDir,
@@ -365,7 +365,7 @@ public class FileUtil {
   }
 
   public static Set<String> readFile(InputStream is) {
-    return FileUtil.readFile(is, false);
+    return FileUtils.readFile(is, false);
   }
 
   public static Set<String> readFile(InputStream is, boolean logging) {
@@ -409,22 +409,5 @@ public class FileUtil {
     }
     LOG.info("Loaded total " + set.size() + " entries");
     return set;
-  }
-
-  public static void delete(File file) throws IOException {
-    FileUtil.delete(file, false);
-  }
-
-  public static void delete(File file, boolean logging) throws IOException {
-    if (logging) {
-      LOG.info("Delete: " + file.getAbsolutePath());
-    }
-    if (file.isDirectory()) {
-      for (File c : file.listFiles())
-        delete(c, logging);
-    }
-    if (!file.delete()) {
-      LOG.error("Failed to delete file: " + file);
-    }
   }
 }

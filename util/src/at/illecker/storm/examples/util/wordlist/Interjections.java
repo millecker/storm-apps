@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtil;
+import at.illecker.storm.examples.util.io.FileUtils;
 
 public class Interjections {
   private static final Logger LOG = LoggerFactory
@@ -60,7 +60,7 @@ public class Interjections {
         Boolean containsRegex = (Boolean) interjectionEntry.getValue().get(
             "containsRegex");
 
-        Set<String> interjections = FileUtil.readFile(is);
+        Set<String> interjections = FileUtils.readFile(is);
 
         if (containsRegex) {
           LOG.info("Load Interjections including regex patterns from: " + file);

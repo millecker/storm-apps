@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtil;
+import at.illecker.storm.examples.util.io.FileUtils;
 
 public class SlangCorrection {
   private static final Logger LOG = LoggerFactory
@@ -54,9 +54,9 @@ public class SlangCorrection {
             "separator");
         LOG.info("Load SlangLookupTable from: " + file);
         if (m_slangWordList == null) {
-          m_slangWordList = FileUtil.readFile(is, separator);
+          m_slangWordList = FileUtils.readFile(is, separator);
         } else {
-          Map<String, String> slangWordList = FileUtil.readFile(is, separator);
+          Map<String, String> slangWordList = FileUtils.readFile(is, separator);
           for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
             if (!m_slangWordList.containsKey(entry.getKey())) {
               m_slangWordList.put(entry.getKey(), entry.getValue());

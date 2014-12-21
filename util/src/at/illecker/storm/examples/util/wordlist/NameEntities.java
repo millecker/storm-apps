@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtil;
+import at.illecker.storm.examples.util.io.FileUtils;
 
 public class NameEntities {
   private static final Logger LOG = LoggerFactory.getLogger(NameEntities.class);
@@ -47,9 +47,9 @@ public class NameEntities {
           is = new FileInputStream(nameEntityFile);
         }
         if (m_nameEntities == null) {
-          m_nameEntities = FileUtil.readFile(is);
+          m_nameEntities = FileUtils.readFile(is);
         } else {
-          m_nameEntities.addAll(FileUtil.readFile(is));
+          m_nameEntities.addAll(FileUtils.readFile(is));
         }
       }
     } catch (FileNotFoundException e) {

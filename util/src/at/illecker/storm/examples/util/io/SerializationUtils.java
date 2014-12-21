@@ -28,16 +28,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SerializationUtil {
+public class SerializationUtils {
   private static final Logger LOG = LoggerFactory
-      .getLogger(SerializationUtil.class);
+      .getLogger(SerializationUtils.class);
 
   public static <T extends Serializable> void serializeList(List<T> objects,
       String fileName) {
     // Assume List is Serializable
     // e.g., LinkedList or ArrayList
     if (objects instanceof java.io.Serializable) {
-      SerializationUtil.serialize((Serializable) objects, fileName);
+      SerializationUtils.serialize((Serializable) objects, fileName);
     } else {
       LOG.error("List is not serializable!");
     }

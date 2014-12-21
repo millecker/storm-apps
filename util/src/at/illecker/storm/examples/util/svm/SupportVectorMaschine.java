@@ -39,8 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtil;
-import at.illecker.storm.examples.util.io.SerializationUtil;
+import at.illecker.storm.examples.util.io.FileUtils;
+import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
@@ -292,7 +292,7 @@ public class SupportVectorMaschine {
     try {
       // Prepare Train tweets
       LOG.info("Prepare Train data...");
-      List<Tweet> trainTweets = SerializationUtil.deserialize(TRAIN_FILE);
+      List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_FILE);
       if (trainTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
@@ -304,14 +304,14 @@ public class SupportVectorMaschine {
           posTagger = POSTagger.getInstance();
         }
         LOG.info("Read train tweets from " + TRAIN_DATA);
-        trainTweets = FileUtil.readTweets(new FileInputStream(TRAIN_DATA));
+        trainTweets = FileUtils.readTweets(new FileInputStream(TRAIN_DATA));
         processTweets(posTagger, sfvg, trainTweets);
-        SerializationUtil.serializeList(trainTweets, TRAIN_FILE);
+        SerializationUtils.serializeList(trainTweets, TRAIN_FILE);
       }
 
       // Prepare Test tweets
       LOG.info("Prepare Test data...");
-      List<Tweet> testTweets = SerializationUtil.deserialize(TEST_FILE);
+      List<Tweet> testTweets = SerializationUtils.deserialize(TEST_FILE);
       if (testTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
@@ -323,9 +323,9 @@ public class SupportVectorMaschine {
           posTagger = POSTagger.getInstance();
         }
         LOG.info("Read test tweets from " + TEST_DATA);
-        testTweets = FileUtil.readTweets(new FileInputStream(TEST_DATA));
+        testTweets = FileUtils.readTweets(new FileInputStream(TEST_DATA));
         processTweets(posTagger, sfvg, testTweets);
-        SerializationUtil.serializeList(testTweets, TEST_FILE);
+        SerializationUtils.serializeList(testTweets, TEST_FILE);
       }
 
       svm_parameter svmParam = getDefaultParameter();

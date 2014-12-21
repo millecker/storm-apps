@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.GsonBuilder;
 
-public class JsonUtil {
-  private static final Logger LOG = LoggerFactory.getLogger(JsonUtil.class);
+public class JsonUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonUtils.class);
 
   public static List<Map<String, Object>> readJsonFile(File jsonFile) {
     LOG.info("Load file " + jsonFile.getAbsolutePath());
