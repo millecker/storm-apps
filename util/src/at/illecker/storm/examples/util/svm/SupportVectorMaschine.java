@@ -253,11 +253,9 @@ public class SupportVectorMaschine {
     try {
 
       // Prepare Train tweets
-      List<Tweet> trainTweets = null;
       LOG.info("Prepare Train data...");
-      List<Tweet> trainedTweets = SerializationUtil
-          .deserializeTweets(TRAIN_FILE);
-      if (trainedTweets == null) {
+      List<Tweet> trainTweets = SerializationUtil.deserializeList(TRAIN_FILE);
+      if (trainTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
           LOG.info("Load SimpleFeatureVectorGenerator...");
@@ -270,16 +268,13 @@ public class SupportVectorMaschine {
         LOG.info("Read train tweets from " + TRAIN_DATA);
         trainTweets = FileUtil.readTweets(new FileInputStream(TRAIN_DATA));
         processTweets(posTagger, sfvg, trainTweets);
-        SerializationUtil.serializeTweets(trainTweets, TRAIN_FILE);
-      } else {
-        trainTweets = trainedTweets;
+        SerializationUtil.serializeList(trainTweets, TRAIN_FILE);
       }
 
       // Prepare Test tweets
-      List<Tweet> testTweets = null;
       LOG.info("Prepare Test data...");
-      List<Tweet> testedTweets = SerializationUtil.deserializeTweets(TEST_FILE);
-      if (trainedTweets == null) {
+      List<Tweet> testTweets = SerializationUtil.deserializeList(TEST_FILE);
+      if (testTweets == null) {
         // Generate feature vectors
         if (sfvg == null) {
           LOG.info("Load SimpleFeatureVectorGenerator...");
@@ -292,9 +287,7 @@ public class SupportVectorMaschine {
         LOG.info("Read test tweets from " + TEST_DATA);
         testTweets = FileUtil.readTweets(new FileInputStream(TEST_DATA));
         processTweets(posTagger, sfvg, testTweets);
-        SerializationUtil.serializeTweets(testTweets, TEST_FILE);
-      } else {
-        testTweets = testedTweets;
+        SerializationUtil.serializeList(testTweets, TEST_FILE);
       }
 
       // classes 1 = positive, 0 = neutral, -1 = negative

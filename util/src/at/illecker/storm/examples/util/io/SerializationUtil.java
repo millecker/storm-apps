@@ -22,48 +22,63 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.tweet.Tweet;
-
 public class SerializationUtil {
   private static final Logger LOG = LoggerFactory
       .getLogger(SerializationUtil.class);
 
-  public static void serializeTweets(List<Tweet> tweets, String file) {
+  public static <T extends Serializable> void serialize(T object,
+      String fileName) {
     try {
-      FileOutputStream fos = new FileOutputStream(file);
+      FileOutputStream fos = new FileOutputStream(fileName);
       ObjectOutputStream oos = new ObjectOutputStream(fos);
-      oos.writeObject(tweets);
+      oos.writeObject(object);
       oos.close();
       fos.close();
-      LOG.info("Serialized tweets in " + file);
+      LOG.info("Serialized in " + fileName);
     } catch (FileNotFoundException fnfe) {
-      LOG.error(fnfe.getMessage());
+      LOG.error("FileNotFoundException: " + fnfe.getMessage());
     } catch (IOException ioe) {
-      LOG.error(ioe.getMessage());
+      LOG.error("IOException: " + ioe.getMessage());
     }
   }
 
-  public static List<Tweet> deserializeTweets(String file) {
-    List<Tweet> tweets = null;
+  public static <T extends Serializable> T deserialize(String fileName) {
+    T object = null;
     try {
-      FileInputStream fis = new FileInputStream(file);
+      FileInputStream fis = new FileInputStream(fileName);
       ObjectInputStream ois = new ObjectInputStream(fis);
-      tweets = (List<Tweet>) ois.readObject();
+      object = (T) ois.readObject();
       ois.close();
       fis.close();
-      LOG.info("Deserialized tweets from " + file);
+      LOG.info("Deserialized from " + fileName);
     } catch (FileNotFoundException fnfe) {
-      LOG.error(fnfe.getMessage());
+      LOG.error("FileNotFoundException: " + fnfe.getMessage());
     } catch (IOException ioe) {
-      LOG.error(ioe.getMessage());
+      LOG.error("IOException: " + ioe.getMessage());
     } catch (ClassNotFoundException c) {
-      LOG.error(c.getMessage());
+      LOG.error("ClassNotFoundException: " + c.getMessage());
     }
-    return tweets;
+    return object;
+  }
+
+  public static <T extends Serializable> void serializeList(List<T> objects,
+      String fileName) {
+    // Assume List is Serializable
+    // e.g., LinkedList or ArrayList
+    if (objects instanceof java.io.Serializable) {
+      SerializationUtil.serialize((Serializable) objects, fileName);
+    } else {
+      LOG.error("List is not serializable!");
+    }
+  }
+
+  public static <T extends Serializable> List<T> deserializeList(String fileName) {
+    return SerializationUtil.deserialize(fileName);
   }
 }
