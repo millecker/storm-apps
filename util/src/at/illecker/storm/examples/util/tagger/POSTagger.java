@@ -69,6 +69,7 @@ public class POSTagger {
   }
 
   public List<TaggedWord> tagSentence(List<String> tokens) {
+    // LOG.info("tagSentence: " + tokens.toString());
     List<TaggedWord> untaggedTokens = new ArrayList<TaggedWord>();
 
     Iterator<String> iter = tokens.iterator();

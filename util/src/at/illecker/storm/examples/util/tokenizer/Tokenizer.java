@@ -30,6 +30,8 @@ public class Tokenizer {
 
   public static List<String> tokenize(String text) {
     List<String> tokens = new ArrayList<String>();
+    // trim text
+    text = text.trim();
     // split at one ore more blanks
     String[] inputTokens = text.split("\\s+");
     for (String inputToken : inputTokens) {
