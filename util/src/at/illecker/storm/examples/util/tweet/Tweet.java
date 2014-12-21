@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util;
+package at.illecker.storm.examples.util.tweet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class Tweet implements Serializable {
-  private static final long serialVersionUID = -8470454779538779332L;
+  private static final long serialVersionUID = 9104947415982847510L;
   private long m_id;
   private String m_text = "";
   private double m_score = 0;

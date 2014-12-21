@@ -16,7 +16,7 @@
  */
 package at.illecker.storm.examples.util.svm;
 
-import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.util.tweet.Tweet;
 
 public interface FeatureVectorGenerator {
   public double[] calculateFeatureVector(Tweet tweet);

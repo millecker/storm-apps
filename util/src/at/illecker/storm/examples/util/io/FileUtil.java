@@ -38,7 +38,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordlist.WordListMap;
 
 public class FileUtil {

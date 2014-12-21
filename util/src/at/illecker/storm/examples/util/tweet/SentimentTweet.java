@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.sentimentanalysis.util;
-
-import at.illecker.storm.examples.util.Tweet;
+package at.illecker.storm.examples.util.tweet;
 
 public class SentimentTweet extends Tweet {
-  private static final long serialVersionUID = -5503274448300022109L;
+  private static final long serialVersionUID = 5040446561123932812L;
   private double m_scoreMislove;
   private double m_scoreAfinn;
   private double m_scoreSentiStrength;

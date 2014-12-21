@@ -27,7 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.Tweet;
+import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class SerializationUtil {
   private static final Logger LOG = LoggerFactory

@@ -29,10 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.Tweet;
 import at.illecker.storm.examples.util.io.FileUtil;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
