@@ -19,6 +19,8 @@ package at.illecker.storm.examples.svm.bolt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +53,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class SupportVectorMachineBolt extends BaseRichBolt {
   public static final Configuration CONFIG = Configuration.getInstance();
   public static final String DATASET_PATH = CONFIG.getDataSetPath()
-      + File.separator + "dataset2" + File.separator;
+      + "dataset2" + File.separator;
   public static final String DATA = DATASET_PATH
       + "mislove_1000tweets_with_sentistrength_and_afinn.json";
   public static final String DATA_SER_FILE = DATASET_PATH
@@ -75,8 +77,30 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
-    LOG.info("Load tweets data...");
-    List<SentimentTweet> tweets = SerializationUtils.deserialize(DATA_SER_FILE);
+    List<SentimentTweet> tweets = null;
+    InputStream is = null;
+    try {
+
+      if (CONFIG.isRunningWithinJar()) {
+        LOG.info("Load tweets within jar: " + DATA_SER_FILE);
+        is = ClassLoader.getSystemResourceAsStream(DATA_SER_FILE);
+      } else {
+        LOG.info("Load tweets from file: " + DATA_SER_FILE);
+        is = new FileInputStream(DATA_SER_FILE);
+      }
+      LOG.info("Load tweets...");
+      tweets = SerializationUtils.deserialize(is);
+
+    } catch (FileNotFoundException e) {
+      LOG.error(e.getMessage());
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException ignore) {
+        }
+      }
+    }
 
     m_totalClasses = 5;
     m_dsc = new DynamicScoreClassifier(m_totalClasses, 1, 9);

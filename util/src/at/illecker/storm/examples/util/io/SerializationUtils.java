@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -60,14 +61,21 @@ public class SerializationUtils {
   }
 
   public static <T extends Serializable> T deserialize(String fileName) {
+    try {
+      return deserialize(new FileInputStream(fileName));
+    } catch (FileNotFoundException e) {
+      LOG.error("FileNotFoundException: " + e.getMessage());
+    }
+    return null;
+  }
+
+  public static <T extends Serializable> T deserialize(InputStream is) {
     T object = null;
     try {
-      FileInputStream fis = new FileInputStream(fileName);
-      ObjectInputStream ois = new ObjectInputStream(fis);
+      ObjectInputStream ois = new ObjectInputStream(is);
       object = (T) ois.readObject();
       ois.close();
-      fis.close();
-      LOG.info("Deserialized from " + fileName);
+      is.close();
     } catch (FileNotFoundException fnfe) {
       LOG.error("FileNotFoundException: " + fnfe.getMessage());
     } catch (IOException ioe) {
