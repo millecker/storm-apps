@@ -18,8 +18,11 @@ package at.illecker.storm.examples.util.io;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 
@@ -33,16 +36,24 @@ public class JsonUtil {
 
   public static List<Map<String, Object>> readJsonFile(File jsonFile) {
     LOG.info("Load file " + jsonFile.getAbsolutePath());
+    try {
+      return readJsonStream(new FileInputStream(jsonFile));
+    } catch (FileNotFoundException e) {
+      LOG.error(e.getMessage());
+    }
+    return null;
+  }
+
+  public static List<Map<String, Object>> readJsonStream(
+      InputStream jsonInputStream) {
     BufferedReader br = null;
     try {
-      br = new BufferedReader(new FileReader(jsonFile));
+      br = new BufferedReader(new InputStreamReader(jsonInputStream));
       GsonBuilder builder = new GsonBuilder();
       List<Map<String, Object>> elements = (List<Map<String, Object>>) builder
           .create().fromJson(br, Object.class);
       LOG.info("Loaded " + " elements: " + elements.size());
       return elements;
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
     } finally {
       if (br != null) {
         try {
@@ -51,6 +62,5 @@ public class JsonUtil {
         }
       }
     }
-    return null;
   }
 }
