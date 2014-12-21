@@ -5,8 +5,8 @@
 	<property name="output.file" value="SentimentAnalysis" />
 	<property name="util.src.dir" value="../util/src" />
 	<property name="libjars.gpu" value="" />
-	<property name="libjars.cpu" value="${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}gson-2.3.1.jar,${lib}${file.separator}json-simple-1.1.1.jar,${lib}${file.separator}stanford-corenlp-3.4.jar" />
-	<property name="libfiles.cpu" value="resources${file.separator}gate-EN-twitter-fast.model,resources${file.separator}AFINN-111.txt,resources${file.separator}SentStrength_Data_Sept2011_EmotionLookupTable.txt" />
+	<property name="libjars.cpu" value="${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}gson-2.3.1.jar,${lib}${file.separator}json-simple-1.1.1.jar,${lib}${file.separator}stanford-corenlp-3.4.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}commons-compress-1.9.jar" />
+	<property name="libfiles.cpu" value="resources${file.separator}models${file.separator}gate-EN-twitter-fast.model,resources${file.separator}wordnet${file.separator}wn3.1.dict.tar.gz,resources${file.separator}wordlists${file.separator}AFINN-111.txt,resources${file.separator}wordlists${file.separator}GATE_cities.txt,resources${file.separator}wordlists${file.separator}GATE_corps.txt,resources${file.separator}wordlists${file.separator}GATE_interjections.regex,resources${file.separator}wordlists${file.separator}GATE_names.txt,resources${file.separator}wordlists${file.separator}GATE_slang.en.csv,resources${file.separator}wordlists${file.separator}SentStrength_Data_Sept2011_EmoticonLookupTable.txt,resources${file.separator}wordlists${file.separator}SentStrength_Data_Sept2011_EmotionLookupTable.txt,resources${file.separator}wordlists${file.separator}SentStrength_Data_Sept2011_SlangLookupTable.txt" />
 	<property name="libjars.bench" value="" />
 	<property name="rootbeer.package.dir" value="" />
 	<property name="rootbeer.classes" value="" />

@@ -94,7 +94,7 @@ public class PolarityDetectionBolt extends BaseRichBolt {
         }
 
         sentimentSentenceString += word + "/"
-            + ((rating != null) ? rating : "NA");
+            + ((rating != null) ? rating : "NA") + " ";
       }
       tweetWords += sentenceWords;
       tweetSentiment += sentenceSentiment;
@@ -108,7 +108,7 @@ public class PolarityDetectionBolt extends BaseRichBolt {
 
     // Debug
     LOG.info("Tweet: " + tweet.toString() + " Words: " + tweetWords
-        + " TweetSentiment1: " + tweetSentiment + " SentimentScore: "
+        + " TweetSentiment: " + tweetSentiment + " SentimentScore: "
         + (tweetSentiment / tweetWords));
 
     this.m_collector.ack(tuple);
