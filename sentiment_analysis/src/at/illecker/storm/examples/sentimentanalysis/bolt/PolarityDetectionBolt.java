@@ -22,9 +22,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.io.FileUtil;
-import at.illecker.storm.examples.util.tweet.SentimentTweet;
-import at.illecker.storm.examples.util.wordlist.WordListMap;
+import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -37,108 +36,80 @@ import edu.stanford.nlp.ling.TaggedWord;
  * 
  */
 public class PolarityDetectionBolt extends BaseRichBolt {
-  public static String CONF_SENTIMENT_WORD_LIST1_FILE = "word.list1.file";
-  public static String CONF_SENTIMENT_WORD_LIST2_FILE = "word.list2.file";
-  private static final long serialVersionUID = -549704444828609491L;
+  private static final long serialVersionUID = 8507565084136299042L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PolarityDetectionBolt.class);
 
   private OutputCollector m_collector;
-  private WordListMap<Double> m_wordRatings1;
-  private WordListMap<Double> m_wordRatings2;
+  private SentimentWordLists m_sentimentWordLists;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    // no output
   }
 
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    this.m_sentimentWordLists = SentimentWordLists.getInstance();
+  }
 
-    if (config.get(CONF_SENTIMENT_WORD_LIST1_FILE) != null) {
-      m_wordRatings1 = FileUtil.readWordListMap(
-          ClassLoader.getSystemResourceAsStream(config.get(
-              CONF_SENTIMENT_WORD_LIST1_FILE).toString()), "\t", false, -5, 5);
-    }
-    if (config.get(CONF_SENTIMENT_WORD_LIST2_FILE) != null) {
-      m_wordRatings2 = FileUtil.readWordListMap(
-          ClassLoader.getSystemResourceAsStream(config.get(
-              CONF_SENTIMENT_WORD_LIST2_FILE).toString()), "\t", false, -5, 5);
-    }
-    if ((m_wordRatings1 == null) && (m_wordRatings2 == null)) {
-      throw new RuntimeException("No word lists available!");
-    }
+  public void cleanup() {
+    m_sentimentWordLists.close();
   }
 
   public void execute(Tuple tuple) {
-    SentimentTweet tweet = (SentimentTweet) tuple
-        .getValueByField("taggedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
     // LOG.info(tweet.toString());
 
-    double tweetSentiment1 = 0;
-    double tweetSentiment2 = 0;
+    double tweetSentiment = 0;
     int tweetWords = 0;
     for (List<TaggedWord> taggedSentence : tweet.getTaggedSentences()) {
       // LOG.info("TaggedSentence: " + taggedSentence.toString());
 
       String sentimentSentenceString = "";
-      double sentenceSentiment1 = 0;
-      double sentenceSentiment2 = 0;
+      double sentenceSentiment = 0;
       int sentenceWords = 0;
       for (TaggedWord taggedWord : taggedSentence) {
+
+        String word = taggedWord.word().toLowerCase().trim();
+        String tag = taggedWord.tag();
+
         // See tags http://www.clips.ua.ac.be/pages/mbsp-tags
         // Skip punctuations
-        if (taggedWord.tag().equals(".") || taggedWord.tag().equals(",")
-            || taggedWord.tag().equals(":")) {
+        if (tag.equals(".") || tag.equals(",") || tag.equals(":")) {
           continue;
         }
         // Skip cardinal numbers and symbols
-        if (taggedWord.tag().equals("CD") || taggedWord.tag().equals("SYM")) {
+        if (tag.equals("CD") || tag.equals("SYM")) {
           continue;
         }
 
-        String word = taggedWord.word().toLowerCase().trim();
         sentenceWords++;
 
-        Double rating1 = null;
-        if (m_wordRatings1 != null) {
-          rating1 = m_wordRatings1.matchKey(word);
-        }
-        Double rating2 = null;
-        if (m_wordRatings2 != null) {
-          rating2 = m_wordRatings2.matchKey(word);
-        }
-
+        Double rating = m_sentimentWordLists.getWordSentimentWithStemming(word,
+            tag);
         // Update sentiment sum
-        if (rating1 != null) {
-          sentenceSentiment1 += rating1;
-        }
-        if (rating2 != null) {
-          sentenceSentiment2 += rating2;
+        if (rating != null) {
+          sentenceSentiment += rating;
         }
 
         sentimentSentenceString += word + "/"
-            + ((rating1 != null) ? rating1 : "NA") + "|"
-            + ((rating2 != null) ? rating2 : "NA") + " ";
+            + ((rating != null) ? rating : "NA");
       }
       tweetWords += sentenceWords;
-      tweetSentiment1 += sentenceSentiment1;
-      tweetSentiment2 += sentenceSentiment2;
+      tweetSentiment += sentenceSentiment;
 
       // Debug
       LOG.info("TaggedSentence: " + taggedSentence.toString()
           + " SentimentSentence: " + sentimentSentenceString + " Words: "
-          + sentenceWords + " SentenceSentiment1: " + sentenceSentiment1
-          + " SentimentScore1: " + (sentenceSentiment1 / sentenceWords)
-          + " SentenceSentiment2: " + sentenceSentiment2 + " SentimentScore2: "
-          + (sentenceSentiment2 / sentenceWords));
+          + sentenceWords + " SentenceSentiment: " + sentenceSentiment
+          + " SentimentScore: " + (sentenceSentiment / sentenceWords));
     }
 
     // Debug
     LOG.info("Tweet: " + tweet.toString() + " Words: " + tweetWords
-        + " TweetSentiment1: " + tweetSentiment1 + " SentimentScore1: "
-        + (tweetSentiment1 / tweetWords) + " TweetSentiment2: "
-        + tweetSentiment2 + " SentimentScore2: "
-        + (tweetSentiment2 / tweetWords));
+        + " TweetSentiment1: " + tweetSentiment + " SentimentScore: "
+        + (tweetSentiment / tweetWords));
 
     this.m_collector.ack(tuple);
   }

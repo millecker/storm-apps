@@ -20,10 +20,10 @@ import java.io.File;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.sentimentanalysis.bolt.JsonTweetExtractorBolt;
-import at.illecker.storm.examples.sentimentanalysis.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.PolarityDetectionBolt;
-import at.illecker.storm.examples.sentimentanalysis.bolt.PreprocessorBolt;
-import at.illecker.storm.examples.sentimentanalysis.bolt.SentenceSplitterBolt;
+import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
+import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
+import at.illecker.storm.examples.util.bolt.TokenizerBolt;
 import at.illecker.storm.examples.util.spout.JsonFileSpout;
 import at.illecker.storm.examples.util.spout.TwitterSpout;
 import backtype.storm.Config;
@@ -42,16 +42,13 @@ public class SentimentAnalysisTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String JSON_TWEET_EXTRACTOR_BOLT_ID = "json-tweet-extractor-bolt";
+  private static final String TOKENIZER_BOLT_ID = "tokenizer-bolt";
   private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
-  private static final String SENTENCE_SPLITTER_BOLT_ID = "sentence-splitter-bolt";
   private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
   private static final String POLARITY_DETECTION_BOLT_ID = "polarity-detection-bolt";
   private static final String TOPOLOGY_NAME = "sentiment-analysis-topology";
 
   public static final String FILTER_LANG = "en";
-  public static final String POS_TAGGER_MODEL = "resources/gate-EN-twitter-fast.model";
-  public static final String SENTIMENT_WORD_LIST1 = "resources/AFINN-111.txt";
-  public static final String SENTIMENT_WORD_LIST2 = "resources/SentStrength_Data_Sept2011_EmotionLookupTable.txt";
 
   public static void main(String[] args) throws Exception {
     String referenceFilePath = "";
@@ -96,11 +93,6 @@ public class SentimentAnalysisTopology {
     }
 
     Config conf = new Config();
-    conf.put(POSTaggerBolt.CONF_TAGGER_MODEL_FILE, POS_TAGGER_MODEL);
-    conf.put(PolarityDetectionBolt.CONF_SENTIMENT_WORD_LIST1_FILE,
-        SENTIMENT_WORD_LIST1);
-    conf.put(PolarityDetectionBolt.CONF_SENTIMENT_WORD_LIST2_FILE,
-        SENTIMENT_WORD_LIST2);
 
     // Create Spout
     IRichSpout spout;
@@ -114,8 +106,8 @@ public class SentimentAnalysisTopology {
 
     // Create Bolts
     JsonTweetExtractorBolt jsonTweetExtractorBolt = new JsonTweetExtractorBolt();
+    TokenizerBolt tokenizerBolt = new TokenizerBolt();
     PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
-    SentenceSplitterBolt sentenceSplitterBolt = new SentenceSplitterBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
     PolarityDetectionBolt polarityDetectionBolt = new PolarityDetectionBolt();
 
@@ -129,17 +121,17 @@ public class SentimentAnalysisTopology {
     builder.setBolt(JSON_TWEET_EXTRACTOR_BOLT_ID, jsonTweetExtractorBolt)
         .shuffleGrouping(TWEET_SPOUT_ID);
 
-    // JsonTweetExtractorBolt --> PreprocessorBolt
-    builder.setBolt(PREPROCESSOR_BOLT_ID, preprocessorBolt).shuffleGrouping(
+    // JsonTweetExtractorBolt --> TokenizerBolt
+    builder.setBolt(TOKENIZER_BOLT_ID, tokenizerBolt).shuffleGrouping(
         JSON_TWEET_EXTRACTOR_BOLT_ID);
 
-    // PreprocessorBolt --> SentenceSplitterBolt
-    builder.setBolt(SENTENCE_SPLITTER_BOLT_ID, sentenceSplitterBolt)
-        .shuffleGrouping(PREPROCESSOR_BOLT_ID);
+    // TokenizerBolt --> PreprocessorBolt
+    builder.setBolt(PREPROCESSOR_BOLT_ID, preprocessorBolt).shuffleGrouping(
+        TOKENIZER_BOLT_ID);
 
-    // SentenceSplitterBolt --> POSTaggerBolt
+    // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
-        SENTENCE_SPLITTER_BOLT_ID);
+        PREPROCESSOR_BOLT_ID);
 
     // POSTaggerBolt --> PolarityDetectionBolt
     builder.setBolt(POLARITY_DETECTION_BOLT_ID, polarityDetectionBolt)

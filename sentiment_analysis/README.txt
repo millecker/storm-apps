@@ -19,7 +19,7 @@ ant run-cpu [ -DreferenceFile=file.json \
  [-DkeyWords='word1 word2']
 
 # Example
-ant clean && ant run-cpu -DreferenceFile=../resources/mislove_1000tweets_with_sentistrength_and_afinn.json
+ant clean && ant run-cpu -DreferenceFile=../resources/datasets/dataset2/mislove_1000tweets_with_sentistrength_and_afinn.json
 
 # Modify file conf/storm_env.ini
 STORM_JAR_JVM_OPTS:-Xmx8g
