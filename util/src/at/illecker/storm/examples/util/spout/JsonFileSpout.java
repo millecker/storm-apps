@@ -16,24 +16,20 @@
  */
 package at.illecker.storm.examples.util.spout;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.io.JsonUtil;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-
-import com.google.gson.GsonBuilder;
 
 public class JsonFileSpout extends BaseRichSpout {
   public static final String CONF_JSON_FILE = "json.file";
@@ -60,7 +56,7 @@ public class JsonFileSpout extends BaseRichSpout {
       String jsonFilePath = config.get(CONF_JSON_FILE).toString();
       File jsonFile = new File(jsonFilePath);
       if (jsonFile.isFile()) {
-        m_elements = parseJson(jsonFile);
+        m_elements = JsonUtil.readJsonFile(jsonFile);
       } else {
         throw new RuntimeException("Error reading directory " + jsonFile);
       }
@@ -80,29 +76,7 @@ public class JsonFileSpout extends BaseRichSpout {
       // default sleep 1 ms
       Thread.sleep(1000); // for development
     } catch (InterruptedException e) {
+      LOG.error(e.getMessage());
     }
-  }
-
-  private static List<Map<String, Object>> parseJson(File jsonFile) {
-    LOG.info("Load file " + jsonFile.getAbsolutePath());
-    BufferedReader br = null;
-    try {
-      br = new BufferedReader(new FileReader(jsonFile));
-      GsonBuilder builder = new GsonBuilder();
-      List<Map<String, Object>> elements = (List<Map<String, Object>>) builder
-          .create().fromJson(br, Object.class);
-      LOG.info("Loaded " + " elements: " + elements.size());
-      return elements;
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-    } finally {
-      if (br != null) {
-        try {
-          br.close();
-        } catch (IOException ignore) {
-        }
-      }
-    }
-    return null;
   }
 }
