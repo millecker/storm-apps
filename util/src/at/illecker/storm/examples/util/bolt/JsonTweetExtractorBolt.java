@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.sentimentanalysis.bolt;
+package at.illecker.storm.examples.util.bolt;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class JsonTweetExtractorBolt extends BaseRichBolt {
-  private static final long serialVersionUID = -8934114541268126264L;
+  private static final long serialVersionUID = -7467317303659214525L;
   private static final Logger LOG = LoggerFactory
       .getLogger(JsonTweetExtractorBolt.class);
 

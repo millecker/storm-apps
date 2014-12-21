@@ -19,8 +19,8 @@ package at.illecker.storm.examples.sentimentanalysis;
 import java.io.File;
 import java.util.Arrays;
 
-import at.illecker.storm.examples.sentimentanalysis.bolt.JsonTweetExtractorBolt;
 import at.illecker.storm.examples.sentimentanalysis.bolt.PolarityDetectionBolt;
+import at.illecker.storm.examples.util.bolt.JsonTweetExtractorBolt;
 import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
 import at.illecker.storm.examples.util.bolt.TokenizerBolt;
@@ -117,7 +117,7 @@ public class SentimentAnalysisTopology {
     // Set Spout
     builder.setSpout(TWEET_SPOUT_ID, spout);
 
-    // Set Spout --> JsonTweetExtractorBolt
+    // Spout --> JsonTweetExtractorBolt
     builder.setBolt(JSON_TWEET_EXTRACTOR_BOLT_ID, jsonTweetExtractorBolt)
         .shuffleGrouping(TWEET_SPOUT_ID);
 
