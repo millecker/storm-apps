@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.svm.bolt.SupportVectorMachineBolt;
+import at.illecker.storm.examples.util.bolt.FeatureExtractorBolt;
 import at.illecker.storm.examples.util.bolt.JsonTweetExtractorBolt;
 import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
@@ -37,6 +38,7 @@ public class SupportVectorMachineTopology {
   private static final String TOKENIZER_BOLT_ID = "tokenizer-bolt";
   private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
   private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
+  private static final String FEATURE_EXTRACTOR_BOLT_ID = "feature-extractor-bolt";
   private static final String SVM_BOLT_ID = "support-vector-maschine-bolt";
   private static final String TOPOLOGY_NAME = "support-vector-maschine-topology";
 
@@ -101,6 +103,7 @@ public class SupportVectorMachineTopology {
     TokenizerBolt tokenizerBolt = new TokenizerBolt();
     PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
+    FeatureExtractorBolt featureExtractorBolt = new FeatureExtractorBolt();
     SupportVectorMachineBolt svmBolt = new SupportVectorMachineBolt();
 
     // Create Topology
@@ -125,8 +128,13 @@ public class SupportVectorMachineTopology {
     builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
         PREPROCESSOR_BOLT_ID);
 
-    // POSTaggerBolt --> SupportVectorMaschineBolt
-    builder.setBolt(SVM_BOLT_ID, svmBolt).shuffleGrouping(POS_TAGGER_BOLT_ID);
+    // POSTaggerBolt --> FeatureExtractorBolt
+    builder.setBolt(FEATURE_EXTRACTOR_BOLT_ID, featureExtractorBolt)
+        .shuffleGrouping(POS_TAGGER_BOLT_ID);
+
+    // FeatureExtractorBolt --> SupportVectorMaschineBolt
+    builder.setBolt(SVM_BOLT_ID, svmBolt).shuffleGrouping(
+        FEATURE_EXTRACTOR_BOLT_ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

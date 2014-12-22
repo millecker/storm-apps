@@ -115,7 +115,7 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField("featuredTweet");
 
     double predictedClass = SupportVectorMachine.evaluate(tweet, m_model,
         m_totalClasses, m_dsc);
