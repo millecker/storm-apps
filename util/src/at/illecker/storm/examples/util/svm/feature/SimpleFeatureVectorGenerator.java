@@ -45,7 +45,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   }
 
   private double[] countPOSTags(Tweet tweet) {
-    // { NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAGS }
+    // [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAGS]
     double[] posTags = new double[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d };
     int wordCount = 0;
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
@@ -79,6 +79,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   @Override
   public double[] calculateFeatureVector(Tweet tweet) {
     // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
+    // MAX_NEG_SCORE]
     double[] resultFeatureVector;
     double tweetSentiment[] = m_sentimentWordLists.getTweetSentiment(tweet);
     if (tweetSentiment == null) {
@@ -117,24 +118,33 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   public static List<Tweet> getTestTweets() {
     List<Tweet> tweets = new ArrayList<Tweet>();
-    tweets.add(new Tweet(264183816548130816L,
+    tweets.add(new Tweet(0L,
         "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)",
         1));
     tweets
         .add(new Tweet(
-            263398998675693568L,
+            0L,
             "@oluoch @victor_otti @kunjand I just watched it ! Sridevi's comeback .... U remember her from the 90s ?? Sun mornings on NTA ;)",
             1));
     tweets
         .add(new Tweet(
-            259724822978904064L,
+            0L,
             "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56",
             0.5));
     tweets
         .add(new Tweet(
-            264259830590603264L,
+            0L,
             "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
             0));
+    tweets.add(new Tweet(0L,
+        "called in sick for the third straight day.  ugh.", 0));
+    tweets
+        .add(new Tweet(
+            0L,
+            "Here we go.  BANK FAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
+            0));
+    tweets.add(new Tweet(0L,
+        "Oh, I'm afraid your Windows-using friends will not survive.", 0));
     return tweets;
   }
 
