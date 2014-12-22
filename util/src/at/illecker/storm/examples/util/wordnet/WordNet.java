@@ -75,7 +75,7 @@ public class WordNet {
       }
 
       // extract tar.gz file
-      FileUtils.extractTarGz(is, m_wordNetDir.getParent(), true);
+      FileUtils.extractTarGz(is, m_wordNetDir.getParent(), false);
 
       m_dict = new RAMDictionary(m_wordNetDir, ILoadPolicy.NO_LOAD);
       m_dict.open();

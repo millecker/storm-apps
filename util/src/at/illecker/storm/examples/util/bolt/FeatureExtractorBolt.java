@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ public class FeatureExtractorBolt extends BaseRichBolt {
 
     // Generate Feature Vector for tweet
     tweet.genFeatureVector(m_fvg);
-    LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
+    // LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
 
     this.m_collector.emit(tuple, new Values(tweet));
     this.m_collector.ack(tuple);

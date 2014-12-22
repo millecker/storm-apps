@@ -119,7 +119,11 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
 
     double predictedClass = SupportVectorMachine.evaluate(tweet, m_model,
         m_totalClasses, m_dsc);
-    LOG.info(tweet.toString() + " - predictedClass: " + predictedClass);
+
+    LOG.info("tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
+        + " expectedClass: " + m_dsc.classfyScore(tweet.getScore())
+        + " predictedClass: " + predictedClass);
+    LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
 
     this.m_collector.ack(tuple);
   }
