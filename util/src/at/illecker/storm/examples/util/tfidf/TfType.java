@@ -21,15 +21,18 @@ package at.illecker.storm.examples.util.tfidf;
  */
 public enum TfType {
   /**
-   * Term frequency
+   * Raw frequency: tf(t,d) = f(t,d) The number of times that term t occurs in
+   * document d.
    */
-  NATURAL,
+  RAW,
+
   /**
-   * Log term frequency plus 1
+   * Log scaled frequency: tf(t,d) = 1 + log f(t,d), or zero if f(t,d) is zero;
    */
-  LOGARITHM,
+  LOG,
+
   /**
-   * 1 if term is present, 0 if it is not
+   * Boolean frequency: tf(t,d) = 1 if t occurs in d and 0 otherwise;
    */
-  BOOLEAN
+  BOOL
 }

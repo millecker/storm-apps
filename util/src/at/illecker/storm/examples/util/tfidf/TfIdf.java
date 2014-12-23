@@ -33,16 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Term Frequency-Inverse Document Frequency based on
- *
- * https://github.com/wpm/tfidf/blob/master/src/main/java/com/github/wpm/tfidf/
- * TfIdf.java
+ * Term Frequency - Inverse Document Frequency
+ * 
+ * based on https://github.com/wpm/tfidf
  *
  */
 public class TfIdf {
   private static final Logger LOG = LoggerFactory.getLogger(TfIdf.class);
 
-  private TfType m_type = TfType.NATURAL;
+  private TfType m_type = TfType.RAW;
 
   public TfIdf() {
 
@@ -53,14 +52,6 @@ public class TfIdf {
     m_type = type;
   }
 
-  /**
-   * Term frequency for a single document
-   *
-   * @param document bag of terms
-   * @param type natural or logarithmic
-   * @param <T> term type
-   * @return map of terms to their term frequencies
-   */
   public static <T> Map<T, Double> tf(Collection<T> document, TfType type) {
     Map<T, Double> tf = new HashMap<T, Double>();
     for (T term : document) {
@@ -68,14 +59,14 @@ public class TfIdf {
       tf.put(term, (v == null) ? 1 : v + 1);
     }
 
-    if (type != TfType.NATURAL) {
+    if (type != TfType.RAW) {
       for (T term : tf.keySet()) {
         switch (type) {
-          case LOGARITHM:
+          case LOG:
             tf.put(term, 1 + Math.log(tf.get(term)));
             break;
-          case BOOLEAN:
-            tf.put(term, (tf.get(term) == 0.0) ? 0.0 : 1.0);
+          case BOOL:
+            tf.put(term, 1.0);
             break;
           default:
             break;
@@ -85,27 +76,12 @@ public class TfIdf {
     return tf;
   }
 
-  /**
-   * Natural term frequency for a single document
-   *
-   * @param document bag of terms
-   * @param <T> term type
-   * @return map of terms to their term frequencies
-   */
   public static <T> Map<T, Double> tf(Collection<T> document) {
-    return tf(document, TfType.NATURAL);
+    return tf(document, TfType.RAW);
   }
 
-  /**
-   * Term frequencies for a set of documents
-   *
-   * @param documents sequence of documents, each of which is a bag of terms
-   * @param type natural or logarithmic
-   * @param <T> term type
-   * @return sequence of map of terms to their term frequencies
-   */
-  public static <T> Iterable<Map<T, Double>> tf(
-      Iterable<Collection<T>> documents, TfType type) {
+  public static <T> List<Map<T, Double>> tf(Iterable<Collection<T>> documents,
+      TfType type) {
 
     List<Map<T, Double>> tfs = new ArrayList<Map<T, Double>>();
     for (Collection<T> document : documents) {
@@ -114,16 +90,8 @@ public class TfIdf {
     return tfs;
   }
 
-  /**
-   * Natural term frequencies for a set of documents
-   *
-   * @param documents sequence of documents, each of which is a bag of terms
-   * @param <T> term type
-   * @return sequence of map of terms to their term frequencies
-   */
-  public static <T> Iterable<Map<T, Double>> tf(
-      Iterable<Collection<T>> documents) {
-    return tf(documents, TfType.NATURAL);
+  public static <T> List<Map<T, Double>> tf(Iterable<Collection<T>> documents) {
+    return tf(documents, TfType.RAW);
   }
 
   /**
