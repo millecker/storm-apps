@@ -57,6 +57,10 @@ public class IOUtils {
   }
 
   public static InputStream getInputStream(String fileOrUrl) {
+    return getInputStream(fileOrUrl, false);
+  }
+
+  public static InputStream getInputStream(String fileOrUrl, boolean unzip) {
     InputStream in = null;
     try {
       if (fileOrUrl.matches("https?://.*")) {
@@ -80,7 +84,7 @@ public class IOUtils {
       }
 
       // unzip if necessary
-      if (fileOrUrl.endsWith(".gz")) {
+      if ((unzip) && (fileOrUrl.endsWith(".gz"))) {
         in = new GZIPInputStream(in, GZIP_FILE_BUFFER_SIZE);
       }
 
@@ -96,43 +100,46 @@ public class IOUtils {
     return in;
   }
 
-  public static void extractTarGz(String inputTarGz, String outDir)
-      throws IOException {
+  public static void extractTarGz(String inputTarGz, String outDir) {
     extractTarGz(getInputStream(inputTarGz), outDir, false);
   }
 
   public static void extractTarGz(InputStream inputTarGzStream, String outDir,
-      boolean logging) throws IOException {
+      boolean logging) {
+    try {
+      GzipCompressorInputStream gzIn = new GzipCompressorInputStream(
+          inputTarGzStream);
+      TarArchiveInputStream tarIn = new TarArchiveInputStream(gzIn);
 
-    BufferedInputStream in = new BufferedInputStream(inputTarGzStream);
-    GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
-    TarArchiveInputStream tarIn = new TarArchiveInputStream(gzIn);
-
-    // read Tar entries
-    TarArchiveEntry entry = null;
-    while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-      if (logging) {
-        LOG.info("Extracting: " + outDir + File.separator + entry.getName());
-      }
-      if (entry.isDirectory()) { // create directory
-        File f = new File(outDir + File.separator + entry.getName());
-        f.mkdirs();
-      } else { // decompress file
-        int count;
-        byte data[] = new byte[EXTRACT_BUFFER_SIZE];
-
-        FileOutputStream fos = new FileOutputStream(outDir + File.separator
-            + entry.getName());
-        BufferedOutputStream dest = new BufferedOutputStream(fos,
-            EXTRACT_BUFFER_SIZE);
-        while ((count = tarIn.read(data, 0, EXTRACT_BUFFER_SIZE)) != -1) {
-          dest.write(data, 0, count);
+      // read Tar entries
+      TarArchiveEntry entry = null;
+      while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
+        if (logging) {
+          LOG.info("Extracting: " + outDir + File.separator + entry.getName());
         }
-        dest.close();
-      }
-    }
+        if (entry.isDirectory()) { // create directory
+          File f = new File(outDir + File.separator + entry.getName());
+          f.mkdirs();
+        } else { // decompress file
+          int count;
+          byte data[] = new byte[EXTRACT_BUFFER_SIZE];
 
-    // close input stream
-    tarIn.close();
+          FileOutputStream fos = new FileOutputStream(outDir + File.separator
+              + entry.getName());
+          BufferedOutputStream dest = new BufferedOutputStream(fos,
+              EXTRACT_BUFFER_SIZE);
+          while ((count = tarIn.read(data, 0, EXTRACT_BUFFER_SIZE)) != -1) {
+            dest.write(data, 0, count);
+          }
+          dest.close();
+        }
+      }
+
+      // close input stream
+      tarIn.close();
+
+    } catch (IOException e) {
+      LOG.error("IOException: " + e.getMessage());
+    }
   }
 }
