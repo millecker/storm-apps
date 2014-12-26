@@ -16,12 +16,7 @@
  */
 package at.illecker.storm.examples.util.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,9 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,45 +34,10 @@ import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordlist.WordListMap;
 
 public class FileUtils {
-  public static final int BUFFER_SIZE = 2048;
   private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
-  public static void extractTarGz(String inputTarGz, String outDir)
-      throws IOException {
-    FileUtils.extractTarGz(new FileInputStream(inputTarGz), outDir, false);
-  }
-
-  public static void extractTarGz(InputStream inputTarGzStream, String outDir,
-      boolean logging) throws IOException {
-
-    BufferedInputStream in = new BufferedInputStream(inputTarGzStream);
-    GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
-    TarArchiveInputStream tarIn = new TarArchiveInputStream(gzIn);
-
-    TarArchiveEntry entry = null;
-    // read Tar entries
-    while ((entry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-      if (logging) {
-        LOG.info("Extracting: " + outDir + File.separator + entry.getName());
-      }
-      if (entry.isDirectory()) { // create directory
-        File f = new File(outDir + File.separator + entry.getName());
-        f.mkdirs();
-      } else { // decompress file
-        int count;
-        byte data[] = new byte[BUFFER_SIZE];
-
-        FileOutputStream fos = new FileOutputStream(outDir + File.separator
-            + entry.getName());
-        BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
-        while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
-          dest.write(data, 0, count);
-        }
-        dest.close();
-      }
-    }
-    // close input stream
-    tarIn.close();
+  public static List<Tweet> readTweets(String file) {
+    return readTweets(IOUtils.getInputStream(file));
   }
 
   public static List<Tweet> readTweets(InputStream is) {
@@ -134,8 +91,8 @@ public class FileUtils {
     return tweets;
   }
 
-  public static Map<String, String> readFile(InputStream is, String splitRegex) {
-    return readFile(is, splitRegex, false);
+  public static Map<String, String> readFile(String file, String splitRegex) {
+    return readFile(IOUtils.getInputStream(file), splitRegex, false);
   }
 
   public static Map<String, String> readFile(InputStream is, String splitRegex,
@@ -184,9 +141,10 @@ public class FileUtils {
     return table;
   }
 
-  public static Map<String, Double> readFile(InputStream is, String splitRegex,
+  public static Map<String, Double> readFile(String file, String splitRegex,
       boolean featureScaling, double minValue, double maxValue) {
-    return readFile(is, splitRegex, featureScaling, minValue, maxValue, false);
+    return readFile(IOUtils.getInputStream(file), splitRegex, featureScaling,
+        minValue, maxValue, false);
   }
 
   public static Map<String, Double> readFile(InputStream is, String splitRegex,
@@ -273,11 +231,11 @@ public class FileUtils {
     return map;
   }
 
-  public static WordListMap<Double> readWordListMap(InputStream is,
+  public static WordListMap<Double> readWordListMap(String file,
       String splitRegex, boolean featureScaling, double minValue,
       double maxValue) {
-    return readWordListMap(is, splitRegex, featureScaling, minValue, maxValue,
-        false);
+    return readWordListMap(IOUtils.getInputStream(file), splitRegex,
+        featureScaling, minValue, maxValue, false);
   }
 
   public static WordListMap<Double> readWordListMap(InputStream is,
@@ -364,8 +322,8 @@ public class FileUtils {
     return null;
   }
 
-  public static Set<String> readFile(InputStream is) {
-    return FileUtils.readFile(is, false);
+  public static Set<String> readFile(String file) {
+    return readFile(IOUtils.getInputStream(file), false);
   }
 
   public static Set<String> readFile(InputStream is, boolean logging) {
