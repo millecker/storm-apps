@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.io;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,12 +60,7 @@ public class SerializationUtils {
   }
 
   public static <T extends Serializable> T deserialize(String fileName) {
-    try {
-      return deserialize(new FileInputStream(fileName));
-    } catch (FileNotFoundException e) {
-      LOG.error("FileNotFoundException: " + e.getMessage());
-    }
-    return null;
+    return deserialize(IOUtils.getInputStream(fileName));
   }
 
   public static <T extends Serializable> T deserialize(InputStream is) {
