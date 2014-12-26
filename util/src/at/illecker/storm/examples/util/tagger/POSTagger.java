@@ -38,22 +38,19 @@ public class POSTagger {
   private static final boolean LOGGING = false;
   private static final POSTagger instance = new POSTagger();
 
-  private Configuration m_conf;
   private MaxentTagger m_posTagger; // Standford POS Tagger
   private NameEntities m_nameEntities;
   private Interjections m_interjections;
 
   private POSTagger() {
-    m_conf = Configuration.getInstance();
-
     // Load POS Tagger
-    String taggingModel = m_conf.getPOSTaggingModel();
+    String taggingModel = Configuration.getPOSTaggingModel();
     try {
       LOG.info("Load POSTagger with model: " + taggingModel);
       TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
       m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
     } catch (RuntimeIOException e) {
-      LOG.error(e.getMessage());
+      LOG.error("RuntimeIOException: " + e.getMessage());
     }
 
     // Load NameEntities

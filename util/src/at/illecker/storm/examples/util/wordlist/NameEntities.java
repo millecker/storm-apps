@@ -16,10 +16,6 @@
  */
 package at.illecker.storm.examples.util.wordlist;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -32,34 +28,15 @@ public class NameEntities {
   private static final Logger LOG = LoggerFactory.getLogger(NameEntities.class);
   private static final NameEntities instance = new NameEntities();
 
-  private Configuration m_conf;
   private Set<String> m_nameEntities = null;
 
   private NameEntities() {
-    m_conf = Configuration.getInstance();
-    InputStream is = null;
-    try {
-      for (String nameEntityFile : m_conf.getNameEntities()) {
-        LOG.info("Load NameEntities from: " + nameEntityFile);
-        if (m_conf.isRunningWithinJar()) {
-          is = ClassLoader.getSystemResourceAsStream(nameEntityFile);
-        } else {
-          is = new FileInputStream(nameEntityFile);
-        }
-        if (m_nameEntities == null) {
-          m_nameEntities = FileUtils.readFile(is);
-        } else {
-          m_nameEntities.addAll(FileUtils.readFile(is));
-        }
-      }
-    } catch (FileNotFoundException e) {
-      LOG.error(e.getMessage());
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (IOException ignore) {
-        }
+    for (String file : Configuration.getNameEntities()) {
+      LOG.info("Load NameEntities from: " + file);
+      if (m_nameEntities == null) {
+        m_nameEntities = FileUtils.readFile(file);
+      } else {
+        m_nameEntities.addAll(FileUtils.readFile(file));
       }
     }
   }

@@ -17,8 +17,6 @@
 package at.illecker.storm.examples.util.sentiwordnet;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.io.IOUtils;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
@@ -37,51 +36,30 @@ public class SentiWordNet {
   private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
   private static final SentiWordNet instance = new SentiWordNet();
 
-  private Configuration m_conf;
   private WordNet m_wordnet;
   private Map<String, HashMap<Integer, SentiValue>> m_dict;
   private Map<String, Double> m_dictWeighted;
 
   private SentiWordNet() {
-    m_conf = Configuration.getInstance();
-    String sentiWordNetDict = m_conf.getSentiWordNetDict();
-    InputStream is = null;
-    try {
-      if (m_conf.isRunningWithinJar()) {
-        is = ClassLoader.getSystemResourceAsStream(sentiWordNetDict);
-      } else {
-        is = new FileInputStream(sentiWordNetDict);
-        LOG.info("loadDictionary: " + sentiWordNetDict);
-      }
+    m_wordnet = WordNet.getInstance();
 
-      m_wordnet = WordNet.getInstance();
-
-      m_dict = loadDict(is);
-      m_dictWeighted = calcAvgWeightScores();
-
-    } catch (FileNotFoundException e) {
-      LOG.error(e.getMessage());
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (IOException ignore) {
-        }
-      }
-    }
+    m_dict = loadSentiWordNetDict();
+    m_dictWeighted = calcAvgWeightScores();
   }
 
   public static SentiWordNet getInstance() {
     return instance;
   }
 
-  private Map<String, HashMap<Integer, SentiValue>> loadDict(
-      InputStream sentiWordNetDict) {
+  private Map<String, HashMap<Integer, SentiValue>> loadSentiWordNetDict() {
+    String sentiWordNetDict = Configuration.getSentiWordNetDict();
+    LOG.info("loadDictionary: " + sentiWordNetDict);
+    InputStream in = IOUtils.getInputStream(sentiWordNetDict);
 
     Map<String, HashMap<Integer, SentiValue>> dict = new HashMap<String, HashMap<Integer, SentiValue>>();
     BufferedReader br = null;
     try {
-      br = new BufferedReader(new InputStreamReader(sentiWordNetDict));
+      br = new BufferedReader(new InputStreamReader(in));
       int lineNumber = 0;
       String line;
       // POS ID PosScore NegScore SynsetTerms Desc
@@ -171,11 +149,7 @@ public class SentiWordNet {
   }
 
   public void close() {
-    try {
-      m_wordnet.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    m_wordnet.close();
   }
 
   public Map<Integer, SentiValue> getSentiValues(String word, char posTag) {

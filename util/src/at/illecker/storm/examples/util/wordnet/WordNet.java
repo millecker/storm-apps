@@ -17,9 +17,7 @@
 package at.illecker.storm.examples.util.wordnet;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.io.IOUtils;
 import edu.mit.jwi.IRAMDictionary;
 import edu.mit.jwi.RAMDictionary;
@@ -50,23 +47,16 @@ public class WordNet {
   private static final Logger LOG = LoggerFactory.getLogger(WordNet.class);
   private static final WordNet instance = new WordNet();
 
-  private Configuration m_conf;
   private IRAMDictionary m_dict;
   private File m_wordNetDir;
   private WordnetStemmer m_wordnetStemmer;
 
   private WordNet() {
-    m_conf = Configuration.getInstance();
-    InputStream is = null;
     try {
-      String wordNetDictPath = m_conf.getWordNetDict();
-      if (m_conf.isRunningWithinJar()) {
-        is = ClassLoader.getSystemResourceAsStream(wordNetDictPath);
-      } else {
-        is = new FileInputStream(wordNetDictPath);
-        LOG.info("WordNet Dictionary: " + wordNetDictPath);
-      }
-      m_wordNetDir = new File(m_conf.getTempDir() + File.separator + "dict");
+      String wordNetDictPath = Configuration.getWordNetDict();
+      LOG.info("WordNet Dictionary: " + wordNetDictPath);
+      m_wordNetDir = new File(Configuration.TEMP_DIR_PATH + File.separator
+          + "dict");
       LOG.info("WordNet Extract Location: " + m_wordNetDir.getAbsolutePath());
 
       // check if extract location does exist
@@ -75,7 +65,7 @@ public class WordNet {
       }
 
       // extract tar.gz file
-      FileUtils.extractTarGz(is, m_wordNetDir.getParent(), false);
+      IOUtils.extractTarGz(wordNetDictPath, m_wordNetDir.getParent());
 
       m_dict = new RAMDictionary(m_wordNetDir, ILoadPolicy.NO_LOAD);
       m_dict.open();
@@ -89,9 +79,9 @@ public class WordNet {
       m_wordnetStemmer = new WordnetStemmer(m_dict);
 
     } catch (IOException e) {
-      LOG.error(e.getMessage());
+      LOG.error("IOException: " + e.getMessage());
     } catch (InterruptedException e) {
-      LOG.error(e.getMessage());
+      LOG.error("InterruptedException: " + e.getMessage());
     }
   }
 
@@ -99,11 +89,15 @@ public class WordNet {
     return instance;
   }
 
-  public void close() throws IOException {
+  public void close() {
     if (m_dict != null) {
       m_dict.close();
     }
-    IOUtils.delete(m_wordNetDir);
+    try {
+      IOUtils.delete(m_wordNetDir);
+    } catch (IOException e) {
+      LOG.error("IOException: " + e.getMessage());
+    }
   }
 
   public List<String> findStems(String wordString, POS wordPOS) {
@@ -632,11 +626,8 @@ public class WordNet {
   }
 
   public static void main(String[] args) {
-    try {
-      WordNet.getInstance().testWordNet();
-      WordNet.getInstance().close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    WordNet wordNet = WordNet.getInstance();
+    wordNet.testWordNet();
+    wordNet.close();
   }
 }

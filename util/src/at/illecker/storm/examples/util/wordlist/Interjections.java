@@ -16,10 +16,6 @@
  */
 package at.illecker.storm.examples.util.wordlist;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,53 +36,34 @@ public class Interjections {
       .getLogger(Interjections.class);
   private static final Interjections instance = new Interjections();
 
-  private Configuration m_conf;
   private Set<String> m_interjections = null;
   private List<Pattern> m_interjectionPatterns = null;
 
   private Interjections() {
-    m_conf = Configuration.getInstance();
-    InputStream is = null;
-    try {
-      Map<String, Properties> interjectionFiles = m_conf.getInterjections();
-      for (Map.Entry<String, Properties> interjectionEntry : interjectionFiles
-          .entrySet()) {
-        String file = interjectionEntry.getKey();
-        if (m_conf.isRunningWithinJar()) {
-          is = ClassLoader.getSystemResourceAsStream(file);
-        } else {
-          is = new FileInputStream(file);
-        }
-        Boolean containsRegex = (Boolean) interjectionEntry.getValue().get(
-            "containsRegex");
+    Map<String, Properties> interjectionFiles = Configuration
+        .getInterjections();
+    for (Map.Entry<String, Properties> interjectionEntry : interjectionFiles
+        .entrySet()) {
+      String file = interjectionEntry.getKey();
+      Boolean containsRegex = (Boolean) interjectionEntry.getValue().get(
+          "containsRegex");
 
-        Set<String> interjections = FileUtils.readFile(is);
+      Set<String> interjections = FileUtils.readFile(file);
 
-        if (containsRegex) {
-          LOG.info("Load Interjections including regex patterns from: " + file);
-          if (m_interjectionPatterns == null) {
-            m_interjectionPatterns = new ArrayList<Pattern>();
-          }
-          for (String interjection : interjections) {
-            m_interjectionPatterns.add(Pattern
-                .compile("^" + interjection + "$"));
-          }
-        } else {
-          LOG.info("Load Interjections from: " + file);
-          if (m_interjections == null) {
-            m_interjections = new HashSet<String>();
-          }
-          m_interjections.addAll(interjections);
+      if (containsRegex) {
+        LOG.info("Loaded Interjections including regex patterns from: " + file);
+        if (m_interjectionPatterns == null) {
+          m_interjectionPatterns = new ArrayList<Pattern>();
         }
-      }
-    } catch (FileNotFoundException e) {
-      LOG.error(e.getMessage());
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (IOException ignore) {
+        for (String interjection : interjections) {
+          m_interjectionPatterns.add(Pattern.compile("^" + interjection + "$"));
         }
+      } else {
+        LOG.info("Loaded Interjections from: " + file);
+        if (m_interjections == null) {
+          m_interjections = new HashSet<String>();
+        }
+        m_interjections.addAll(interjections);
       }
     }
   }

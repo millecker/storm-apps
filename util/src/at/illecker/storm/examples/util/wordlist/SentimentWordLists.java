@@ -16,10 +16,6 @@
  */
 package at.illecker.storm.examples.util.wordlist;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -46,68 +42,49 @@ public class SentimentWordLists {
   private static final boolean LOGGING = false;
   private static final SentimentWordLists instance = new SentimentWordLists();
 
-  private Configuration m_conf;
   private WordNet m_wordnet;
   private Map<String, Double> m_wordList = null;
   private WordListMap<Double> m_wordListMap = null;
 
   private SentimentWordLists() {
-    m_conf = Configuration.getInstance();
     m_wordnet = WordNet.getInstance();
-    InputStream is = null;
-    try {
-      Map<String, Properties> wordLists = m_conf.getWordlists();
-      for (Map.Entry<String, Properties> wordListEntry : wordLists.entrySet()) {
-        String file = wordListEntry.getKey();
-        if (m_conf.isRunningWithinJar()) {
-          is = ClassLoader.getSystemResourceAsStream(file);
-        } else {
-          is = new FileInputStream(file);
-        }
-        Properties props = wordListEntry.getValue();
-        String separator = props.getProperty("separator");
-        boolean containsRegex = (Boolean) props.get("containsRegex");
-        boolean featureScaling = (Boolean) props.get("featureScaling");
-        double minValue = (Double) props.get("minValue");
-        double maxValue = (Double) props.get("maxValue");
+    Map<String, Properties> wordLists = Configuration.getWordlists();
+    for (Map.Entry<String, Properties> wordListEntry : wordLists.entrySet()) {
+      String file = wordListEntry.getKey();
+      Properties props = wordListEntry.getValue();
+      String separator = props.getProperty("separator");
+      boolean containsRegex = (Boolean) props.get("containsRegex");
+      boolean featureScaling = (Boolean) props.get("featureScaling");
+      double minValue = (Double) props.get("minValue");
+      double maxValue = (Double) props.get("maxValue");
 
-        if (containsRegex) {
-          LOG.info("Load WordListMap including Regex from: " + file);
-          if (m_wordListMap == null) {
-            m_wordListMap = FileUtils.readWordListMap(is, separator,
-                featureScaling, minValue, maxValue);
-          } else {
-            WordListMap<Double> wordListMap = FileUtils.readWordListMap(is,
-                separator, featureScaling, minValue, maxValue);
-            for (Map.Entry<String, Double> entry : wordListMap.entrySet()) {
-              if (!m_wordListMap.containsKey(entry.getKey())) {
-                m_wordListMap.put(entry.getKey(), entry.getValue());
-              }
-            }
-          }
+      if (containsRegex) {
+        LOG.info("Load WordListMap including Regex from: " + file);
+        if (m_wordListMap == null) {
+          m_wordListMap = FileUtils.readWordListMap(file, separator,
+              featureScaling, minValue, maxValue);
         } else {
-          LOG.info("Load WordList from: " + file);
-          if (m_wordList == null) {
-            m_wordList = FileUtils.readFile(is, separator, featureScaling,
-                minValue, maxValue);
-          } else {
-            Map<String, Double> wordList = FileUtils.readFile(is, separator,
-                featureScaling, minValue, maxValue);
-            for (Map.Entry<String, Double> entry : wordList.entrySet()) {
-              if (!m_wordList.containsKey(entry.getKey())) {
-                m_wordList.put(entry.getKey(), entry.getValue());
-              }
+          WordListMap<Double> wordListMap = FileUtils.readWordListMap(file,
+              separator, featureScaling, minValue, maxValue);
+          for (Map.Entry<String, Double> entry : wordListMap.entrySet()) {
+            if (!m_wordListMap.containsKey(entry.getKey())) {
+              m_wordListMap.put(entry.getKey(), entry.getValue());
             }
           }
         }
-      }
-    } catch (FileNotFoundException e) {
-      LOG.error(e.getMessage());
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (IOException ignore) {
+      } else {
+        LOG.info("Load WordList from: " + file);
+        if (m_wordList == null) {
+          m_wordList = FileUtils.readFile(file, separator, featureScaling,
+              minValue, maxValue);
+        } else {
+          Map<String, Double> wordList = FileUtils.readFile(file, separator,
+              featureScaling, minValue, maxValue);
+          for (Map.Entry<String, Double> entry : wordList.entrySet()) {
+            if (!m_wordList.containsKey(entry.getKey())) {
+              m_wordList.put(entry.getKey(), entry.getValue());
+            }
+          }
         }
       }
     }
@@ -118,11 +95,7 @@ public class SentimentWordLists {
   }
 
   public void close() {
-    try {
-      m_wordnet.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    m_wordnet.close();
   }
 
   public Double getWordSentiment(String word) {

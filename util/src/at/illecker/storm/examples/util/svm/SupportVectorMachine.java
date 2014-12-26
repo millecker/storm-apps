@@ -51,8 +51,7 @@ import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SupportVectorMachine {
-  public static final Configuration CONFIG = Configuration.getInstance();
-  public static final String DATASET_PATH = CONFIG.getDataSetPath()
+  public static final String DATASET_PATH = Configuration.getDataSetPath()
       + File.separator + "dataset3" + File.separator;
   public static final String TRAIN_DATA = DATASET_PATH + "trainingInput.txt";
   public static final String TEST_DATA = DATASET_PATH + "testingInput.txt";
@@ -219,9 +218,9 @@ public class SupportVectorMachine {
       }
 
     } catch (InterruptedException e) {
-      LOG.error(e.getMessage());
+      LOG.error("InterruptedException: " + e.getMessage());
     } catch (ExecutionException e) {
-      LOG.error(e.getMessage());
+      LOG.error("ExecutionException: " + e.getMessage());
     }
 
     executorService.shutdown();

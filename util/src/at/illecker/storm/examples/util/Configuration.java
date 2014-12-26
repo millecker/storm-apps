@@ -23,63 +23,31 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Configuration {
 
-  private static final Logger LOG = LoggerFactory
-      .getLogger(Configuration.class);
-  private static final Configuration instance = new Configuration();
+  public static final boolean LOGGING = false;
 
-  private static final String CONF_MODEL_PATH = "resources" + File.separator
+  public static final String MODEL_PATH = "resources" + File.separator
       + "models";
-  private static final String CONF_WORD_LIST_PATH = "resources"
-      + File.separator + "wordlists";
-  private static final String CONF_WORD_NET_PATH = "resources" + File.separator
+
+  public static final String WORD_LIST_PATH = "resources" + File.separator
+      + "wordlists";
+
+  public static final String WORD_NET_PATH = "resources" + File.separator
       + "wordnet";
-  private static final String CONF_DATASET_PATH = "resources" + File.separator
+
+  public static final String DATASET_PATH = "resources" + File.separator
       + "datasets";
 
-  public static boolean CONF_LOGGING = false;
+  public static final String USER_DIR_PATH = ((System.getProperty("user.dir") != null) ? System
+      .getProperty("user.dir") + File.separator
+      : "");
 
-  private String m_userDir;
-  private String m_workingDir;
-  private String m_tempDir;
-  private String m_classPath;
-  private boolean m_runningWithinJar;
+  public static final String TEMP_DIR_PATH = System
+      .getProperty("java.io.tmpdir");
 
-  private Configuration() {
-    m_userDir = System.getProperty("user.dir");
-    m_tempDir = System.getProperty("java.io.tmpdir");
-
-    m_classPath = Configuration.class.getResource("Configuration.class")
-        .toString();
-    if (m_classPath.startsWith("jar:")) {
-      LOG.info("Running within a jar file...");
-      m_runningWithinJar = true;
-      m_workingDir = "";
-    } else {
-      LOG.info("Running outside of a jar file...");
-      m_runningWithinJar = false;
-      m_workingDir = m_userDir + File.separator;
-    }
-  }
-
-  public static Configuration getInstance() {
-    return instance;
-  }
-
-  public boolean isRunningWithinJar() {
-    return m_runningWithinJar;
-  }
-
-  public String getTempDir() {
-    return m_tempDir;
-  }
-
-  public Map<String, Properties> getWordlists() {
-    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
+  public static Map<String, Properties> getWordlists() {
+    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
     Map<String, Properties> wordLists = new HashMap<String, Properties>();
 
     // Add AFINN word list using Regex = false
@@ -118,8 +86,8 @@ public class Configuration {
     return wordLists;
   }
 
-  public Map<String, Properties> getSlangWordlists() {
-    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
+  public static Map<String, Properties> getSlangWordlists() {
+    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
 
     // Add SentStrength SlangLookupTable
@@ -136,8 +104,8 @@ public class Configuration {
     return slangWordLists;
   }
 
-  public Set<String> getNameEntities() {
-    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
+  public static Set<String> getNameEntities() {
+    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
     Set<String> nameEntities = new HashSet<String>();
 
     // Add GATE cities
@@ -152,8 +120,8 @@ public class Configuration {
     return nameEntities;
   }
 
-  public Map<String, Properties> getInterjections() {
-    String wordListDir = m_workingDir + CONF_WORD_LIST_PATH + File.separator;
+  public static Map<String, Properties> getInterjections() {
+    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
     // Add GATE interjections including regex patterns
@@ -164,32 +132,21 @@ public class Configuration {
     return interjections;
   }
 
-  public String getPOSTaggingModel() {
-    String modelDir = m_workingDir + CONF_MODEL_PATH + File.separator;
-    return modelDir + "gate-EN-twitter-fast.model";
+  public static String getPOSTaggingModel() {
+    return USER_DIR_PATH + MODEL_PATH + File.separator
+        + "gate-EN-twitter-fast.model";
   }
 
-  public String getWordNetDict() {
-    String wordNetDir = m_workingDir + CONF_WORD_NET_PATH + File.separator;
-    return wordNetDir + "wn3.1.dict.tar.gz";
+  public static String getWordNetDict() {
+    return USER_DIR_PATH + WORD_NET_PATH + File.separator + "wn3.1.dict.tar.gz";
   }
 
-  public String getSentiWordNetDict() {
-    String wordNetDir = m_workingDir + CONF_WORD_NET_PATH + File.separator;
-    return wordNetDir + "SentiWordNet_3.0.0_20130122.txt";
+  public static String getSentiWordNetDict() {
+    return USER_DIR_PATH + WORD_NET_PATH + File.separator
+        + "SentiWordNet_3.0.0_20130122.txt";
   }
 
-  public String getDataSetPath() {
-    return m_workingDir + CONF_DATASET_PATH + File.separator;
-  }
-
-  @Override
-  public String toString() {
-    return "Configuration [classPath=" + m_classPath + ", runningWithinJar="
-        + m_runningWithinJar + ", workingDir=" + m_workingDir + "]";
-  }
-
-  public static void main(String[] args) {
-    System.out.println(Configuration.getInstance());
+  public static String getDataSetPath() {
+    return USER_DIR_PATH + DATASET_PATH + File.separator;
   }
 }
