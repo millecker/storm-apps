@@ -23,6 +23,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.ArraysUtils;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -42,6 +43,10 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   public static SimpleFeatureVectorGenerator getInstance() {
     return instance;
+  }
+
+  public SentimentWordLists getSentimentWordLists() {
+    return m_sentimentWordLists;
   }
 
   private double[] countPOSTags(Tweet tweet) {
@@ -93,7 +98,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
     resultFeatureVector = tweetSentiment;
 
     double[] posTags = countPOSTags(tweet);
-    resultFeatureVector = concat(resultFeatureVector, posTags);
+    resultFeatureVector = ArraysUtils.concat(resultFeatureVector, posTags);
 
     if (LOGGING) {
       LOG.info("tweetSentiment: " + Arrays.toString(tweetSentiment));
@@ -101,19 +106,6 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
     }
 
     return resultFeatureVector;
-  }
-
-  private static double[] concat(double[] a, double[] b) {
-    int aLen = a.length;
-    int bLen = b.length;
-    double[] c = new double[aLen + bLen];
-    System.arraycopy(a, 0, c, 0, aLen);
-    System.arraycopy(b, 0, c, aLen, bLen);
-    return c;
-  }
-
-  public void close() {
-    m_sentimentWordLists.close();
   }
 
   public static List<Tweet> getTestTweets() {
@@ -164,6 +156,6 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
           + Arrays.toString(sfvg.calculateFeatureVector(tweet)));
     }
 
-    sfvg.close();
+    sfvg.getSentimentWordLists().close();
   }
 }

@@ -216,7 +216,7 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
       LOG.error("FileNotFoundException: " + e.getMessage());
     } finally {
       if (sfvg != null) {
-        sfvg.close();
+        sfvg.getSentimentWordLists().close();
       }
     }
   }
