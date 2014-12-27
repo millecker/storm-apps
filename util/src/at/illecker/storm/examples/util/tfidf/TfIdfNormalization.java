@@ -19,7 +19,7 @@ package at.illecker.storm.examples.util.tfidf;
 /**
  * Normalization of the TF-IDF vector
  */
-public enum Normalization {
+public enum TfIdfNormalization {
   /**
    * Do not normalize the vector
    */
@@ -27,5 +27,5 @@ public enum Normalization {
   /**
    * Normalize by the vector elements added in quadrature
    */
-  COSINE
+  COS
 }
