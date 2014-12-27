@@ -28,16 +28,22 @@ public class Tweet implements Serializable {
   private long m_id;
   private String m_text = "";
   private double m_score = 0;
+
   private List<List<String>> m_sentences;
   private List<List<TaggedWord>> m_taggedSentences;
+
   private double[] m_featureVector;
 
+  public Tweet() {
+    this.m_sentences = new ArrayList<List<String>>();
+    this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
+  }
+
   public Tweet(long id, String text, double score) {
+    this();
     this.m_id = id;
     this.m_text = text;
     this.m_score = score;
-    this.m_sentences = new ArrayList<List<String>>();
-    this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
   }
 
   public long getId() {
