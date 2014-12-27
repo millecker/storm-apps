@@ -75,7 +75,6 @@ public class TfIdf {
     // compute document frequency
     // number of documents containing the term
     Map<T, Long> docFreq = new HashMap<T, Long>();
-
     for (Map<T, Double> document : termFreq.values()) {
       for (T term : document.keySet()) {
         Long v = docFreq.get(term);
