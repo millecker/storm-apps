@@ -88,6 +88,9 @@ public class TfIdf {
     for (Map.Entry<T, Long> e : docFreq.entrySet()) {
       T term = e.getKey();
       double documentFreq = e.getValue();
+      LOG.info("term: " + term.toString() + " idf: log(" + totalDocuments + "/"
+          + documentFreq + ") + 1 = "
+          + (Math.log(totalDocuments / documentFreq) + 1));
       idf.put(term, Math.log(totalDocuments / documentFreq) + 1);
     }
     return idf;

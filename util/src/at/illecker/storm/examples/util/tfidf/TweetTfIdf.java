@@ -62,6 +62,17 @@ public class TweetTfIdf {
     return tfIdf;
   }
 
+  public static void print(String title, Map<String, Double> inverseDocFreq) {
+    // print title
+    System.out.printf("%n=== %s ===%n", title);
+    // print values
+    for (Map.Entry<String, Double> term : inverseDocFreq.entrySet()) {
+      System.out.printf("%15s", term.getKey());
+      System.out.printf("%8.4f", term.getValue());
+      System.out.println();
+    }
+  }
+
   public static void print(String title,
       Map<Tweet, Map<String, Double>> tweetData,
       Map<String, Double> inverseDocFreq) {
@@ -112,6 +123,7 @@ public class TweetTfIdf {
         inverseDocFreq, TfIdfNormalization.NONE);
 
     print("Term Frequency", termFreqs, inverseDocFreq);
-    print("TF IDF", tfIdf, inverseDocFreq);
+    print("Inverse Document Frequency", inverseDocFreq);
+    print("tf-idf", tfIdf, inverseDocFreq);
   }
 }
