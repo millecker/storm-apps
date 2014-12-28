@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.ArraysUtils;
 import at.illecker.storm.examples.util.tagger.POSTagger;
-import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
-import at.illecker.storm.examples.util.tfidf.TfType;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -37,17 +35,15 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(ExtendedFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
-  private static final ExtendedFeatureVectorGenerator instance = new ExtendedFeatureVectorGenerator();
+
   private SimpleFeatureVectorGenerator m_sfvg;
   private SentimentWordLists m_sentimentWordLists;
+  private TweetTfIdf m_tweetTfIdf = null;
 
-  private ExtendedFeatureVectorGenerator() {
-    m_sfvg = SimpleFeatureVectorGenerator.getInstance();
-    m_sentimentWordLists = m_sfvg.getSentimentWordLists();
-  }
-
-  public static ExtendedFeatureVectorGenerator getInstance() {
-    return instance;
+  public ExtendedFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
+    this.m_tweetTfIdf = tweetTfIdf;
+    this.m_sfvg = SimpleFeatureVectorGenerator.getInstance();
+    this.m_sentimentWordLists = m_sfvg.getSentimentWordLists();
   }
 
   public SentimentWordLists getSentimentWordLists() {
@@ -55,45 +51,63 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
   }
 
   public double[] getTfIdsVector(Tweet tweet) {
+    double[] featureVector = null;
+    if (m_tweetTfIdf != null) {
+      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdf(tweet);
 
-    Map<Tweet, Map<String, Double>> termFreqs = TweetTfIdf.tf(tweets,
-        TfType.RAW);
-    
-    Map<String, Double> inverseDocFreq = TweetTfIdf.idf(termFreqs);
+      featureVector = new double[m_tweetTfIdf.getInverseDocFreq().size()];
+      int i = 0;
+      for (String key : m_tweetTfIdf.getInverseDocFreq().keySet()) {
+        Double v = tfIdf.get(key);
+        featureVector[i] = (v != null) ? v : 0;
+        i++;
+      }
 
-    Map<Tweet, Map<String, Double>> tfIdf = TweetTfIdf.tfIdf(termFreqs,
-        inverseDocFreq, TfIdfNormalization.NONE);
+      LOG.info("TfIdsVector: " + Arrays.toString(featureVector));
+    }
+    return featureVector;
   }
-      
+
   @Override
   public double[] calculateFeatureVector(Tweet tweet) {
     // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
     // MAX_NEG_SCORE]
     // [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAGS]
+    // [TfIdsVector]
     double[] resultFeatureVector = m_sfvg.calculateFeatureVector(tweet);
 
-    // TODO
-    resultFeatureVector = ArraysUtils.concat(resultFeatureVector, tfIdsVector);
-
+    double[] tfIdsVector = getTfIdsVector(tweet);
+    if (tfIdsVector != null) {
+      resultFeatureVector = ArraysUtils
+          .concat(resultFeatureVector, tfIdsVector);
+    }
     return resultFeatureVector;
   }
 
   public static void main(String[] args) {
+    List<Tweet> tweets = SimpleFeatureVectorGenerator.getTestTweets();
     POSTagger posTagger = POSTagger.getInstance();
-    ExtendedFeatureVectorGenerator efvg = ExtendedFeatureVectorGenerator
-        .getInstance();
 
-    for (Tweet tweet : SimpleFeatureVectorGenerator.getTestTweets()) {
+    // prepare Tweets
+    for (Tweet tweet : tweets) {
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
+
       List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
-
       tweet.addTaggedSentence(taggedSentence);
+    }
 
+    ExtendedFeatureVectorGenerator efvg = new ExtendedFeatureVectorGenerator(
+        new TweetTfIdf(tweets));
+
+    // generate Feature Vector
+    for (Tweet tweet : tweets) {
       System.out.println("Tweet: " + tweet);
       System.out.println("FeatureVector: "
           + Arrays.toString(efvg.calculateFeatureVector(tweet)));
     }
 
+    // close wordnet dic
     efvg.getSentimentWordLists().close();
   }
 }
