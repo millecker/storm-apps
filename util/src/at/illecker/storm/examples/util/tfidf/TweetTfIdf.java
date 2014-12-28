@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
@@ -29,19 +32,60 @@ import at.illecker.storm.examples.util.tweet.Tweet;
  * 
  */
 public class TweetTfIdf {
+  private static final Logger LOG = LoggerFactory.getLogger(TweetTfIdf.class);
+
+  private List<Tweet> m_tweets;
+  private TfType m_type;
+  private TfIdfNormalization m_normalization;
+  private Map<Tweet, Map<String, Double>> m_termFreqs;
+  private Map<String, Double> m_inverseDocFreq;
+
+  public TweetTfIdf(List<Tweet> tweets) {
+    this(tweets, TfType.RAW, TfIdfNormalization.NONE);
+  }
+
+  public TweetTfIdf(List<Tweet> tweets, TfType type,
+      TfIdfNormalization normalization) {
+    this.m_tweets = tweets;
+    this.m_type = type;
+    this.m_normalization = normalization;
+
+    this.m_termFreqs = TweetTfIdf.tf(tweets, type);
+    this.m_inverseDocFreq = TweetTfIdf.idf(m_termFreqs);
+
+    // Debug
+    print("Term Frequency", m_termFreqs, m_inverseDocFreq);
+    print("Inverse Document Frequency", m_inverseDocFreq);
+  }
+
+  public Map<Tweet, Map<String, Double>> getTermFreqs() {
+    return m_termFreqs;
+  }
+
+  public Map<String, Double> getInverseDocFreq() {
+    return m_inverseDocFreq;
+  }
+
+  public Map<String, Double> tfIdf(Tweet tweet) {
+    return TfIdf.tfIdf(tf(tweet, m_type), m_inverseDocFreq, m_normalization);
+  }
+
+  public static Map<String, Double> tf(Tweet tweet, TfType type) {
+    Map<String, Double> termFreq = new HashMap<String, Double>();
+    for (List<String> sentence : tweet.getSentences()) {
+      termFreq = TfIdf.tf(termFreq, sentence);
+    }
+    termFreq = TfIdf.normalizeTf(termFreq, type);
+    return termFreq;
+  }
 
   public static Map<Tweet, Map<String, Double>> tf(List<Tweet> tweets,
       TfType type) {
-    Map<Tweet, Map<String, Double>> termFrequency = new HashMap<Tweet, Map<String, Double>>();
+    Map<Tweet, Map<String, Double>> termFreqs = new HashMap<Tweet, Map<String, Double>>();
     for (Tweet tweet : tweets) {
-      Map<String, Double> tf = new HashMap<String, Double>();
-      for (List<String> sentence : tweet.getSentences()) {
-        tf = TfIdf.tf(tf, sentence);
-      }
-      tf = TfIdf.normalizeTf(tf, type);
-      termFrequency.put(tweet, tf);
+      termFreqs.put(tweet, tf(tweet, type));
     }
-    return termFrequency;
+    return termFreqs;
   }
 
   public static Map<String, Double> idf(Map<Tweet, Map<String, Double>> termFreq) {
@@ -64,12 +108,12 @@ public class TweetTfIdf {
 
   public static void print(String title, Map<String, Double> inverseDocFreq) {
     // print title
-    System.out.printf("%n=== %s ===%n", title);
+    LOG.info(String.format("=== %s ===", title));
     // print values
     for (Map.Entry<String, Double> term : inverseDocFreq.entrySet()) {
-      System.out.printf("%15s", term.getKey());
-      System.out.printf("%8.4f", term.getValue());
-      System.out.println();
+      String line = String.format("%15s", term.getKey());
+      line += String.format("%8.4f", term.getValue());
+      LOG.info(line);
     }
   }
 
@@ -77,22 +121,22 @@ public class TweetTfIdf {
       Map<Tweet, Map<String, Double>> tweetData,
       Map<String, Double> inverseDocFreq) {
     // print title
-    System.out.printf("%n=== %s ===%n", title);
+    LOG.info(String.format("=== %s ===", title));
 
     // print header
-    System.out.printf("%15s", " ");
+    String line = String.format("%15s", " ");
     for (Map.Entry<Tweet, Map<String, Double>> tweet : tweetData.entrySet()) {
-      System.out.printf("%8s", "Tweet " + tweet.getKey().getId());
+      line += String.format("%8s", "Tweet " + tweet.getKey().getId());
     }
-    System.out.println();
+    LOG.info(line);
 
     // print values
     for (Map.Entry<String, Double> term : inverseDocFreq.entrySet()) {
-      System.out.printf("%15s", term.getKey());
+      line = String.format("%15s", term.getKey());
       for (Map.Entry<Tweet, Map<String, Double>> tweet : tweetData.entrySet()) {
-        System.out.printf("%8.4f", tweet.getValue().get(term.getKey()));
+        line += String.format("%8.4f", tweet.getValue().get(term.getKey()));
       }
-      System.out.println();
+      LOG.info(line);
     }
   }
 
