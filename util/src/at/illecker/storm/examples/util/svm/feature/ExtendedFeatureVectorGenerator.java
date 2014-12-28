@@ -87,6 +87,7 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
   public static void main(String[] args) {
     List<Tweet> tweets = SimpleFeatureVectorGenerator.getTestTweets();
     POSTagger posTagger = POSTagger.getInstance();
+    boolean tfIdfusePOSTags = false;
 
     // prepare Tweets
     for (Tweet tweet : tweets) {
@@ -98,7 +99,7 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
     }
 
     ExtendedFeatureVectorGenerator efvg = new ExtendedFeatureVectorGenerator(
-        new TweetTfIdf(tweets));
+        new TweetTfIdf(tweets, tfIdfusePOSTags));
 
     // generate Feature Vector
     for (Tweet tweet : tweets) {
