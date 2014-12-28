@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.POSTag;
+import edu.mit.jwi.item.POS;
 import edu.stanford.nlp.ling.TaggedWord;
 
 /**
@@ -83,7 +84,9 @@ public class TweetTfIdf {
       for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
         List<String> words = new ArrayList<String>();
         for (TaggedWord word : sentence) {
-          String w = word.word() + "#" + POSTag.convertString(word.tag());
+          POS posTag = POSTag.convertString(word.tag());
+          String w = word.word().toLowerCase()
+              + ((posTag != null) ? "#" + POSTag.toString(posTag) : "");
           words.add(w);
         }
         termFreq = TfIdf.tf(termFreq, words);
