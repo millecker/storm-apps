@@ -43,9 +43,10 @@ import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
+import at.illecker.storm.examples.util.svm.feature.ExtendedFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
-import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
+import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -286,18 +287,18 @@ public class SupportVectorMachine {
   }
 
   public static void main(String[] args) {
-    SimpleFeatureVectorGenerator sfvg = null;
+    ExtendedFeatureVectorGenerator efvg = null;
     POSTagger posTagger = null;
+    TweetTfIdf tweetTfIdf = null;
     boolean parameterSearch = false;
     try {
       // Prepare Train tweets
       LOG.info("Prepare Train data...");
       List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_FILE);
       if (trainTweets == null) {
-        // Generate feature vectors
-        if (sfvg == null) {
-          LOG.info("Load SimpleFeatureVectorGenerator...");
-          sfvg = SimpleFeatureVectorGenerator.getInstance();
+        if (efvg == null) {
+          LOG.info("Load ExtendedFeatureVectorGenerator...");
+          efvg = ExtendedFeatureVectorGenerator.getInstance();
         }
         // Load POS Tagger
         if (posTagger == null) {
@@ -305,7 +306,10 @@ public class SupportVectorMachine {
         }
         LOG.info("Read train tweets from " + TRAIN_DATA);
         trainTweets = FileUtils.readTweets(new FileInputStream(TRAIN_DATA));
-        processTweets(posTagger, sfvg, trainTweets);
+
+        efvg.setTweetTfIdf(new TweetTfIdf(trainTweets));
+
+        processTweets(posTagger, efvg, trainTweets);
         SerializationUtils.serializeList(trainTweets, TRAIN_FILE);
       }
 
@@ -313,18 +317,13 @@ public class SupportVectorMachine {
       LOG.info("Prepare Test data...");
       List<Tweet> testTweets = SerializationUtils.deserialize(TEST_FILE);
       if (testTweets == null) {
-        // Generate feature vectors
-        if (sfvg == null) {
-          LOG.info("Load SimpleFeatureVectorGenerator...");
-          sfvg = SimpleFeatureVectorGenerator.getInstance();
-        }
-        // Load POS Tagger
-        if (posTagger == null) {
-          posTagger = POSTagger.getInstance();
+        if ((efvg == null) || (posTagger == null)) {
+          LOG.error("Train and test data must use the same FeatureVectorGenerator!");
+          System.exit(1);
         }
         LOG.info("Read test tweets from " + TEST_DATA);
         testTweets = FileUtils.readTweets(new FileInputStream(TEST_DATA));
-        processTweets(posTagger, sfvg, testTweets);
+        processTweets(posTagger, efvg, testTweets);
         SerializationUtils.serializeList(testTweets, TEST_FILE);
       }
 
@@ -381,8 +380,8 @@ public class SupportVectorMachine {
     } catch (FileNotFoundException e) {
       LOG.error("FileNotFoundException: " + e.getMessage());
     } finally {
-      if (sfvg != null) {
-        sfvg.close();
+      if (efvg != null) {
+        efvg.getSentimentWordLists().close();
       }
     }
   }
