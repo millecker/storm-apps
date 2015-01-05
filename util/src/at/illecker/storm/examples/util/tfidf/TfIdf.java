@@ -103,7 +103,8 @@ public class TfIdf {
 
     // compute tf * idf
     for (T term : termFreq.keySet()) {
-      tfIdf.put(term, termFreq.get(term) * inverseDocFreq.get(term));
+      Double idf = inverseDocFreq.get(term);
+      tfIdf.put(term, termFreq.get(term) * ((idf != null) ? idf : 0));
     }
 
     // compute normalization
