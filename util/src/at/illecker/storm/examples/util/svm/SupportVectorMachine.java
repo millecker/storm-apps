@@ -17,8 +17,6 @@
 package at.illecker.storm.examples.util.svm;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.FileUtils;
+import at.illecker.storm.examples.util.io.IOUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
@@ -61,7 +60,7 @@ public class SupportVectorMachine {
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMachine.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = true;
 
   public static svm_parameter getDefaultParameter() {
     svm_parameter param = new svm_parameter();
@@ -264,23 +263,30 @@ public class SupportVectorMachine {
     return predictedClass;
   }
 
-  public static void processTweets(POSTagger posTagger,
-      FeatureVectorGenerator fvg, List<Tweet> tweets) {
+  public static void tokenizeTweets(List<Tweet> tweets) {
     for (Tweet tweet : tweets) {
-      // Tokenizer
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
+    }
+  }
 
-      // POS Tagging
-      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
-      tweet.addTaggedSentence(taggedSentence);
+  public static void tagTweets(POSTagger posTagger, List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      for (List<String> sentence : tweet.getSentences()) {
+        List<TaggedWord> taggedSentence = posTagger.tagSentence(sentence);
+        tweet.addTaggedSentence(taggedSentence);
+      }
+    }
+  }
+
+  public static void featureGenTweets(FeatureVectorGenerator fvg,
+      List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      // Generate Feature Vector
+      tweet.genFeatureVector(fvg);
 
       if (LOGGING) {
         LOG.info("Tweet: " + tweet);
-      }
-
-      // Generate Feature Vector
-      tweet.genFeatureVector(fvg);
-      if (LOGGING) {
         LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
       }
     }
@@ -291,98 +297,113 @@ public class SupportVectorMachine {
     POSTagger posTagger = null;
     TweetTfIdf tweetTfIdf = null;
     boolean parameterSearch = false;
-    try {
-      // Prepare Train tweets
-      LOG.info("Prepare Train data...");
-      List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_FILE);
-      if (trainTweets == null) {
-        if (efvg == null) {
-          LOG.info("Load ExtendedFeatureVectorGenerator...");
-          efvg = ExtendedFeatureVectorGenerator.getInstance();
-        }
-        // Load POS Tagger
-        if (posTagger == null) {
-          posTagger = POSTagger.getInstance();
-        }
-        LOG.info("Read train tweets from " + TRAIN_DATA);
-        trainTweets = FileUtils.readTweets(new FileInputStream(TRAIN_DATA));
 
-        efvg.setTweetTfIdf(new TweetTfIdf(trainTweets));
+    // Prepare Train tweets
+    LOG.info("Prepare Train data...");
+    List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_FILE);
+    if (trainTweets == null) {
+      LOG.info("Read train tweets from " + TRAIN_DATA);
+      trainTweets = FileUtils.readTweets(IOUtils.getInputStream(TRAIN_DATA));
 
-        processTweets(posTagger, efvg, trainTweets);
-        SerializationUtils.serializeList(trainTweets, TRAIN_FILE);
+      // Tokenize
+      tokenizeTweets(trainTweets);
+
+      // POS Tagging
+      if (posTagger == null) {
+        posTagger = POSTagger.getInstance();
+      }
+      tagTweets(posTagger, trainTweets);
+
+      if (efvg == null) {
+        LOG.info("Load ExtendedFeatureVectorGenerator...");
+        efvg = new ExtendedFeatureVectorGenerator(new TweetTfIdf(trainTweets,
+            true));
       }
 
-      // Prepare Test tweets
-      LOG.info("Prepare Test data...");
-      List<Tweet> testTweets = SerializationUtils.deserialize(TEST_FILE);
-      if (testTweets == null) {
-        if ((efvg == null) || (posTagger == null)) {
-          LOG.error("Train and test data must use the same FeatureVectorGenerator!");
-          System.exit(1);
-        }
-        LOG.info("Read test tweets from " + TEST_DATA);
-        testTweets = FileUtils.readTweets(new FileInputStream(TEST_DATA));
-        processTweets(posTagger, efvg, testTweets);
-        SerializationUtils.serializeList(testTweets, TEST_FILE);
+      // Feature Vector Generation
+      featureGenTweets(efvg, trainTweets);
+
+      // Serialize training data
+      SerializationUtils.serializeList(trainTweets, TRAIN_FILE);
+    }
+
+    // Prepare Test tweets
+    LOG.info("Prepare Test data...");
+    List<Tweet> testTweets = SerializationUtils.deserialize(TEST_FILE);
+    if (testTweets == null) {
+      if ((efvg == null) || (posTagger == null)) {
+        LOG.error("Train and test data must use the same FeatureVectorGenerator!");
+        System.exit(1);
+      }
+      LOG.info("Read test tweets from " + TEST_DATA);
+      testTweets = FileUtils.readTweets(IOUtils.getInputStream(TEST_DATA));
+
+      // Tokenize
+      tokenizeTweets(testTweets);
+
+      // POS Tagging
+      tagTweets(posTagger, testTweets);
+
+      // Feature Vector Generation
+      featureGenTweets(efvg, testTweets);
+
+      // Serialize test data
+      SerializationUtils.serializeList(testTweets, TEST_FILE);
+    }
+
+    svm_parameter svmParam = getDefaultParameter();
+    svm_problem svmProb = generateProblem(trainTweets,
+        new IdentityScoreClassifier());
+
+    // Optional parameter search of C and gamma
+    if (parameterSearch) {
+      // 1) coarse grained paramter search
+      coarseGrainedParamterSearch(svmProb, svmParam);
+
+      // 2) fine grained paramter search
+      // C = 2^5, 2^6, ..., 2^13
+      double[] c = new double[9];
+      for (int i = 0; i < 9; i++) {
+        c[i] = Math.pow(2, 5 + i);
+      }
+      // gamma = 2^−10, 2^−9, ..., 2^-3
+      double[] gamma = new double[8];
+      for (int j = 0; j < 8; j++) {
+        gamma[j] = Math.pow(2, -10 + j);
       }
 
-      svm_parameter svmParam = getDefaultParameter();
-      svm_problem svmProb = generateProblem(trainTweets,
-          new IdentityScoreClassifier());
+      paramterSearch(svmProb, svmParam, c, gamma);
 
-      // Optional parameter search of C and gamma
-      if (parameterSearch) {
-        // 1) coarse grained paramter search
-        coarseGrainedParamterSearch(svmProb, svmParam);
+    } else {
 
-        // 2) fine grained paramter search
-        // C = 2^5, 2^6, ..., 2^13
-        double[] c = new double[9];
-        for (int i = 0; i < 9; i++) {
-          c[i] = Math.pow(2, 5 + i);
+      int totalClasses = 3;
+      // classes 1 = positive, 0 = neutral, -1 = negative
+      IdentityScoreClassifier isc = new IdentityScoreClassifier();
+
+      // after parameter search use best C and gamma values
+      svmParam.C = Math.pow(2, 6);
+      svmParam.gamma = Math.pow(2, -5);
+
+      // train model
+      svm_model model = train(svmProb, svmParam);
+
+      long countMatches = 0;
+      for (Tweet tweet : testTweets) {
+        double predictedClass = evaluate(tweet, model, totalClasses, isc);
+        if (predictedClass == isc.classfyScore(tweet.getScore())) {
+          countMatches++;
         }
-        // gamma = 2^−10, 2^−9, ..., 2^-3
-        double[] gamma = new double[8];
-        for (int j = 0; j < 8; j++) {
-          gamma[j] = Math.pow(2, -10 + j);
-        }
-
-        paramterSearch(svmProb, svmParam, c, gamma);
-
-      } else {
-
-        int totalClasses = 3;
-        // classes 1 = positive, 0 = neutral, -1 = negative
-        IdentityScoreClassifier isc = new IdentityScoreClassifier();
-
-        // after parameter search use best C and gamma values
-        svmParam.C = Math.pow(2, 6);
-        svmParam.gamma = Math.pow(2, -5);
-
-        // train model
-        svm_model model = train(svmProb, svmParam);
-
-        long countMatches = 0;
-        for (Tweet tweet : testTweets) {
-          double predictedClass = evaluate(tweet, model, totalClasses, isc);
-          if (predictedClass == isc.classfyScore(tweet.getScore())) {
-            countMatches++;
-          }
-        }
-
-        LOG.info("Total test tweets: " + testTweets.size());
-        LOG.info("Matches: " + countMatches);
-        double accuracy = (double) countMatches / (double) testTweets.size();
-        LOG.info("Accuracy: " + accuracy);
       }
 
-    } catch (FileNotFoundException e) {
-      LOG.error("FileNotFoundException: " + e.getMessage());
-    } finally {
-      if (efvg != null) {
-        efvg.getSentimentWordLists().close();
-      }
+      LOG.info("Total test tweets: " + testTweets.size());
+      LOG.info("Matches: " + countMatches);
+      double accuracy = (double) countMatches / (double) testTweets.size();
+      LOG.info("Accuracy: " + accuracy);
+    }
+
+    // remove wordnet dict
+    if (efvg != null) {
+      efvg.getSentimentWordLists().close();
     }
   }
 }
