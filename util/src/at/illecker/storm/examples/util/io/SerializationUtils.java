@@ -46,11 +46,13 @@ public class SerializationUtils {
   public static <T extends Serializable> void serialize(T object,
       String fileName) {
     try {
-      FileOutputStream fos = new FileOutputStream(fileName);
-      ObjectOutputStream oos = new ObjectOutputStream(fos);
-      oos.writeObject(object);
-      oos.close();
-      fos.close();
+      if (object != null) {
+        FileOutputStream fos = new FileOutputStream(fileName);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(object);
+        oos.close();
+        fos.close();
+      }
       LOG.info("Serialized in " + fileName);
     } catch (FileNotFoundException fnfe) {
       LOG.error("FileNotFoundException: " + fnfe.getMessage());
@@ -66,10 +68,12 @@ public class SerializationUtils {
   public static <T extends Serializable> T deserialize(InputStream is) {
     T object = null;
     try {
-      ObjectInputStream ois = new ObjectInputStream(is);
-      object = (T) ois.readObject();
-      ois.close();
-      is.close();
+      if (is != null) {
+        ObjectInputStream ois = new ObjectInputStream(is);
+        object = (T) ois.readObject();
+        ois.close();
+        is.close();
+      }
     } catch (FileNotFoundException fnfe) {
       LOG.error("FileNotFoundException: " + fnfe.getMessage());
     } catch (IOException ioe) {
