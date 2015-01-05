@@ -576,11 +576,11 @@ public class WordNet {
     // ************************************************************************
     System.out.println("\nStemming test...");
     String[] stemmingWords = { "cats", "running", "ran", "cactus", "cactuses",
-        "community", "communities" };
+        "community", "communities", "going" };
     POS[] stemmingPOS = { POS.NOUN, POS.VERB, POS.VERB, POS.NOUN, POS.NOUN,
-        POS.NOUN, POS.NOUN };
+        POS.NOUN, POS.NOUN, POS.VERB };
     String[] stemmingResults = { "cat", "run", "run", "cactus", "cactus",
-        "community", "community" };
+        "community", "community", "go" };
 
     for (int i = 0; i < stemmingWords.length; i++) {
       List<String> stemResults = m_wordnetStemmer.findStems(stemmingWords[i],
