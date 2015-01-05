@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +62,8 @@ public class TweetTfIdf {
     this.m_inverseDocFreq = idf(m_termFreqs);
 
     // Debug
-    print("Term Frequency", m_termFreqs, m_inverseDocFreq);
-    print("Inverse Document Frequency", m_inverseDocFreq);
+    // print("Term Frequency", m_termFreqs, m_inverseDocFreq);
+    // print("Inverse Document Frequency", m_inverseDocFreq);
   }
 
   public Map<Tweet, Map<String, Double>> getTermFreqs() {
@@ -85,23 +86,31 @@ public class TweetTfIdf {
     if (usePOSTags) {
       WordNet wordNet = WordNet.getInstance();
       StopWords stopWords = StopWords.getInstance();
+      // regex for one or more punctuations
+      Pattern p = Pattern.compile("^\\p{Punct}+$");
 
       for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
         List<String> words = new ArrayList<String>();
+
         for (TaggedWord taggedWord : sentence) {
           String word = taggedWord.word().toLowerCase();
           String pennTag = taggedWord.tag();
 
           if ((!pennTag.equals(".")) && (!pennTag.equals(","))
               && (!pennTag.equals(":")) && (!pennTag.equals("''"))
+              && (!pennTag.equals("(")) && (!pennTag.equals(")"))
               && (!pennTag.equals("URL")) && (!pennTag.equals("HT"))
               && (!pennTag.equals("USR")) && (!pennTag.equals("CC"))
-              && (!pennTag.equals("CD")) && (!pennTag.equals("POS"))
-              && (!stopWords.isStopWord(word))) {
+              && (!pennTag.equals("CD")) && (!pennTag.equals("SYM"))
+              && (!pennTag.equals("POS")) && (!stopWords.isStopWord(word))) {
+
+            if ((p.matcher(word).find()) && (!pennTag.equals("POS"))) {
+              continue;
+            }
 
             POS posTag = POSTag.convertString(pennTag);
-            LOG.info("word: '" + word + "' pennTag: '" + pennTag + "' tag: '"
-                + posTag + "'");
+            // LOG.info("word: '" + word + "' pennTag: '" + pennTag + "' tag: '"
+            // + posTag + "'");
 
             // word stemming
             List<String> stems = wordNet.findStems(word, posTag);

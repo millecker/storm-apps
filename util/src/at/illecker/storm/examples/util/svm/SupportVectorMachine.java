@@ -60,7 +60,7 @@ public class SupportVectorMachine {
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMachine.class);
-  private static final boolean LOGGING = true;
+  private static final boolean LOGGING = false;
 
   public static svm_parameter getDefaultParameter() {
     svm_parameter param = new svm_parameter();
@@ -295,7 +295,6 @@ public class SupportVectorMachine {
   public static void main(String[] args) {
     ExtendedFeatureVectorGenerator efvg = null;
     POSTagger posTagger = null;
-    TweetTfIdf tweetTfIdf = null;
     boolean parameterSearch = false;
 
     // Prepare Train tweets
