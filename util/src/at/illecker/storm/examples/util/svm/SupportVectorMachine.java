@@ -55,8 +55,9 @@ public class SupportVectorMachine {
       + File.separator + "dataset3" + File.separator;
   public static final String TRAIN_DATA = DATASET_PATH + "trainingInput.txt";
   public static final String TEST_DATA = DATASET_PATH + "testingInput.txt";
-  public static final String TRAIN_FILE = DATASET_PATH + "trainingInput.ser";
-  public static final String TEST_FILE = DATASET_PATH + "testingInput.ser";
+  public static final String TRAIN_SER = DATASET_PATH + "trainingInput.ser";
+  public static final String TEST_SER = DATASET_PATH + "testingInput.ser";
+  public static final String SVM_MODEL_SER = DATASET_PATH + "svmModel.ser";
 
   private static final Logger LOG = LoggerFactory
       .getLogger(SupportVectorMachine.class);
@@ -299,7 +300,7 @@ public class SupportVectorMachine {
 
     // Prepare Train tweets
     LOG.info("Prepare Train data...");
-    List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_FILE);
+    List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_SER);
     if (trainTweets == null) {
       LOG.info("Read train tweets from " + TRAIN_DATA);
       trainTweets = FileUtils.readTweets(IOUtils.getInputStream(TRAIN_DATA));
@@ -326,12 +327,12 @@ public class SupportVectorMachine {
       featureGenTweets(efvg, trainTweets);
 
       // Serialize training data
-      SerializationUtils.serializeList(trainTweets, TRAIN_FILE);
+      SerializationUtils.serializeList(trainTweets, TRAIN_SER);
     }
 
     // Prepare Test tweets
     LOG.info("Prepare Test data...");
-    List<Tweet> testTweets = SerializationUtils.deserialize(TEST_FILE);
+    List<Tweet> testTweets = SerializationUtils.deserialize(TEST_SER);
     if (testTweets == null) {
       if ((efvg == null) || (posTagger == null)) {
         LOG.error("Train and test data must use the same FeatureVectorGenerator!");
@@ -353,16 +354,16 @@ public class SupportVectorMachine {
       featureGenTweets(efvg, testTweets);
 
       // Serialize test data
-      SerializationUtils.serializeList(testTweets, TEST_FILE);
+      SerializationUtils.serializeList(testTweets, TEST_SER);
     }
-
-    svm_parameter svmParam = getDefaultParameter();
-    LOG.info("Generate SVM problem...");
-    svm_problem svmProb = generateProblem(trainTweets,
-        new IdentityScoreClassifier());
 
     // Optional parameter search of C and gamma
     if (parameterSearch) {
+      svm_parameter svmParam = getDefaultParameter();
+      LOG.info("Generate SVM problem...");
+      svm_problem svmProb = generateProblem(trainTweets,
+          new IdentityScoreClassifier());
+
       // 1) coarse grained paramter search
       coarseGrainedParamterSearch(svmProb, svmParam);
 
@@ -387,17 +388,27 @@ public class SupportVectorMachine {
       // classes 1 = positive, 0 = neutral, -1 = negative
       IdentityScoreClassifier isc = new IdentityScoreClassifier();
 
-      // after parameter search use best C and gamma values
-      svmParam.C = Math.pow(2, 6);
-      svmParam.gamma = Math.pow(2, -5);
+      // deserialize svmModel
+      svm_model svmModel = SerializationUtils.deserialize(SVM_MODEL_SER);
+      if (svmModel == null) {
+        svm_parameter svmParam = getDefaultParameter();
+        LOG.info("Generate SVM problem...");
+        svm_problem svmProb = generateProblem(trainTweets, isc);
 
-      // train model
-      LOG.info("Train SVM model...");
-      svm_model model = train(svmProb, svmParam);
+        // after parameter search use best C and gamma values
+        svmParam.C = Math.pow(2, 6);
+        svmParam.gamma = Math.pow(2, -5);
+
+        // train model
+        LOG.info("Train SVM model...");
+        svmModel = train(svmProb, svmParam);
+
+        SerializationUtils.serialize(svmModel, SVM_MODEL_SER);
+      }
 
       long countMatches = 0;
       for (Tweet tweet : testTweets) {
-        double predictedClass = evaluate(tweet, model, totalClasses, isc);
+        double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
         if (predictedClass == isc.classfyScore(tweet.getScore())) {
           countMatches++;
         }
