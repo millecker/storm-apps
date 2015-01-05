@@ -24,9 +24,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.POSTag;
+import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -37,7 +39,6 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class TweetTfIdf {
   private static final Logger LOG = LoggerFactory.getLogger(TweetTfIdf.class);
 
-  private List<Tweet> m_tweets;
   private TfType m_type;
   private TfIdfNormalization m_normalization;
   private Map<Tweet, Map<String, Double>> m_termFreqs;
@@ -50,7 +51,6 @@ public class TweetTfIdf {
 
   public TweetTfIdf(List<Tweet> tweets, TfType type,
       TfIdfNormalization normalization, boolean usePOSTags) {
-    this.m_tweets = tweets;
     this.m_type = type;
     this.m_normalization = normalization;
     this.m_usePOSTags = usePOSTags;
@@ -81,13 +81,32 @@ public class TweetTfIdf {
     Map<String, Double> termFreq = new HashMap<String, Double>();
 
     if (usePOSTags) {
+      WordNet wordNet = WordNet.getInstance();
+
       for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
         List<String> words = new ArrayList<String>();
         for (TaggedWord word : sentence) {
-          POS posTag = POSTag.convertString(word.tag());
-          String w = word.word().toLowerCase()
-              + ((posTag != null) ? "#" + POSTag.toString(posTag) : "");
-          words.add(w);
+          String pennTag = word.tag();
+          if ((!pennTag.equals(".")) && (!pennTag.equals(","))
+              && (!pennTag.equals(":")) && (!pennTag.equals("''"))
+              && (!pennTag.equals("URL")) && (!pennTag.equals("HT"))
+              && (!pennTag.equals("USR")) && (!pennTag.equals("CC"))
+              && (!pennTag.equals("CD")) && (!pennTag.equals("POS"))) {
+
+            POS posTag = POSTag.convertString(pennTag);
+            String w = word.word().toLowerCase();
+            LOG.info("word: '" + w + "' pennTag: '" + pennTag + "' tag: '"
+                + posTag + "'");
+
+            // word stemming
+            List<String> stems = wordNet.findStems(w, posTag);
+            if (!stems.isEmpty()) {
+              w = stems.get(0);
+            }
+
+            words.add(w
+                + ((posTag != null) ? "#" + POSTag.toString(posTag) : ""));
+          }
         }
         termFreq = TfIdf.tf(termFreq, words);
       }
@@ -163,24 +182,48 @@ public class TweetTfIdf {
 
   public static void main(String[] args) {
     List<Tweet> tweets = new ArrayList<Tweet>();
-    tweets.add(new Tweet(1,
-        "Human machine interface for computer applications", 0));
-    tweets.add(new Tweet(2,
-        "A survey of user opinion of computer system response time", 0));
-    tweets.add(new Tweet(3, "The EPS user interface management system", 0));
-    tweets.add(new Tweet(4,
-        "System and human system engineering testing of EPS", 0));
-    tweets.add(new Tweet(5,
-        "The generation of random, binary and ordered trees", 0));
-    tweets.add(new Tweet(6, "The intersection graph of paths in trees", 0));
-    tweets.add(new Tweet(7, "Graph minors: A survey", 0));
-
+    tweets
+        .add(new Tweet(
+            1,
+            "Excuse the connectivity of this live stream , from Baba Amr , so many activists using only one Sat Modem . LIVE http://t.co/U283IhZ5 #Homs",
+            0));
+    tweets
+        .add(new Tweet(
+            2,
+            "Show your LOVE for your local field & it might win an award ! Gallagher Park #Bedlington current 4th in National Award http://t.co/WeiMDtQt",
+            0));
+    tweets
+        .add(new Tweet(
+            3,
+            "@firecore Can you tell me when an update for the Apple TV 3rd gen becomes available ? The missing update holds me back from buying #appletv3",
+            0));
+    tweets
+        .add(new Tweet(
+            4,
+            "My #cre blog Oklahoma Per Square Foot returns to the @JournalRecord blog hub tomorrow . I will have some interesting local data to share .",
+            0));
+    tweets
+        .add(new Tweet(
+            5,
+            "\" @bbcburnsy : Loads from SB ; talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
+            0));
     // Tokenize
     for (Tweet tweet : tweets) {
       tweet.addSentence(Tokenizer.tokenize(tweet.getText()));
     }
 
-    boolean usePOSTags = false;
+    boolean usePOSTags = true;
+    // POS Tagging
+    if (usePOSTags) {
+      POSTagger posTagger = POSTagger.getInstance();
+      for (Tweet tweet : tweets) {
+        for (List<String> sentence : tweet.getSentences()) {
+          List<TaggedWord> taggedSentence = posTagger.tagSentence(sentence);
+          tweet.addTaggedSentence(taggedSentence);
+        }
+      }
+    }
+
     Map<Tweet, Map<String, Double>> termFreqs = TweetTfIdf.tf(tweets,
         TfType.RAW, usePOSTags);
     Map<String, Double> inverseDocFreq = TweetTfIdf.idf(termFreqs);
