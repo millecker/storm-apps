@@ -24,9 +24,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.wordlist.StopWords;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
@@ -82,29 +84,32 @@ public class TweetTfIdf {
 
     if (usePOSTags) {
       WordNet wordNet = WordNet.getInstance();
+      StopWords stopWords = StopWords.getInstance();
 
       for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
         List<String> words = new ArrayList<String>();
-        for (TaggedWord word : sentence) {
-          String pennTag = word.tag();
+        for (TaggedWord taggedWord : sentence) {
+          String word = taggedWord.word().toLowerCase();
+          String pennTag = taggedWord.tag();
+
           if ((!pennTag.equals(".")) && (!pennTag.equals(","))
               && (!pennTag.equals(":")) && (!pennTag.equals("''"))
               && (!pennTag.equals("URL")) && (!pennTag.equals("HT"))
               && (!pennTag.equals("USR")) && (!pennTag.equals("CC"))
-              && (!pennTag.equals("CD")) && (!pennTag.equals("POS"))) {
+              && (!pennTag.equals("CD")) && (!pennTag.equals("POS"))
+              && (!stopWords.isStopWord(word))) {
 
             POS posTag = POSTag.convertString(pennTag);
-            String w = word.word().toLowerCase();
-            LOG.info("word: '" + w + "' pennTag: '" + pennTag + "' tag: '"
+            LOG.info("word: '" + word + "' pennTag: '" + pennTag + "' tag: '"
                 + posTag + "'");
 
             // word stemming
-            List<String> stems = wordNet.findStems(w, posTag);
+            List<String> stems = wordNet.findStems(word, posTag);
             if (!stems.isEmpty()) {
-              w = stems.get(0);
+              word = stems.get(0);
             }
 
-            words.add(w
+            words.add(word
                 + ((posTag != null) ? "#" + POSTag.toString(posTag) : ""));
           }
         }
@@ -207,9 +212,14 @@ public class TweetTfIdf {
             5,
             "\" @bbcburnsy : Loads from SB ; talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
             0));
-    // Tokenize
+
+    Preprocessor preprocessor = Preprocessor.getInstance();
     for (Tweet tweet : tweets) {
-      tweet.addSentence(Tokenizer.tokenize(tweet.getText()));
+      // Tokenize
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+
+      // Preprocess
+      tweet.addSentence(preprocessor.preprocess(tokens));
     }
 
     boolean usePOSTags = true;
