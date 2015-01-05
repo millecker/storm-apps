@@ -44,6 +44,7 @@ import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
 import at.illecker.storm.examples.util.svm.feature.ExtendedFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
+import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
@@ -294,8 +295,9 @@ public class SupportVectorMachine {
   }
 
   public static void main(String[] args) {
-    ExtendedFeatureVectorGenerator efvg = null;
+    FeatureVectorGenerator fvg = null;
     POSTagger posTagger = null;
+    boolean useExtendedFeatureVectorGen = false;
     boolean parameterSearch = false;
 
     // Prepare Train tweets
@@ -316,15 +318,20 @@ public class SupportVectorMachine {
       }
       tagTweets(posTagger, trainTweets);
 
-      if (efvg == null) {
-        LOG.info("Load ExtendedFeatureVectorGenerator...");
-        efvg = new ExtendedFeatureVectorGenerator(new TweetTfIdf(trainTweets,
-            true));
+      if (fvg == null) {
+        if (useExtendedFeatureVectorGen) {
+          LOG.info("Load ExtendedFeatureVectorGenerator...");
+          fvg = new ExtendedFeatureVectorGenerator(new TweetTfIdf(trainTweets,
+              true));
+        } else {
+          LOG.info("Load SimpleFeatureVectorGenerator...");
+          fvg = SimpleFeatureVectorGenerator.getInstance();
+        }
       }
 
       // Feature Vector Generation
       LOG.info("Feature Vector Generation of train tweets...");
-      featureGenTweets(efvg, trainTweets);
+      featureGenTweets(fvg, trainTweets);
 
       // Serialize training data
       SerializationUtils.serializeList(trainTweets, TRAIN_SER);
@@ -334,7 +341,7 @@ public class SupportVectorMachine {
     LOG.info("Prepare Test data...");
     List<Tweet> testTweets = SerializationUtils.deserialize(TEST_SER);
     if (testTweets == null) {
-      if ((efvg == null) || (posTagger == null)) {
+      if ((fvg == null) || (posTagger == null)) {
         LOG.error("Train and test data must use the same FeatureVectorGenerator!");
         System.exit(1);
       }
@@ -351,7 +358,7 @@ public class SupportVectorMachine {
 
       // Feature Vector Generation
       LOG.info("Feature Vector Generation of test tweets...");
-      featureGenTweets(efvg, testTweets);
+      featureGenTweets(fvg, testTweets);
 
       // Serialize test data
       SerializationUtils.serializeList(testTweets, TEST_SER);
@@ -389,6 +396,7 @@ public class SupportVectorMachine {
       IdentityScoreClassifier isc = new IdentityScoreClassifier();
 
       // deserialize svmModel
+      LOG.info("Try loading SVM model...");
       svm_model svmModel = SerializationUtils.deserialize(SVM_MODEL_SER);
       if (svmModel == null) {
         svm_parameter svmParam = getDefaultParameter();
@@ -401,12 +409,15 @@ public class SupportVectorMachine {
 
         // train model
         LOG.info("Train SVM model...");
+        long startTime = System.currentTimeMillis();
         svmModel = train(svmProb, svmParam);
-
+        LOG.info("Train SVM model finished after "
+            + (System.currentTimeMillis() - startTime) + " ms");
         SerializationUtils.serialize(svmModel, SVM_MODEL_SER);
       }
 
       long countMatches = 0;
+      long startTime = System.currentTimeMillis();
       for (Tweet tweet : testTweets) {
         double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
         if (predictedClass == isc.classfyScore(tweet.getScore())) {
@@ -414,15 +425,12 @@ public class SupportVectorMachine {
         }
       }
 
+      LOG.info("SVM evalute finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
       LOG.info("Total test tweets: " + testTweets.size());
       LOG.info("Matches: " + countMatches);
       double accuracy = (double) countMatches / (double) testTweets.size();
       LOG.info("Accuracy: " + accuracy);
-    }
-
-    // remove wordnet dict
-    if (efvg != null) {
-      efvg.getSentimentWordLists().close();
     }
   }
 }
