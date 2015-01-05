@@ -120,6 +120,10 @@ public class Configuration {
     return nameEntities;
   }
 
+  public static Set<String> getStopWords() {
+    return null;
+  }
+
   public static Map<String, Properties> getInterjections() {
     String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
