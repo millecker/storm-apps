@@ -305,9 +305,11 @@ public class SupportVectorMachine {
       trainTweets = FileUtils.readTweets(IOUtils.getInputStream(TRAIN_DATA));
 
       // Tokenize
+      LOG.info("Tokenize train tweets...");
       tokenizeTweets(trainTweets);
 
       // POS Tagging
+      LOG.info("POS Tagging of train tweets...");
       if (posTagger == null) {
         posTagger = POSTagger.getInstance();
       }
@@ -320,6 +322,7 @@ public class SupportVectorMachine {
       }
 
       // Feature Vector Generation
+      LOG.info("Feature Vector Generation of train tweets...");
       featureGenTweets(efvg, trainTweets);
 
       // Serialize training data
@@ -338,12 +341,15 @@ public class SupportVectorMachine {
       testTweets = FileUtils.readTweets(IOUtils.getInputStream(TEST_DATA));
 
       // Tokenize
+      LOG.info("Tokenize test tweets...");
       tokenizeTweets(testTweets);
 
       // POS Tagging
+      LOG.info("POS Tagging of test tweets...");
       tagTweets(posTagger, testTweets);
 
       // Feature Vector Generation
+      LOG.info("Feature Vector Generation of test tweets...");
       featureGenTweets(efvg, testTweets);
 
       // Serialize test data
@@ -351,6 +357,7 @@ public class SupportVectorMachine {
     }
 
     svm_parameter svmParam = getDefaultParameter();
+    LOG.info("Generate SVM problem...");
     svm_problem svmProb = generateProblem(trainTweets,
         new IdentityScoreClassifier());
 
@@ -371,6 +378,7 @@ public class SupportVectorMachine {
         gamma[j] = Math.pow(2, -10 + j);
       }
 
+      LOG.info("SVM paramterSearch...");
       paramterSearch(svmProb, svmParam, c, gamma);
 
     } else {
@@ -384,6 +392,7 @@ public class SupportVectorMachine {
       svmParam.gamma = Math.pow(2, -5);
 
       // train model
+      LOG.info("Train SVM model...");
       svm_model model = train(svmProb, svmParam);
 
       long countMatches = 0;

@@ -42,6 +42,8 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
 
   public ExtendedFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
     this.m_tweetTfIdf = tweetTfIdf;
+    LOG.info("TF-IDF Feature Vector Size: "
+        + m_tweetTfIdf.getInverseDocFreq().size());
     this.m_sfvg = SimpleFeatureVectorGenerator.getInstance();
     this.m_sentimentWordLists = m_sfvg.getSentimentWordLists();
   }
@@ -63,7 +65,7 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
         i++;
       }
 
-      LOG.info("TfIdsVector: " + Arrays.toString(featureVector));
+      // LOG.info("TfIdsVector: " + Arrays.toString(featureVector));
     }
     return featureVector;
   }
