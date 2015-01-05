@@ -40,14 +40,14 @@ public class Configuration {
       + "datasets";
 
   public static final String USER_DIR_PATH = ((System.getProperty("user.dir") != null) ? System
-      .getProperty("user.dir") + File.separator
-      : "");
+      .getProperty("user.dir") : "");
 
   public static final String TEMP_DIR_PATH = System
       .getProperty("java.io.tmpdir");
 
   public static Map<String, Properties> getWordlists() {
-    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
+    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+        + File.separator;
     Map<String, Properties> wordLists = new HashMap<String, Properties>();
 
     // Add AFINN word list using Regex = false
@@ -87,7 +87,8 @@ public class Configuration {
   }
 
   public static Map<String, Properties> getSlangWordlists() {
-    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
+    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+        + File.separator;
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
 
     // Add SentStrength SlangLookupTable
@@ -105,7 +106,8 @@ public class Configuration {
   }
 
   public static Set<String> getNameEntities() {
-    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
+    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+        + File.separator;
     Set<String> nameEntities = new HashSet<String>();
 
     // Add GATE cities
@@ -125,7 +127,8 @@ public class Configuration {
   }
 
   public static Map<String, Properties> getInterjections() {
-    String wordListDir = USER_DIR_PATH + WORD_LIST_PATH + File.separator;
+    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+        + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
     // Add GATE interjections including regex patterns
@@ -137,20 +140,21 @@ public class Configuration {
   }
 
   public static String getPOSTaggingModel() {
-    return USER_DIR_PATH + MODEL_PATH + File.separator
+    return USER_DIR_PATH + File.separator + MODEL_PATH + File.separator
         + "gate-EN-twitter-fast.model";
   }
 
   public static String getWordNetDict() {
-    return USER_DIR_PATH + WORD_NET_PATH + File.separator + "wn3.1.dict.tar.gz";
+    return USER_DIR_PATH + File.separator + WORD_NET_PATH + File.separator
+        + "wn3.1.dict.tar.gz";
   }
 
   public static String getSentiWordNetDict() {
-    return USER_DIR_PATH + WORD_NET_PATH + File.separator
+    return USER_DIR_PATH + File.separator + WORD_NET_PATH + File.separator
         + "SentiWordNet_3.0.0_20130122.txt";
   }
 
   public static String getDataSetPath() {
-    return USER_DIR_PATH + DATASET_PATH + File.separator;
+    return USER_DIR_PATH + File.separator + DATASET_PATH;
   }
 }
