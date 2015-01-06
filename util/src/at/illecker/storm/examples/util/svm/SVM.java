@@ -16,7 +16,9 @@
  */
 package at.illecker.storm.examples.util.svm;
 
-import java.io.File;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -36,33 +38,11 @@ import libsvm.svm_problem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.io.FileUtils;
-import at.illecker.storm.examples.util.io.IOUtils;
-import at.illecker.storm.examples.util.io.SerializationUtils;
-import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
-import at.illecker.storm.examples.util.svm.feature.ExtendedFeatureVectorGenerator;
-import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
-import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
-import at.illecker.storm.examples.util.tagger.POSTagger;
-import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
-import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import edu.stanford.nlp.ling.TaggedWord;
 
-public class SupportVectorMachine {
-  public static final String DATASET_PATH = Configuration.getDataSetPath()
-      + File.separator + "dataset3" + File.separator;
-  public static final String TRAIN_DATA = DATASET_PATH + "trainingInput.txt";
-  public static final String TEST_DATA = DATASET_PATH + "testingInput.txt";
-  public static final String TRAIN_SER = DATASET_PATH + "trainingInput.ser";
-  public static final String TEST_SER = DATASET_PATH + "testingInput.ser";
-  public static final String SVM_MODEL_SER = DATASET_PATH + "svmModel.ser";
-
-  private static final Logger LOG = LoggerFactory
-      .getLogger(SupportVectorMachine.class);
-  private static final boolean LOGGING = false;
+public class SVM {
+  private static final Logger LOG = LoggerFactory.getLogger(SVM.class);
 
   public static svm_parameter getDefaultParameter() {
     svm_parameter param = new svm_parameter();
@@ -113,6 +93,29 @@ public class SupportVectorMachine {
     }
 
     return svmProb;
+  }
+
+  public static void saveProblem(svm_problem svmProb, String file) {
+    // save problem in LIBSVM format
+    // <label> <index1>:<value1> <index2>:<value2> ...
+    try {
+      BufferedWriter br = new BufferedWriter(new FileWriter(file));
+
+      for (int i = 0; i < svmProb.l; i++) {
+        br.write(Double.toString(svmProb.y[i])); // <label>
+        for (int j = 0; j < svmProb.x[i].length; i++) {
+          if (svmProb.x[i][j].value != 0) {
+            br.write(" " + svmProb.x[i][j].index + ":" + svmProb.x[i][j].value);
+          }
+        }
+        br.newLine();
+      }
+
+      br.close();
+      LOG.info("saved svm_problem in " + file);
+    } catch (IOException e) {
+      LOG.error("IOException: " + e.getMessage());
+    }
   }
 
   public static svm_model train(svm_problem svmProb, svm_parameter svmParam) {
@@ -230,8 +233,7 @@ public class SupportVectorMachine {
 
   public static double evaluate(Tweet tweet, svm_model svmModel,
       int totalClasses, ScoreClassifier scoreClassifier) {
-    return SupportVectorMachine.evaluate(tweet, svmModel, totalClasses,
-        scoreClassifier, false);
+    return SVM.evaluate(tweet, svmModel, totalClasses, scoreClassifier, false);
   }
 
   public static double evaluate(Tweet tweet, svm_model svmModel,
@@ -263,175 +265,5 @@ public class SupportVectorMachine {
     }
 
     return predictedClass;
-  }
-
-  public static void tokenizeTweets(List<Tweet> tweets) {
-    for (Tweet tweet : tweets) {
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
-    }
-  }
-
-  public static void tagTweets(POSTagger posTagger, List<Tweet> tweets) {
-    for (Tweet tweet : tweets) {
-      for (List<String> sentence : tweet.getSentences()) {
-        List<TaggedWord> taggedSentence = posTagger.tagSentence(sentence);
-        tweet.addTaggedSentence(taggedSentence);
-      }
-    }
-  }
-
-  public static void featureGenTweets(FeatureVectorGenerator fvg,
-      List<Tweet> tweets) {
-    for (Tweet tweet : tweets) {
-      // Generate Feature Vector
-      tweet.genFeatureVector(fvg);
-
-      if (LOGGING) {
-        LOG.info("Tweet: " + tweet);
-        LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
-      }
-    }
-  }
-
-  public static void main(String[] args) {
-    FeatureVectorGenerator fvg = null;
-    POSTagger posTagger = null;
-    boolean useExtendedFeatureVectorGen = false;
-    boolean parameterSearch = false;
-
-    // Prepare Train tweets
-    LOG.info("Prepare Train data...");
-    List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_SER);
-    if (trainTweets == null) {
-      LOG.info("Read train tweets from " + TRAIN_DATA);
-      trainTweets = FileUtils.readTweets(IOUtils.getInputStream(TRAIN_DATA));
-
-      // Tokenize
-      LOG.info("Tokenize train tweets...");
-      tokenizeTweets(trainTweets);
-
-      // POS Tagging
-      LOG.info("POS Tagging of train tweets...");
-      if (posTagger == null) {
-        posTagger = POSTagger.getInstance();
-      }
-      tagTweets(posTagger, trainTweets);
-
-      if (fvg == null) {
-        if (useExtendedFeatureVectorGen) {
-          LOG.info("Load ExtendedFeatureVectorGenerator...");
-          fvg = new ExtendedFeatureVectorGenerator(new TweetTfIdf(trainTweets,
-              true));
-        } else {
-          LOG.info("Load SimpleFeatureVectorGenerator...");
-          fvg = SimpleFeatureVectorGenerator.getInstance();
-        }
-      }
-
-      // Feature Vector Generation
-      LOG.info("Feature Vector Generation of train tweets...");
-      featureGenTweets(fvg, trainTweets);
-
-      // Serialize training data
-      SerializationUtils.serializeList(trainTweets, TRAIN_SER);
-    }
-
-    // Prepare Test tweets
-    LOG.info("Prepare Test data...");
-    List<Tweet> testTweets = SerializationUtils.deserialize(TEST_SER);
-    if (testTweets == null) {
-      if ((fvg == null) || (posTagger == null)) {
-        LOG.error("Train and test data must use the same FeatureVectorGenerator!");
-        System.exit(1);
-      }
-      LOG.info("Read test tweets from " + TEST_DATA);
-      testTweets = FileUtils.readTweets(IOUtils.getInputStream(TEST_DATA));
-
-      // Tokenize
-      LOG.info("Tokenize test tweets...");
-      tokenizeTweets(testTweets);
-
-      // POS Tagging
-      LOG.info("POS Tagging of test tweets...");
-      tagTweets(posTagger, testTweets);
-
-      // Feature Vector Generation
-      LOG.info("Feature Vector Generation of test tweets...");
-      featureGenTweets(fvg, testTweets);
-
-      // Serialize test data
-      SerializationUtils.serializeList(testTweets, TEST_SER);
-    }
-
-    // Optional parameter search of C and gamma
-    if (parameterSearch) {
-      svm_parameter svmParam = getDefaultParameter();
-      LOG.info("Generate SVM problem...");
-      svm_problem svmProb = generateProblem(trainTweets,
-          new IdentityScoreClassifier());
-
-      // 1) coarse grained paramter search
-      coarseGrainedParamterSearch(svmProb, svmParam);
-
-      // 2) fine grained paramter search
-      // C = 2^5, 2^6, ..., 2^13
-      double[] c = new double[9];
-      for (int i = 0; i < 9; i++) {
-        c[i] = Math.pow(2, 5 + i);
-      }
-      // gamma = 2^−10, 2^−9, ..., 2^-3
-      double[] gamma = new double[8];
-      for (int j = 0; j < 8; j++) {
-        gamma[j] = Math.pow(2, -10 + j);
-      }
-
-      LOG.info("SVM paramterSearch...");
-      paramterSearch(svmProb, svmParam, c, gamma);
-
-    } else {
-
-      int totalClasses = 3;
-      // classes 1 = positive, 0 = neutral, -1 = negative
-      IdentityScoreClassifier isc = new IdentityScoreClassifier();
-
-      // deserialize svmModel
-      LOG.info("Try loading SVM model...");
-      svm_model svmModel = SerializationUtils.deserialize(SVM_MODEL_SER);
-      if (svmModel == null) {
-        svm_parameter svmParam = getDefaultParameter();
-        LOG.info("Generate SVM problem...");
-        svm_problem svmProb = generateProblem(trainTweets, isc);
-
-        // after parameter search use best C and gamma values
-        svmParam.C = Math.pow(2, 6);
-        svmParam.gamma = Math.pow(2, -5);
-
-        // train model
-        LOG.info("Train SVM model...");
-        long startTime = System.currentTimeMillis();
-        svmModel = train(svmProb, svmParam);
-        LOG.info("Train SVM model finished after "
-            + (System.currentTimeMillis() - startTime) + " ms");
-        SerializationUtils.serialize(svmModel, SVM_MODEL_SER);
-      }
-
-      long countMatches = 0;
-      LOG.info("Evaluate test tweets...");
-      long startTime = System.currentTimeMillis();
-      for (Tweet tweet : testTweets) {
-        double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
-        if (predictedClass == isc.classfyScore(tweet.getScore())) {
-          countMatches++;
-        }
-      }
-
-      LOG.info("Evaluate finished after "
-          + (System.currentTimeMillis() - startTime) + " ms");
-      LOG.info("Total test tweets: " + testTweets.size());
-      LOG.info("Matches: " + countMatches);
-      double accuracy = (double) countMatches / (double) testTweets.size();
-      LOG.info("Accuracy: " + accuracy);
-    }
   }
 }

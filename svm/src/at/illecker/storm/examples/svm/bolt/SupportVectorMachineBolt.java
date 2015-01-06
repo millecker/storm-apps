@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.JsonUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
-import at.illecker.storm.examples.util.svm.SupportVectorMachine;
+import at.illecker.storm.examples.util.svm.SVM;
 import at.illecker.storm.examples.util.svm.classifier.DynamicScoreClassifier;
 import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
@@ -80,19 +80,19 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
     m_totalClasses = 5;
     m_dsc = new DynamicScoreClassifier(m_totalClasses, 1, 9);
 
-    svm_parameter svmParam = SupportVectorMachine.getDefaultParameter();
-    svm_problem svmProb = SupportVectorMachine.generateProblem(tweets, m_dsc);
+    svm_parameter svmParam = SVM.getDefaultParameter();
+    svm_problem svmProb = SVM.generateProblem(tweets, m_dsc);
 
     // TODO load model instead of training...
 
     LOG.info("Train model...");
-    m_model = SupportVectorMachine.train(svmProb, svmParam);
+    m_model = SVM.train(svmProb, svmParam);
   }
 
   public void execute(Tuple tuple) {
     Tweet tweet = (Tweet) tuple.getValueByField("featuredTweet");
 
-    double predictedClass = SupportVectorMachine.evaluate(tweet, m_model,
+    double predictedClass = SVM.evaluate(tweet, m_model,
         m_totalClasses, m_dsc);
 
     LOG.info("tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
@@ -166,14 +166,14 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
       // 3 = positive
       // 4 = extreme-positive
 
-      svm_parameter svmParam = SupportVectorMachine.getDefaultParameter();
-      svm_problem svmProb = SupportVectorMachine.generateProblem(trainTweets,
+      svm_parameter svmParam = SVM.getDefaultParameter();
+      svm_problem svmProb = SVM.generateProblem(trainTweets,
           dsc);
 
       // Optional parameter search of C and gamma
       if (parameterSearch) {
         // 1) coarse grained paramter search
-        SupportVectorMachine.coarseGrainedParamterSearch(svmProb, svmParam);
+        SVM.coarseGrainedParamterSearch(svmProb, svmParam);
 
         // 2) fine grained paramter search
         // C = 2^5, 2^6, ..., 2^13
@@ -196,11 +196,11 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
         svmParam.gamma = Math.pow(2, 3);
 
         // train model
-        svm_model model = SupportVectorMachine.train(svmProb, svmParam);
+        svm_model model = SVM.train(svmProb, svmParam);
 
         long countMatches = 0;
         for (Tweet tweet : testTweets) {
-          double predictedClass = SupportVectorMachine.evaluate(tweet, model,
+          double predictedClass = SVM.evaluate(tweet, model,
               totalClasses, dsc);
           if (predictedClass == dsc.classfyScore(tweet.getScore())) {
             countMatches++;
