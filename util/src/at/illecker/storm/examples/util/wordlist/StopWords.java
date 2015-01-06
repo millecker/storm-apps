@@ -71,5 +71,6 @@ public class StopWords {
   public static void main(String[] args) {
     StopWords stopWords = StopWords.getInstance();
     System.out.println("isStopWord(i): " + stopWords.isStopWord("i"));
+    System.out.println("isStopWord(q): " + stopWords.isStopWord("q"));
   }
 }

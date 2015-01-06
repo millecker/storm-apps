@@ -123,7 +123,13 @@ public class Configuration {
   }
 
   public static Set<String> getStopWords() {
-    return null;
+    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+        + File.separator;
+
+    Set<String> stopWords = new HashSet<String>();
+    stopWords.add(wordListDir + "stopwords.txt");
+
+    return stopWords;
   }
 
   public static Map<String, Properties> getInterjections() {
