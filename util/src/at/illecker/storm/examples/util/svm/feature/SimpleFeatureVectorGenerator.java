@@ -19,14 +19,16 @@ package at.illecker.storm.examples.util.svm.feature;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.ArraysUtils;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.wordlist.SentimentResult;
 import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -35,6 +37,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
       .getLogger(SimpleFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
   private static final SimpleFeatureVectorGenerator instance = new SimpleFeatureVectorGenerator();
+
   private SentimentWordLists m_sentimentWordLists;
 
   private SimpleFeatureVectorGenerator() {
@@ -47,6 +50,56 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   public SentimentWordLists getSentimentWordLists() {
     return m_sentimentWordLists;
+  }
+
+  @Override
+  public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
+    Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
+
+    SentimentResult tweetSentiment = m_sentimentWordLists
+        .getTweetSentiment(tweet);
+    if (tweetSentiment != null) {
+      // LOG.info("tweetSentiment: " + tweetSentiment);
+      if (tweetSentiment.getAvgPosCount() != 0)
+        resultFeatureVector.put(1, tweetSentiment.getAvgPosCount());
+      if (tweetSentiment.getAvgNeutralCount() != 0)
+        resultFeatureVector.put(2, tweetSentiment.getAvgNeutralCount());
+      if (tweetSentiment.getAvgNegCount() != 0)
+        resultFeatureVector.put(3, tweetSentiment.getAvgNegCount());
+      if (tweetSentiment.getAvgSum() != 0)
+        resultFeatureVector.put(4, tweetSentiment.getAvgSum());
+      if (tweetSentiment.getCount() != 0)
+        resultFeatureVector.put(5, (double) tweetSentiment.getCount());
+      if (tweetSentiment.getMaxPos() != 0)
+        resultFeatureVector.put(6, tweetSentiment.getMaxPos());
+      if (tweetSentiment.getMaxNeg() != 0)
+        resultFeatureVector.put(7, tweetSentiment.getMaxNeg());
+    }
+
+    double[] posTags = countPOSTags(tweet);
+    if (posTags != null) {
+      if (posTags[0] != 0) // nouns / wordCount
+        resultFeatureVector.put(8, posTags[0]);
+      if (posTags[1] != 0) // verbs / wordCount
+        resultFeatureVector.put(9, posTags[1]);
+      if (posTags[2] != 0) // adjectives / wordCount
+        resultFeatureVector.put(10, posTags[2]);
+      if (posTags[3] != 0) // adverbs / wordCount
+        resultFeatureVector.put(11, posTags[3]);
+      if (posTags[4] != 0) // interjections / wordCount
+        resultFeatureVector.put(12, posTags[4]);
+      if (posTags[5] != 0) // punctuations / wordCount
+        resultFeatureVector.put(13, posTags[5]);
+      if (posTags[6] != 0) // hashtags / wordCount
+        resultFeatureVector.put(14, posTags[6]);
+    }
+
+    if (LOGGING) {
+      LOG.info("TweetSentiment: " + tweetSentiment);
+      LOG.info("POStags: " + Arrays.toString(posTags));
+    }
+
+    return resultFeatureVector;
   }
 
   private double[] countPOSTags(Tweet tweet) {
@@ -79,33 +132,6 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
       posTags[i] /= wordCount;
     }
     return posTags;
-  }
-
-  @Override
-  public double[] calculateFeatureVector(Tweet tweet) {
-    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
-    // MAX_NEG_SCORE]
-    double[] resultFeatureVector;
-    double tweetSentiment[] = m_sentimentWordLists.getTweetSentiment(tweet);
-    if (tweetSentiment == null) {
-      tweetSentiment = new double[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-    } else {
-      tweetSentiment[0] = tweetSentiment[0] / tweetSentiment[4];
-      tweetSentiment[1] = tweetSentiment[1] / tweetSentiment[4];
-      tweetSentiment[2] = tweetSentiment[2] / tweetSentiment[4];
-      tweetSentiment[3] = tweetSentiment[3] / tweetSentiment[4]; // AVG
-    }
-    resultFeatureVector = tweetSentiment;
-
-    double[] posTags = countPOSTags(tweet);
-    resultFeatureVector = ArraysUtils.concat(resultFeatureVector, posTags);
-
-    if (LOGGING) {
-      LOG.info("tweetSentiment: " + Arrays.toString(tweetSentiment));
-      LOG.info("POStags: " + Arrays.toString(posTags));
-    }
-
-    return resultFeatureVector;
   }
 
   public static List<Tweet> getTestTweets() {
@@ -147,13 +173,17 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
     for (Tweet tweet : getTestTweets()) {
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
 
+      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
       tweet.addTaggedSentence(taggedSentence);
 
       System.out.println("Tweet: " + tweet);
-      System.out.println("FeatureVector: "
-          + Arrays.toString(sfvg.calculateFeatureVector(tweet)));
+      System.out.print("FeatureVector:");
+      for (Map.Entry<Integer, Double> feature : sfvg.calculateFeatureVector(
+          tweet).entrySet()) {
+        System.out.print(" " + feature.getKey() + ":" + feature.getValue());
+      }
+      System.out.println();
     }
 
     sfvg.getSentimentWordLists().close();
