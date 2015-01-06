@@ -103,12 +103,13 @@ public class SVM {
 
       for (int i = 0; i < svmProb.l; i++) {
         br.write(Double.toString(svmProb.y[i])); // <label>
-        for (int j = 0; j < svmProb.x[i].length; i++) {
+        for (int j = 0; j < svmProb.x[i].length; j++) {
           if (svmProb.x[i][j].value != 0) {
             br.write(" " + svmProb.x[i][j].index + ":" + svmProb.x[i][j].value);
           }
         }
         br.newLine();
+        br.flush();
       }
 
       br.close();
