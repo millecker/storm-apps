@@ -16,14 +16,12 @@
  */
 package at.illecker.storm.examples.util.svm.feature;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.ArraysUtils;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
@@ -42,47 +40,42 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
 
   public ExtendedFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
     this.m_tweetTfIdf = tweetTfIdf;
-    LOG.info("TF-IDF Feature Vector Size: "
-        + m_tweetTfIdf.getInverseDocFreq().size());
     this.m_sfvg = SimpleFeatureVectorGenerator.getInstance();
     this.m_sentimentWordLists = m_sfvg.getSentimentWordLists();
+    LOG.info("VectorSize: " + getFeatureVectorSize());
   }
 
   public SentimentWordLists getSentimentWordLists() {
     return m_sentimentWordLists;
   }
 
-  public double[] getTfIdsVector(Tweet tweet) {
-    double[] featureVector = null;
-    if (m_tweetTfIdf != null) {
-      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdf(tweet);
-
-      featureVector = new double[m_tweetTfIdf.getInverseDocFreq().size()];
-      int i = 0;
-      for (String key : m_tweetTfIdf.getInverseDocFreq().keySet()) {
-        Double v = tfIdf.get(key);
-        featureVector[i] = (v != null) ? v : 0;
-        i++;
-      }
-
-      // LOG.info("TfIdsVector: " + Arrays.toString(featureVector));
-    }
-    return featureVector;
+  @Override
+  public int getFeatureVectorSize() {
+    return m_sfvg.getFeatureVectorSize()
+        + m_tweetTfIdf.getInverseDocFreq().size();
   }
 
   @Override
-  public double[] calculateFeatureVector(Tweet tweet) {
-    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
-    // MAX_NEG_SCORE]
-    // [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAGS]
-    // [TfIdsVector]
-    double[] resultFeatureVector = m_sfvg.calculateFeatureVector(tweet);
+  public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
+    Map<Integer, Double> resultFeatureVector = m_sfvg
+        .calculateFeatureVector(tweet);
 
-    double[] tfIdsVector = getTfIdsVector(tweet);
-    if (tfIdsVector != null) {
-      resultFeatureVector = ArraysUtils
-          .concat(resultFeatureVector, tfIdsVector);
+    if (m_tweetTfIdf != null) {
+      Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
+      Map<String, Integer> termIds = m_tweetTfIdf.getTermIds();
+      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdf(tweet);
+
+      for (Map.Entry<String, Double> element : tfIdf.entrySet()) {
+        String key = element.getKey();
+        if (idf.containsKey(key)) {
+          int id = m_sfvg.getFeatureVectorSize() + 1 + termIds.get(key);
+          resultFeatureVector.put(id, element.getValue());
+        }
+      }
+
     }
+    // LOG.info("TfIdsVector: " + resultFeatureVector);
+
     return resultFeatureVector;
   }
 
@@ -93,24 +86,37 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
 
     // prepare Tweets
     for (Tweet tweet : tweets) {
+      // tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
       tweet.addSentence(tokens);
 
+      // POS tagging
       List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
       tweet.addTaggedSentence(taggedSentence);
     }
 
+    // calculate tfidf
+    TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, tfIdfusePOSTags);
     ExtendedFeatureVectorGenerator efvg = new ExtendedFeatureVectorGenerator(
-        new TweetTfIdf(tweets, tfIdfusePOSTags));
+        tweetTfIdf);
+
+    // debug
+    TweetTfIdf.print("Term Frequency", tweetTfIdf.getTermFreqs(),
+        tweetTfIdf.getInverseDocFreq());
+    TweetTfIdf.print("Inverse Document Frequency",
+        tweetTfIdf.getInverseDocFreq());
 
     // generate Feature Vector
     for (Tweet tweet : tweets) {
       System.out.println("Tweet: " + tweet);
-      System.out.println("FeatureVector: "
-          + Arrays.toString(efvg.calculateFeatureVector(tweet)));
+      System.out.print("FeatureVector:");
+      for (Map.Entry<Integer, Double> feature : efvg.calculateFeatureVector(
+          tweet).entrySet()) {
+        System.out.print(" " + feature.getKey() + ":" + feature.getValue());
+      }
+      System.out.println();
     }
 
-    // close wordnet dic
     efvg.getSentimentWordLists().close();
   }
 }
