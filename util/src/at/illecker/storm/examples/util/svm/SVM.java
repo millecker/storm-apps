@@ -56,7 +56,7 @@ public class SVM {
     param.gamma = 0.5; // default 1/num_features
     param.nu = 0.5; // default 0.5
     param.eps = 0.001; // stopping criterion
-    param.cache_size = 20000; // kernel cache specified in megabytes
+    param.cache_size = 2000; // kernel cache specified in megabytes
 
     return param;
   }
@@ -75,7 +75,7 @@ public class SVM {
       double[] features = tweet.getFeatureVector();
 
       // set feature vector
-      svmProb.x[i] = new svm_node[features.length + 1];
+      svmProb.x[i] = new svm_node[features.length];
       for (int j = 0; j < features.length; j++) {
         svm_node node = new svm_node();
         node.index = j;
@@ -83,12 +83,7 @@ public class SVM {
         svmProb.x[i][j] = node;
       }
 
-      // set end node
-      svm_node node = new svm_node();
-      node.index = -1;
-      svmProb.x[i][features.length] = node;
-
-      // set class
+      // set class / label
       svmProb.y[i] = scoreClassifier.classfyScore(tweet.getScore());
     }
 
@@ -100,18 +95,18 @@ public class SVM {
     // <label> <index1>:<value1> <index2>:<value2> ...
     try {
       BufferedWriter br = new BufferedWriter(new FileWriter(file));
-
       for (int i = 0; i < svmProb.l; i++) {
-        br.write(Double.toString(svmProb.y[i])); // <label>
+        // <label>
+        br.write(Double.toString(svmProb.y[i]));
         for (int j = 0; j < svmProb.x[i].length; j++) {
           if (svmProb.x[i][j].value != 0) {
+            // <index>:<value>
             br.write(" " + svmProb.x[i][j].index + ":" + svmProb.x[i][j].value);
           }
         }
         br.newLine();
         br.flush();
       }
-
       br.close();
       LOG.info("saved svm_problem in " + file);
     } catch (IOException e) {
