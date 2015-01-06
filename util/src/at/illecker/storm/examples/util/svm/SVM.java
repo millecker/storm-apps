@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -72,15 +73,17 @@ public class SVM {
 
     for (int i = 0; i < dataCount; i++) {
       Tweet tweet = trainTweets.get(i);
-      double[] features = tweet.getFeatureVector();
+      Map<Integer, Double> features = tweet.getFeatureVector();
 
       // set feature vector
-      svmProb.x[i] = new svm_node[features.length];
-      for (int j = 0; j < features.length; j++) {
+      svmProb.x[i] = new svm_node[features.size()];
+      int j = 0;
+      for (Map.Entry<Integer, Double> feature : features.entrySet()) {
         svm_node node = new svm_node();
-        node.index = j;
-        node.value = features[j];
+        node.index = feature.getKey();
+        node.value = feature.getValue();
         svmProb.x[i][j] = node;
+        j++;
       }
 
       // set class / label
@@ -235,13 +238,15 @@ public class SVM {
   public static double evaluate(Tweet tweet, svm_model svmModel,
       int totalClasses, ScoreClassifier scoreClassifier, boolean logging) {
 
-    double[] features = tweet.getFeatureVector();
-    svm_node[] nodes = new svm_node[features.length];
-    for (int i = 0; i < features.length; i++) {
+    Map<Integer, Double> features = tweet.getFeatureVector();
+    svm_node[] nodes = new svm_node[features.size()];
+    int i = 0;
+    for (Map.Entry<Integer, Double> feature : features.entrySet()) {
       svm_node node = new svm_node();
-      node.index = i;
-      node.value = features[i];
+      node.index = feature.getKey();
+      node.value = feature.getValue();
       nodes[i] = node;
+      i++;
     }
 
     int[] labels = new int[totalClasses];
@@ -252,7 +257,7 @@ public class SVM {
         probEstimates);
 
     if (logging) {
-      for (int i = 0; i < totalClasses; i++) {
+      for (i = 0; i < totalClasses; i++) {
         LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
             + probEstimates[i]);
       }
