@@ -16,27 +16,30 @@
  */
 package at.illecker.storm.examples.util.wordlist;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SentimentResult {
   private long m_posCount;
   private long m_neutralCount;
   private long m_negCount;
   private double m_sum;
-  private long m_count;
   private double m_maxPos;
   private double m_maxNeg;
   private double m_initialMaxPos;
   private double m_initialMaxNeg;
+  private List<Double> m_scores;
 
   public SentimentResult() {
     this.m_posCount = 0;
     this.m_neutralCount = 0;
     this.m_negCount = 0;
     this.m_sum = 0;
-    this.m_count = 0;
     this.m_maxPos = 0;
     this.m_maxNeg = 0;
     this.m_initialMaxPos = 0;
     this.m_initialMaxNeg = 0;
+    this.m_scores = new ArrayList<Double>();
   }
 
   public SentimentResult(double initialMaxPos, double initialMaxNeg) {
@@ -45,16 +48,6 @@ public class SentimentResult {
     this.m_maxPos = initialMaxPos;
     this.m_initialMaxNeg = initialMaxNeg;
     this.m_maxNeg = initialMaxNeg;
-  }
-
-  public SentimentResult(long posCount, long neutralCount, long negCount,
-      double sum, long count, double initialMaxPos, double initialMaxNeg) {
-    this(initialMaxPos, initialMaxNeg);
-    this.m_posCount = posCount;
-    this.m_neutralCount = neutralCount;
-    this.m_negCount = negCount;
-    this.m_sum = sum;
-    this.m_count = count;
   }
 
   public long getPosCount() {
@@ -85,16 +78,8 @@ public class SentimentResult {
     return m_sum;
   }
 
-  public void addSum(double value) {
-    this.m_sum += value;
-  }
-
   public long getCount() {
-    return m_count;
-  }
-
-  public void incCount() {
-    this.m_count++;
+    return m_scores.size();
   }
 
   public double getMaxPos() {
@@ -121,13 +106,17 @@ public class SentimentResult {
     return m_initialMaxNeg;
   }
 
+  public void addScore(double value) {
+    this.m_scores.add(value);
+    this.m_sum += value;
+  }
+
   public void add(SentimentResult sentimentResult) {
     this.m_posCount += sentimentResult.getPosCount();
     this.m_neutralCount += sentimentResult.getNeutralCount();
     this.m_negCount += sentimentResult.getNegCount();
 
     this.m_sum += sentimentResult.getSum();
-    this.m_count += sentimentResult.getCount();
 
     double maxPos = sentimentResult.getMaxPos();
     if (maxPos != sentimentResult.getInitalMaxPos()) {
@@ -144,7 +133,7 @@ public class SentimentResult {
   public String toString() {
     return "SentimentResult [posCount=" + m_posCount + ", neutralCount="
         + m_neutralCount + ", negCount=" + m_negCount + ", sum=" + m_sum
-        + ", count=" + m_count + ", maxPos=" + m_maxPos + ", maxNeg="
-        + m_maxNeg + "]";
+        + ", count=" + m_scores.size() + ", maxPos=" + m_maxPos + ", maxNeg="
+        + m_maxNeg + ", scores=" + m_scores.toString() + "]";
   }
 }

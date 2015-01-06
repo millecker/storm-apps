@@ -194,10 +194,8 @@ public class SentimentWordLists {
         } else if ((wordSentiment <= 0.55) && (wordSentiment >= 0.45)) {
           sentimentResult.incNeutralCount(); // NEUTRAL
         }
-        // SUM
-        sentimentResult.addSum(wordSentiment);
-        // COUNT
-        sentimentResult.incCount();
+        // add score value
+        sentimentResult.addScore(wordSentiment);
       }
     }
 
@@ -228,7 +226,7 @@ public class SentimentWordLists {
 
     List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
 
-    System.out.println("text: '" + text + "'");
+    System.out.println("Tweet: '" + text + "'");
     SentimentResult sentimentResult = sentimentWordLists
         .getTaggedSentenceSentiment(taggedSentence);
     System.out.println(sentimentResult);
