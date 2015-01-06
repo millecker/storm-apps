@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.wordlist;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -177,57 +176,46 @@ public class SentimentWordLists {
     return (count > 0) ? sentenceScore / count : null;
   }
 
-  public double[] getTaggedSentenceSentiment(List<TaggedWord> sentence) {
-    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
-    // MAX_NEG_SCORE]
-    double[] sentenceScore = new double[] { 0, 0, 0, 0, 0, 0, 0.5 };
+  public SentimentResult getTaggedSentenceSentiment(List<TaggedWord> sentence) {
+    SentimentResult sentimentResult = new SentimentResult(0, 0.5);
     for (TaggedWord w : sentence) {
       Double wordSentiment = getWordSentimentWithStemming(w.word(), w.tag());
       if (wordSentiment != null) {
-        // POS, NEUTRAL and NEG COUNT
-        if (wordSentiment < 0.45) {
-          sentenceScore[2]++; // NEGATIV
-          if (wordSentiment < sentenceScore[6]) {
-            sentenceScore[6] = wordSentiment; // MAX_NEG_SCORE
+        if (wordSentiment < 0.45) { // NEGATIV
+          sentimentResult.incNegCount();
+          if (wordSentiment < sentimentResult.getMaxNeg()) { // MAX_NEG_SCORE
+            sentimentResult.setMaxNeg(wordSentiment);
           }
-        } else if (wordSentiment > 0.55) {
-          sentenceScore[0]++; // POSITIV
-          if (wordSentiment > sentenceScore[5]) {
-            sentenceScore[5] = wordSentiment; // MAX_POS_SCORE
+        } else if (wordSentiment > 0.55) { // POSITIV
+          sentimentResult.incPosCount();
+          if (wordSentiment > sentimentResult.getMaxPos()) { // MAX_POS_SCORE
+            sentimentResult.setMaxPos(wordSentiment);
           }
         } else if ((wordSentiment <= 0.55) && (wordSentiment >= 0.45)) {
-          sentenceScore[1]++; // NEUTRAL
+          sentimentResult.incNeutralCount(); // NEUTRAL
         }
         // SUM
-        sentenceScore[3] += wordSentiment;
+        sentimentResult.addSum(wordSentiment);
         // COUNT
-        sentenceScore[4]++;
+        sentimentResult.incCount();
       }
     }
 
-    return (sentenceScore[4] > 0) ? sentenceScore : null;
+    return (sentimentResult.getCount() > 0) ? sentimentResult : null;
   }
 
-  public double[] getTweetSentiment(Tweet tweet) {
-    // [POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE,
-    // MAX_NEG_SCORE]
-    double[] tweetScore = new double[] { 0, 0, 0, 0, 0, 0, 0 };
+  public SentimentResult getTweetSentiment(Tweet tweet) {
+    SentimentResult tweetSentiment = new SentimentResult();
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
       if (LOGGING) {
         LOG.info("taggedSentence: " + sentence.toString());
       }
-      double[] sentenceScore = getTaggedSentenceSentiment(sentence);
-      if (sentenceScore != null) {
-        tweetScore[0] += sentenceScore[0]; // POS_COUNT
-        tweetScore[1] += sentenceScore[1]; // NEUTRAL_COUNT
-        tweetScore[2] += sentenceScore[2]; // NEG_COUNT
-        tweetScore[3] += sentenceScore[3]; // SUM
-        tweetScore[4] += sentenceScore[4]; // COUNT
-        tweetScore[5] = sentenceScore[5]; // MAX_POS_SCORE
-        tweetScore[6] = sentenceScore[6]; // MAX_NEG_SCORE
+      SentimentResult sentenceSentiment = getTaggedSentenceSentiment(sentence);
+      if (sentenceSentiment != null) {
+        tweetSentiment.add(sentenceSentiment);
       }
     }
-    return (tweetScore[4] > 0) ? tweetScore : null;
+    return (tweetSentiment.getCount() > 0) ? tweetSentiment : null;
   }
 
   public static void main(String[] args) {
@@ -241,11 +229,9 @@ public class SentimentWordLists {
     List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
 
     System.out.println("text: '" + text + "'");
-    double sentimentScore[] = sentimentWordLists
+    SentimentResult sentimentResult = sentimentWordLists
         .getTaggedSentenceSentiment(taggedSentence);
-    System.out
-        .println("sentimentScore[POS_COUNT, NEUTRAL_COUNT, NEG_COUNT, SUM, COUNT, MAX_POS_SCORE, MAX_NEG_SCORE]"
-            + Arrays.toString(sentimentScore));
+    System.out.println(sentimentResult);
 
     sentimentWordLists.close();
   }
