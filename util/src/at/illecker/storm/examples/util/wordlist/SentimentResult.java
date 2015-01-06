@@ -55,7 +55,7 @@ public class SentimentResult {
   }
 
   public double getAvgPosCount() {
-    return m_posCount / m_scores.size();
+    return m_posCount / (double) m_scores.size();
   }
 
   public void incPosCount() {
@@ -67,7 +67,7 @@ public class SentimentResult {
   }
 
   public double getAvgNeutralCount() {
-    return m_neutralCount / m_scores.size();
+    return m_neutralCount / (double) m_scores.size();
   }
 
   public void incNeutralCount() {
@@ -79,7 +79,7 @@ public class SentimentResult {
   }
 
   public double getAvgNegCount() {
-    return m_negCount / m_scores.size();
+    return m_negCount / (double) m_scores.size();
   }
 
   public void incNegCount() {
@@ -91,7 +91,7 @@ public class SentimentResult {
   }
 
   public double getAvgSum() {
-    return m_sum / m_scores.size();
+    return m_sum / (double) m_scores.size();
   }
 
   public long getCount() {
@@ -143,6 +143,8 @@ public class SentimentResult {
     if (maxNeg != sentimentResult.getInitalMaxNeg()) {
       this.m_maxNeg = maxNeg;
     }
+
+    this.m_scores.addAll(sentimentResult.m_scores);
   }
 
   @Override
