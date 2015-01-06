@@ -54,12 +54,20 @@ public class SentimentResult {
     return m_posCount;
   }
 
+  public double getAvgPosCount() {
+    return m_posCount / m_scores.size();
+  }
+
   public void incPosCount() {
     this.m_posCount++;
   }
 
   public long getNeutralCount() {
     return m_neutralCount;
+  }
+
+  public double getAvgNeutralCount() {
+    return m_neutralCount / m_scores.size();
   }
 
   public void incNeutralCount() {
@@ -70,12 +78,20 @@ public class SentimentResult {
     return m_negCount;
   }
 
+  public double getAvgNegCount() {
+    return m_negCount / m_scores.size();
+  }
+
   public void incNegCount() {
     this.m_negCount++;
   }
 
   public double getSum() {
     return m_sum;
+  }
+
+  public double getAvgSum() {
+    return m_sum / m_scores.size();
   }
 
   public long getCount() {
