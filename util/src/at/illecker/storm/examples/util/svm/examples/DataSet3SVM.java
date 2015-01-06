@@ -17,7 +17,6 @@
 package at.illecker.storm.examples.util.svm.examples;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import libsvm.svm_model;
@@ -49,7 +48,7 @@ public class DataSet3SVM {
   public static final String TEST_DATA = DATASET_PATH + "testingInput.txt";
   public static final String TRAIN_SER = DATASET_PATH + "trainingInput.ser";
   public static final String TEST_SER = DATASET_PATH + "testingInput.ser";
-  public static final String SVM_PROBLEM_SER = DATASET_PATH + "svmProblem.ser";
+  public static final String SVM_PROBLEM_SER = DATASET_PATH + "svmProblem.txt";
   public static final String SVM_MODEL_SER = DATASET_PATH + "svmModel.ser";
 
   private static final Logger LOG = LoggerFactory.getLogger(DataSet3SVM.class);
@@ -79,7 +78,7 @@ public class DataSet3SVM {
 
       if (LOGGING) {
         LOG.info("Tweet: " + tweet);
-        LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
+        LOG.info("FeatureVector: " + tweet.getFeatureVector());
       }
     }
   }
