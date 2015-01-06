@@ -18,7 +18,9 @@ package at.illecker.storm.examples.util.tweet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -31,12 +33,12 @@ public class Tweet implements Serializable {
 
   private List<List<String>> m_sentences;
   private List<List<TaggedWord>> m_taggedSentences;
-
-  private double[] m_featureVector;
+  private Map<Integer, Double> m_featureVector; // store only non-zero values
 
   public Tweet() {
     this.m_sentences = new ArrayList<List<String>>();
     this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
+    this.m_featureVector = new HashMap<Integer, Double>();
   }
 
   public Tweet(long id, String text, double score) {
@@ -58,7 +60,7 @@ public class Tweet implements Serializable {
     return m_score;
   }
 
-  public double[] getFeatureVector() {
+  public Map<Integer, Double> getFeatureVector() {
     return m_featureVector;
   }
 
