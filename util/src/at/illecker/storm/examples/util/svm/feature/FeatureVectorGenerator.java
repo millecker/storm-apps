@@ -22,4 +22,6 @@ import at.illecker.storm.examples.util.tweet.Tweet;
 
 public interface FeatureVectorGenerator {
   public Map<Integer, Double> calculateFeatureVector(Tweet tweet);
+
+  public int getFeatureVectorSize();
 }

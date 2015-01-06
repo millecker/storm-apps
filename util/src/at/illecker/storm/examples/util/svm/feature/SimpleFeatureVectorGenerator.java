@@ -53,6 +53,11 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   }
 
   @Override
+  public int getFeatureVectorSize() {
+    return 14;
+  }
+
+  @Override
   public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
