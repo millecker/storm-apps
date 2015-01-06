@@ -46,6 +46,8 @@ public class TweetTfIdf {
   private TfIdfNormalization m_normalization;
   private Map<Tweet, Map<String, Double>> m_termFreqs;
   private Map<String, Double> m_inverseDocFreq;
+  private Map<String, Integer> m_termIds;
+
   private boolean m_usePOSTags;
 
   public TweetTfIdf(List<Tweet> tweets, boolean usePOSTags) {
@@ -61,6 +63,13 @@ public class TweetTfIdf {
     this.m_termFreqs = tf(tweets, type, m_usePOSTags);
     this.m_inverseDocFreq = idf(m_termFreqs);
 
+    this.m_termIds = new HashMap<String, Integer>();
+    int i = 0;
+    for (String key : m_inverseDocFreq.keySet()) {
+      this.m_termIds.put(key, i);
+      i++;
+    }
+
     // Debug
     // print("Term Frequency", m_termFreqs, m_inverseDocFreq);
     // print("Inverse Document Frequency", m_inverseDocFreq);
@@ -72,6 +81,10 @@ public class TweetTfIdf {
 
   public Map<String, Double> getInverseDocFreq() {
     return m_inverseDocFreq;
+  }
+
+  public Map<String, Integer> getTermIds() {
+    return m_termIds;
   }
 
   public Map<String, Double> tfIdf(Tweet tweet) {
