@@ -417,6 +417,7 @@ public class SupportVectorMachine {
       }
 
       long countMatches = 0;
+      LOG.info("Evaluate test tweets...");
       long startTime = System.currentTimeMillis();
       for (Tweet tweet : testTweets) {
         double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
@@ -425,7 +426,7 @@ public class SupportVectorMachine {
         }
       }
 
-      LOG.info("SVM evalute finished after "
+      LOG.info("Evaluate finished after "
           + (System.currentTimeMillis() - startTime) + " ms");
       LOG.info("Total test tweets: " + testTweets.size());
       LOG.info("Matches: " + countMatches);
