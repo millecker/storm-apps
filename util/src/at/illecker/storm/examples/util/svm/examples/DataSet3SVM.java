@@ -19,6 +19,7 @@ package at.illecker.storm.examples.util.svm.examples;
 import java.io.File;
 import java.util.List;
 
+import libsvm.svm;
 import libsvm.svm_model;
 import libsvm.svm_parameter;
 import libsvm.svm_problem;
@@ -225,6 +226,8 @@ public class DataSet3SVM {
       LOG.info("Matches: " + countMatches);
       double accuracy = (double) countMatches / (double) testTweets.size();
       LOG.info("Accuracy: " + accuracy);
+
+      svm.EXEC_SERV.shutdown();
     }
   }
 }
