@@ -90,17 +90,23 @@ public class Configuration {
     String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
         + File.separator;
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
+    Properties props;
 
-    // Add SentStrength SlangLookupTable
-    Properties props = new Properties();
+    // Add noslang.txt from http://www.noslang.com/dictionary/
+    props = new Properties();
     props.put("separator", "\t");
-    slangWordLists.put(wordListDir
-        + "SentStrength_Data_Sept2011_SlangLookupTable.txt", props);
+    slangWordLists.put(wordListDir + "noslang.txt", props);
 
     // Add GATE SlangLookupTable orth.en
     props = new Properties();
     props.put("separator", ",");
     slangWordLists.put(wordListDir + "GATE_slang.en.csv", props);
+
+    // Add SentStrength SlangLookupTable
+    props = new Properties();
+    props.put("separator", "\t");
+    slangWordLists.put(wordListDir
+        + "SentStrength_Data_Sept2011_SlangLookupTable.txt", props);
 
     return slangWordLists;
   }
