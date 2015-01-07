@@ -16,6 +16,8 @@
  */
 package at.illecker.storm.examples.util.wordlist;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,7 +32,7 @@ public class SlangCorrection {
       .getLogger(SlangCorrection.class);
   private static final SlangCorrection instance = new SlangCorrection();
 
-  private Map<String, String> m_slangWordList = null;
+  private Map<String, String[]> m_slangWordList = new HashMap<String, String[]>();
 
   private SlangCorrection() {
     Map<String, Properties> slangWordLists = Configuration.getSlangWordlists();
@@ -40,14 +42,10 @@ public class SlangCorrection {
       String separator = slangWordListEntry.getValue().getProperty("separator");
 
       LOG.info("Load SlangLookupTable from: " + file);
-      if (m_slangWordList == null) {
-        m_slangWordList = FileUtils.readFile(file, separator);
-      } else {
-        Map<String, String> slangWordList = FileUtils.readFile(file, separator);
-        for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
-          if (!m_slangWordList.containsKey(entry.getKey())) {
-            m_slangWordList.put(entry.getKey(), entry.getValue());
-          }
+      Map<String, String> slangWordList = FileUtils.readFile(file, separator);
+      for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
+        if (!m_slangWordList.containsKey(entry.getKey())) {
+          m_slangWordList.put(entry.getKey(), entry.getValue().split(" "));
         }
       }
     }
@@ -57,20 +55,17 @@ public class SlangCorrection {
     return instance;
   }
 
-  public String getCorrection(String slangString) {
-    String correctionStr = null;
-    if (m_slangWordList != null) {
-      correctionStr = m_slangWordList.get(slangString);
-    }
-    // LOG.info("getCorrection('" + slangString + "'): " + correctionStr);
-    return correctionStr;
+  public String[] getCorrection(String token) {
+    // LOG.info("getCorrection('" + token + "'): "
+    // + Arrays.toString(m_slangWordList.get(token)));
+    return m_slangWordList.get(token);
   }
 
   public static void main(String[] args) {
     SlangCorrection slangCorrection = SlangCorrection.getInstance();
     System.out.println("SlangCorrection of 'afaik': '"
-        + slangCorrection.getCorrection("afaik") + "'");
+        + Arrays.toString(slangCorrection.getCorrection("afaik")) + "'");
     System.out.println("SlangCorrection of 'cum': '"
-        + slangCorrection.getCorrection("cum") + "'");
+        + Arrays.toString(slangCorrection.getCorrection("cum")) + "'");
   }
 }
