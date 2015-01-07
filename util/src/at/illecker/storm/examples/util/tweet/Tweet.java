@@ -32,11 +32,13 @@ public class Tweet implements Serializable {
   private double m_score = 0;
 
   private List<List<String>> m_sentences;
+  private List<List<String>> m_preprocessedSentences;
   private List<List<TaggedWord>> m_taggedSentences;
   private Map<Integer, Double> m_featureVector; // store only non-zero values
 
   public Tweet() {
     this.m_sentences = new ArrayList<List<String>>();
+    this.m_preprocessedSentences = new ArrayList<List<String>>();
     this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
     this.m_featureVector = new HashMap<Integer, Double>();
   }
@@ -60,32 +62,36 @@ public class Tweet implements Serializable {
     return m_score;
   }
 
-  public Map<Integer, Double> getFeatureVector() {
-    return m_featureVector;
+  public List<List<String>> getSentences() {
+    return m_sentences;
   }
 
   public void addSentence(List<String> sentence) {
     m_sentences.add(sentence);
   }
 
-  public List<List<String>> getSentences() {
-    return m_sentences;
+  public List<List<String>> getPreprocessedSentences() {
+    return m_preprocessedSentences;
   }
 
-  public void replaceSentences(List<List<String>> sentences) {
-    m_sentences = sentences;
-  }
-
-  public void addTaggedSentence(List<TaggedWord> sentence) {
-    m_taggedSentences.add(sentence);
+  public void addPreprocessedSentence(List<String> preprocessedSentence) {
+    m_preprocessedSentences.add(preprocessedSentence);
   }
 
   public List<List<TaggedWord>> getTaggedSentences() {
     return m_taggedSentences;
   }
 
+  public void addTaggedSentence(List<TaggedWord> sentence) {
+    m_taggedSentences.add(sentence);
+  }
+
   public void genFeatureVector(FeatureVectorGenerator featureVectorGen) {
     m_featureVector = featureVectorGen.calculateFeatureVector(this);
+  }
+
+  public Map<Integer, Double> getFeatureVector() {
+    return m_featureVector;
   }
 
   @Override

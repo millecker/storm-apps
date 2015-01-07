@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,11 +54,9 @@ public class PreprocessorBolt extends BaseRichBolt {
     Tweet tweet = (Tweet) tuple.getValueByField("splittedTweet");
     // LOG.info(tweet.toString());
 
-    List<List<String>> preprocessedSentences = new ArrayList<List<String>>();
     for (List<String> sentence : tweet.getSentences()) {
-      preprocessedSentences.add(m_preprocessor.preprocess(sentence));
+      tweet.addPreprocessedSentence(m_preprocessor.preprocess(sentence));
     }
-    tweet.replaceSentences(preprocessedSentences);
 
     this.m_collector.emit(tuple, new Values(tweet));
     this.m_collector.ack(tuple);
