@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -92,13 +91,17 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Tweet tweet = (Tweet) tuple.getValueByField("featuredTweet");
 
-    double predictedClass = SVM.evaluate(tweet, m_model,
-        m_totalClasses, m_dsc);
+    double predictedClass = SVM.evaluate(tweet, m_model, m_totalClasses, m_dsc);
 
-    LOG.info("tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
+    LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
         + " expectedClass: " + m_dsc.classfyScore(tweet.getScore())
         + " predictedClass: " + predictedClass);
-    LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
+    String featureVectorStr = "";
+    for (Map.Entry<Integer, Double> feature : tweet.getFeatureVector()
+        .entrySet()) {
+      featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+    }
+    LOG.info("FeatureVector: " + featureVectorStr);
 
     this.m_collector.ack(tuple);
   }
@@ -143,9 +146,15 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
 
           // Generate Feature Vector
           tweet.genFeatureVector(sfvg);
+
           if (LOGGING) {
-            LOG.info("FeatureVector: "
-                + Arrays.toString(tweet.getFeatureVector()));
+            String featureVectorStr = "";
+            for (Map.Entry<Integer, Double> feature : tweet.getFeatureVector()
+                .entrySet()) {
+              featureVectorStr += " " + feature.getKey() + ":"
+                  + feature.getValue();
+            }
+            LOG.info("FeatureVector: " + featureVectorStr);
           }
         }
 
@@ -167,8 +176,7 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
       // 4 = extreme-positive
 
       svm_parameter svmParam = SVM.getDefaultParameter();
-      svm_problem svmProb = SVM.generateProblem(trainTweets,
-          dsc);
+      svm_problem svmProb = SVM.generateProblem(trainTweets, dsc);
 
       // Optional parameter search of C and gamma
       if (parameterSearch) {
@@ -200,8 +208,7 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
 
         long countMatches = 0;
         for (Tweet tweet : testTweets) {
-          double predictedClass = SVM.evaluate(tweet, model,
-              totalClasses, dsc);
+          double predictedClass = SVM.evaluate(tweet, model, totalClasses, dsc);
           if (predictedClass == dsc.classfyScore(tweet.getScore())) {
             countMatches++;
           }
