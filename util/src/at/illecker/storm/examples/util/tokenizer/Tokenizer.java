@@ -29,11 +29,13 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 public class Tokenizer {
 
   public static List<String> tokenize(String text) {
-    List<String> tokens = new ArrayList<String>();
     // trim text
     text = text.trim();
+    
     // split at one or more blanks
     String[] inputTokens = text.split("\\s+");
+    
+    List<String> tokens = new ArrayList<String>();
     for (String inputToken : inputTokens) {
       tokens.add(inputToken);
     }
