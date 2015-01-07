@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SentimentResult {
-  private long m_posCount;
-  private long m_neutralCount;
-  private long m_negCount;
+  private int m_posCount;
+  private int m_neutralCount;
+  private int m_negCount;
   private double m_sum;
   private double m_maxPos;
   private double m_maxNeg;
@@ -50,7 +50,7 @@ public class SentimentResult {
     this.m_maxNeg = initialMaxNeg;
   }
 
-  public long getPosCount() {
+  public int getPosCount() {
     return m_posCount;
   }
 
@@ -62,7 +62,7 @@ public class SentimentResult {
     this.m_posCount++;
   }
 
-  public long getNeutralCount() {
+  public int getNeutralCount() {
     return m_neutralCount;
   }
 
@@ -74,7 +74,7 @@ public class SentimentResult {
     this.m_neutralCount++;
   }
 
-  public long getNegCount() {
+  public int getNegCount() {
     return m_negCount;
   }
 
@@ -94,7 +94,7 @@ public class SentimentResult {
     return m_sum / (double) m_scores.size();
   }
 
-  public long getCount() {
+  public int getCount() {
     return m_scores.size();
   }
 
