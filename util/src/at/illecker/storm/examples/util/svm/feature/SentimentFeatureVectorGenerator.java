@@ -32,20 +32,21 @@ import at.illecker.storm.examples.util.wordlist.SentimentResult;
 import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
+public class SentimentFeatureVectorGenerator implements FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
-      .getLogger(SimpleFeatureVectorGenerator.class);
+      .getLogger(SentimentFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
-  private static final SimpleFeatureVectorGenerator instance = new SimpleFeatureVectorGenerator();
 
   private SentimentWordLists m_sentimentWordLists;
+  private int m_vectorStartId = 1;
 
-  private SimpleFeatureVectorGenerator() {
-    m_sentimentWordLists = SentimentWordLists.getInstance();
+  public SentimentFeatureVectorGenerator() {
+    this.m_sentimentWordLists = SentimentWordLists.getInstance();
   }
 
-  public static SimpleFeatureVectorGenerator getInstance() {
-    return instance;
+  public SentimentFeatureVectorGenerator(int vectorStartId) {
+    this();
+    this.m_vectorStartId = vectorStartId;
   }
 
   public SentimentWordLists getSentimentWordLists() {
@@ -54,6 +55,9 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
 
   @Override
   public int getFeatureVectorSize() {
+    // PosCount, NeutralCount, NegCount, Sum, Count, MaxPos, MaxNeg
+    // Nouns/wc, Verbs/wc, Adjectives/wc, Adverbs/wc, Interjections/wc,
+    // Punctuations/wc, Hashtags/wc
     return 14;
   }
 
@@ -65,38 +69,44 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
         .getTweetSentiment(tweet);
     if (tweetSentiment != null) {
       // LOG.info("tweetSentiment: " + tweetSentiment);
-      if (tweetSentiment.getAvgPosCount() != 0)
-        resultFeatureVector.put(1, tweetSentiment.getAvgPosCount());
-      if (tweetSentiment.getAvgNeutralCount() != 0)
-        resultFeatureVector.put(2, tweetSentiment.getAvgNeutralCount());
-      if (tweetSentiment.getAvgNegCount() != 0)
-        resultFeatureVector.put(3, tweetSentiment.getAvgNegCount());
-      if (tweetSentiment.getAvgSum() != 0)
-        resultFeatureVector.put(4, tweetSentiment.getAvgSum());
+      if (tweetSentiment.getPosCount() != 0)
+        resultFeatureVector.put(m_vectorStartId,
+            (double) tweetSentiment.getPosCount());
+      if (tweetSentiment.getNeutralCount() != 0)
+        resultFeatureVector.put(m_vectorStartId + 1,
+            (double) tweetSentiment.getNeutralCount());
+      if (tweetSentiment.getNegCount() != 0)
+        resultFeatureVector.put(m_vectorStartId + 2,
+            (double) tweetSentiment.getNegCount());
+      if (tweetSentiment.getSum() != 0)
+        resultFeatureVector.put(m_vectorStartId + 3, tweetSentiment.getSum());
       if (tweetSentiment.getCount() != 0)
-        resultFeatureVector.put(5, (double) tweetSentiment.getCount());
+        resultFeatureVector.put(m_vectorStartId + 4,
+            (double) tweetSentiment.getCount());
       if (tweetSentiment.getMaxPos() != 0)
-        resultFeatureVector.put(6, tweetSentiment.getMaxPos());
+        resultFeatureVector
+            .put(m_vectorStartId + 5, tweetSentiment.getMaxPos());
       if (tweetSentiment.getMaxNeg() != 0)
-        resultFeatureVector.put(7, tweetSentiment.getMaxNeg());
+        resultFeatureVector
+            .put(m_vectorStartId + 6, tweetSentiment.getMaxNeg());
     }
 
     double[] posTags = countPOSTags(tweet);
     if (posTags != null) {
       if (posTags[0] != 0) // nouns / wordCount
-        resultFeatureVector.put(8, posTags[0]);
+        resultFeatureVector.put(m_vectorStartId + 7, posTags[0]);
       if (posTags[1] != 0) // verbs / wordCount
-        resultFeatureVector.put(9, posTags[1]);
+        resultFeatureVector.put(m_vectorStartId + 8, posTags[1]);
       if (posTags[2] != 0) // adjectives / wordCount
-        resultFeatureVector.put(10, posTags[2]);
+        resultFeatureVector.put(m_vectorStartId + 9, posTags[2]);
       if (posTags[3] != 0) // adverbs / wordCount
-        resultFeatureVector.put(11, posTags[3]);
+        resultFeatureVector.put(m_vectorStartId + 10, posTags[3]);
       if (posTags[4] != 0) // interjections / wordCount
-        resultFeatureVector.put(12, posTags[4]);
+        resultFeatureVector.put(m_vectorStartId + 11, posTags[4]);
       if (posTags[5] != 0) // punctuations / wordCount
-        resultFeatureVector.put(13, posTags[5]);
+        resultFeatureVector.put(m_vectorStartId + 12, posTags[5]);
       if (posTags[6] != 0) // hashtags / wordCount
-        resultFeatureVector.put(14, posTags[6]);
+        resultFeatureVector.put(m_vectorStartId + 13, posTags[6]);
     }
 
     if (LOGGING) {
@@ -108,7 +118,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   }
 
   private double[] countPOSTags(Tweet tweet) {
-    // [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAGS]
+    // [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAG]
     double[] posTags = new double[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d };
     int wordCount = 0;
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
@@ -142,8 +152,7 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
-    SimpleFeatureVectorGenerator sfvg = SimpleFeatureVectorGenerator
-        .getInstance();
+    SentimentFeatureVectorGenerator sfvg = new SentimentFeatureVectorGenerator();
 
     for (Tweet tweet : Tweet.getTestTweets()) {
       // Tokenize

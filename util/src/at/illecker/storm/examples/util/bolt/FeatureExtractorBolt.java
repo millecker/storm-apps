@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
-import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
+import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -48,8 +48,8 @@ public class FeatureExtractorBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
-    LOG.info("Load SimpleFeatureVectorGenerator...");
-    m_fvg = SimpleFeatureVectorGenerator.getInstance();
+    LOG.info("Load SentimentFeatureVectorGenerator...");
+    m_fvg = new SentimentFeatureVectorGenerator();
   }
 
   public void execute(Tuple tuple) {

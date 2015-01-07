@@ -35,7 +35,7 @@ import at.illecker.storm.examples.util.io.JsonUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.svm.SVM;
 import at.illecker.storm.examples.util.svm.classifier.DynamicScoreClassifier;
-import at.illecker.storm.examples.util.svm.feature.SimpleFeatureVectorGenerator;
+import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.SentimentTweet;
@@ -107,7 +107,7 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
   }
 
   public static void main(String[] args) {
-    SimpleFeatureVectorGenerator sfvg = null;
+    SentimentFeatureVectorGenerator sfvg = null;
     POSTagger posTagger = null;
     boolean parameterSearch = false;
     try {
@@ -117,8 +117,8 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
           .deserialize(DATA_SER_FILE);
       if (tweets == null) {
         // Generate feature vectors
-        LOG.info("Load SimpleFeatureVectorGenerator...");
-        sfvg = SimpleFeatureVectorGenerator.getInstance();
+        LOG.info("Load SentimentFeatureVectorGenerator...");
+        sfvg = new SentimentFeatureVectorGenerator();
 
         // Load POS Tagger
         posTagger = POSTagger.getInstance();
