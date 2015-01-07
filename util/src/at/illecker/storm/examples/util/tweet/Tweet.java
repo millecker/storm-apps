@@ -99,4 +99,66 @@ public class Tweet implements Serializable {
     return "Tweet [id=" + m_id + ", text=" + m_text + ", score=" + m_score
         + "]";
   }
+
+  public static List<Tweet> getTestTweets() {
+    List<Tweet> tweets = new ArrayList<Tweet>();
+    tweets.add(new Tweet(0,
+        "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)",
+        1));
+    tweets
+        .add(new Tweet(
+            0,
+            "@oluoch @victor_otti @kunjand I just watched it ! Sridevi's comeback .... U remember her from the 90s ?? Sun mornings on NTA ;)",
+            1));
+    tweets
+        .add(new Tweet(
+            0,
+            "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56",
+            0.5));
+    tweets
+        .add(new Tweet(
+            0,
+            "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
+            0));
+    tweets.add(new Tweet(0, "called in sick for the third straight day.  ugh.",
+        0));
+    tweets
+        .add(new Tweet(
+            0,
+            "Here we go.  BANK FAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
+            0));
+    tweets.add(new Tweet(0,
+        "Oh, I'm afraid your Windows-using friends will not survive.", 0));
+
+    tweets.add(new Tweet(0, "2moro afaik bbq hf lol", 0));
+
+    tweets
+        .add(new Tweet(
+            0,
+            "Excuse the connectivity of this live stream , from Baba Amr , so many activists using only one Sat Modem . LIVE http://t.co/U283IhZ5 #Homs",
+            0));
+    tweets
+        .add(new Tweet(
+            0,
+            "Show your LOVE for your local field & it might win an award ! Gallagher Park #Bedlington current 4th in National Award http://t.co/WeiMDtQt",
+            0));
+    tweets
+        .add(new Tweet(
+            0,
+            "@firecore Can you tell me when an update for the Apple TV 3rd gen becomes available ? The missing update holds me back from buying #appletv3",
+            0));
+    tweets
+        .add(new Tweet(
+            0,
+            "My #cre blog Oklahoma Per Square Foot returns to the @JournalRecord blog hub tomorrow . I will have some interesting local data to share .",
+            0));
+    tweets
+        .add(new Tweet(
+            0,
+            "\" @bbcburnsy : Loads from SB ; talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
+            0));
+
+    return tweets;
+  }
+
 }
