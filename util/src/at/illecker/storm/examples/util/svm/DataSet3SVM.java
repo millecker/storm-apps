@@ -32,9 +32,9 @@ import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.io.IOUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
-import at.illecker.storm.examples.util.svm.feature.ExtendedFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
+import at.illecker.storm.examples.util.svm.feature.TfIdfFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
@@ -109,8 +109,8 @@ public class DataSet3SVM {
 
       if (fvg == null) {
         if (useExtendedFeatureVectorGen) {
-          LOG.info("Load ExtendedFeatureVectorGenerator...");
-          fvg = new ExtendedFeatureVectorGenerator(new TweetTfIdf(trainTweets,
+          LOG.info("Load TfIdfFeatureVectorGenerator...");
+          fvg = new TfIdfFeatureVectorGenerator(new TweetTfIdf(trainTweets,
               true));
         } else {
           LOG.info("Load SentimentFeatureVectorGenerator...");

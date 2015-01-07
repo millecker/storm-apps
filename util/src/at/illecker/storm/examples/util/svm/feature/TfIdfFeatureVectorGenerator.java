@@ -18,6 +18,7 @@ package at.illecker.storm.examples.util.svm.feature;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,20 +31,24 @@ import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
+public class TfIdfFeatureVectorGenerator implements FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
-      .getLogger(ExtendedFeatureVectorGenerator.class);
+      .getLogger(TfIdfFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
 
-  private SimpleFeatureVectorGenerator m_sfvg;
-  private SentimentWordLists m_sentimentWordLists;
   private TweetTfIdf m_tweetTfIdf = null;
+  private SentimentWordLists m_sentimentWordLists;
+  private int m_vectorStartId = 1;
 
-  public ExtendedFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
+  public TfIdfFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
     this.m_tweetTfIdf = tweetTfIdf;
-    this.m_sfvg = SimpleFeatureVectorGenerator.getInstance();
-    this.m_sentimentWordLists = m_sfvg.getSentimentWordLists();
+    this.m_sentimentWordLists = SentimentWordLists.getInstance();
     LOG.info("VectorSize: " + getFeatureVectorSize());
+  }
+
+  public TfIdfFeatureVectorGenerator(TweetTfIdf tweetTfIdf, int vectorStartId) {
+    this(tweetTfIdf);
+    this.m_vectorStartId = vectorStartId;
   }
 
   public SentimentWordLists getSentimentWordLists() {
@@ -52,14 +57,12 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
 
   @Override
   public int getFeatureVectorSize() {
-    return m_sfvg.getFeatureVectorSize()
-        + m_tweetTfIdf.getInverseDocFreq().size();
+    return m_tweetTfIdf.getInverseDocFreq().size();
   }
 
   @Override
   public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
-    Map<Integer, Double> resultFeatureVector = m_sfvg
-        .calculateFeatureVector(tweet);
+    Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
     if (m_tweetTfIdf != null) {
       Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
@@ -69,8 +72,8 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
       for (Map.Entry<String, Double> element : tfIdf.entrySet()) {
         String key = element.getKey();
         if (idf.containsKey(key)) {
-          int id = m_sfvg.getFeatureVectorSize() + 1 + termIds.get(key);
-          resultFeatureVector.put(id, element.getValue());
+          int vectorId = m_vectorStartId + termIds.get(key);
+          resultFeatureVector.put(vectorId, element.getValue());
         }
       }
 
@@ -85,7 +88,6 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
 
-    // prepare Tweets
     // prepare Tweets
     for (Tweet tweet : tweets) {
       // Tokenize
@@ -105,7 +107,7 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
     boolean usePOSTags = true; // use POS tags in terms
     // calculate Tf-Idf
     TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, usePOSTags);
-    ExtendedFeatureVectorGenerator efvg = new ExtendedFeatureVectorGenerator(
+    TfIdfFeatureVectorGenerator efvg = new TfIdfFeatureVectorGenerator(
         tweetTfIdf);
 
     // debug
