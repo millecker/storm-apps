@@ -17,7 +17,7 @@
 package at.illecker.storm.examples.util.preprocessor;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -77,25 +77,27 @@ public class Preprocessor {
     // LOG.info("preprocess: " + tokens.toString());
     List<String> processedTokens = new ArrayList<String>();
 
-    Iterator<String> iter = tokens.iterator();
-    while (iter.hasNext()) {
-      String token = iter.next();
+    for (String token : tokens) {
       String tokenLowerCase = token.toLowerCase();
 
       // Slang correction
       String correction = m_slangCorrection.getCorrection(tokenLowerCase);
       if (correction != null) {
-        if (LOGGING) {
-          LOG.info("SlangCorrecting from " + token + " to " + correction);
+        String[] correctionTokens = correction.split(" ");
+        for (int i = 0; i < correctionTokens.length; i++) {
+          processedTokens.add(correctionTokens[i]);
         }
-        token = correction;
+        if (LOGGING) {
+          LOG.info("SlangCorrecting from " + token + " to "
+              + Arrays.toString(correctionTokens));
+        }
+        token = null;
       }
 
-      processedTokens.add(token);
-    }
-
-    if (LOGGING) {
-      LOG.info("preprocessed: " + processedTokens.toString());
+      // add unmodified token
+      if (token != null) {
+        processedTokens.add(token);
+      }
     }
 
     return processedTokens;
