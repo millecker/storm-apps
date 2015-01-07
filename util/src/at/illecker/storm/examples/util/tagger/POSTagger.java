@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.NameEntities;
@@ -130,18 +129,15 @@ public class POSTagger {
   }
 
   public static void main(String[] args) {
-    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . lol :)";
-    System.out.println("text: '" + text + "'");
-
     POSTagger posTagger = POSTagger.getInstance();
-    Preprocessor preProcessor = Preprocessor.getInstance();
+    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . lol :)";
+    LOG.info("Text: '" + text + "'");
 
     List<String> tokens = Tokenizer.tokenize(text);
-    List<String> preprocessedTokens = preProcessor.preprocess(tokens);
 
-    List<TaggedWord> taggedSentence = posTagger.tagSentence(preprocessedTokens);
+    List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
     for (TaggedWord w : taggedSentence) {
-      System.out.println("token: '" + w.word() + "' tag: '" + w.tag() + "'");
+      LOG.info("token: '" + w.word() + "' tag: '" + w.tag() + "'");
     }
   }
 }
