@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.util.svm.examples;
+package at.illecker.storm.examples.util.svm;
 
 import java.io.File;
 import java.util.List;
@@ -31,7 +31,6 @@ import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.io.IOUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
-import at.illecker.storm.examples.util.svm.SVM;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.feature.ExtendedFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
