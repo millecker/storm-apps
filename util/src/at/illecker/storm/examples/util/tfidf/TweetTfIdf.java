@@ -208,54 +208,27 @@ public class TweetTfIdf {
   }
 
   public static void main(String[] args) {
-    List<Tweet> tweets = new ArrayList<Tweet>();
-    tweets
-        .add(new Tweet(
-            1,
-            "Excuse the connectivity of this live stream , from Baba Amr , so many activists using only one Sat Modem . LIVE http://t.co/U283IhZ5 #Homs",
-            0));
-    tweets
-        .add(new Tweet(
-            2,
-            "Show your LOVE for your local field & it might win an award ! Gallagher Park #Bedlington current 4th in National Award http://t.co/WeiMDtQt",
-            0));
-    tweets
-        .add(new Tweet(
-            3,
-            "@firecore Can you tell me when an update for the Apple TV 3rd gen becomes available ? The missing update holds me back from buying #appletv3",
-            0));
-    tweets
-        .add(new Tweet(
-            4,
-            "My #cre blog Oklahoma Per Square Foot returns to the @JournalRecord blog hub tomorrow . I will have some interesting local data to share .",
-            0));
-    tweets
-        .add(new Tweet(
-            5,
-            "\" @bbcburnsy : Loads from SB ; talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
-            0));
-
+    List<Tweet> tweets = Tweet.getTestTweets();
     Preprocessor preprocessor = Preprocessor.getInstance();
+    POSTagger posTagger = POSTagger.getInstance();
+
+    // prepare Tweets
     for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
 
       // Preprocess
-      tweet.addSentence(preprocessor.preprocess(tokens));
+      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      tweet.addPreprocessedSentence(preprocessedTokens);
+
+      // POS Tagging
+      List<TaggedWord> taggedSentence = posTagger
+          .tagSentence(preprocessedTokens);
+      tweet.addTaggedSentence(taggedSentence);
     }
 
-    boolean usePOSTags = true;
-    // POS Tagging
-    if (usePOSTags) {
-      POSTagger posTagger = POSTagger.getInstance();
-      for (Tweet tweet : tweets) {
-        for (List<String> sentence : tweet.getSentences()) {
-          List<TaggedWord> taggedSentence = posTagger.tagSentence(sentence);
-          tweet.addTaggedSentence(taggedSentence);
-        }
-      }
-    }
-
+    boolean usePOSTags = true; // use POS tags in terms
     Map<Tweet, Map<String, Double>> termFreqs = TweetTfIdf.tf(tweets,
         TfType.RAW, usePOSTags);
     Map<String, Double> inverseDocFreq = TweetTfIdf.idf(termFreqs);

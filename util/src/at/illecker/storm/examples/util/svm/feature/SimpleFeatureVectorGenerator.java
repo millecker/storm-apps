@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.svm.feature;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -139,56 +139,36 @@ public class SimpleFeatureVectorGenerator implements FeatureVectorGenerator {
     return posTags;
   }
 
-  public static List<Tweet> getTestTweets() {
-    List<Tweet> tweets = new ArrayList<Tweet>();
-    tweets.add(new Tweet(0L,
-        "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)",
-        1));
-    tweets
-        .add(new Tweet(
-            0L,
-            "@oluoch @victor_otti @kunjand I just watched it ! Sridevi's comeback .... U remember her from the 90s ?? Sun mornings on NTA ;)",
-            1));
-    tweets
-        .add(new Tweet(
-            0L,
-            "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56",
-            0.5));
-    tweets
-        .add(new Tweet(
-            0L,
-            "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
-            0));
-    tweets.add(new Tweet(0L,
-        "called in sick for the third straight day.  ugh.", 0));
-    tweets
-        .add(new Tweet(
-            0L,
-            "Here we go.  BANK FAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
-            0));
-    tweets.add(new Tweet(0L,
-        "Oh, I'm afraid your Windows-using friends will not survive.", 0));
-    return tweets;
-  }
-
   public static void main(String[] args) {
+    Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
     SimpleFeatureVectorGenerator sfvg = SimpleFeatureVectorGenerator
         .getInstance();
 
-    for (Tweet tweet : getTestTweets()) {
+    for (Tweet tweet : Tweet.getTestTweets()) {
+      // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
 
-      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+      // Preprocess
+      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      tweet.addPreprocessedSentence(preprocessedTokens);
+
+      // POS Tagging
+      List<TaggedWord> taggedSentence = posTagger
+          .tagSentence(preprocessedTokens);
       tweet.addTaggedSentence(taggedSentence);
 
-      System.out.println("Tweet: " + tweet);
-      System.out.print("FeatureVector:");
+      // Feature Vector Generation
+      String featureVectorStr = "";
       for (Map.Entry<Integer, Double> feature : sfvg.calculateFeatureVector(
           tweet).entrySet()) {
-        System.out.print(" " + feature.getKey() + ":" + feature.getValue());
+        featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
-      System.out.println();
+
+      LOG.info("Tweet: '" + tweet + "'");
+      LOG.info("TaggedSentence: " + taggedSentence);
+      LOG.info("FeatureVector: " + featureVectorStr);
     }
 
     sfvg.getSentimentWordLists().close();

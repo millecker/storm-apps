@@ -22,6 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
@@ -80,23 +81,30 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
   }
 
   public static void main(String[] args) {
-    List<Tweet> tweets = SimpleFeatureVectorGenerator.getTestTweets();
+    List<Tweet> tweets = Tweet.getTestTweets();
+    Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
-    boolean tfIdfusePOSTags = true;
 
     // prepare Tweets
+    // prepare Tweets
     for (Tweet tweet : tweets) {
-      // tokenize
+      // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
       tweet.addSentence(tokens);
 
-      // POS tagging
-      List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+      // Preprocess
+      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      tweet.addPreprocessedSentence(preprocessedTokens);
+
+      // POS Tagging
+      List<TaggedWord> taggedSentence = posTagger
+          .tagSentence(preprocessedTokens);
       tweet.addTaggedSentence(taggedSentence);
     }
 
-    // calculate tfidf
-    TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, tfIdfusePOSTags);
+    boolean usePOSTags = true; // use POS tags in terms
+    // calculate Tf-Idf
+    TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, usePOSTags);
     ExtendedFeatureVectorGenerator efvg = new ExtendedFeatureVectorGenerator(
         tweetTfIdf);
 
@@ -106,15 +114,16 @@ public class ExtendedFeatureVectorGenerator implements FeatureVectorGenerator {
     TweetTfIdf.print("Inverse Document Frequency",
         tweetTfIdf.getInverseDocFreq());
 
-    // generate Feature Vector
+    // Feature Vector Generation
     for (Tweet tweet : tweets) {
-      System.out.println("Tweet: " + tweet);
-      System.out.print("FeatureVector:");
+      String featureVectorStr = "";
       for (Map.Entry<Integer, Double> feature : efvg.calculateFeatureVector(
           tweet).entrySet()) {
-        System.out.print(" " + feature.getKey() + ":" + feature.getValue());
+        featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
-      System.out.println();
+
+      LOG.info("Tweet: '" + tweet + "'");
+      LOG.info("FeatureVector: " + featureVectorStr);
     }
 
     efvg.getSentimentWordLists().close();

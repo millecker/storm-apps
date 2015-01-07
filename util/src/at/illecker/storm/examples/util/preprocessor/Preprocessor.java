@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordlist.SlangCorrection;
 
 public class Preprocessor {
@@ -101,13 +102,19 @@ public class Preprocessor {
   }
 
   public static void main(String[] args) {
-    String text = "2moro afaik bbq hf lol";
-    System.out.println("text: '" + text + "'");
-
     Preprocessor preprocessor = Preprocessor.getInstance();
-    List<String> tokens = Tokenizer.tokenize(text);
-    List<String> processedTokens = preprocessor.preprocess(tokens);
 
-    System.out.println("preprocessed: '" + processedTokens + "'");
+    for (Tweet tweet : Tweet.getTestTweets()) {
+      // Tokenize
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
+
+      // Preprocess
+      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      tweet.addPreprocessedSentence(preprocessedTokens);
+
+      LOG.info("Tweet: '" + tweet + "'");
+      LOG.info("Preprocessed: '" + preprocessedTokens + "'");
+    }
   }
 }

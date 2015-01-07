@@ -20,6 +20,10 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
@@ -27,14 +31,15 @@ import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 public class Tokenizer {
+  private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
   public static List<String> tokenize(String text) {
     // trim text
     text = text.trim();
-    
+
     // split at one or more blanks
     String[] inputTokens = text.split("\\s+");
-    
+
     List<String> tokens = new ArrayList<String>();
     for (String inputToken : inputTokens) {
       tokens.add(inputToken);
@@ -51,11 +56,13 @@ public class Tokenizer {
   }
 
   public static void main(String[] args) {
-    String text = "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
-    System.out.println("text: '" + text + "'");
-    List<String> tokens = Tokenizer.tokenize(text);
-    for (String token : tokens) {
-      System.out.println("token: '" + token + "'");
+    for (Tweet tweet : Tweet.getTestTweets()) {
+      // Tokenize
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
+
+      LOG.info("Tweet: '" + tweet + "'");
+      LOG.info("Tokens: " + tokens);
     }
   }
 }

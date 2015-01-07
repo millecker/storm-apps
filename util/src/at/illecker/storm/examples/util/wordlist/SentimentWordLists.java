@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.FileUtils;
+import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -217,19 +218,31 @@ public class SentimentWordLists {
   }
 
   public static void main(String[] args) {
-    String text = "Gas by my monster house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)";
-
-    List<String> tokens = Tokenizer.tokenize(text);
-
+    Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
     SentimentWordLists sentimentWordLists = SentimentWordLists.getInstance();
 
-    List<TaggedWord> taggedSentence = posTagger.tagSentence(tokens);
+    for (Tweet tweet : Tweet.getTestTweets()) {
+      // Tokenize
+      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+      tweet.addSentence(tokens);
 
-    System.out.println("Tweet: '" + text + "'");
-    SentimentResult sentimentResult = sentimentWordLists
-        .getTaggedSentenceSentiment(taggedSentence);
-    System.out.println(sentimentResult);
+      // Preprocess
+      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      tweet.addPreprocessedSentence(preprocessedTokens);
+
+      // POS Tagging
+      List<TaggedWord> taggedSentence = posTagger
+          .tagSentence(preprocessedTokens);
+      tweet.addTaggedSentence(taggedSentence);
+
+      // Calculate Sentiment
+      SentimentResult sentimentResult = sentimentWordLists
+          .getTaggedSentenceSentiment(taggedSentence);
+
+      LOG.info("Tweet: '" + tweet + "'");
+      LOG.info("Sentiment: " + sentimentResult);
+    }
 
     sentimentWordLists.close();
   }
