@@ -19,6 +19,8 @@ package at.illecker.storm.examples.util.preprocessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +55,9 @@ public class Preprocessor {
   }
 
   public List<String> preprocess(List<String> tokens) {
-    // LOG.info("preprocess: " + tokens.toString());
     List<String> processedTokens = new ArrayList<String>();
 
     for (String token : tokens) {
-
       // Step 1) Replace HTML symbols
       token = replaceHTMLSymbols(token);
 
@@ -75,15 +75,8 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 4) Remove elongations of characters (suuuper).
+      // Step 4) Remove elongations of characters (suuuper)
       token = removeRepeatedChars(token);
-
-      // we first tried to subsequently remove each repeating character until we
-      // hit an in-vocabulary word.
-      // For cases resisting this treatment, we adopted the method
-      // suggested by (Brody/Diakopoulos, 2011) and generated a squeezed form of
-      // the prolongated word, subsequently looking it up in a probability table
-      // that has previously been gathered from a training corpus.
 
       // Step 5) Slang correction
       String[] correction = m_slangCorrection
@@ -120,9 +113,38 @@ public class Preprocessor {
   }
 
   private String removeRepeatedChars(String value) {
-    // "(.)\\1{3,}" means any character (added to group 1)
-    // followed by itself at least three times
-    return value.replaceAll("(.)\\1{3,}", "$1");
+    // falls 3 gleiche buchstaben hinereinanda, dann
+    // while: reduziere jeweils um einen buchstaben und schaug ob im
+    // worterbuch vorhanden.
+    // falls nicht im worterbuch gefunden zb. aahh aaahh aahhh aaahhh
+    // dann setze auf 2 gleiche buchstaben
+
+    Pattern repeatPattern = Pattern.compile("(.)\\1{1,}");
+    // "(.)\\1{1,}" means any character (added to group 1)
+    // followed by itself at least one times, means two equal chars
+
+    Matcher m = repeatPattern.matcher(value);
+    while (m.find()) {
+      int start = m.start();
+      int end = m.end();
+      String c = m.group(1);
+      LOG.info("token: '" + value + "' found: " + c + " start: " + start
+          + " end: " + end);
+      // check only if token is not alreay in the vocabulary
+      if (!m_wordnet.contains(value)) {
+        StringBuilder sb = new StringBuilder(value);
+        for (int i = 0; i < end - start - 1; i++) {
+          sb.deleteCharAt(start);
+          LOG.info("check token: '" + sb.toString());
+          // check if token is in the vocabulary
+          if (m_wordnet.contains(sb.toString())) {
+            return sb.toString();
+          }
+        }
+      }
+    }
+
+    return value;
   }
 
   public static void main(String[] args) {
