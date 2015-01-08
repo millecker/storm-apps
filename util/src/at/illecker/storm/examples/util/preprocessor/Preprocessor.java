@@ -66,16 +66,7 @@ public class Preprocessor {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 3) Fix omission of final g in gerund forms (goin)
-      if ((token.endsWith("in")) && (!m_wordnet.contains(token.toLowerCase()))) {
-        // append "g" if a word ends with "in" and is not in the vocabulary
-        if (LOGGING) {
-          LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
-        }
-        token = token + "g";
-      }
-
-      // Step 4) Slang correction
+      // Step 3) Slang correction
       String[] correction = m_slangCorrection
           .getCorrection(token.toLowerCase());
 
@@ -90,8 +81,19 @@ public class Preprocessor {
         token = "";
       }
 
+      // Step 4) Fix omission of final g in gerund forms (goin)
+      if ((!token.isEmpty()) && (token.endsWith("in"))
+          && (!m_wordnet.contains(token.toLowerCase()))) {
+        // append "g" if a word ends with "in" and is not in the vocabulary
+        if (LOGGING) {
+          LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
+        }
+        token = token + "g";
+      }
+
       // Step 5) Remove elongations of characters (suuuper)
-      if ((!StringUtils.isURL(token)) && (!token.startsWith("@"))) {
+      if ((!token.isEmpty()) && (!StringUtils.isURL(token))
+          && (!token.startsWith("@"))) {
         token = removeRepeatingChars(token);
       }
 
