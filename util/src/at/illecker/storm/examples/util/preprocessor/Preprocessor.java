@@ -76,7 +76,10 @@ public class Preprocessor {
       }
 
       // Step 4) Remove elongations of characters (suuuper)
-      token = removeRepeatedChars(token);
+      if ((token.indexOf(".com") == -1) && (token.indexOf("http:") != 0)
+          && (token.indexOf("www.") != 0)) {
+        token = removeRepeatedChars(token);
+      }
 
       // Step 5) Slang correction
       String[] correction = m_slangCorrection
@@ -113,37 +116,71 @@ public class Preprocessor {
   }
 
   private String removeRepeatedChars(String value) {
-    // falls 3 gleiche buchstaben hinereinanda, dann
-    // while: reduziere jeweils um einen buchstaben und schaug ob im
-    // worterbuch vorhanden.
-    // falls nicht im worterbuch gefunden zb. aahh aaahh aahhh aaahhh
-    // dann setze auf 2 gleiche buchstaben
+    // if there are two repeating equal chars
+    // then remove one char until the word is found in the vocabular
+    // else if the word is not found reduce the repeating chars to one
 
     Pattern repeatPattern = Pattern.compile("(.)\\1{1,}");
     // "(.)\\1{1,}" means any character (added to group 1)
     // followed by itself at least one times, means two equal chars
 
-    Matcher m = repeatPattern.matcher(value);
-    while (m.find()) {
-      int start = m.start();
-      int end = m.end();
-      String c = m.group(1);
-      LOG.info("token: '" + value + "' found: " + c + " start: " + start
-          + " end: " + end);
-      // check only if token is not alreay in the vocabulary
+    String lastReducedToken = null;
+
+    Matcher matcher = repeatPattern.matcher(value);
+    List<int[]> matches = new ArrayList<int[]>();
+    while (matcher.find()) {
+      int start = matcher.start();
+      int end = matcher.end();
+      // String c = matcher.group(1);
+      // LOG.info("token: '" + value + "' match at start: " + start + " end: "
+      // + end);
+
+      // check if token is not in the vocabulary
       if (!m_wordnet.contains(value)) {
+        // collect matches for subtoken check
+        matches.add(new int[] { start, end });
+
         StringBuilder sb = new StringBuilder(value);
         for (int i = 0; i < end - start - 1; i++) {
-          sb.deleteCharAt(start);
-          LOG.info("check token: '" + sb.toString());
+          sb.deleteCharAt(start); // delete repeating char
+          lastReducedToken = sb.toString();
+
+          // LOG.info("check token: '" + sb.toString() + "'");
           // check if token is in the vocabulary
           if (m_wordnet.contains(sb.toString())) {
+            LOG.info("reduce token '" + value + "' to '" + sb + "'");
             return sb.toString();
+          }
+
+          // if the token is not in the vocabulary check all combinations
+          // of prior matches
+          for (int j = 0; j < matches.size(); j++) {
+            int startSub = matches.get(j)[0];
+            int endSub = matches.get(j)[1];
+            if (startSub != start) {
+              StringBuilder subSb = new StringBuilder(sb);
+              for (int k = 0; k < endSub - startSub - 1; k++) {
+                subSb.deleteCharAt(startSub);
+                lastReducedToken = subSb.toString();
+
+                // LOG.info("check subtoken: '" + subSb.toString() + "'");
+                if (m_wordnet.contains(subSb.toString())) {
+                  LOG.info("reduce token '" + value + "' to '" + subSb + "'");
+                  return subSb.toString();
+                }
+              }
+            }
           }
         }
       }
     }
 
+    // no match have been found
+    // reduce all repeating chars
+    if (!matches.isEmpty()) {
+      LOG.info("reduce token '" + value + "' to '" + lastReducedToken + "'");
+      value = lastReducedToken;
+    }
     return value;
   }
 
