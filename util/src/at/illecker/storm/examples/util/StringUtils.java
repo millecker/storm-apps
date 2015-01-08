@@ -18,6 +18,11 @@ package at.illecker.storm.examples.util;
 
 public class StringUtils {
 
+  public static boolean isURL(String value) {
+    return ((value.indexOf(".com") > -1) || (value.indexOf("http:") == 0) || (value
+        .indexOf("www.") == 0));
+  }
+
   public static boolean isPunctuation(char c) {
     return c == ',' || c == '.' || c == '!' || c == '?' || c == ':' || c == ';';
   }

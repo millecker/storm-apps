@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -95,8 +96,7 @@ public class POSTagger {
           }
         }
       }
-      if ((token.indexOf(".com") > -1) || (token.indexOf("http:") == 0)
-          || (token.indexOf("www.") == 0)) {
+      if (StringUtils.isURL(token)) {
         preTaggedToken.setTag("URL");
       }
       if ((token.toLowerCase().equals("rt"))

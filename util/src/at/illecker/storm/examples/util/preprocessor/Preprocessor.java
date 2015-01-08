@@ -75,13 +75,7 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 4) Remove elongations of characters (suuuper)
-      if ((token.indexOf(".com") == -1) && (token.indexOf("http:") != 0)
-          && (token.indexOf("www.") != 0)) {
-        token = removeRepeatingChars(token);
-      }
-
-      // Step 5) Slang correction
+      // Step 4) Slang correction
       String[] correction = m_slangCorrection
           .getCorrection(token.toLowerCase());
 
@@ -94,6 +88,11 @@ public class Preprocessor {
               + Arrays.toString(correction));
         }
         token = "";
+      }
+
+      // Step 5) Remove elongations of characters (suuuper)
+      if ((!StringUtils.isURL(token)) && (!token.startsWith("@"))) {
+        token = removeRepeatingChars(token);
       }
 
       // add unmodified token
