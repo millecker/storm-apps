@@ -115,13 +115,13 @@ public class Preprocessor {
   }
 
   private String removeRepeatingChars(String value) {
-    // if there are two repeating equal chars
-    // then remove one char until the word is found in the vocabular
+    // if there are three repeating equal chars
+    // then remove one char until the word is found in the vocabulary
     // else if the word is not found reduce the repeating chars to one
 
-    Pattern repeatPattern = Pattern.compile("(.)\\1{1,}");
-    // "(.)\\1{1,}" means any character (added to group 1)
-    // followed by itself at least one times, means two equal chars
+    Pattern repeatPattern = Pattern.compile("(.)\\1{2,}");
+    // "(.)\\1{2,}" means any character (added to group 1)
+    // followed by itself at least two times, this means three equal chars
 
     Matcher matcher = repeatPattern.matcher(value);
     List<int[]> matches = new ArrayList<int[]>();
