@@ -103,7 +103,7 @@ public class Tweet implements Serializable {
   public static List<Tweet> getTestTweets() {
     List<Tweet> tweets = new ArrayList<Tweet>();
     tweets.add(new Tweet(0,
-        "Gas by my house hit $3.39 !!!! I'm going to Chapel Hill on Sat . :)",
+        "Gas by my house hit $3.39 !!!! I'm goin to Chapel Hill on Sat . :)",
         1));
     tweets
         .add(new Tweet(

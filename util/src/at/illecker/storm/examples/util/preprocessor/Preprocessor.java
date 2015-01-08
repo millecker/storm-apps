@@ -28,16 +28,20 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.SlangCorrection;
+import at.illecker.storm.examples.util.wordnet.WordNet;
 
 public class Preprocessor {
   private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
   private static final boolean LOGGING = true;
   private static final Preprocessor instance = new Preprocessor();
 
+  private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
   private Interjections m_interjections;
 
   private Preprocessor() {
+    // load WordNet
+    m_wordnet = WordNet.getInstance();
     // load SlangCorrection dictionaries
     m_slangCorrection = SlangCorrection.getInstance();
     // load interjections
@@ -53,23 +57,30 @@ public class Preprocessor {
     List<String> processedTokens = new ArrayList<String>();
 
     for (String token : tokens) {
+
       // Step 1) Replace HTML symbols
       token = replaceHTMLSymbols(token);
 
-      // Step 2) Remove punctuation at beginning and ending
+      // Step 2) Remove punctuation and special chars at beginning and ending
       if (!m_interjections.isInterjection(token.toLowerCase())) {
         token = StringUtils.trimPunctuation(token);
       }
 
       // Step 3) Fix omission of final g in gerund forms (goin)
-      // we appended the character g to words ending with -in if
-      // these words are unknown to vocabulary, 4 while the corresponding
-      // ‘g’-forms are in- vocabulary words (IVW).
+      if ((token.endsWith("in")) && (!m_wordnet.contains(token.toLowerCase()))) {
+        // append "g" if a word ends with "in" and is not in the vocabulary
+        if (LOGGING) {
+          LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
+        }
+        token = token + "g";
+      }
 
       // Step 4) Remove elongations of characters (suuuper).
-      // For the latter problem, we
-      // first tried to subsequently remove each repeating character until we
-      // hit an IVW. For cases resisting this treatment, we adopted the method
+      token = removeRepeatedChars(token);
+
+      // we first tried to subsequently remove each repeating character until we
+      // hit an in-vocabulary word.
+      // For cases resisting this treatment, we adopted the method
       // suggested by (Brody/Diakopoulos, 2011) and generated a squeezed form of
       // the prolongated word, subsequently looking it up in a probability table
       // that has previously been gathered from a training corpus.
@@ -106,6 +117,12 @@ public class Preprocessor {
     result = result.replaceAll("&gt;", ">");
     result = result.replaceAll("&nbsp;", " ");
     return result;
+  }
+
+  private String removeRepeatedChars(String value) {
+    // "(.)\\1{3,}" means any character (added to group 1)
+    // followed by itself at least three times
+    return value.replaceAll("(.)\\1{3,}", "$1");
   }
 
   public static void main(String[] args) {
