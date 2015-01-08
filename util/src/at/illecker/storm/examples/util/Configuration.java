@@ -92,10 +92,15 @@ public class Configuration {
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
     Properties props;
 
-    // Add noslang.txt from http://www.noslang.com/dictionary/
+    // Add InternetSlang.txt from http://www.internetslang.com/
     props = new Properties();
     props.put("separator", "\t");
-    slangWordLists.put(wordListDir + "noslang.txt", props);
+    slangWordLists.put(wordListDir + "InternetSlang.txt", props);
+
+    // Add NoSlang.txt from http://www.noslang.com/dictionary/
+    props = new Properties();
+    props.put("separator", "\t");
+    slangWordLists.put(wordListDir + "NoSlang.txt", props);
 
     // Add GATE SlangLookupTable orth.en
     props = new Properties();
