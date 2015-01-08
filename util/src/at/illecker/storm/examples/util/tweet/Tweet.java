@@ -160,8 +160,6 @@ public class Tweet implements Serializable {
             "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
             0));
 
-    tweets.add(new Tweet(0, "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa", 0));
-
     return tweets;
   }
 
