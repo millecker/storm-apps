@@ -185,12 +185,11 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = Tweet.getTestTweets();
-    tweets.add(new Tweet(0, "2moro afaik bbq hf lol", 0));
+    tweets.add(new Tweet(0, "2moro afaik bbq hf lol"));
     tweets
         .add(new Tweet(
             0,
-            "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa",
-            0));
+            "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
 
     for (Tweet tweet : tweets) {
       // Tokenize

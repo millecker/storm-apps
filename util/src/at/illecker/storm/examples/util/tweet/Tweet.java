@@ -29,7 +29,7 @@ public class Tweet implements Serializable {
   private static final long serialVersionUID = 4547113316137760131L;
   private long m_id;
   private String m_text = "";
-  private double m_score = 0;
+  private Double m_score = null;
 
   private List<List<String>> m_sentences;
   private List<List<String>> m_preprocessedSentences;
@@ -41,6 +41,12 @@ public class Tweet implements Serializable {
     this.m_preprocessedSentences = new ArrayList<List<String>>();
     this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
     this.m_featureVector = new HashMap<Integer, Double>();
+  }
+
+  public Tweet(long id, String text) {
+    this();
+    this.m_id = id;
+    this.m_text = text;
   }
 
   public Tweet(long id, String text, double score) {
@@ -58,7 +64,7 @@ public class Tweet implements Serializable {
     return m_text;
   }
 
-  public double getScore() {
+  public Double getScore() {
     return m_score;
   }
 
@@ -96,37 +102,37 @@ public class Tweet implements Serializable {
 
   @Override
   public String toString() {
-    return "Tweet [id=" + m_id + ", text=" + m_text + ", score=" + m_score
-        + "]";
+    return "Tweet [id=" + m_id + ", text=" + m_text
+        + ((m_score != null) ? ", score=" + m_score : "") + "]";
   }
 
   public static List<Tweet> getTestTweets() {
     List<Tweet> tweets = new ArrayList<Tweet>();
     tweets
         .add(new Tweet(
-            0,
+            1,
             "Gas by my house hit $3.39 !!!! I'm goin to Chapel Hill on Sat . :)",
             1));
     tweets
         .add(new Tweet(
-            0,
+            2,
             "@oluoch @victor_otti @kunjand I just watched it ! Sridevi's comeback .... U remember her from the 90s ?? Sun mornings on NTA ;)",
             1));
     tweets
         .add(new Tweet(
-            0,
+            3,
             "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56",
             0.5));
     tweets
         .add(new Tweet(
-            0,
+            4,
             "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
             0));
     tweets.add(new Tweet(0, "called in sick for the third straight day.  ugh.",
         0));
     tweets
         .add(new Tweet(
-            0,
+            5,
             "Here we go.  BANK FAAAAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
             0));
     tweets.add(new Tweet(0,
@@ -134,29 +140,24 @@ public class Tweet implements Serializable {
 
     tweets
         .add(new Tweet(
-            0,
-            "Excuse the connectivity of this live stream , from Baba Amr , so many activists using only one Sat Modem . LIVE http://t.co/U283IhZ5 #Homs",
-            0));
+            6,
+            "Excuse the connectivity of this live stream , from Baba Amr , so many activists using only one Sat Modem . LIVE http://t.co/U283IhZ5 #Homs"));
     tweets
         .add(new Tweet(
-            0,
-            "Show your LOVE for your local field & it might win an award ! Gallagher Park #Bedlington current 4th in National Award http://t.co/WeiMDtQt",
-            0));
+            7,
+            "Show your LOVE for your local field & it might win an award ! Gallagher Park #Bedlington current 4th in National Award http://t.co/WeiMDtQt"));
     tweets
         .add(new Tweet(
-            0,
-            "@firecore Can you tell me when an update for the Apple TV 3rd gen becomes available ? The missing update holds me back from buying #appletv3",
-            0));
+            8,
+            "@firecore Can you tell me when an update for the Apple TV 3rd gen becomes available ? The missing update holds me back from buying #appletv3"));
     tweets
         .add(new Tweet(
-            0,
-            "My #cre blog Oklahoma Per Square Foot returns to the @JournalRecord blog hub tomorrow . I will have some interesting local data to share .",
-            0));
+            9,
+            "My #cre blog Oklahoma Per Square Foot returns to the @JournalRecord blog hub tomorrow . I will have some interesting local data to share ."));
     tweets
         .add(new Tweet(
-            0,
-            "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
-            0));
+            10,
+            "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \""));
 
     return tweets;
   }
