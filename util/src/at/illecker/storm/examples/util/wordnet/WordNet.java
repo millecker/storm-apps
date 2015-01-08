@@ -33,6 +33,7 @@ import edu.mit.jwi.IRAMDictionary;
 import edu.mit.jwi.RAMDictionary;
 import edu.mit.jwi.data.ILoadPolicy;
 import edu.mit.jwi.item.IIndexWord;
+import edu.mit.jwi.item.ISenseEntry;
 import edu.mit.jwi.item.ISynset;
 import edu.mit.jwi.item.ISynsetID;
 import edu.mit.jwi.item.IWord;
@@ -100,8 +101,80 @@ public class WordNet {
     }
   }
 
-  public List<String> findStems(String wordString, POS wordPOS) {
-    return m_wordnetStemmer.findStems(wordString, wordPOS);
+  public boolean contains(String word) {
+    for (POS pos : POS.values()) {
+      for (String stem : m_wordnetStemmer.findStems(word, pos)) {
+        IIndexWord indexWord = m_dict.getIndexWord(stem, pos);
+        if (indexWord != null)
+          return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean isNoun(String word) {
+    return m_dict.getIndexWord(word, POS.NOUN) != null;
+  }
+
+  public boolean isAdjective(String word) {
+    return m_dict.getIndexWord(word, POS.ADJECTIVE) != null;
+  }
+
+  public boolean isAdverb(String word) {
+    return m_dict.getIndexWord(word, POS.ADVERB) != null;
+  }
+
+  public boolean isVerb(String word) {
+    return m_dict.getIndexWord(word, POS.VERB) != null;
+  }
+
+  public synchronized POS findPOS(String word) {
+    int maxCount = 0;
+    POS mostLikelyPOS = null;
+    for (POS pos : POS.values()) {
+      // From JavaDoc: The surface form may or may not contain whitespace or
+      // underscores, and may be in mixed case.
+      word = word.replaceAll("\\s", "").replaceAll("_", "");
+
+      List<String> stems = m_wordnetStemmer.findStems(word, pos);
+      for (String stem : stems) {
+        IIndexWord indexWord = m_dict.getIndexWord(stem, pos);
+        if (indexWord != null) {
+          int count = 0;
+          for (IWordID wordId : indexWord.getWordIDs()) {
+            IWord aWord = m_dict.getWord(wordId);
+            ISenseEntry senseEntry = m_dict.getSenseEntry(aWord.getSenseKey());
+            count += senseEntry.getTagCount();
+          }
+
+          if (count > maxCount) {
+            maxCount = count;
+            mostLikelyPOS = pos;
+          }
+        }
+      }
+    }
+
+    return mostLikelyPOS;
+  }
+
+  public List<String> findStems(String word, POS pos) {
+    return m_wordnetStemmer.findStems(word, pos);
+  }
+
+  public IIndexWord getIndexWord(String word, POS pos) {
+    List<String> stems = findStems(word, pos);
+    if (stems != null) {
+      if (stems.size() > 1) {
+        LOG.info("Be careful the word '" + word
+            + "' has several lemmatized forms.");
+      }
+
+      for (String stem : stems) {
+        return m_dict.getIndexWord(stem, pos); // return first stem
+      }
+    }
+    return null;
   }
 
   public String getLemma(ISynset synset) {
@@ -112,25 +185,10 @@ public class WordNet {
     return getLemma(m_dict.getSynset(synsetID));
   }
 
-  public IIndexWord getIndexWord(String wordString, POS wordPOS) {
-    List<String> stems = findStems(wordString, wordPOS);
-    if (stems != null) {
-      if (stems.size() > 1) {
-        System.out.println("Be careful: the lemma \"" + wordString
-            + "\" has several lemmatized form.");
-      }
-
-      for (String stem : stems) {
-        return m_dict.getIndexWord(stem, wordPOS); // return random stem
-      }
-    }
-    return null;
-  }
-
-  public Set<IIndexWord> getAllIndexWords(String wordString) {
+  public Set<IIndexWord> getAllIndexWords(String word) {
     Set<IIndexWord> indexWords = new HashSet<IIndexWord>();
     for (POS pos : POS.values()) {
-      IIndexWord indexWord = m_dict.getIndexWord(wordString, pos);
+      IIndexWord indexWord = m_dict.getIndexWord(word, pos);
       if (indexWord != null) {
         indexWords.add(indexWord);
       }
@@ -138,10 +196,13 @@ public class WordNet {
     return indexWords;
   }
 
-  public ISynset getSynset(String wordString, POS wordPOS) {
-    IWordID wordID = m_dict.getIndexWord(wordString, wordPOS).getWordIDs()
-        .get(0);
-    return m_dict.getWord(wordID).getSynset();
+  public ISynset getSynset(String word, POS pos) {
+    IIndexWord indexWord = m_dict.getIndexWord(word, pos);
+    if (indexWord != null) {
+      IWordID wordID = indexWord.getWordIDs().get(0); // use first WordID
+      return m_dict.getWord(wordID).getSynset();
+    }
+    return null;
   }
 
   public Set<ISynset> getSynsets(IIndexWord indexWord) {
@@ -457,16 +518,9 @@ public class WordNet {
     return maxSim;
   }
 
-  /**
-   * 
-   * @param sentence
-   * @param wordString
-   * @param wordPOS
-   * @return
-   */
-  public ISynset disambiguateWordSenses(List<TaggedWord> sentence,
-      String wordString, POS wordPOS) {
-    IIndexWord indexWord = getIndexWord(wordString, wordPOS);
+  public ISynset disambiguateWordSenses(List<TaggedWord> sentence, String word,
+      POS pos) {
+    IIndexWord indexWord = getIndexWord(word, pos);
     Set<ISynset> synsets = getSynsets(indexWord);
 
     ISynset resultSynset = null;
