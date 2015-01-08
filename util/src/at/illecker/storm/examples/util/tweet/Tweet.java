@@ -125,7 +125,7 @@ public class Tweet implements Serializable {
     tweets
         .add(new Tweet(
             0,
-            "Here we go.  BANK FAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
+            "Here we go.  BANK FAAAAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
             0));
     tweets.add(new Tweet(0,
         "Oh, I'm afraid your Windows-using friends will not survive.", 0));
@@ -155,7 +155,7 @@ public class Tweet implements Serializable {
     tweets
         .add(new Tweet(
             0,
-            "\" @bbcburnsy : Loads from SB ; talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
+            "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \"",
             0));
 
     return tweets;

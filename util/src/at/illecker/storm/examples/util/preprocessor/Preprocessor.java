@@ -53,21 +53,20 @@ public class Preprocessor {
     List<String> processedTokens = new ArrayList<String>();
 
     for (String token : tokens) {
-      String tokenLowerCase = token.toLowerCase();
-
-      // Step 1) Replace symbols
+      // Step 1) Replace HTML symbols
+      token = replaceHTMLSymbols(token);
 
       // Step 2) Remove punctuation at beginning and ending
-      if (!m_interjections.isInterjection(tokenLowerCase)) {
+      if (!m_interjections.isInterjection(token.toLowerCase())) {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 2) Fix omission of final g in gerund forms (goin)
+      // Step 3) Fix omission of final g in gerund forms (goin)
       // we appended the character g to words ending with -in if
       // these words are unknown to vocabulary, 4 while the corresponding
       // ‘g’-forms are in- vocabulary words (IVW).
 
-      // Step 3) Remove elongations of characters (suuuper).
+      // Step 4) Remove elongations of characters (suuuper).
       // For the latter problem, we
       // first tried to subsequently remove each repeating character until we
       // hit an IVW. For cases resisting this treatment, we adopted the method
@@ -75,8 +74,10 @@ public class Preprocessor {
       // the prolongated word, subsequently looking it up in a probability table
       // that has previously been gathered from a training corpus.
 
-      // Step 4) Slang correction
-      String[] correction = m_slangCorrection.getCorrection(tokenLowerCase);
+      // Step 5) Slang correction
+      String[] correction = m_slangCorrection
+          .getCorrection(token.toLowerCase());
+
       if (correction != null) {
         for (int i = 0; i < correction.length; i++) {
           processedTokens.add(correction[i]);
@@ -95,6 +96,16 @@ public class Preprocessor {
     }
 
     return processedTokens;
+  }
+
+  private String replaceHTMLSymbols(String value) {
+    String result = value;
+    result = result.replaceAll("&quot;", "\"");
+    result = result.replaceAll("&amp;", "&");
+    result = result.replaceAll("&lt;", "<");
+    result = result.replaceAll("&gt;", ">");
+    result = result.replaceAll("&nbsp;", " ");
+    return result;
   }
 
   public static void main(String[] args) {
