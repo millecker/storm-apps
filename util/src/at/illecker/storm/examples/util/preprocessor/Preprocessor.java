@@ -185,6 +185,7 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = Tweet.getTestTweets();
+    tweets.add(new Tweet(0, "2moro afaik bbq hf lol", 0));
     tweets
         .add(new Tweet(
             0,

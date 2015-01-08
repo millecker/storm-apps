@@ -132,8 +132,6 @@ public class Tweet implements Serializable {
     tweets.add(new Tweet(0,
         "Oh, I'm afraid your Windows-using friends will not survive.", 0));
 
-    tweets.add(new Tweet(0, "2moro afaik bbq hf lol", 0));
-
     tweets
         .add(new Tweet(
             0,
