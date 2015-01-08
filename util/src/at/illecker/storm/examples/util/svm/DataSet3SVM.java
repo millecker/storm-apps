@@ -31,6 +31,7 @@ import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.io.IOUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
+import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
@@ -61,9 +62,19 @@ public class DataSet3SVM {
     }
   }
 
-  public static void tagTweets(POSTagger posTagger, List<Tweet> tweets) {
+  public static void preprocessTweets(Preprocessor preprocessor,
+      List<Tweet> tweets) {
     for (Tweet tweet : tweets) {
       for (List<String> sentence : tweet.getSentences()) {
+        List<String> preprocessedSentence = preprocessor.preprocess(sentence);
+        tweet.addPreprocessedSentence(preprocessedSentence);
+      }
+    }
+  }
+
+  public static void tagTweets(POSTagger posTagger, List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      for (List<String> sentence : tweet.getPreprocessedSentences()) {
         List<TaggedWord> taggedSentence = posTagger.tagSentence(sentence);
         tweet.addTaggedSentence(taggedSentence);
       }
@@ -85,6 +96,7 @@ public class DataSet3SVM {
 
   public static void main(String[] args) {
     FeatureVectorGenerator fvg = null;
+    Preprocessor preprocessor = null;
     POSTagger posTagger = null;
     boolean useExtendedFeatureVectorGen = false;
     boolean parameterSearch = false;
@@ -100,22 +112,22 @@ public class DataSet3SVM {
       LOG.info("Tokenize train tweets...");
       tokenizeTweets(trainTweets);
 
+      // Preprocess
+      LOG.info("Preprocess train tweets...");
+      preprocessor = Preprocessor.getInstance();
+      preprocessTweets(preprocessor, trainTweets);
+
       // POS Tagging
       LOG.info("POS Tagging of train tweets...");
-      if (posTagger == null) {
-        posTagger = POSTagger.getInstance();
-      }
+      posTagger = POSTagger.getInstance();
       tagTweets(posTagger, trainTweets);
 
-      if (fvg == null) {
-        if (useExtendedFeatureVectorGen) {
-          LOG.info("Load TfIdfFeatureVectorGenerator...");
-          fvg = new TfIdfFeatureVectorGenerator(new TweetTfIdf(trainTweets,
-              true));
-        } else {
-          LOG.info("Load SentimentFeatureVectorGenerator...");
-          fvg = new SentimentFeatureVectorGenerator();
-        }
+      if (useExtendedFeatureVectorGen) {
+        LOG.info("Load TfIdfFeatureVectorGenerator...");
+        fvg = new TfIdfFeatureVectorGenerator(new TweetTfIdf(trainTweets, true));
+      } else {
+        LOG.info("Load SentimentFeatureVectorGenerator...");
+        fvg = new SentimentFeatureVectorGenerator();
       }
 
       // Feature Vector Generation
@@ -130,7 +142,7 @@ public class DataSet3SVM {
     LOG.info("Prepare Test data...");
     List<Tweet> testTweets = SerializationUtils.deserialize(TEST_SER);
     if (testTweets == null) {
-      if ((fvg == null) || (posTagger == null)) {
+      if (fvg == null) {
         LOG.error("Train and test data must use the same FeatureVectorGenerator!");
         System.exit(1);
       }
@@ -140,6 +152,10 @@ public class DataSet3SVM {
       // Tokenize
       LOG.info("Tokenize test tweets...");
       tokenizeTweets(testTweets);
+
+      // Preprocess
+      LOG.info("Preprocess test tweets...");
+      preprocessTweets(preprocessor, trainTweets);
 
       // POS Tagging
       LOG.info("POS Tagging of test tweets...");
