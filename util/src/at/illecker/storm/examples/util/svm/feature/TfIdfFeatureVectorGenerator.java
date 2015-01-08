@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
+import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
+import at.illecker.storm.examples.util.tfidf.TfType;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -34,7 +36,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class TfIdfFeatureVectorGenerator implements FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(TfIdfFeatureVectorGenerator.class);
-  private static final boolean LOGGING = false;
+  // private static final boolean LOGGING = false;
 
   private TweetTfIdf m_tweetTfIdf = null;
   private SentimentWordLists m_sentimentWordLists;
@@ -65,13 +67,13 @@ public class TfIdfFeatureVectorGenerator implements FeatureVectorGenerator {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
     if (m_tweetTfIdf != null) {
-      Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
+      // Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
       Map<String, Integer> termIds = m_tweetTfIdf.getTermIds();
       Map<String, Double> tfIdf = m_tweetTfIdf.tfIdf(tweet);
 
       for (Map.Entry<String, Double> element : tfIdf.entrySet()) {
         String key = element.getKey();
-        if (idf.containsKey(key)) {
+        if (termIds.containsKey(key)) {
           int vectorId = m_vectorStartId + termIds.get(key);
           resultFeatureVector.put(vectorId, element.getValue());
         }
@@ -106,7 +108,8 @@ public class TfIdfFeatureVectorGenerator implements FeatureVectorGenerator {
 
     boolean usePOSTags = true; // use POS tags in terms
     // calculate Tf-Idf
-    TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, usePOSTags);
+    TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, TfType.RAW,
+        TfIdfNormalization.COS, usePOSTags);
     TfIdfFeatureVectorGenerator efvg = new TfIdfFeatureVectorGenerator(
         tweetTfIdf);
 
