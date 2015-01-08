@@ -78,7 +78,7 @@ public class Preprocessor {
       // Step 4) Remove elongations of characters (suuuper)
       if ((token.indexOf(".com") == -1) && (token.indexOf("http:") != 0)
           && (token.indexOf("www.") != 0)) {
-        token = removeRepeatedChars(token);
+        token = removeRepeatingChars(token);
       }
 
       // Step 5) Slang correction
@@ -115,7 +115,7 @@ public class Preprocessor {
     return result;
   }
 
-  private String removeRepeatedChars(String value) {
+  private String removeRepeatingChars(String value) {
     // if there are two repeating equal chars
     // then remove one char until the word is found in the vocabular
     // else if the word is not found reduce the repeating chars to one
@@ -123,8 +123,6 @@ public class Preprocessor {
     Pattern repeatPattern = Pattern.compile("(.)\\1{1,}");
     // "(.)\\1{1,}" means any character (added to group 1)
     // followed by itself at least one times, means two equal chars
-
-    String lastReducedToken = null;
 
     Matcher matcher = repeatPattern.matcher(value);
     List<int[]> matches = new ArrayList<int[]>();
@@ -143,7 +141,6 @@ public class Preprocessor {
         StringBuilder sb = new StringBuilder(value);
         for (int i = 0; i < end - start - 1; i++) {
           sb.deleteCharAt(start); // delete repeating char
-          lastReducedToken = sb.toString();
 
           // LOG.info("check token: '" + sb.toString() + "'");
           // check if token is in the vocabulary
@@ -161,7 +158,6 @@ public class Preprocessor {
               StringBuilder subSb = new StringBuilder(sb);
               for (int k = 0; k < endSub - startSub - 1; k++) {
                 subSb.deleteCharAt(startSub);
-                lastReducedToken = subSb.toString();
 
                 // LOG.info("check subtoken: '" + subSb.toString() + "'");
                 if (m_wordnet.contains(subSb.toString())) {
@@ -178,8 +174,9 @@ public class Preprocessor {
     // no match have been found
     // reduce all repeating chars
     if (!matches.isEmpty()) {
-      LOG.info("reduce token '" + value + "' to '" + lastReducedToken + "'");
-      value = lastReducedToken;
+      String reducedToken = matcher.replaceAll("$1");
+      LOG.info("reduce token '" + value + "' to '" + reducedToken + "'");
+      value = reducedToken;
     }
     return value;
   }
