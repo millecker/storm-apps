@@ -23,55 +23,30 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.SlangCorrection;
 
 public class Preprocessor {
   private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = true;
   private static final Preprocessor instance = new Preprocessor();
 
   private SlangCorrection m_slangCorrection;
+  private Interjections m_interjections;
 
   private Preprocessor() {
-    // Load SlangCorrection
+    // load SlangCorrection dictionaries
     m_slangCorrection = SlangCorrection.getInstance();
+    // load interjections
+    m_interjections = Interjections.getInstance();
   }
 
   public static Preprocessor getInstance() {
     return instance;
   }
-
-  // STEP 1
-  // First unify all URLs, e-mail addresses and user names by replacing them
-  // with unique tokens.
-  // All hash marks were stripped from words, and emoticons were mapped to
-  // special tokens representing their emotion categories
-  // These special tokens were then added to the polarity lexicons used by
-  // SO-CAL.
-
-  // STEP 2
-  // Social media specific slang expressions and abbreviations like “2 b” (for
-  // “to be”) or “im- sry” (for “I am sorry”) were translated to their ap-
-  // propriate standard language forms. For this, we used a dictionary of
-  // 5,424 expressions that we gathered from publicly available resources.
-  // http://www.noslang.com/dictionary/
-  // http://onlineslangdictionary.com/
-  // http: //www.urbandictionary.com/
-
-  // STEP 3
-  // Tackles two typical spelling phenomena:
-  // a) the omission of final g in gerund forms (goin), and
-  // b) elongations of characters (suuuper).
-  // For the former, we appended the character g to words ending with -in if
-  // these words are unknown to vo- cabulary,4 while the corresponding
-  // ‘g’-forms are in- vocabulary words (IVW). For the latter problem, we
-  // first tried to subsequently remove each repeat- ing character until we
-  // hit an IVW. For cases re- sisting this treatment, we adopted the method
-  // sug- gested by (Brody/Diakopoulos, 2011) and generated a squeezed form of
-  // the prolongated word, subse- quently looking it up in a probability table
-  // that has previously been gathered from a training corpus.
 
   public List<String> preprocess(List<String> tokens) {
     // LOG.info("preprocess: " + tokens.toString());
@@ -80,22 +55,41 @@ public class Preprocessor {
     for (String token : tokens) {
       String tokenLowerCase = token.toLowerCase();
 
-      // Slang correction
-      String correction = m_slangCorrection.getCorrection(tokenLowerCase);
+      // Step 1) Replace symbols
+
+      // Step 2) Remove punctuation at beginning and ending
+      if (!m_interjections.isInterjection(tokenLowerCase)) {
+        token = StringUtils.trimPunctuation(token);
+      }
+
+      // Step 2) Fix omission of final g in gerund forms (goin)
+      // we appended the character g to words ending with -in if
+      // these words are unknown to vocabulary, 4 while the corresponding
+      // ‘g’-forms are in- vocabulary words (IVW).
+
+      // Step 3) Remove elongations of characters (suuuper).
+      // For the latter problem, we
+      // first tried to subsequently remove each repeating character until we
+      // hit an IVW. For cases resisting this treatment, we adopted the method
+      // suggested by (Brody/Diakopoulos, 2011) and generated a squeezed form of
+      // the prolongated word, subsequently looking it up in a probability table
+      // that has previously been gathered from a training corpus.
+
+      // Step 4) Slang correction
+      String[] correction = m_slangCorrection.getCorrection(tokenLowerCase);
       if (correction != null) {
-        String[] correctionTokens = correction.split(" ");
-        for (int i = 0; i < correctionTokens.length; i++) {
-          processedTokens.add(correctionTokens[i]);
+        for (int i = 0; i < correction.length; i++) {
+          processedTokens.add(correction[i]);
         }
         if (LOGGING) {
           LOG.info("SlangCorrecting from " + token + " to "
-              + Arrays.toString(correctionTokens));
+              + Arrays.toString(correction));
         }
-        token = null;
+        token = "";
       }
 
       // add unmodified token
-      if (token != null) {
+      if (!token.isEmpty()) {
         processedTokens.add(token);
       }
     }
