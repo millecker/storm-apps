@@ -70,6 +70,7 @@ public class TweetTfIdf {
       i++;
     }
 
+    LOG.info("Found " + m_inverseDocFreq.size() + " terms");
     // Debug
     // print("Term Frequency", m_termFreqs, m_inverseDocFreq);
     // print("Inverse Document Frequency", m_inverseDocFreq);
@@ -100,7 +101,8 @@ public class TweetTfIdf {
       WordNet wordNet = WordNet.getInstance();
       StopWords stopWords = StopWords.getInstance();
       // regex for one or more punctuations
-      Pattern p = Pattern.compile("^\\p{Punct}+$");
+      // Pattern punctuationPattern = Pattern.compile("^\\p{Punct}+$");
+      Pattern startAlphabetPattern = Pattern.compile("^[a-zA-Z].*$");
 
       for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
         List<String> words = new ArrayList<String>();
@@ -112,12 +114,24 @@ public class TweetTfIdf {
           if ((!pennTag.equals(".")) && (!pennTag.equals(","))
               && (!pennTag.equals(":")) && (!pennTag.equals("''"))
               && (!pennTag.equals("(")) && (!pennTag.equals(")"))
-              && (!pennTag.equals("URL")) && (!pennTag.equals("HT"))
-              && (!pennTag.equals("USR")) && (!pennTag.equals("CC"))
-              && (!pennTag.equals("CD")) && (!pennTag.equals("SYM"))
-              && (!pennTag.equals("POS")) && (!stopWords.isStopWord(word))) {
+              && (!pennTag.equals("URL")) && (!pennTag.equals("USR"))
+              && (!pennTag.equals("CC")) && (!pennTag.equals("CD"))
+              && (!pennTag.equals("SYM")) && (!pennTag.equals("POS"))
+              && (!stopWords.isStopWord(word))) {
 
-            if ((p.matcher(word).find()) && (!pennTag.equals("POS"))) {
+            // remove hashtag
+            if (pennTag.equals("HT")) {
+              word = word.substring(1);
+            }
+
+            // check if word consists of punctuations
+            // if ((punctuationPattern.matcher(word).find())
+            // && (!pennTag.equals("POS"))) {
+            // continue;
+            // }
+
+            // check if word starts with an alphabet
+            if (!startAlphabetPattern.matcher(word).find()) {
               continue;
             }
 
@@ -131,6 +145,7 @@ public class TweetTfIdf {
               word = stems.get(0);
             }
 
+            // add word to term frequency
             words.add(word
                 + ((posTag != null) ? "#" + POSTag.toString(posTag) : ""));
           }
@@ -236,8 +251,9 @@ public class TweetTfIdf {
     Map<Tweet, Map<String, Double>> tfIdf = TweetTfIdf.tfIdf(termFreqs,
         inverseDocFreq, TfIdfNormalization.NONE);
 
+    LOG.info("Found " + inverseDocFreq.size() + " terms");
     print("Term Frequency", termFreqs, inverseDocFreq);
     print("Inverse Document Frequency", inverseDocFreq);
-    print("tf-idf", tfIdf, inverseDocFreq);
+    print("Tf-Idf", tfIdf, inverseDocFreq);
   }
 }
