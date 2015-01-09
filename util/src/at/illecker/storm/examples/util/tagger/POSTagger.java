@@ -28,6 +28,7 @@ import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.wordlist.Emoticons;
 import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.NameEntities;
 import edu.stanford.nlp.io.RuntimeIOException;
@@ -43,6 +44,7 @@ public class POSTagger {
   private MaxentTagger m_posTagger; // Standford POS Tagger
   private NameEntities m_nameEntities;
   private Interjections m_interjections;
+  private Emoticons m_emoticons;
 
   private POSTagger() {
     // Load POS Tagger
@@ -54,12 +56,12 @@ public class POSTagger {
     } catch (RuntimeIOException e) {
       LOG.error("RuntimeIOException: " + e.getMessage());
     }
-
     // Load NameEntities
     m_nameEntities = NameEntities.getInstance();
-
     // Load Interjections
     m_interjections = Interjections.getInstance();
+    // Load emoticons
+    m_emoticons = Emoticons.getInstance();
   }
 
   public static POSTagger getInstance() {
@@ -74,7 +76,6 @@ public class POSTagger {
     while (iter.hasNext()) {
       String token = iter.next();
       TaggedWord preTaggedToken = new TaggedWord(token);
-      String tokenLowerCase = token.toLowerCase();
 
       // set custom tags
       if (StringUtils.isHashTag(token)) {
@@ -104,7 +105,7 @@ public class POSTagger {
       }
 
       // Name entities
-      if (m_nameEntities.isNameEntity(tokenLowerCase)) {
+      if (m_nameEntities.isNameEntity(token)) {
         if (LOGGING) {
           LOG.info("NameEntity labelled for " + token);
         }
@@ -112,9 +113,10 @@ public class POSTagger {
       }
 
       // Interjections
-      if (m_interjections.isInterjection(tokenLowerCase)) {
+      if ((m_interjections.isInterjection(token))
+          || (m_emoticons.isEmoticon(token))) {
         if (LOGGING) {
-          LOG.info("Interjection labelled for " + token);
+          LOG.info("Interjection or Emoticon labelled for " + token);
         }
         preTaggedToken.setTag("UH");
       }
