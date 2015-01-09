@@ -31,6 +31,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class JsonTweetExtractorBolt extends BaseRichBolt {
+  public static final String ID = "json-tweet-extractor-bolt";
   private static final long serialVersionUID = -7467317303659214525L;
   private static final Logger LOG = LoggerFactory
       .getLogger(JsonTweetExtractorBolt.class);

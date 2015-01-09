@@ -41,6 +41,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 public class TwitterFilesSpout extends BaseRichSpout {
+  public static final String ID = "twitter-files-spout";
   public static final String CONF_TWITTER_DIR = "twitter.dir";
   public static final String FILE_EXTENSION = ".gz";
   private static final long serialVersionUID = -4277696098291748609L;

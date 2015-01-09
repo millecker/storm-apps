@@ -38,6 +38,7 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
 public class TwitterSpout extends BaseRichSpout {
+  public static final String ID = "twitter-spout";
   private static final long serialVersionUID = 1208142390795660693L;
 
   private SpoutOutputCollector m_collector;

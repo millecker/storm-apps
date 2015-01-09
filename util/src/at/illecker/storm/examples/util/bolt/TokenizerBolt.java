@@ -33,6 +33,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class TokenizerBolt extends BaseRichBolt {
+  public static final String ID = "tokenizer-bolt";
   private static final long serialVersionUID = -2932822073019567061L;
   private static final Logger LOG = LoggerFactory
       .getLogger(TokenizerBolt.class);

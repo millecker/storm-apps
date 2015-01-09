@@ -32,6 +32,7 @@ import backtype.storm.tuple.Tuple;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SentimentDetectionBolt extends BaseRichBolt {
+  public static final String ID = "sentiment-detection-bolt";
   private static final long serialVersionUID = -3279220626656829348L;
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentDetectionBolt.class);

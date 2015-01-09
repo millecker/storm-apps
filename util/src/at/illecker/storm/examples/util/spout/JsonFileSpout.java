@@ -32,6 +32,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 public class JsonFileSpout extends BaseRichSpout {
+  public static final String ID = "json-file-spout";
   public static final String CONF_JSON_FILE = "json.file";
   private static final long serialVersionUID = -566909258413711921L;
   private static final Logger LOG = LoggerFactory

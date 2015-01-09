@@ -33,6 +33,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class PreprocessorBolt extends BaseRichBolt {
+  public static final String ID = "preprocessor-bolt";
   private static final long serialVersionUID = 5767153574646034298L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PreprocessorBolt.class);

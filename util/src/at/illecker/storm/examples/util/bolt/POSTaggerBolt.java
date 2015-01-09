@@ -43,6 +43,7 @@ import edu.stanford.nlp.ling.TaggedWord;
  * 
  */
 public class POSTaggerBolt extends BaseRichBolt {
+  public static final String ID = "pos-tagger-bolt";
   private static final long serialVersionUID = -2931810659942708343L;
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
