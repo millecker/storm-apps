@@ -72,6 +72,11 @@ public class Preprocessor {
       }
 
       // Step 3) slang correction
+      // TODO 'owned' to [made, to, look, bad], 'xD' to [extreme, droll]
+      // 'FC' to [fruit, cake]
+      // 'Ajax' to [Asynchronous, Javascript, and, XML]
+      // 'TL' to [dr too, long, didn't, read]
+      // 'Rammstein' to 'Rammsteing'
       String[] correction = m_slangCorrection
           .getCorrection(token.toLowerCase());
       if (correction != null) {
@@ -86,6 +91,7 @@ public class Preprocessor {
       }
 
       // Step 4) Fix omission of final g in gerund forms (goin)
+      // TODO check for names e.g., Kevin, Justin
       if ((!token.isEmpty()) && (!tokenIsUSR) && (!tokenIsHashTag)
           && (token.endsWith("in"))
           && (!m_wordnet.contains(token.toLowerCase()))) {
@@ -97,6 +103,7 @@ public class Preprocessor {
       }
 
       // Step 5) Remove elongations of characters (suuuper)
+      // TODO do not remove chars from numbers
       if ((!token.isEmpty()) && (!tokenIsURL) && (!tokenIsUSR)
           && (!tokenIsHashTag) && (!tokenIsEmoticon)) {
         token = removeRepeatingChars(token);
