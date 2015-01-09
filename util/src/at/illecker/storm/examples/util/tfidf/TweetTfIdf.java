@@ -122,7 +122,7 @@ public class TweetTfIdf {
             }
 
             // Check if word consists of punctuations
-            // if ((punctuationPattern.matcher(word).find())
+            // if (StringUtils.consitsOfPunctuations(word)
             // && (!pennTag.equals("POS"))) {
             // continue;
             // }

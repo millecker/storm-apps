@@ -42,6 +42,10 @@ public class StringUtils {
     return RegexUtils.RETWEET.matcher(value).matches();
   }
 
+  public static boolean consitsOfPunctuations(String value) {
+    return RegexUtils.ONE_OR_MORE_PUNCTUATIONS.matcher(value).matches();
+  }
+
   public static boolean isPunctuation(char c) {
     return c == ',' || c == '.' || c == '!' || c == '?' || c == ':' || c == ';';
   }
