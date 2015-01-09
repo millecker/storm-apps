@@ -86,12 +86,13 @@ public class StringUtils {
     }
 
     // case 3) substring
-    LOG.info("substring token '" + value + "'");
-
-    // TODO try and catch StringIndexOutOfBoundsException
-    // e.g., >:-[
-    return value.substring(startingPunctuations, valueLen - endingPunctuations
-        - startingPunctuations);
+    int substringLen = valueLen - endingPunctuations - startingPunctuations;
+    if (startingPunctuations >= substringLen) {
+      LOG.info("trimPunctuation is not possible for '" + value + "'");
+      return value;
+    } else {
+      return value.substring(startingPunctuations, substringLen);
+    }
   }
 
   public static void main(String[] args) {
@@ -117,5 +118,11 @@ public class StringUtils {
       System.out.println("isHashTag(" + s + "): " + isHashTag(s));
     }
 
+    // test Punctuations
+    String[] testPunctuations = new String[] { ".asdf.", "asdf.:--",
+        "--asdf-!", ":-)", ">:-[" };
+    for (String s : testPunctuations) {
+      System.out.println("trimPunctuation(" + s + "): " + trimPunctuation(s));
+    }
   }
 }
