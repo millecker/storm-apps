@@ -34,10 +34,7 @@ import backtype.storm.topology.TopologyBuilder;
  * 
  */
 public class SimpleSentimentAnalysisTopology {
-
-  private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String SIMPLE_SENTIMENT_ANALYSIS_BOLT_ID = "simple-sentiment-analysis-bolt";
-  private static final String TOPOLOGY_NAME = "simple-sentiment-analysis-topology";
+  public static final String TOPOLOGY_NAME = "simple-sentiment-analysis-topology";
   public static final String FILTER_LANG = "en";
   public static final String AFINN_SENTIMENT_FILE = "resources/AFINN-111.txt";
 
@@ -89,12 +86,15 @@ public class SimpleSentimentAnalysisTopology {
 
     // Create Spout
     IRichSpout spout;
+    String spoutID = "";
     if (twitterDir.isDirectory()) {
       conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
       spout = new TwitterFilesSpout(FILTER_LANG);
+      spoutID = TwitterFilesSpout.ID;
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
           accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterSpout.ID;
     }
 
     // Create Bolts
@@ -102,11 +102,14 @@ public class SimpleSentimentAnalysisTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
+
     // Set Spout
-    builder.setSpout(TWEET_SPOUT_ID, spout);
+    builder.setSpout(spoutID, spout);
+
     // Set Spout --> SimpleSentimentAnalysisBolt
-    builder.setBolt(SIMPLE_SENTIMENT_ANALYSIS_BOLT_ID,
-        simpleSentimentAnalysisBolt).shuffleGrouping(TWEET_SPOUT_ID);
+    builder
+        .setBolt(SimpleSentimentAnalysisBolt.ID, simpleSentimentAnalysisBolt)
+        .shuffleGrouping(spoutID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

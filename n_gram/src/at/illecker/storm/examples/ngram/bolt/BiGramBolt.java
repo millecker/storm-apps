@@ -35,6 +35,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class BiGramBolt extends BaseRichBolt {
+  public static final String ID = "bi-gram-bolt";
   private static final long serialVersionUID = 7554959448481890289L;
   private static final Logger LOG = LoggerFactory.getLogger(BiGramBolt.class);
 

@@ -28,10 +28,7 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
 public class NGramTopology {
-
-  private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String BI_GRAM_BOLT_ID = "bi-gram-bolt";
-  private static final String TOPOLOGY_NAME = "n-gram-topology";
+  public static final String TOPOLOGY_NAME = "n-gram-topology";
   public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
@@ -80,12 +77,15 @@ public class NGramTopology {
 
     // Create Spout
     IRichSpout spout;
+    String spoutID = "";
     if (twitterDir.isDirectory()) {
       conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
       spout = new TwitterFilesSpout(FILTER_LANG);
+      spoutID = TwitterFilesSpout.ID;
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
           accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterSpout.ID;
     }
 
     // Create Bolts
@@ -94,10 +94,9 @@ public class NGramTopology {
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
     // Set Spout
-    builder.setSpout(TWEET_SPOUT_ID, spout);
+    builder.setSpout(spoutID, spout);
     // Set Spout --> BiGramBolt
-    builder.setBolt(BI_GRAM_BOLT_ID, biGramBolt)
-        .shuffleGrouping(TWEET_SPOUT_ID);
+    builder.setBolt(BiGramBolt.ID, biGramBolt).shuffleGrouping(spoutID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

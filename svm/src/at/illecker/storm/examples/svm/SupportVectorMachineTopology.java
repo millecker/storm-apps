@@ -33,15 +33,7 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
 public class SupportVectorMachineTopology {
-  private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String JSON_TWEET_EXTRACTOR_BOLT_ID = "json-tweet-extractor-bolt";
-  private static final String TOKENIZER_BOLT_ID = "tokenizer-bolt";
-  private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
-  private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
-  private static final String FEATURE_EXTRACTOR_BOLT_ID = "feature-extractor-bolt";
-  private static final String SVM_BOLT_ID = "support-vector-maschine-bolt";
-  private static final String TOPOLOGY_NAME = "support-vector-maschine-topology";
-
+  public static final String TOPOLOGY_NAME = "support-vector-maschine-topology";
   private static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
@@ -90,12 +82,15 @@ public class SupportVectorMachineTopology {
 
     // Create Spout
     IRichSpout spout;
+    String spoutID = "";
     if (referenceFile.isFile()) {
       conf.put(JsonFileSpout.CONF_JSON_FILE, referenceFile.getAbsolutePath());
       spout = new JsonFileSpout();
+      spoutID = JsonFileSpout.ID;
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
           accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterSpout.ID;
     }
 
     // Create Bolts
@@ -110,31 +105,31 @@ public class SupportVectorMachineTopology {
     TopologyBuilder builder = new TopologyBuilder();
 
     // Set Spout
-    builder.setSpout(TWEET_SPOUT_ID, spout);
+    builder.setSpout(spoutID, spout);
 
     // Spout --> JsonTweetExtractorBolt
-    builder.setBolt(JSON_TWEET_EXTRACTOR_BOLT_ID, jsonTweetExtractorBolt)
-        .shuffleGrouping(TWEET_SPOUT_ID);
+    builder.setBolt(JsonTweetExtractorBolt.ID, jsonTweetExtractorBolt)
+        .shuffleGrouping(spoutID);
 
     // JsonTweetExtractorBolt --> TokenizerBolt
-    builder.setBolt(TOKENIZER_BOLT_ID, tokenizerBolt).shuffleGrouping(
-        JSON_TWEET_EXTRACTOR_BOLT_ID);
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(
+        JsonTweetExtractorBolt.ID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PREPROCESSOR_BOLT_ID, preprocessorBolt).shuffleGrouping(
-        TOKENIZER_BOLT_ID);
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
+        TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
-        PREPROCESSOR_BOLT_ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt).shuffleGrouping(
+        PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureExtractorBolt
-    builder.setBolt(FEATURE_EXTRACTOR_BOLT_ID, featureExtractorBolt)
-        .shuffleGrouping(POS_TAGGER_BOLT_ID);
+    builder.setBolt(FeatureExtractorBolt.ID, featureExtractorBolt)
+        .shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureExtractorBolt --> SupportVectorMaschineBolt
-    builder.setBolt(SVM_BOLT_ID, svmBolt).shuffleGrouping(
-        FEATURE_EXTRACTOR_BOLT_ID);
+    builder.setBolt(SupportVectorMachineBolt.ID, svmBolt).shuffleGrouping(
+        FeatureExtractorBolt.ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

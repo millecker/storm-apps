@@ -48,6 +48,7 @@ import backtype.storm.tuple.Tuple;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SupportVectorMachineBolt extends BaseRichBolt {
+  public static final String ID = "support-vector-maschine-bolt";
   public static final String DATASET_PATH = Configuration.getDataSetPath()
       + "dataset2" + File.separator;
   public static final String DATA = DATASET_PATH

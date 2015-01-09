@@ -39,6 +39,7 @@ import backtype.storm.tuple.Tuple;
  * 
  */
 public class SimpleSentimentAnalysisBolt extends BaseRichBolt {
+  public static final String ID = "simple-sentiment-analysis-bolt";
   public static String CONF_WORD_LIST_FILE = "afinn.sentiment.file";
   private static final long serialVersionUID = -5959679287318116521L;
   private static final Logger LOG = LoggerFactory

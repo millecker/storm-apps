@@ -30,12 +30,7 @@ import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
 public class POSTaggerTopology {
-
-  private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String TOKENIZER_BOLT_ID = "tokenizer-bolt";
-  private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
-  private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
-  private static final String TOPOLOGY_NAME = "pos-tagger-topology";
+  public static final String TOPOLOGY_NAME = "pos-tagger-topology";
   public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
@@ -84,12 +79,15 @@ public class POSTaggerTopology {
 
     // Create Spout
     IRichSpout spout;
+    String spoutID = "";
     if (twitterDir.isDirectory()) {
       conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
       spout = new TwitterFilesSpout(FILTER_LANG);
+      spoutID = TwitterFilesSpout.ID;
     } else {
       spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
           accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterSpout.ID;
     }
 
     // Create Bolts
@@ -101,19 +99,18 @@ public class POSTaggerTopology {
     TopologyBuilder builder = new TopologyBuilder();
 
     // Set Spout
-    builder.setSpout(TWEET_SPOUT_ID, spout);
+    builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TOKENIZER_BOLT_ID, tokenizerBolt).shuffleGrouping(
-        TWEET_SPOUT_ID);
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PREPROCESSOR_BOLT_ID, preprocessorBolt).shuffleGrouping(
-        TOKENIZER_BOLT_ID);
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
+        TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
-        PREPROCESSOR_BOLT_ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt).shuffleGrouping(
+        PreprocessorBolt.ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
