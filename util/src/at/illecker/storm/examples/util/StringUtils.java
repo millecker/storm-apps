@@ -118,6 +118,13 @@ public class StringUtils {
       System.out.println("isHashTag(" + s + "): " + isHashTag(s));
     }
 
+    // test retweets
+    String[] retweets = new String[] { "RT", "retweet", "Retweet",
+        "RT@username", "RT @ username" };
+    for (String s : retweets) {
+      System.out.println("isRetweet(" + s + "): " + isRetweet(s));
+    }
+
     // test Punctuations
     String[] testPunctuations = new String[] { ".asdf.", "asdf.:--",
         "--asdf-!", ":-)", ">:-[" };

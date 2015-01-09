@@ -79,6 +79,6 @@ public class RegexUtils {
       + "([A-Za-z]+[A-Za-z0-9_]+)");
 
   public static final Pattern RETWEET = Pattern.compile("(RT|retweet|from|via)"
-      + "((?:\\b\\W*@\\w+)+)", Pattern.CASE_INSENSITIVE);
+      + "((?:\\b\\W*@\\w+)*)", Pattern.CASE_INSENSITIVE);
 
 }
