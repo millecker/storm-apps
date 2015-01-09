@@ -77,31 +77,29 @@ public class POSTagger {
       String tokenLowerCase = token.toLowerCase();
 
       // set custom tags
-      if (token.indexOf("#") == 0) {
+      if (StringUtils.isHashTag(token)) {
         preTaggedToken.setTag("HT");
-        if ((token.length() == 1) && (iter.hasNext())) {
-          String nextToken = iter.next();
-          preTaggedToken.setWord(preTaggedToken.word() + nextToken);
-          token = nextToken;
-        }
+        // if ((token.length() == 1) && (iter.hasNext())) {
+        // String nextToken = iter.next();
+        // preTaggedToken.setWord(preTaggedToken.word() + nextToken);
+        // token = nextToken;
+        // }
       }
-      if (token.indexOf("@") == 0) {
+      if (StringUtils.isURL(token)) {
         preTaggedToken.setTag("USR");
-        if ((token.length() == 1) && (iter.hasNext())) {
-          String nextToken = iter.next();
-          preTaggedToken.setWord(preTaggedToken.word() + nextToken);
-          token = nextToken;
-          if (preTaggedToken.word().indexOf("#") == 0) {
-            preTaggedToken.setTag("HT");
-          }
-        }
+        // if ((token.length() == 1) && (iter.hasNext())) {
+        // String nextToken = iter.next();
+        // preTaggedToken.setWord(preTaggedToken.word() + nextToken);
+        // token = nextToken;
+        // if (preTaggedToken.word().indexOf("#") == 0) {
+        // preTaggedToken.setTag("HT");
+        // }
+        // }
       }
       if (StringUtils.isURL(token)) {
         preTaggedToken.setTag("URL");
       }
-      if ((token.toLowerCase().equals("rt"))
-          || ((token.substring(0, 1).equals("R")) && (token.toLowerCase()
-              .equals("retweet")))) {
+      if (StringUtils.isRetweet(token)) {
         preTaggedToken.setTag("RT");
       }
 
