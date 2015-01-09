@@ -64,8 +64,8 @@ public class StopWords {
     return instance;
   }
 
-  public boolean isStopWord(String string) {
-    return m_stopwords.contains(string);
+  public boolean isStopWord(String value) {
+    return m_stopwords.contains(value.toLowerCase());
   }
 
   public static void main(String[] args) {

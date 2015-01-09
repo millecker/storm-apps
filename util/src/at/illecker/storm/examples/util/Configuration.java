@@ -138,7 +138,7 @@ public class Configuration {
         + File.separator;
 
     Set<String> stopWords = new HashSet<String>();
-    stopWords.add(wordListDir + "stopwords.txt");
+    stopWords.add(wordListDir + "Stopwords.txt");
 
     return stopWords;
   }
