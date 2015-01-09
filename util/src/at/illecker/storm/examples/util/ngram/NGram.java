@@ -14,62 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.ngram;
+package at.illecker.storm.examples.util.ngram;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * N-Gram Java implementations
  * 
  */
 public class NGram {
-
-  public static void main(String[] args) {
-
-    List<String> tweets = new ArrayList<String>();
-    tweets.add("Colorless green ideas sleep furiously");
-
-    for (String tweet : tweets) {
-      // Cleanup Tweet (remove @user #hashtag RT)
-      // \\n - newlines
-      // @\\w* - @users
-      // #\\w* - hashtags
-      // \\bRT\\b - Retweets RT
-      // \\p{Punct} - removes smileys
-      // [^@#\\p{L}\\p{N} ]+
-      // URL
-      // (https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?
-      // -
-      Pattern pattern = Pattern
-          .compile("\\n|@\\w*|#\\w*|\\bRT\\b|"
-              + "(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?");
-      String cleanupTweet = pattern.matcher(tweet).replaceAll(" ");
-
-      // Tweet to lower case
-      cleanupTweet = cleanupTweet.toLowerCase();
-      System.out.println("Tweet: " + cleanupTweet);
-
-      String[] words = cleanupTweet.split(" ");
-
-      // Bigrams
-      List<String[]> bigrams = getBigrams(words);
-      for (int i = 0; i < bigrams.size(); i++) {
-        System.out.println("bigram[" + i + "]: "
-            + Arrays.toString(bigrams.get(i)));
-      }
-
-      // Trigrams
-      List<String[]> trigrams = getTrigrams(words);
-      for (int i = 0; i < trigrams.size(); i++) {
-        System.out.println("trigrams[" + i + "]: "
-            + Arrays.toString(trigrams.get(i)));
-      }
-
-    }
-  }
 
   public static List<String[]> getBigrams(String[] words) {
     List<String[]> bigrams = new ArrayList<String[]>();
@@ -89,6 +44,27 @@ public class NGram {
       }
     }
     return trigrams;
+  }
+
+  public static void main(String[] args) {
+    String testStr = "Colorless green ideas sleep furiously";
+    System.out.println("TestString: " + testStr);
+
+    String[] words = testStr.split(" ");
+
+    // Bigrams
+    List<String[]> bigrams = getBigrams(words);
+    for (int i = 0; i < bigrams.size(); i++) {
+      System.out.println("bigram[" + i + "]: "
+          + Arrays.toString(bigrams.get(i)));
+    }
+
+    // Trigrams
+    List<String[]> trigrams = getTrigrams(words);
+    for (int i = 0; i < trigrams.size(); i++) {
+      System.out.println("trigrams[" + i + "]: "
+          + Arrays.toString(trigrams.get(i)));
+    }
   }
 
 }

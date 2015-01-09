@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import twitter4j.Status;
-import at.illecker.storm.examples.ngram.NGram;
+import at.illecker.storm.examples.util.ngram.NGram;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
