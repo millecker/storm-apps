@@ -54,7 +54,6 @@ public class StringUtils {
 
   public static String trimPunctuation(String value) {
     int valueLen = value.length();
-
     // count starting punctuations
     int startingPunctuations = 0;
     for (int i = 0; i < valueLen; i++) {
@@ -64,7 +63,6 @@ public class StringUtils {
         break;
       }
     }
-
     // count ending punctuations
     int endingPunctuations = 0;
     for (int i = valueLen - 1; i >= 0; i--) {
@@ -74,17 +72,14 @@ public class StringUtils {
         break;
       }
     }
-
     // case 1) no characters were punctuation
     if ((startingPunctuations == 0) && (endingPunctuations == 0)) {
       return value;
     }
-
     // case 2) all characters were punctuation
     if ((startingPunctuations == valueLen) && (endingPunctuations == valueLen)) {
       return "";
     }
-
     // case 3) substring
     int substringLen = valueLen - endingPunctuations - startingPunctuations;
     if (startingPunctuations >= substringLen) {
@@ -93,6 +88,16 @@ public class StringUtils {
     } else {
       return value.substring(startingPunctuations, substringLen);
     }
+  }
+
+  public static String replaceHTMLSymbols(String value) {
+    String result = value;
+    result = result.replaceAll("&quot;", "\"");
+    result = result.replaceAll("&amp;", "&");
+    result = result.replaceAll("&lt;", "<");
+    result = result.replaceAll("&gt;", ">");
+    result = result.replaceAll("&nbsp;", " ");
+    return result;
   }
 
   public static void main(String[] args) {
