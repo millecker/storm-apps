@@ -19,12 +19,12 @@ package at.illecker.storm.examples.util.wordlist;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
@@ -131,7 +131,7 @@ public class SentimentWordLists {
       if (word.length() == 1) {
         return null; // ignore single char interjection
       }
-    } else if ((posTag == null) || (Pattern.matches("^\\p{Punct}+$", word))) {
+    } else if ((posTag == null) || (StringUtils.consitsOfPunctuations(word))) {
       // ignore punctuation and all non valid POS tags
       return null;
     }
