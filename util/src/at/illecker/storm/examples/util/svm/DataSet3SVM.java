@@ -37,6 +37,8 @@ import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.TfIdfFeatureVectorGenerator;
 import at.illecker.storm.examples.util.tagger.POSTagger;
+import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
+import at.illecker.storm.examples.util.tfidf.TfType;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -98,7 +100,7 @@ public class DataSet3SVM {
     FeatureVectorGenerator fvg = null;
     Preprocessor preprocessor = null;
     POSTagger posTagger = null;
-    boolean useExtendedFeatureVectorGen = false;
+    boolean useExtendedFeatureVectorGen = true;
     boolean parameterSearch = false;
 
     // Prepare Train tweets
@@ -124,7 +126,8 @@ public class DataSet3SVM {
 
       if (useExtendedFeatureVectorGen) {
         LOG.info("Load TfIdfFeatureVectorGenerator...");
-        fvg = new TfIdfFeatureVectorGenerator(new TweetTfIdf(trainTweets, true));
+        fvg = new TfIdfFeatureVectorGenerator(new TweetTfIdf(trainTweets,
+            TfType.RAW, TfIdfNormalization.COS, true));
       } else {
         LOG.info("Load SentimentFeatureVectorGenerator...");
         fvg = new SentimentFeatureVectorGenerator();
