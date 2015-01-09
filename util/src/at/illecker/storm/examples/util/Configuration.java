@@ -156,6 +156,20 @@ public class Configuration {
     return interjections;
   }
 
+  public static Map<String, Properties> getEmoticons() {
+    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+        + File.separator;
+    Map<String, Properties> interjections = new HashMap<String, Properties>();
+
+    // Add emoticons including regex patterns
+    // from http://de.wiktionary.org/wiki/Verzeichnis:International/Smileys
+    Properties props = new Properties();
+    props.put("containsRegex", Boolean.valueOf(true));
+    interjections.put(wordListDir + "Emoticons.regex", props);
+
+    return interjections;
+  }
+
   public static String getPOSTaggingModel() {
     return USER_DIR_PATH + File.separator + MODEL_PATH + File.separator
         + "gate-EN-twitter-fast.model";

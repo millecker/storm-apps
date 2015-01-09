@@ -72,15 +72,16 @@ public class Interjections {
     return instance;
   }
 
-  public boolean isInterjection(String string) {
+  public boolean isInterjection(String value) {
+    value = value.toLowerCase();
     boolean result = false;
     if (m_interjections != null) {
-      result = m_interjections.contains(string);
+      result = m_interjections.contains(value);
     }
 
     if ((result == false) && (m_interjectionPatterns != null)) {
       for (Pattern interjection : m_interjectionPatterns) {
-        Matcher m = interjection.matcher(string);
+        Matcher m = interjection.matcher(value);
         if (m.find()) {
           return true;
         }
@@ -92,9 +93,11 @@ public class Interjections {
 
   public static void main(String[] args) {
     Interjections interjections = Interjections.getInstance();
-    System.out.println("isInterjection ':))': "
-        + interjections.isInterjection(":))"));
-    System.out.println("isInterjection 'wooow': "
-        + interjections.isInterjection("wooow"));
+    // test Interjections
+    String[] testInterjections = new String[] { "wow", "wooow", "wooo" };
+    for (String s : testInterjections) {
+      System.out.println("isInterjection(" + s + "): "
+          + interjections.isInterjection(s));
+    }
   }
 }
