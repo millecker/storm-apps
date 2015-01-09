@@ -45,8 +45,8 @@ public class NameEntities {
     return instance;
   }
 
-  public boolean isNameEntity(String string) {
-    return m_nameEntities.contains(string);
+  public boolean isNameEntity(String value) {
+    return m_nameEntities.contains(value.toLowerCase());
   }
 
   public static void main(String[] args) {
