@@ -16,11 +16,30 @@
  */
 package at.illecker.storm.examples.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StringUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(StringUtils.class);
 
   public static boolean isURL(String value) {
-    return ((value.indexOf(".com") > -1) || (value.indexOf("http:") == 0) || (value
-        .indexOf("www.") == 0));
+    return RegexUtils.WEB_URL.matcher(value).matches();
+  }
+
+  public static boolean isEmail(String value) {
+    return RegexUtils.EMAIL_ADDRESS.matcher(value).matches();
+  }
+
+  public static boolean isHashTag(String value) {
+    return RegexUtils.HASHTAG.matcher(value).matches();
+  }
+
+  public static boolean isUser(String value) {
+    return RegexUtils.USER.matcher(value).matches();
+  }
+
+  public static boolean isRetweet(String value) {
+    return RegexUtils.RETWEET.matcher(value).matches();
   }
 
   public static boolean isPunctuation(char c) {
@@ -29,7 +48,8 @@ public class StringUtils {
 
   public static boolean isSpecialChar(char c) {
     return c == '-' || c == '_' || c == '&' || c == '|' || c == '/'
-        || c == '\\' || c == '"' || c == '\'' || c == '`' || c == '´';
+        || c == '\\' || c == '"' || c == '\'' || c == '`' || c == '´'
+        || c == '<' || c == '>';
   }
 
   public static String trimPunctuation(String value) {
@@ -66,8 +86,36 @@ public class StringUtils {
     }
 
     // case 3) substring
+    LOG.info("substring token '" + value + "'");
+
+    // TODO try and catch StringIndexOutOfBoundsException
+    // e.g., >:-[
     return value.substring(startingPunctuations, valueLen - endingPunctuations
         - startingPunctuations);
   }
 
+  public static void main(String[] args) {
+    // test URLs
+    String[] testURLs = new String[] { "www.google.com",
+        "http://www.google.com", "https://www.google.com",
+        "ftp://www.google.com", "google.com" };
+    for (String s : testURLs) {
+      System.out.println("isURL(" + s + "): " + isURL(s));
+    }
+
+    // test userNames
+    String[] userNames = new String[] { "@hugo", "@@hugo", " @hugu2", "@hugo_",
+        "2@hugo_", "a@a", "@h0_", "@0abc", "@abc0" };
+    for (String s : userNames) {
+      System.out.println("isUser(" + s + "): " + isUser(s));
+    }
+
+    // test hashTags
+    String[] hashTags = new String[] { "#hugo", "##hugo", " #hugu2", "#hugo_",
+        "a#a", "#h0_", "#0abc", "#abc0" };
+    for (String s : hashTags) {
+      System.out.println("isHashTag(" + s + "): " + isHashTag(s));
+    }
+
+  }
 }
