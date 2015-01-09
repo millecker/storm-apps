@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
@@ -100,9 +100,6 @@ public class TweetTfIdf {
     if (usePOSTags) {
       WordNet wordNet = WordNet.getInstance();
       StopWords stopWords = StopWords.getInstance();
-      // regex for one or more punctuations
-      // Pattern punctuationPattern = Pattern.compile("^\\p{Punct}+$");
-      Pattern startAlphabetPattern = Pattern.compile("^[a-zA-Z].*$");
 
       for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
         List<String> words = new ArrayList<String>();
@@ -119,19 +116,19 @@ public class TweetTfIdf {
               && (!pennTag.equals("SYM")) && (!pennTag.equals("POS"))
               && (!stopWords.isStopWord(word))) {
 
-            // remove hashtag
+            // Remove hashtag
             if (pennTag.equals("HT")) {
               word = word.substring(1);
             }
 
-            // check if word consists of punctuations
+            // Check if word consists of punctuations
             // if ((punctuationPattern.matcher(word).find())
             // && (!pennTag.equals("POS"))) {
             // continue;
             // }
 
-            // check if word starts with an alphabet
-            if (!startAlphabetPattern.matcher(word).find()) {
+            // Check if word starts with an alphabet
+            if (!StringUtils.startsWithAlphabeticChar(word)) {
               continue;
             }
 

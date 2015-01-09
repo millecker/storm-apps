@@ -52,6 +52,10 @@ public class StringUtils {
         || c == '<' || c == '>';
   }
 
+  public static boolean startsWithAlphabeticChar(String value) {
+    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR.matcher(value).matches();
+  }
+
   public static String trimPunctuation(String value) {
     int valueLen = value.length();
     // count starting punctuations
@@ -130,11 +134,19 @@ public class StringUtils {
       System.out.println("isRetweet(" + s + "): " + isRetweet(s));
     }
 
-    // test Punctuations
+    // test punctuations
     String[] testPunctuations = new String[] { ".asdf.", "asdf.:--",
         "--asdf-!", ":-)", ">:-[" };
     for (String s : testPunctuations) {
       System.out.println("trimPunctuation(" + s + "): " + trimPunctuation(s));
+    }
+
+    // test startsWithAlphabeticChar
+    String[] testStartsWithAlphabeticChar = new String[] { "Hello", "hello",
+        "-hello", "0hello", "@hello" };
+    for (String s : testStartsWithAlphabeticChar) {
+      System.out.println("startsWithAlphabeticChar(" + s + "): "
+          + startsWithAlphabeticChar(s));
     }
   }
 }

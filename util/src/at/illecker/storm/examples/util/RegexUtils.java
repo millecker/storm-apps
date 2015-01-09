@@ -85,4 +85,12 @@ public class RegexUtils {
   // followed by itself at least two times, this means three equal chars
   public static final Pattern THREE_OR_MORE_REPEATING_CHARS = Pattern
       .compile("(.)\\1{2,}");
+
+  // one or more punctuations
+  public static final Pattern ONE_OR_MORE_PUNCTUATIONS = Pattern
+      .compile("^\\p{Punct}+$");
+
+  // starts with an alphabetic character
+  public static final Pattern STARTS_WITH_ALPHABETIC_CHAR = Pattern
+      .compile("^[a-zA-Z].*$");
 }
