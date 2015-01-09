@@ -63,9 +63,11 @@ public class SlangCorrection {
 
   public static void main(String[] args) {
     SlangCorrection slangCorrection = SlangCorrection.getInstance();
-    System.out.println("SlangCorrection of 'afaik': '"
+    System.out.println("slang correction of 'afaik': '"
         + Arrays.toString(slangCorrection.getCorrection("afaik")) + "'");
-    System.out.println("SlangCorrection of 'cum': '"
+    System.out.println("slang correction of 'cum': '"
         + Arrays.toString(slangCorrection.getCorrection("cum")) + "'");
+    System.out.println("slang correction of 'w/': '"
+        + Arrays.toString(slangCorrection.getCorrection("w/")) + "'");
   }
 }
