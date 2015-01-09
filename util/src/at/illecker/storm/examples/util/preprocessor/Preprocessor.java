@@ -20,15 +20,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import at.illecker.storm.examples.util.wordlist.Interjections;
+import at.illecker.storm.examples.util.wordlist.Emoticons;
 import at.illecker.storm.examples.util.wordlist.SlangCorrection;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 
@@ -39,15 +39,15 @@ public class Preprocessor {
 
   private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
-  private Interjections m_interjections;
+  private Emoticons m_emoticons;
 
   private Preprocessor() {
-    // load WordNet
+    // Load WordNet
     m_wordnet = WordNet.getInstance();
-    // load SlangCorrection dictionaries
+    // Load slang correction vocabulary
     m_slangCorrection = SlangCorrection.getInstance();
-    // load interjections
-    m_interjections = Interjections.getInstance();
+    // Load emoticons
+    m_emoticons = Emoticons.getInstance();
   }
 
   public static Preprocessor getInstance() {
@@ -58,31 +58,36 @@ public class Preprocessor {
     List<String> processedTokens = new ArrayList<String>();
 
     for (String token : tokens) {
+      boolean tokenIsURL = StringUtils.isURL(token);
+      boolean tokenIsUSR = StringUtils.isUser(token);
+      boolean tokenIsHashTag = StringUtils.isHashTag(token);
+      boolean tokenIsEmoticon = m_emoticons.isEmoticon(token.toLowerCase());
+
       // Step 1) Replace HTML symbols
-      token = replaceHTMLSymbols(token);
+      token = StringUtils.replaceHTMLSymbols(token);
 
       // Step 2) Remove punctuation and special chars at beginning and ending
-      if (!m_interjections.isInterjection(token.toLowerCase())) {
+      if ((!tokenIsEmoticon) && (!tokenIsUSR) && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 3) Slang correction
+      // Step 3) slang correction
       String[] correction = m_slangCorrection
           .getCorrection(token.toLowerCase());
-
       if (correction != null) {
         for (int i = 0; i < correction.length; i++) {
           processedTokens.add(correction[i]);
         }
         if (LOGGING) {
-          LOG.info("SlangCorrecting from " + token + " to "
+          LOG.info("slang correction from '" + token + "' to "
               + Arrays.toString(correction));
         }
         token = "";
       }
 
       // Step 4) Fix omission of final g in gerund forms (goin)
-      if ((!token.isEmpty()) && (token.endsWith("in"))
+      if ((!token.isEmpty()) && (!tokenIsUSR) && (!tokenIsHashTag)
+          && (token.endsWith("in"))
           && (!m_wordnet.contains(token.toLowerCase()))) {
         // append "g" if a word ends with "in" and is not in the vocabulary
         if (LOGGING) {
@@ -92,9 +97,22 @@ public class Preprocessor {
       }
 
       // Step 5) Remove elongations of characters (suuuper)
-      if ((!token.isEmpty()) && (!StringUtils.isURL(token))
-          && (!token.startsWith("@"))) {
+      if ((!token.isEmpty()) && (!tokenIsURL) && (!tokenIsUSR)
+          && (!tokenIsHashTag) && (!tokenIsEmoticon)) {
         token = removeRepeatingChars(token);
+
+        // Try slang correction again
+        correction = m_slangCorrection.getCorrection(token.toLowerCase());
+        if (correction != null) {
+          for (int i = 0; i < correction.length; i++) {
+            processedTokens.add(correction[i]);
+          }
+          if (LOGGING) {
+            LOG.info("slang correction from '" + token + "' to "
+                + Arrays.toString(correction));
+          }
+          token = "";
+        }
       }
 
       // add unmodified token
@@ -106,27 +124,15 @@ public class Preprocessor {
     return processedTokens;
   }
 
-  private String replaceHTMLSymbols(String value) {
-    String result = value;
-    result = result.replaceAll("&quot;", "\"");
-    result = result.replaceAll("&amp;", "&");
-    result = result.replaceAll("&lt;", "<");
-    result = result.replaceAll("&gt;", ">");
-    result = result.replaceAll("&nbsp;", " ");
-    return result;
-  }
-
   private String removeRepeatingChars(String value) {
     // if there are three repeating equal chars
     // then remove one char until the word is found in the vocabulary
     // else if the word is not found reduce the repeating chars to one
 
-    Pattern repeatPattern = Pattern.compile("(.)\\1{2,}");
-    // "(.)\\1{2,}" means any character (added to group 1)
-    // followed by itself at least two times, this means three equal chars
-
-    Matcher matcher = repeatPattern.matcher(value);
+    // collect matches for sub-token search
     List<int[]> matches = new ArrayList<int[]>();
+
+    Matcher matcher = RegexUtils.THREE_OR_MORE_REPEATING_CHARS.matcher(value);
     while (matcher.find()) {
       int start = matcher.start();
       int end = matcher.end();
@@ -146,7 +152,8 @@ public class Preprocessor {
           // LOG.info("check token: '" + sb.toString() + "'");
           // check if token is in the vocabulary
           if (m_wordnet.contains(sb.toString())) {
-            LOG.info("reduce token '" + value + "' to '" + sb + "'");
+            LOG.info("removeRepeatingChars from token '" + value + "' to '"
+                + sb + "'");
             return sb.toString();
           }
 
@@ -162,7 +169,8 @@ public class Preprocessor {
 
                 // LOG.info("check subtoken: '" + subSb.toString() + "'");
                 if (m_wordnet.contains(subSb.toString())) {
-                  LOG.info("reduce token '" + value + "' to '" + subSb + "'");
+                  LOG.info("removeRepeatingChars from '" + value + "' to '"
+                      + subSb + "'");
                   return subSb.toString();
                 }
               }
@@ -176,7 +184,8 @@ public class Preprocessor {
     // reduce all repeating chars
     if (!matches.isEmpty()) {
       String reducedToken = matcher.replaceAll("$1");
-      LOG.info("reduce token '" + value + "' to '" + reducedToken + "'");
+      LOG.info("removeRepeatingChars from '" + value + "' to '" + reducedToken
+          + "'");
       value = reducedToken;
     }
     return value;
@@ -185,7 +194,7 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = Tweet.getTestTweets();
-    tweets.add(new Tweet(0, "2moro afaik bbq hf lol"));
+    tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool"));
     tweets
         .add(new Tweet(
             0,
