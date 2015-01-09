@@ -19,10 +19,10 @@ package at.illecker.storm.examples.sentimentanalysis;
 import java.io.File;
 import java.util.Arrays;
 
-import at.illecker.storm.examples.sentimentanalysis.bolt.PolarityDetectionBolt;
 import at.illecker.storm.examples.util.bolt.JsonTweetExtractorBolt;
 import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
+import at.illecker.storm.examples.util.bolt.SentimentDetectionBolt;
 import at.illecker.storm.examples.util.bolt.TokenizerBolt;
 import at.illecker.storm.examples.util.spout.JsonFileSpout;
 import at.illecker.storm.examples.util.spout.TwitterSpout;
@@ -31,21 +31,13 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
-/*
- * Sentiment Analysis Topology
- * 
- * JSON Spout -> TweetFeatureExtractorBolt -> POSTaggerBolt 
- * -> PolarityDetectorBolt -> NGramBolt -> EmoticonsBolt
- * 
- */
 public class SentimentAnalysisTopology {
-
   private static final String TWEET_SPOUT_ID = "tweet-spout";
   private static final String JSON_TWEET_EXTRACTOR_BOLT_ID = "json-tweet-extractor-bolt";
   private static final String TOKENIZER_BOLT_ID = "tokenizer-bolt";
   private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
   private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
-  private static final String POLARITY_DETECTION_BOLT_ID = "polarity-detection-bolt";
+  private static final String SENTIMENT_DETECTION_BOLT_ID = "sentiment-detection-bolt";
   private static final String TOPOLOGY_NAME = "sentiment-analysis-topology";
 
   public static final String FILTER_LANG = "en";
@@ -109,7 +101,7 @@ public class SentimentAnalysisTopology {
     TokenizerBolt tokenizerBolt = new TokenizerBolt();
     PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
-    PolarityDetectionBolt polarityDetectionBolt = new PolarityDetectionBolt();
+    SentimentDetectionBolt sentimentDetectionBolt = new SentimentDetectionBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -133,8 +125,8 @@ public class SentimentAnalysisTopology {
     builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
         PREPROCESSOR_BOLT_ID);
 
-    // POSTaggerBolt --> PolarityDetectionBolt
-    builder.setBolt(POLARITY_DETECTION_BOLT_ID, polarityDetectionBolt)
+    // POSTaggerBolt --> SentimentDetectionBolt
+    builder.setBolt(SENTIMENT_DETECTION_BOLT_ID, sentimentDetectionBolt)
         .shuffleGrouping(POS_TAGGER_BOLT_ID);
 
     StormSubmitter

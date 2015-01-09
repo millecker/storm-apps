@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.sentimentanalysis.bolt;
+package at.illecker.storm.examples.util.bolt;
 
 import java.util.List;
 import java.util.Map;
@@ -31,14 +31,10 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import edu.stanford.nlp.ling.TaggedWord;
 
-/**
- * Polarity Detector Bolt
- * 
- */
-public class PolarityDetectionBolt extends BaseRichBolt {
-  private static final long serialVersionUID = 8507565084136299042L;
+public class SentimentDetectionBolt extends BaseRichBolt {
+  private static final long serialVersionUID = -3279220626656829348L;
   private static final Logger LOG = LoggerFactory
-      .getLogger(PolarityDetectionBolt.class);
+      .getLogger(SentimentDetectionBolt.class);
 
   private OutputCollector m_collector;
   private SentimentWordLists m_sentimentWordLists;
@@ -74,8 +70,8 @@ public class PolarityDetectionBolt extends BaseRichBolt {
         String word = taggedWord.word().toLowerCase().trim();
         String tag = taggedWord.tag();
 
-        // See tags http://www.clips.ua.ac.be/pages/mbsp-tags
         // Skip punctuations
+        // See tags http://www.clips.ua.ac.be/pages/mbsp-tags
         if (tag.equals(".") || tag.equals(",") || tag.equals(":")) {
           continue;
         }
