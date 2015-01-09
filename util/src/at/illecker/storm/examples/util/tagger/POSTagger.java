@@ -32,6 +32,8 @@ import at.illecker.storm.examples.util.wordlist.Emoticons;
 import at.illecker.storm.examples.util.wordlist.Interjections;
 import at.illecker.storm.examples.util.wordlist.NameEntities;
 import edu.stanford.nlp.io.RuntimeIOException;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.tagger.maxent.TaggerConfig;
@@ -128,6 +130,90 @@ public class POSTagger {
       LOG.info("tagSentence: " + untaggedTokens.toString());
     }
     return m_posTagger.tagSentence(untaggedTokens, true);
+  }
+
+  public static void testPOSTagger() {
+    String text = "ikr smh he asked fir yo last name so he can add u on fb lololol";
+    final int testRounds = 1;
+
+    // Measurements
+    List<Long> tagger1TextTimes = new ArrayList<Long>();
+    List<Long> tagger2TextTimes = new ArrayList<Long>();
+    List<Long> tagger1SentenceTimes = new ArrayList<Long>();
+    List<Long> tagger2SentenceTimes = new ArrayList<Long>();
+
+    // Load tagger and models
+    MaxentTagger tagger1 = new MaxentTagger(Configuration.getPOSTaggingModel());
+    MaxentTagger tagger2 = new MaxentTagger(
+        Configuration.getPOSTaggingModelFast());
+
+    // Test tagger1 via strings
+    String taggedText1 = "";
+    for (int i = 0; i < testRounds; i++) {
+      long startTime = System.currentTimeMillis();
+      taggedText1 = tagger1.tagString(text);
+      tagger1TextTimes.add(System.currentTimeMillis() - startTime);
+    }
+
+    // Test tagger2 via strings
+    String taggedText2 = "";
+    for (int i = 0; i < testRounds; i++) {
+      long startTime = System.currentTimeMillis();
+      taggedText2 = tagger2.tagString(text);
+      tagger2TextTimes.add(System.currentTimeMillis() - startTime);
+    }
+
+    // Manually tokenize
+    List<HasWord> sentence = Sentence.toWordList(text.split(" "));
+
+    // Test tagger1 via sentence
+    List<TaggedWord> taggedSentence1 = null;
+    for (int i = 0; i < testRounds; i++) {
+      long startTime = System.currentTimeMillis();
+      taggedSentence1 = tagger1.tagSentence(sentence);
+      tagger1SentenceTimes.add(System.currentTimeMillis() - startTime);
+    }
+    // Test tagger2 via sentence
+    List<TaggedWord> taggedSentence2 = null;
+    for (int i = 0; i < testRounds; i++) {
+      long startTime = System.currentTimeMillis();
+      taggedSentence2 = tagger2.tagSentence(sentence);
+      tagger2SentenceTimes.add(System.currentTimeMillis() - startTime);
+    }
+
+    // Output results
+    System.out.println("Input: " + text);
+    System.out.println("Tagger1 Text output: " + taggedText1);
+    System.out.println("Tagger2 Text output: " + taggedText2);
+    System.out.println("Tagger1 Sentence output: ");
+    for (TaggedWord tw : taggedSentence1) {
+      System.out.println("word: " + tw.word() + " ::  tag: " + tw.tag());
+      // tw.tag().startsWith("JJ")
+    }
+    System.out.println("Tagger2 Sentence output: ");
+    for (TaggedWord tw : taggedSentence2) {
+      System.out.println("word: " + tw.word() + " ::  tag: " + tw.tag());
+    }
+
+    System.out.println("Time Measurements: ");
+    System.out
+        .println("Tagger1 (gate-EN-twitter.model): TextTagging (incl tokenize): "
+            + getAvg(tagger1TextTimes)
+            + " ms SentenceTagging: "
+            + getAvg(tagger2TextTimes) + " ms");
+    System.out
+        .println("Tagger2 (gate-EN-twitter-fast.model): TextTagging (incl tokenize): "
+            + getAvg(tagger1SentenceTimes)
+            + " ms SentenceTagging: "
+            + getAvg(tagger2SentenceTimes) + " ms");
+  }
+
+  private static long getAvg(List<Long> list) {
+    long sum = 0;
+    for (Long l : list) {
+      sum += l.longValue();
+    }
+    return (sum / list.size());
   }
 
   public static void main(String[] args) {

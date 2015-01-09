@@ -172,6 +172,11 @@ public class Configuration {
 
   public static String getPOSTaggingModel() {
     return USER_DIR_PATH + File.separator + MODEL_PATH + File.separator
+        + "gate-EN-twitter.model";
+  }
+
+  public static String getPOSTaggingModelFast() {
+    return USER_DIR_PATH + File.separator + MODEL_PATH + File.separator
         + "gate-EN-twitter-fast.model";
   }
 

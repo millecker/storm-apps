@@ -19,8 +19,9 @@ package at.illecker.storm.examples.postagger;
 import java.io.File;
 import java.util.Arrays;
 
-import at.illecker.storm.examples.postagger.bolt.POSTaggerBolt;
-import at.illecker.storm.examples.postagger.bolt.SplitTweetBolt;
+import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
+import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
+import at.illecker.storm.examples.util.bolt.TokenizerBolt;
 import at.illecker.storm.examples.util.spout.TwitterFilesSpout;
 import at.illecker.storm.examples.util.spout.TwitterSpout;
 import backtype.storm.Config;
@@ -31,12 +32,11 @@ import backtype.storm.topology.TopologyBuilder;
 public class POSTaggerTopology {
 
   private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String SPLIT_TWEET_BOLT_ID = "split-tweet-bolt";
+  private static final String TOKENIZER_BOLT_ID = "tokenizer-bolt";
+  private static final String PREPROCESSOR_BOLT_ID = "preprocessor-bolt";
   private static final String POS_TAGGER_BOLT_ID = "pos-tagger-bolt";
   private static final String TOPOLOGY_NAME = "pos-tagger-topology";
   public static final String FILTER_LANG = "en";
-  public static final String TAGGER_MODEL = "resources/gate-EN-twitter.model";
-  public static final String TAGGER_MODEL_FAST = "resources/gate-EN-twitter-fast.model";
 
   public static void main(String[] args) throws Exception {
     String twitterDirPath = "";
@@ -81,7 +81,6 @@ public class POSTaggerTopology {
     }
 
     Config conf = new Config();
-    conf.put(POSTaggerBolt.CONF_TAGGER_MODEL_FILE, TAGGER_MODEL_FAST);
 
     // Create Spout
     IRichSpout spout;
@@ -94,19 +93,27 @@ public class POSTaggerTopology {
     }
 
     // Create Bolts
-    SplitTweetBolt splitTweetBolt = new SplitTweetBolt();
+    TokenizerBolt tokenizerBolt = new TokenizerBolt();
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
+
     // Set Spout
     builder.setSpout(TWEET_SPOUT_ID, spout);
-    // Set Spout --> SplitTweetBolt
-    builder.setBolt(SPLIT_TWEET_BOLT_ID, splitTweetBolt).shuffleGrouping(
+
+    // Set Spout --> TokenizerBolt
+    builder.setBolt(TOKENIZER_BOLT_ID, tokenizerBolt).shuffleGrouping(
         TWEET_SPOUT_ID);
-    // Set SplitTweetBolt --> POSTaggerBolt
+
+    // TokenizerBolt --> PreprocessorBolt
+    builder.setBolt(PREPROCESSOR_BOLT_ID, preprocessorBolt).shuffleGrouping(
+        TOKENIZER_BOLT_ID);
+
+    // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(POS_TAGGER_BOLT_ID, posTaggerBolt).shuffleGrouping(
-        SPLIT_TWEET_BOLT_ID);
+        PREPROCESSOR_BOLT_ID);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
