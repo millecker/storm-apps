@@ -323,10 +323,15 @@ public class FileUtils {
   }
 
   public static Set<String> readFile(String file) {
-    return readFile(IOUtils.getInputStream(file), false);
+    return readFile(IOUtils.getInputStream(file), false, false);
   }
 
-  public static Set<String> readFile(InputStream is, boolean logging) {
+  public static Set<String> readFile(String file, boolean toLowerCase) {
+    return readFile(IOUtils.getInputStream(file), toLowerCase, false);
+  }
+
+  public static Set<String> readFile(InputStream is, boolean toLowerCase,
+      boolean logging) {
     Set<String> set = new HashSet<String>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -335,12 +340,16 @@ public class FileUtils {
       br = new BufferedReader(isr);
       String line = "";
       while ((line = br.readLine()) != null) {
-        if (line.trim().length() == 0) {
+        line = line.trim();
+        if (line.length() == 0) {
           continue;
         }
-        set.add(line.trim());
+        if (toLowerCase) {
+          line = line.toLowerCase();
+        }
+        set.add(line);
         if (logging) {
-          LOG.info("Add entry: '" + line.trim() + "'");
+          LOG.info("Add entry: '" + line + "'");
         }
       }
     } catch (IOException e) {
