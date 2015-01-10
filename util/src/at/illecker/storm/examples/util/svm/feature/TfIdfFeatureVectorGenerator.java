@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.dictionaries.SentimentWordLists;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
@@ -30,7 +31,6 @@ import at.illecker.storm.examples.util.tfidf.TfType;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class TfIdfFeatureVectorGenerator implements FeatureVectorGenerator {

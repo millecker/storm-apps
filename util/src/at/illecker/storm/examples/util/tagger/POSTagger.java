@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.StringUtils;
+import at.illecker.storm.examples.util.dictionaries.Emoticons;
+import at.illecker.storm.examples.util.dictionaries.Interjections;
+import at.illecker.storm.examples.util.dictionaries.NameEntities;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import at.illecker.storm.examples.util.wordlist.Emoticons;
-import at.illecker.storm.examples.util.wordlist.Interjections;
-import at.illecker.storm.examples.util.wordlist.NameEntities;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Sentence;

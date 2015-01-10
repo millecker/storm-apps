@@ -25,11 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.StringUtils;
+import at.illecker.storm.examples.util.dictionaries.StopWords;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import at.illecker.storm.examples.util.wordlist.StopWords;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;

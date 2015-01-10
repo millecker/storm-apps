@@ -1,4 +1,4 @@
-package at.illecker.storm.examples.util.wordlist;
+package at.illecker.storm.examples.util.dictionaries;
 
 import java.util.Set;
 

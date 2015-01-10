@@ -22,8 +22,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.dictionaries.SentimentWordLists;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import at.illecker.storm.examples.util.wordlist.SentimentWordLists;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;

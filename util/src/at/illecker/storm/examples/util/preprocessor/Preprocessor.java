@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
+import at.illecker.storm.examples.util.dictionaries.Emoticons;
+import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import at.illecker.storm.examples.util.wordlist.Emoticons;
-import at.illecker.storm.examples.util.wordlist.SlangCorrection;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 
 public class Preprocessor {
