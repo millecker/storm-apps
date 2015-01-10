@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.dictionaries.Emoticons;
+import at.illecker.storm.examples.util.dictionaries.FirstNames;
 import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -40,14 +41,17 @@ public class Preprocessor {
   private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
   private Emoticons m_emoticons;
+  private FirstNames m_firstNames;
 
   private Preprocessor() {
     // Load WordNet
     m_wordnet = WordNet.getInstance();
-    // Load slang correction vocabulary
+    // Load Slang correction vocabulary
     m_slangCorrection = SlangCorrection.getInstance();
-    // Load emoticons
+    // Load Emoticons
     m_emoticons = Emoticons.getInstance();
+    // Load FirstNames
+    m_firstNames = FirstNames.getInstance();
   }
 
   public static Preprocessor getInstance() {
@@ -91,9 +95,8 @@ public class Preprocessor {
       }
 
       // Step 4) Fix omission of final g in gerund forms (goin)
-      // TODO check for names e.g., Kevin, Justin
       if ((!token.isEmpty()) && (!tokenIsUSR) && (!tokenIsHashTag)
-          && (token.endsWith("in"))
+          && (token.endsWith("in")) && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
         // append "g" if a word ends with "in" and is not in the vocabulary
         if (LOGGING) {
@@ -206,6 +209,7 @@ public class Preprocessor {
         .add(new Tweet(
             0,
             "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
+    tweets.add(new Tweet(0, "Martin martin kevin Kevin Justin justin"));
 
     for (Tweet tweet : tweets) {
       // Tokenize
