@@ -150,6 +150,19 @@ public class Configuration {
     return nameEntities;
   }
 
+  public static Set<String> getFirstNames() {
+    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
+        + File.separator;
+    Set<String> firstNames = new HashSet<String>();
+
+    // Oxford Reference
+    // A Dictionary of First Names (2 ed.)
+    // http://www.oxfordreference.com/view/10.1093/acref/9780198610601.001.0001/acref-9780198610601?hide=true&pageSize=100&sort=titlesort
+    firstNames.add(dictDir + "FirstNames.txt");
+
+    return firstNames;
+  }
+
   public static Set<String> getStopWords() {
     String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
         + File.separator;
