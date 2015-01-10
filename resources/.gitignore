@@ -1,4 +1,6 @@
 datasets/
+dictionaries/
+models/
 *.model
 *.txt
 *.json
