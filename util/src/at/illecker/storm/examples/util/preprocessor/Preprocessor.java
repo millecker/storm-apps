@@ -76,11 +76,10 @@ public class Preprocessor {
       }
 
       // Step 3) slang correction
-      // TODO 'owned' to [made, to, look, bad], 'xD' to [extreme, droll]
+      // TODO 'xD' to [extreme, droll]
       // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
-      // 'Rammstein' to 'Rammsteing'
       String[] correction = m_slangCorrection
           .getCorrection(token.toLowerCase());
       if (correction != null) {
@@ -106,9 +105,10 @@ public class Preprocessor {
       }
 
       // Step 5) Remove elongations of characters (suuuper)
-      // TODO do not remove chars from numbers
       if ((!token.isEmpty()) && (!tokenIsURL) && (!tokenIsUSR)
-          && (!tokenIsHashTag) && (!tokenIsEmoticon)) {
+          && (!tokenIsHashTag) && (!tokenIsEmoticon)
+          && (!StringUtils.isNumeric(token))) {
+
         token = removeRepeatingChars(token);
 
         // Try slang correction again
@@ -194,8 +194,8 @@ public class Preprocessor {
     // reduce all repeating chars
     if (!matches.isEmpty()) {
       String reducedToken = matcher.replaceAll("$1");
-      LOG.info("removeRepeatingChars from '" + value + "' to '" + reducedToken
-          + "'");
+      LOG.info("removeRepeatingChars(not found in dict) from '" + value
+          + "' to '" + reducedToken + "'");
       value = reducedToken;
     }
     return value;
@@ -204,12 +204,13 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = Tweet.getTestTweets();
-    tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool"));
+    tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool lollll"));
     tweets
         .add(new Tweet(
             0,
             "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
     tweets.add(new Tweet(0, "Martin martin kevin Kevin Justin justin"));
+    tweets.add(new Tweet(0, "10,000 1000 +111 -111,0000.4444"));
 
     for (Tweet tweet : tweets) {
       // Tokenize
