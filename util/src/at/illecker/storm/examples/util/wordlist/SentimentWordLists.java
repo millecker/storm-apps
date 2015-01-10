@@ -48,7 +48,7 @@ public class SentimentWordLists {
 
   private SentimentWordLists() {
     m_wordnet = WordNet.getInstance();
-    Map<String, Properties> wordLists = Configuration.getWordlists();
+    Map<String, Properties> wordLists = Configuration.getSentimentWordlists();
     for (Map.Entry<String, Properties> wordListEntry : wordLists.entrySet()) {
       String file = wordListEntry.getKey();
       Properties props = wordListEntry.getValue();

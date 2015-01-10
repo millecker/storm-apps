@@ -27,13 +27,25 @@ public class Configuration {
 
   public static final boolean LOGGING = false;
 
-  public static final String MODEL_PATH = "resources" + File.separator
+  public static final String MODELS_PATH = "resources" + File.separator
       + "models";
 
-  public static final String WORD_LIST_PATH = "resources" + File.separator
-      + "wordlists";
+  public static final String POS_MODEL_PATH = MODELS_PATH + File.separator
+      + "pos";
 
-  public static final String WORD_NET_PATH = "resources" + File.separator
+  public static final String SVM_MODEL_PATH = MODELS_PATH + File.separator
+      + "svm";
+
+  public static final String DICTIONARIES_PATH = "resources" + File.separator
+      + "dictionaries";
+
+  public static final String SENTIMENT_DICTIONARIES_PATH = DICTIONARIES_PATH
+      + File.separator + "sentiment";
+
+  public static final String SLANG_DICTIONARIES_PATH = DICTIONARIES_PATH
+      + File.separator + "slang";
+
+  public static final String WORD_NET_PATH = DICTIONARIES_PATH + File.separator
       + "wordnet";
 
   public static final String DATASET_PATH = "resources" + File.separator
@@ -45,9 +57,14 @@ public class Configuration {
   public static final String TEMP_DIR_PATH = System
       .getProperty("java.io.tmpdir");
 
-  public static Map<String, Properties> getWordlists() {
-    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
-        + File.separator;
+  public static String getSentiWordNetDict() {
+    return USER_DIR_PATH + File.separator + SENTIMENT_DICTIONARIES_PATH
+        + File.separator + "SentiWordNet_3.0.0_20130122.txt";
+  }
+
+  public static Map<String, Properties> getSentimentWordlists() {
+    String wordListDir = USER_DIR_PATH + File.separator
+        + SENTIMENT_DICTIONARIES_PATH + File.separator;
     Map<String, Properties> wordLists = new HashMap<String, Properties>();
 
     // Add AFINN word list using Regex = false
@@ -87,8 +104,8 @@ public class Configuration {
   }
 
   public static Map<String, Properties> getSlangWordlists() {
-    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
-        + File.separator;
+    String wordListDir = USER_DIR_PATH + File.separator
+        + SLANG_DICTIONARIES_PATH + File.separator;
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
     Properties props;
 
@@ -117,47 +134,47 @@ public class Configuration {
   }
 
   public static Set<String> getNameEntities() {
-    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
         + File.separator;
     Set<String> nameEntities = new HashSet<String>();
 
     // Add GATE cities
-    nameEntities.add(wordListDir + "GATE_cities.txt");
+    nameEntities.add(dictDir + "GATE_cities.txt");
 
     // Add GATE corps
-    nameEntities.add(wordListDir + "GATE_corps.txt");
+    nameEntities.add(dictDir + "GATE_corps.txt");
 
     // Add GATE names
-    nameEntities.add(wordListDir + "GATE_names.txt");
+    nameEntities.add(dictDir + "GATE_names.txt");
 
     return nameEntities;
   }
 
   public static Set<String> getStopWords() {
-    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
         + File.separator;
 
     Set<String> stopWords = new HashSet<String>();
-    stopWords.add(wordListDir + "Stopwords.txt");
+    stopWords.add(dictDir + "Stopwords.txt");
 
     return stopWords;
   }
 
   public static Map<String, Properties> getInterjections() {
-    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
         + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
     // Add GATE interjections including regex patterns
     Properties props = new Properties();
     props.put("containsRegex", Boolean.valueOf(true));
-    interjections.put(wordListDir + "GATE_interjections.regex", props);
+    interjections.put(dictDir + "GATE_interjections.regex", props);
 
     return interjections;
   }
 
   public static Map<String, Properties> getEmoticons() {
-    String wordListDir = USER_DIR_PATH + File.separator + WORD_LIST_PATH
+    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
         + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
@@ -165,29 +182,24 @@ public class Configuration {
     // from http://de.wiktionary.org/wiki/Verzeichnis:International/Smileys
     Properties props = new Properties();
     props.put("containsRegex", Boolean.valueOf(true));
-    interjections.put(wordListDir + "Emoticons.regex", props);
+    interjections.put(dictDir + "Emoticons.regex", props);
 
     return interjections;
   }
 
   public static String getPOSTaggingModel() {
-    return USER_DIR_PATH + File.separator + MODEL_PATH + File.separator
+    return USER_DIR_PATH + File.separator + POS_MODEL_PATH + File.separator
         + "gate-EN-twitter.model";
   }
 
   public static String getPOSTaggingModelFast() {
-    return USER_DIR_PATH + File.separator + MODEL_PATH + File.separator
+    return USER_DIR_PATH + File.separator + POS_MODEL_PATH + File.separator
         + "gate-EN-twitter-fast.model";
   }
 
   public static String getWordNetDict() {
     return USER_DIR_PATH + File.separator + WORD_NET_PATH + File.separator
         + "wn3.1.dict.tar.gz";
-  }
-
-  public static String getSentiWordNetDict() {
-    return USER_DIR_PATH + File.separator + WORD_NET_PATH + File.separator
-        + "SentiWordNet_3.0.0_20130122.txt";
   }
 
   public static String getDataSetPath() {

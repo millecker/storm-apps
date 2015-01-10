@@ -50,7 +50,7 @@ public class POSTagger {
 
   private POSTagger() {
     // Load POS Tagger
-    String taggingModel = Configuration.getPOSTaggingModel();
+    String taggingModel = Configuration.getPOSTaggingModelFast();
     try {
       LOG.info("Load POSTagger with model: " + taggingModel);
       TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
