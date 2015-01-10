@@ -93,4 +93,8 @@ public class RegexUtils {
   // starts with an alphabetic character
   public static final Pattern STARTS_WITH_ALPHABETIC_CHAR = Pattern
       .compile("^[a-zA-Z].*$");
+
+  // isNumeric
+  public static final Pattern IS_NUMERIC = Pattern.compile("^[+-]?" + "\\d+"
+      + "(\\,\\d+)?" + "(\\.\\d+)?$");
 }

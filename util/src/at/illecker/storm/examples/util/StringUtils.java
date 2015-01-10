@@ -46,6 +46,10 @@ public class StringUtils {
     return RegexUtils.ONE_OR_MORE_PUNCTUATIONS.matcher(value).matches();
   }
 
+  public static boolean isNumeric(String value) {
+    return RegexUtils.IS_NUMERIC.matcher(value).matches();
+  }
+
   public static boolean isPunctuation(char c) {
     return c == ',' || c == '.' || c == '!' || c == '?' || c == ':' || c == ';';
   }
@@ -151,6 +155,13 @@ public class StringUtils {
     for (String s : testStartsWithAlphabeticChar) {
       System.out.println("startsWithAlphabeticChar(" + s + "): "
           + startsWithAlphabeticChar(s));
+    }
+
+    // test numerics
+    String[] testNumerics = new String[] { "1", "1000", "1,000", "+1", "-1",
+        "+1.0", "+1.", "-.5", "000000" };
+    for (String s : testNumerics) {
+      System.out.println("isNumeric(" + s + "): " + isNumeric(s));
     }
   }
 }
