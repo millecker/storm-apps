@@ -47,6 +47,7 @@ import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
+import at.illecker.storm.examples.util.svm.feature.CombinedFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.TfIdfFeatureVectorGenerator;
@@ -318,16 +319,23 @@ public class SVM {
       LOG.info("POS Tagging of train tweets...");
       posTagger.tagTweets(trainTweets);
 
-      if (featureVectorGenerator.equals(TfIdfFeatureVectorGenerator.class)) {
+      if (featureVectorGenerator.equals(SentimentFeatureVectorGenerator.class)) {
+        LOG.info("Load SentimentFeatureVectorGenerator...");
+        fvg = new SentimentFeatureVectorGenerator();
+
+      } else if (featureVectorGenerator
+          .equals(TfIdfFeatureVectorGenerator.class)) {
         TweetTfIdf tweetTfIdf = new TweetTfIdf(trainTweets, TfType.RAW,
             TfIdfNormalization.COS, true);
         LOG.info("Load TfIdfFeatureVectorGenerator...");
         fvg = new TfIdfFeatureVectorGenerator(tweetTfIdf);
 
       } else if (featureVectorGenerator
-          .equals(SentimentFeatureVectorGenerator.class)) {
-        LOG.info("Load SentimentFeatureVectorGenerator...");
-        fvg = new SentimentFeatureVectorGenerator();
+          .equals(CombinedFeatureVectorGenerator.class)) {
+        TweetTfIdf tweetTfIdf = new TweetTfIdf(trainTweets, TfType.RAW,
+            TfIdfNormalization.COS, true);
+        LOG.info("Load CombinedFeatureVectorGenerator...");
+        fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
 
       } else {
         throw new UnsupportedOperationException("FeatureVectorGenerator '"
@@ -470,11 +478,18 @@ public class SVM {
   }
 
   public static void main(String[] args) {
-    // SVM.svm(Configuration.getDataSet3(),
-    // SentimentFeatureVectorGenerator.class,
-    // 3, false);
+    int nFoldCrossValidation = 3;
+    int featureVectorLevel = 2;
 
-    SVM.svm(Configuration.getDataSet3(), TfIdfFeatureVectorGenerator.class, 3,
-        false);
+    if (featureVectorLevel == 0) {
+      SVM.svm(Configuration.getDataSet3(),
+          SentimentFeatureVectorGenerator.class, nFoldCrossValidation, false);
+    } else if (featureVectorLevel == 1) {
+      SVM.svm(Configuration.getDataSet3(), TfIdfFeatureVectorGenerator.class,
+          nFoldCrossValidation, false);
+    } else {
+      SVM.svm(Configuration.getDataSet3(),
+          CombinedFeatureVectorGenerator.class, nFoldCrossValidation, false);
+    }
   }
 }
