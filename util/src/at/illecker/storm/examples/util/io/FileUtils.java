@@ -30,17 +30,18 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.DatasetProperty;
 import at.illecker.storm.examples.util.dictionaries.WordListMap;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class FileUtils {
   private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
-  public static List<Tweet> readTweets(String file) {
-    return readTweets(IOUtils.getInputStream(file));
+  public static List<Tweet> readTweets(String file, DatasetProperty property) {
+    return readTweets(IOUtils.getInputStream(file), property);
   }
 
-  public static List<Tweet> readTweets(InputStream is) {
+  public static List<Tweet> readTweets(InputStream is, DatasetProperty property) {
     List<Tweet> tweets = new ArrayList<Tweet>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -49,18 +50,17 @@ public class FileUtils {
       br = new BufferedReader(isr);
       String line = "";
       while ((line = br.readLine()) != null) {
-        String[] values = line.split("\t");
-        long id = Long.parseLong(values[0]);
-        String text = values[1];
-        // String posTags = values[2]; // ignore
-        String label = values[3].toLowerCase().trim();
-        double score = 0;
-        if (label.equals("negative")) {
-          score = -1;
-        } else if (label.equals("neutral")) {
-          score = 0;
-        } else if (label.equals("positive")) {
-          score = 1;
+        String[] values = line.split(property.getDelimiter());
+        long id = Long.parseLong(values[property.getIdIndex()]);
+        String text = values[property.getTextIndex()];
+        String label = values[property.getLabelIndex()].toLowerCase().trim();
+        double score = -1;
+        if (label.equals(property.getNegativeLabel())) {
+          score = property.getNegativeValue();
+        } else if (label.equals(property.getNeutralLabel())) {
+          score = property.getNeutralValue();
+        } else if (label.equals(property.getPositiveLabel())) {
+          score = property.getPositiveValue();
         }
         tweets.add(new Tweet(id, text, score));
       }
