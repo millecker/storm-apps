@@ -28,8 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.DatasetProperty;
 import at.illecker.storm.examples.util.io.FileUtils;
-import at.illecker.storm.examples.util.io.IOUtils;
 import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
@@ -44,14 +44,8 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class DataSet3SVM {
-  public static final String DATASET_PATH = Configuration.getDataSetPath()
-      + File.separator + "dataset3" + File.separator;
-  public static final String TRAIN_DATA = DATASET_PATH + "trainingInput.txt";
-  public static final String TEST_DATA = DATASET_PATH + "testingInput.txt";
-  public static final String TRAIN_SER = DATASET_PATH + "trainingInput.ser";
-  public static final String TEST_SER = DATASET_PATH + "testingInput.ser";
-  public static final String SVM_PROBLEM_SER = DATASET_PATH + "svmProblem.txt";
-  public static final String SVM_MODEL_SER = DATASET_PATH + "svmModel.ser";
+  public static final String SVM_PROBLEM_FILE = "svmProblem.txt";
+  public static final String SVM_MODEL_FILE_SER = "svmModel.ser";
   private static final Logger LOG = LoggerFactory.getLogger(DataSet3SVM.class);
 
   public static void main(String[] args) {
@@ -60,13 +54,18 @@ public class DataSet3SVM {
     POSTagger posTagger = null;
     boolean useTfIdfFeatureVectorGen = true;
     boolean parameterSearch = false;
+    DatasetProperty dataset3Prop = Configuration.getDataSet3();
 
     // Prepare Train tweets
     LOG.info("Prepare Train data...");
-    List<Tweet> trainTweets = SerializationUtils.deserialize(TRAIN_SER);
+    List<Tweet> trainTweets = SerializationUtils.deserialize(dataset3Prop
+        .getTrainDataSerializationFile());
+
     if (trainTweets == null) {
-      trainTweets = FileUtils.readTweets(IOUtils.getInputStream(TRAIN_DATA));
-      LOG.info("Read train tweets from " + TRAIN_DATA);
+      // Read train tweets
+      trainTweets = FileUtils.readTweets(dataset3Prop.getTrainDataFile(),
+          dataset3Prop);
+      LOG.info("Read train tweets from " + dataset3Prop.getTrainDataFile());
 
       // Tokenize
       LOG.info("Tokenize train tweets...");
@@ -97,20 +96,25 @@ public class DataSet3SVM {
       fvg.generateFeatureVectors(trainTweets);
 
       // Serialize training data
-      SerializationUtils.serializeList(trainTweets, TRAIN_SER);
+      SerializationUtils.serializeList(trainTweets,
+          dataset3Prop.getTrainDataSerializationFile());
     }
 
     // Prepare Test tweets
     LOG.info("Prepare Test data...");
-    List<Tweet> testTweets = SerializationUtils.deserialize(TEST_SER);
+    List<Tweet> testTweets = SerializationUtils.deserialize(dataset3Prop
+        .getTestDataSerializationFile());
+
     if (testTweets == null) {
       if (fvg == null) {
         LOG.error("Train and test data must use the same FeatureVectorGenerator!");
         System.exit(1);
       }
 
-      testTweets = FileUtils.readTweets(IOUtils.getInputStream(TEST_DATA));
-      LOG.info("Read test tweets from " + TEST_DATA);
+      // read test tweets
+      testTweets = FileUtils.readTweets(dataset3Prop.getTestDataFile(),
+          dataset3Prop);
+      LOG.info("Read test tweets from " + dataset3Prop.getTestDataFile());
 
       // Tokenize
       LOG.info("Tokenize test tweets...");
@@ -129,7 +133,8 @@ public class DataSet3SVM {
       fvg.generateFeatureVectors(trainTweets);
 
       // Serialize test data
-      SerializationUtils.serializeList(testTweets, TEST_SER);
+      SerializationUtils.serializeList(testTweets,
+          dataset3Prop.getTestDataSerializationFile());
     }
 
     // Optional parameter search of C and gamma
@@ -165,13 +170,15 @@ public class DataSet3SVM {
 
       // deserialize svmModel
       LOG.info("Try loading SVM model...");
-      svm_model svmModel = SerializationUtils.deserialize(SVM_MODEL_SER);
+      svm_model svmModel = SerializationUtils.deserialize(dataset3Prop
+          .getDatasetPath() + File.separator + SVM_MODEL_FILE_SER);
       if (svmModel == null) {
         LOG.info("Generate SVM problem...");
         svm_problem svmProb = SVM.generateProblem(trainTweets, isc);
 
         // save svm problem in libSVM format
-        SVM.saveProblem(svmProb, SVM_PROBLEM_SER);
+        SVM.saveProblem(svmProb, dataset3Prop.getDatasetPath() + File.separator
+            + SVM_PROBLEM_FILE);
 
         // after parameter search use best C and gamma values
         svm_parameter svmParam = SVM.getDefaultParameter();
@@ -188,7 +195,8 @@ public class DataSet3SVM {
             + (System.currentTimeMillis() - startTime) + " ms");
 
         // serialize svm model
-        SerializationUtils.serialize(svmModel, SVM_MODEL_SER);
+        SerializationUtils.serialize(svmModel, dataset3Prop.getDatasetPath()
+            + File.separator + SVM_MODEL_FILE_SER);
 
         // Evaluate n-fold
         LOG.info("Run n-fold cross validation...");
