@@ -33,7 +33,7 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class TfIdfFeatureVectorGenerator implements FeatureVectorGenerator {
+public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(TfIdfFeatureVectorGenerator.class);
   // private static final boolean LOGGING = false;

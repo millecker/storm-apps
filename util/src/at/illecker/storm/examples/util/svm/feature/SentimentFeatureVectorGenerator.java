@@ -32,7 +32,7 @@ import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class SentimentFeatureVectorGenerator implements FeatureVectorGenerator {
+public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;

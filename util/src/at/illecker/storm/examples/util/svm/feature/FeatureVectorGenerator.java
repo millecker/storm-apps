@@ -16,12 +16,34 @@
  */
 package at.illecker.storm.examples.util.svm.feature;
 
+import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.tweet.Tweet;
 
-public interface FeatureVectorGenerator {
-  public Map<Integer, Double> calculateFeatureVector(Tweet tweet);
+public abstract class FeatureVectorGenerator {
+  private static final Logger LOG = LoggerFactory
+      .getLogger(FeatureVectorGenerator.class);
 
-  public int getFeatureVectorSize();
+  public abstract int getFeatureVectorSize();
+
+  public abstract Map<Integer, Double> calculateFeatureVector(Tweet tweet);
+
+  public void generateFeatureVectors(List<Tweet> tweets, boolean logging) {
+    for (Tweet tweet : tweets) {
+      tweet.genFeatureVector(this);
+
+      if (logging) {
+        LOG.info("Tweet: " + tweet);
+        LOG.info("FeatureVector: " + tweet.getFeatureVector());
+      }
+    }
+  }
+
+  public void generateFeatureVectors(List<Tweet> tweets) {
+    generateFeatureVectors(tweets, false);
+  }
 }
