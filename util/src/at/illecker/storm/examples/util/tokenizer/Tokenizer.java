@@ -47,6 +47,13 @@ public class Tokenizer {
     return tokens;
   }
 
+  public static void tokenizeTweets(List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      List<String> tokens = tokenize(tweet.getText());
+      tweet.addSentence(tokens);
+    }
+  }
+
   public static List<List<HasWord>> tokenizeSentences(String text) {
     TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
         .newTokenizerFactory();
