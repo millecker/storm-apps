@@ -65,17 +65,51 @@ public class SVM {
 
   public static svm_parameter getDefaultParameter() {
     svm_parameter param = new svm_parameter();
+    // type of SVM
     param.svm_type = svm_parameter.C_SVC; // default
-    param.kernel_type = svm_parameter.RBF;
+
+    // type of kernel function
+    param.kernel_type = svm_parameter.RBF; // default
+
+    // degree in kernel function (default 3)
+    param.degree = 3;
+
+    // gamma in kernel function (default 1/num_features)
+    // gamma = 2^−15, 2^−13, ..., 2^3
+    param.gamma = Double.MIN_VALUE;
+
+    // parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)
+    // C = 2^−5, 2^−3, ..., 2^15
+    param.C = 1; // cost of constraints violation default 1
+
+    // coef0 in kernel function (default 0)
+    param.coef0 = 0;
+
+    // parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)
+    param.nu = 0.5;
+
+    // epsilon in loss function of epsilon-SVR (default 0.1)
+    param.p = 0.1;
+
+    // tolerance of termination criterion (default 0.001)
+    param.eps = 0.001;
+
+    // whether to use the shrinking heuristics, 0 or 1
+    // (default 1)
+    param.shrinking = 1;
+
+    // whether to train a SVC or SVR model for probability estimates, 0 or 1
+    // (default 0)
     // 1 means model with probability information is obtained
     param.probability = 1;
-    // C = 2^−5, 2^−3, ..., 2^15
-    param.C = 10; // cost of constraints violation default 1
-    // gamma = 2^−15, 2^−13, ..., 2^3
-    param.gamma = 0.5; // default 1/num_features
-    param.nu = 0.5; // default 0.5
-    param.eps = 0.001; // stopping criterion
-    param.cache_size = 2000; // kernel cache specified in megabytes
+
+    // parameter C of class i to weight*C, for C-SVC (default 1)
+    param.nr_weight = 0;
+    param.weight_label = new int[0];
+    param.weight = new double[0];
+
+    // cache memory size in MB (default 100)
+    param.cache_size = 2000;
 
     return param;
   }
@@ -91,12 +125,11 @@ public class SVM {
 
     for (int i = 0; i < dataCount; i++) {
       Tweet tweet = trainTweets.get(i);
-      Map<Integer, Double> features = tweet.getFeatureVector();
-
-      // set feature vector
-      svmProb.x[i] = new svm_node[features.size()];
+      Map<Integer, Double> featureVector = tweet.getFeatureVector();
+      // set feature nodes
+      svmProb.x[i] = new svm_node[featureVector.size()];
       int j = 0;
-      for (Map.Entry<Integer, Double> feature : features.entrySet()) {
+      for (Map.Entry<Integer, Double> feature : featureVector.entrySet()) {
         svm_node node = new svm_node();
         node.index = feature.getKey();
         node.value = feature.getValue();
@@ -112,7 +145,7 @@ public class SVM {
   }
 
   public static void saveProblem(svm_problem svmProb, String file) {
-    // save problem in LIBSVM format
+    // save problem in libSVM format
     // <label> <index1>:<value1> <index2>:<value2> ...
     try {
       BufferedWriter br = new BufferedWriter(new FileWriter(file));
@@ -136,6 +169,11 @@ public class SVM {
   }
 
   public static svm_model train(svm_problem svmProb, svm_parameter svmParam) {
+    // set gamma to default 1/num_features if 0
+    if (svmParam.gamma == Double.MIN_VALUE) {
+      svmParam.gamma = 1 / (double) svmProb.l;
+    }
+
     String paramCheck = svm.svm_check_parameter(svmProb, svmParam);
     if (paramCheck != null) {
       LOG.error("svm_check_parameter: " + paramCheck);
@@ -146,6 +184,12 @@ public class SVM {
 
   public static double crossValidate(svm_problem svmProb,
       svm_parameter svmParam, int nFold) {
+
+    // set gamma to default 1/num_features if 0
+    if (svmParam.gamma == Double.MIN_VALUE) {
+      svmParam.gamma = 1 / (double) svmProb.l;
+    }
+
     double[] target = new double[svmProb.l];
     svm.svm_cross_validation(svmProb, svmParam, nFold, target);
 
@@ -257,31 +301,34 @@ public class SVM {
   public static double evaluate(Tweet tweet, svm_model svmModel,
       int totalClasses, ScoreClassifier scoreClassifier, boolean logging) {
 
-    Map<Integer, Double> features = tweet.getFeatureVector();
-    svm_node[] nodes = new svm_node[features.size()];
+    Map<Integer, Double> featureVector = tweet.getFeatureVector();
+    // set feature nodes
+    svm_node[] testNodes = new svm_node[featureVector.size()];
     int i = 0;
-    for (Map.Entry<Integer, Double> feature : features.entrySet()) {
+    for (Map.Entry<Integer, Double> feature : featureVector.entrySet()) {
       svm_node node = new svm_node();
       node.index = feature.getKey();
       node.value = feature.getValue();
-      nodes[i] = node;
+      testNodes[i] = node;
       i++;
     }
 
-    int[] labels = new int[totalClasses];
-    svm.svm_get_labels(svmModel, labels);
-
-    double[] probEstimates = new double[totalClasses];
-    double predictedClass = svm.svm_predict_probability(svmModel, nodes,
-        probEstimates);
+    double predictedClass = svm.svm_predict(svmModel, testNodes);
 
     if (logging) {
+      int[] labels = new int[totalClasses];
+      svm.svm_get_labels(svmModel, labels);
+
+      double[] probEstimates = new double[totalClasses];
+      double predictedClassProb = svm.svm_predict_probability(svmModel,
+          testNodes, probEstimates);
+
       for (i = 0; i < totalClasses; i++) {
         LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
             + probEstimates[i]);
       }
-      LOG.info("TweetClass:" + scoreClassifier.classfyScore(tweet.getScore())
-          + " Prediction:" + predictedClass);
+      LOG.info("TweetClass: " + scoreClassifier.classfyScore(tweet.getScore())
+          + " Prediction: " + predictedClassProb);
     }
 
     return predictedClass;
@@ -373,7 +420,7 @@ public class SVM {
 
       // Preprocess
       LOG.info("Preprocess test tweets...");
-      preprocessor.preprocessTweets(trainTweets);
+      preprocessor.preprocessTweets(testTweets);
 
       // POS Tagging
       LOG.info("POS Tagging of test tweets...");
@@ -381,7 +428,7 @@ public class SVM {
 
       // Feature Vector Generation
       LOG.info("Generate Feature Vectors for test tweets...");
-      fvg.generateFeatureVectors(trainTweets);
+      fvg.generateFeatureVectors(testTweets);
 
       // Serialize test data
       SerializationUtils.serializeList(testTweets,
@@ -390,13 +437,13 @@ public class SVM {
 
     // Optional parameter search of C and gamma
     if (parameterSearch) {
-      svm_parameter svmParam = SVM.getDefaultParameter();
+      svm_parameter svmParam = getDefaultParameter();
       LOG.info("Generate SVM problem...");
-      svm_problem svmProb = SVM.generateProblem(trainTweets,
+      svm_problem svmProb = generateProblem(trainTweets,
           new IdentityScoreClassifier());
 
       // 1) coarse grained paramter search
-      SVM.coarseGrainedParamterSearch(svmProb, svmParam);
+      coarseGrainedParamterSearch(svmProb, svmParam);
 
       // 2) fine grained paramter search
       // C = 2^5, 2^6, ..., 2^13
@@ -411,12 +458,12 @@ public class SVM {
       }
 
       LOG.info("SVM paramterSearch...");
-      SVM.paramterSearch(svmProb, svmParam, c, gamma);
+      paramterSearch(svmProb, svmParam, c, gamma);
 
     } else {
 
       int totalClasses = 3;
-      // classes 1 = positive, 0 = neutral, -1 = negative
+      // classes 0 = negative, 1 = neutral, 2 = positive
       IdentityScoreClassifier isc = new IdentityScoreClassifier();
 
       // deserialize svmModel
@@ -425,16 +472,16 @@ public class SVM {
           .getDatasetPath() + File.separator + SVM_MODEL_FILE_SER);
       if (svmModel == null) {
         LOG.info("Generate SVM problem...");
-        svm_problem svmProb = SVM.generateProblem(trainTweets, isc);
+        svm_problem svmProb = generateProblem(trainTweets, isc);
 
         // save svm problem in libSVM format
-        SVM.saveProblem(svmProb, datasetProperty.getDatasetPath()
-            + File.separator + SVM_PROBLEM_FILE);
+        saveProblem(svmProb, datasetProperty.getDatasetPath() + File.separator
+            + SVM_PROBLEM_FILE);
 
         // train model
         LOG.info("Train SVM model...");
         long startTime = System.currentTimeMillis();
-        svmModel = SVM.train(svmProb, datasetProperty.getSVMParam());
+        svmModel = train(svmProb, datasetProperty.getSVMParam());
         LOG.info("Train SVM model finished after "
             + (System.currentTimeMillis() - startTime) + " ms");
 
@@ -446,7 +493,7 @@ public class SVM {
         if (nFoldCrossValidation > 0) {
           LOG.info("Run n-fold cross validation...");
           startTime = System.currentTimeMillis();
-          double accuracy = SVM.crossValidate(svmProb,
+          double accuracy = crossValidate(svmProb,
               datasetProperty.getSVMParam(), nFoldCrossValidation);
           LOG.info("CrossValidation finished after "
               + (System.currentTimeMillis() - startTime) + " ms");
@@ -459,8 +506,7 @@ public class SVM {
       LOG.info("Evaluate test tweets...");
       long startTime = System.currentTimeMillis();
       for (Tweet tweet : testTweets) {
-        double predictedClass = SVM
-            .evaluate(tweet, svmModel, totalClasses, isc);
+        double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
         if (predictedClass == isc.classfyScore(tweet.getScore())) {
           countMatches++;
         }
