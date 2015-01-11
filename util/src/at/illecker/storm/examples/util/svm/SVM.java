@@ -126,9 +126,10 @@ public class SVM {
     return svm.svm_train(svmProb, svmParam);
   }
 
-  public static double crossValidate(svm_problem svmProb, svm_parameter svmParam) {
+  public static double crossValidate(svm_problem svmProb,
+      svm_parameter svmParam, int nFold) {
     double[] target = new double[svmProb.l];
-    svm.svm_cross_validation(svmProb, svmParam, 3, target);
+    svm.svm_cross_validation(svmProb, svmParam, nFold, target);
 
     double correctCounter = 0;
     for (int i = 0; i < target.length; i++) {
@@ -176,7 +177,7 @@ public class SVM {
     @Override
     public double[] call() throws Exception {
       long startTime = System.currentTimeMillis();
-      double accuracy = crossValidate(m_svmProb, m_svmParam);
+      double accuracy = crossValidate(m_svmProb, m_svmParam, 10);
       long estimatedTime = System.currentTimeMillis() - startTime;
       return new double[] { m_i, m_j, accuracy, m_svmParam.C, m_svmParam.gamma,
           estimatedTime };
