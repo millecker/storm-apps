@@ -201,6 +201,15 @@ public class Preprocessor {
     return value;
   }
 
+  public void preprocessTweets(List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      for (List<String> sentence : tweet.getSentences()) {
+        List<String> preprocessedSentence = this.preprocess(sentence);
+        tweet.addPreprocessedSentence(preprocessedSentence);
+      }
+    }
+  }
+
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = Tweet.getTestTweets();
