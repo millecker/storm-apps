@@ -218,4 +218,9 @@ public class Configuration {
   public static String getDataSetPath() {
     return USER_DIR_PATH + File.separator + DATASET_PATH;
   }
+
+  public static DatasetProperty getDataSet3() {
+    return new DatasetProperty(Configuration.getDataSetPath() + File.separator
+        + "dataset3", "trainingInput.txt", "testingInput.txt", "\t", 0, 1, 3);
+  }
 }
