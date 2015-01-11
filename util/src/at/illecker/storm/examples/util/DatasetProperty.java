@@ -18,6 +18,9 @@ package at.illecker.storm.examples.util;
 
 import java.io.File;
 
+import libsvm.svm_parameter;
+import at.illecker.storm.examples.util.svm.SVM;
+
 public class DatasetProperty {
   private String m_datasetPath;
   private String m_trainDataFile;
@@ -36,11 +39,13 @@ public class DatasetProperty {
   private int m_neutralValue;
   private int m_negativeValue;
 
+  private svm_parameter m_svmParam;
+
   public DatasetProperty(String datasetPath, String trainDataFile,
       String testDataFile, String delimiter, int idIndex, int textIndex,
       int labelIndex, String positiveLabel, String neutralLabel,
       String negativeLabel, int positiveValue, int neutralValue,
-      int negativeValue) {
+      int negativeValue, svm_parameter svmParam) {
     this.m_datasetPath = datasetPath;
     this.m_trainDataFile = trainDataFile;
     this.m_testDataFile = testDataFile;
@@ -57,6 +62,17 @@ public class DatasetProperty {
     this.m_positiveValue = positiveValue;
     this.m_neutralValue = neutralValue;
     this.m_negativeValue = negativeValue;
+
+    this.m_svmParam = svmParam;
+  }
+
+  public DatasetProperty(String datasetPath, String trainDataFile,
+      String testDataFile, String delimiter, int idIndex, int textIndex,
+      int labelIndex, String positiveLabel, String neutralLabel,
+      String negativeLabel, svm_parameter svmParam) {
+    this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
+        textIndex, labelIndex, positiveLabel, neutralLabel, negativeLabel, 0,
+        1, 2, svmParam);
   }
 
   public DatasetProperty(String datasetPath, String trainDataFile,
@@ -65,19 +81,33 @@ public class DatasetProperty {
       String negativeLabel) {
     this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
         textIndex, labelIndex, positiveLabel, neutralLabel, negativeLabel, 0,
-        1, 2);
+        1, 2, SVM.getDefaultParameter());
+  }
+
+  public DatasetProperty(String datasetPath, String trainDataFile,
+      String testDataFile, String delimiter, int idIndex, int textIndex,
+      int labelIndex, svm_parameter svmParam) {
+    this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
+        textIndex, labelIndex, "positive", "neutral", "negative", svmParam);
   }
 
   public DatasetProperty(String datasetPath, String trainDataFile,
       String testDataFile, String delimiter, int idIndex, int textIndex,
       int labelIndex) {
     this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
-        textIndex, labelIndex, "positive", "neutral", "negative");
+        textIndex, labelIndex, "positive", "neutral", "negative", SVM
+            .getDefaultParameter());
+  }
+
+  public DatasetProperty(String datasetPath, String trainDataFile,
+      String testDataFile, svm_parameter svmParam) {
+    this(datasetPath, trainDataFile, testDataFile, "\t", 0, 1, 2, svmParam);
   }
 
   public DatasetProperty(String datasetPath, String trainDataFile,
       String testDataFile) {
-    this(datasetPath, trainDataFile, testDataFile, "\t", 0, 1, 2);
+    this(datasetPath, trainDataFile, testDataFile, "\t", 0, 1, 2, SVM
+        .getDefaultParameter());
   }
 
   public String getDatasetPath() {
@@ -138,6 +168,10 @@ public class DatasetProperty {
 
   public int getNegativeValue() {
     return m_negativeValue;
+  }
+
+  public svm_parameter getSVMParam() {
+    return m_svmParam;
   }
 
   @Override

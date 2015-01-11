@@ -423,17 +423,10 @@ public class SVM {
         SVM.saveProblem(svmProb, datasetProperty.getDatasetPath()
             + File.separator + SVM_PROBLEM_FILE);
 
-        // after parameter search use best C and gamma values
-        svm_parameter svmParam = SVM.getDefaultParameter();
-        svmParam.kernel_type = svm_parameter.LINEAR;
-        svmParam.C = 0.5;
-        // svmParam.C = Math.pow(2, 6);
-        // svmParam.gamma = Math.pow(2, -5);
-
         // train model
         LOG.info("Train SVM model...");
         long startTime = System.currentTimeMillis();
-        svmModel = SVM.train(svmProb, svmParam);
+        svmModel = SVM.train(svmProb, datasetProperty.getSVMParam());
         LOG.info("Train SVM model finished after "
             + (System.currentTimeMillis() - startTime) + " ms");
 
@@ -445,8 +438,8 @@ public class SVM {
         if (nFoldCrossValidation > 0) {
           LOG.info("Run n-fold cross validation...");
           startTime = System.currentTimeMillis();
-          double accuracy = SVM.crossValidate(svmProb, svmParam,
-              nFoldCrossValidation);
+          double accuracy = SVM.crossValidate(svmProb,
+              datasetProperty.getSVMParam(), nFoldCrossValidation);
           LOG.info("CrossValidation finished after "
               + (System.currentTimeMillis() - startTime) + " ms");
           LOG.info("Cross Validation Accurancy: " + accuracy);

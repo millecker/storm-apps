@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import libsvm.svm_parameter;
+import at.illecker.storm.examples.util.svm.SVM;
+
 public class Configuration {
 
   public static final boolean LOGGING = false;
@@ -220,7 +223,14 @@ public class Configuration {
   }
 
   public static DatasetProperty getDataSet3() {
+    // After Grid search use best C and gamma values
+    svm_parameter svmParam = SVM.getDefaultParameter();
+    svmParam.kernel_type = svm_parameter.LINEAR;
+    svmParam.C = 0.5;
+    // svmParam.C = Math.pow(2, 6);
+    // svmParam.gamma = Math.pow(2, -5);
     return new DatasetProperty(Configuration.getDataSetPath() + File.separator
-        + "dataset3", "trainingInput.txt", "testingInput.txt", "\t", 0, 1, 3);
+        + "dataset3", "trainingInput.txt", "testingInput.txt", "\t", 0, 1, 3,
+        svmParam);
   }
 }
