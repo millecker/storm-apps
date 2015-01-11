@@ -132,6 +132,15 @@ public class POSTagger {
     return m_posTagger.tagSentence(untaggedTokens, true);
   }
 
+  public void tagTweets(List<Tweet> tweets) {
+    for (Tweet tweet : tweets) {
+      for (List<String> sentence : tweet.getPreprocessedSentences()) {
+        List<TaggedWord> taggedSentence = this.tagSentence(sentence);
+        tweet.addTaggedSentence(taggedSentence);
+      }
+    }
+  }
+
   public static void testPOSTagger() {
     String text = "ikr smh he asked fir yo last name so he can add u on fb lololol";
     final int testRounds = 1;
