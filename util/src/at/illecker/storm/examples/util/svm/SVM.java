@@ -526,16 +526,17 @@ public class SVM {
   public static void main(String[] args) {
     int nFoldCrossValidation = 3;
     int featureVectorLevel = 2;
+    DatasetProperty dataSet = Configuration.getDataSetSemEval2013Mixed();
 
     if (featureVectorLevel == 0) {
-      SVM.svm(Configuration.getDataSet3(),
-          SentimentFeatureVectorGenerator.class, nFoldCrossValidation, false);
-    } else if (featureVectorLevel == 1) {
-      SVM.svm(Configuration.getDataSet3(), TfIdfFeatureVectorGenerator.class,
+      SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,
           nFoldCrossValidation, false);
+    } else if (featureVectorLevel == 1) {
+      SVM.svm(dataSet, TfIdfFeatureVectorGenerator.class, nFoldCrossValidation,
+          false);
     } else {
-      SVM.svm(Configuration.getDataSet3(),
-          CombinedFeatureVectorGenerator.class, nFoldCrossValidation, false);
+      SVM.svm(dataSet, CombinedFeatureVectorGenerator.class,
+          nFoldCrossValidation, false);
     }
   }
 }
