@@ -184,6 +184,11 @@ public class SVM {
 
   public static double crossValidate(svm_problem svmProb,
       svm_parameter svmParam, int nFold) {
+    return crossValidate(svmProb, svmParam, nFold, false);
+  }
+
+  public static double crossValidate(svm_problem svmProb,
+      svm_parameter svmParam, int nFold, boolean printStats) {
 
     // set gamma to default 1/num_features if 0
     if (svmParam.gamma == Double.MIN_VALUE) {
@@ -194,13 +199,109 @@ public class SVM {
     svm.svm_cross_validation(svmProb, svmParam, nFold, target);
 
     double correctCounter = 0;
-    for (int i = 0; i < target.length; i++) {
+    for (int i = 0; i < svmProb.l; i++) {
       if (target[i] == svmProb.y[i]) {
         correctCounter++;
       }
     }
 
-    return correctCounter / (double) svmProb.l;
+    double accuracy = correctCounter / (double) svmProb.l;
+    LOG.info("Cross Validation Accuracy: " + (100.0 * accuracy));
+
+    if (printStats) {
+      printStats(svmProb.y, target);
+    }
+
+    return accuracy;
+  }
+
+  public static int[][] printStats(double[] actualClass, double[] predictedClass) {
+
+    if (actualClass.length != predictedClass.length) {
+      return null;
+    }
+
+    // find the maximum number of classes
+    int maxClassNum = 0;
+    for (int i = 0; i < actualClass.length; i++) {
+      if (actualClass[i] > maxClassNum)
+        maxClassNum = (int) actualClass[i];
+    }
+    // add 1 because of zero class
+    maxClassNum++;
+
+    // create confusion matrix
+    // rows represent the instances in an actual class
+    // cols represent the instances in a predicted class
+    int[][] confusionMatrix = new int[maxClassNum][maxClassNum];
+    int totalCorrect = 0;
+    for (int i = 0; i < actualClass.length; i++) {
+      if (predictedClass[i] == actualClass[i]) {
+        totalCorrect++;
+      }
+      confusionMatrix[(int) actualClass[i]][(int) predictedClass[i]]++;
+    }
+
+    int[] rowSum = new int[maxClassNum];
+    int[] colSum = new int[maxClassNum];
+    for (int i = 0; i < maxClassNum; i++) {
+      for (int j = 0; j < maxClassNum; j++) {
+        rowSum[i] += confusionMatrix[i][j];
+        colSum[i] += confusionMatrix[j][i];
+      }
+    }
+
+    LOG.info("Confusion Matrix:");
+    // print header
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < maxClassNum; i++) {
+      sb.append("\t").append(i);
+    }
+    sb.append("\t").append("total");
+    LOG.info(sb.toString());
+    // print matrix
+    for (int i = 0; i < maxClassNum; i++) {
+      int[] predictedClasses = confusionMatrix[i];
+      sb = new StringBuffer();
+      sb.append(i);
+      for (int j = 0; j < predictedClasses.length; j++) {
+        sb.append("\t").append(predictedClasses[j]);
+      }
+      sb.append("\t" + rowSum[i]);
+      LOG.info(sb.toString());
+    }
+    sb = new StringBuffer();
+    sb.append("total");
+    for (int i = 0; i < maxClassNum; i++) {
+      sb.append("\t").append(colSum[i]);
+    }
+    LOG.info(sb.toString());
+
+    LOG.info("Total: " + actualClass.length);
+    LOG.info("Correct: " + totalCorrect);
+    LOG.info("Accuracy: " + (totalCorrect / (double) actualClass.length));
+
+    // get accuracy per type
+    LOG.info("Scores per class:");
+    for (int i = 0; i < maxClassNum; i++) {
+      int correctHitsPerClass = confusionMatrix[i][i];
+
+      double precision = correctHitsPerClass / (double) colSum[i];
+      double recall = correctHitsPerClass / (double) rowSum[i];
+      double F1 = 2 * ((precision * recall) / (precision + recall));
+
+      LOG.info("Class: " + i + "\tPrecision: " + precision + "\tRecall: "
+          + recall + "\tF1: " + F1);
+    }
+
+    // Macro-average: Average precision, recall, or F1 over the classes of
+    // interest.
+
+    // Micro-average: Sum corresponding cells to create a 2 x 2 confusion
+    // matrix, and calculate precision in terms of the new matrix.
+    // (In this set-up, precision, recall, and F1 are all the same.)
+
+    return confusionMatrix;
   }
 
   public static void coarseGrainedParamterSearch(svm_problem svmProb,
@@ -490,11 +591,11 @@ public class SVM {
             + File.separator + SVM_MODEL_FILE_SER);
 
         // Run n-fold cross validation
-        if (nFoldCrossValidation > 0) {
+        if (nFoldCrossValidation > 1) {
           LOG.info("Run n-fold cross validation...");
           startTime = System.currentTimeMillis();
           double accuracy = crossValidate(svmProb,
-              datasetProperty.getSVMParam(), nFoldCrossValidation);
+              datasetProperty.getSVMParam(), nFoldCrossValidation, true);
           LOG.info("CrossValidation finished after "
               + (System.currentTimeMillis() - startTime) + " ms");
           LOG.info("Cross Validation Accurancy: " + accuracy);
