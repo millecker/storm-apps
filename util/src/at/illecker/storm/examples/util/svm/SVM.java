@@ -254,6 +254,7 @@ public class SVM {
     LOG.info("Confusion Matrix:");
     // print header
     StringBuffer sb = new StringBuffer();
+    sb.append("\t\t");
     for (int i = 0; i < maxClassNum; i++) {
       sb.append("\t").append(i);
     }
@@ -263,7 +264,7 @@ public class SVM {
     for (int i = 0; i < maxClassNum; i++) {
       int[] predictedClasses = confusionMatrix[i];
       sb = new StringBuffer();
-      sb.append(i);
+      sb.append("Class:\t" + i);
       for (int j = 0; j < predictedClasses.length; j++) {
         sb.append("\t").append(predictedClasses[j]);
       }
@@ -271,7 +272,7 @@ public class SVM {
       LOG.info(sb.toString());
     }
     sb = new StringBuffer();
-    sb.append("total");
+    sb.append("total").append("\t");
     for (int i = 0; i < maxClassNum; i++) {
       sb.append("\t").append(colSum[i]);
     }
@@ -281,7 +282,6 @@ public class SVM {
     LOG.info("Correct: " + totalCorrect);
     LOG.info("Accuracy: " + (totalCorrect / (double) actualClass.length));
 
-    // get accuracy per type
     LOG.info("Scores per class:");
     for (int i = 0; i < maxClassNum; i++) {
       int correctHitsPerClass = confusionMatrix[i][i];
@@ -290,8 +290,8 @@ public class SVM {
       double recall = correctHitsPerClass / (double) rowSum[i];
       double F1 = 2 * ((precision * recall) / (precision + recall));
 
-      LOG.info("Class: " + i + "\tPrecision: " + precision + "\tRecall: "
-          + recall + "\tF1: " + F1);
+      LOG.info("Class: " + i + " Precision: " + precision + " Recall: "
+          + recall + " F1: " + F1);
     }
 
     // Macro-average: Average precision, recall, or F1 over the classes of
