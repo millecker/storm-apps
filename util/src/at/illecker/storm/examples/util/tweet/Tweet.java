@@ -101,6 +101,25 @@ public class Tweet implements Serializable {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Tweet other = (Tweet) obj;
+    if (this.m_id != other.getId()) {
+      // check if Tweet text is matching
+      if (this.m_text.equals(other.getText())) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  }
+
+  @Override
   public String toString() {
     return "Tweet [id=" + m_id + ", text=" + m_text
         + ((m_score != null) ? ", score=" + m_score : "") + "]";
@@ -161,5 +180,4 @@ public class Tweet implements Serializable {
 
     return tweets;
   }
-
 }
