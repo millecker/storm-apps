@@ -209,99 +209,10 @@ public class SVM {
     LOG.info("Cross Validation Accuracy: " + (100.0 * accuracy));
 
     if (printStats) {
-      printStats(svmProb.y, target);
+      printStats(getConfusionMatrix(svmProb.y, target));
     }
 
     return accuracy;
-  }
-
-  public static int[][] printStats(double[] actualClass, double[] predictedClass) {
-
-    if (actualClass.length != predictedClass.length) {
-      return null;
-    }
-
-    // find the maximum number of classes
-    int maxClassNum = 0;
-    for (int i = 0; i < actualClass.length; i++) {
-      if (actualClass[i] > maxClassNum)
-        maxClassNum = (int) actualClass[i];
-    }
-    // add 1 because of zero class
-    maxClassNum++;
-
-    // create confusion matrix
-    // rows represent the instances in an actual class
-    // cols represent the instances in a predicted class
-    int[][] confusionMatrix = new int[maxClassNum][maxClassNum];
-    int totalCorrect = 0;
-    for (int i = 0; i < actualClass.length; i++) {
-      if (predictedClass[i] == actualClass[i]) {
-        totalCorrect++;
-      }
-      confusionMatrix[(int) actualClass[i]][(int) predictedClass[i]]++;
-    }
-
-    int[] rowSum = new int[maxClassNum];
-    int[] colSum = new int[maxClassNum];
-    for (int i = 0; i < maxClassNum; i++) {
-      for (int j = 0; j < maxClassNum; j++) {
-        rowSum[i] += confusionMatrix[i][j];
-        colSum[i] += confusionMatrix[j][i];
-      }
-    }
-
-    LOG.info("Confusion Matrix:");
-    // print header
-    StringBuffer sb = new StringBuffer();
-    sb.append("\t\t");
-    for (int i = 0; i < maxClassNum; i++) {
-      sb.append("\t").append(i);
-    }
-    sb.append("\t").append("total");
-    LOG.info(sb.toString());
-    // print matrix
-    for (int i = 0; i < maxClassNum; i++) {
-      int[] predictedClasses = confusionMatrix[i];
-      sb = new StringBuffer();
-      sb.append("Class:\t" + i);
-      for (int j = 0; j < predictedClasses.length; j++) {
-        sb.append("\t").append(predictedClasses[j]);
-      }
-      sb.append("\t" + rowSum[i]);
-      LOG.info(sb.toString());
-    }
-    sb = new StringBuffer();
-    sb.append("total").append("\t");
-    for (int i = 0; i < maxClassNum; i++) {
-      sb.append("\t").append(colSum[i]);
-    }
-    LOG.info(sb.toString());
-
-    LOG.info("Total: " + actualClass.length);
-    LOG.info("Correct: " + totalCorrect);
-    LOG.info("Accuracy: " + (totalCorrect / (double) actualClass.length));
-
-    LOG.info("Scores per class:");
-    for (int i = 0; i < maxClassNum; i++) {
-      int correctHitsPerClass = confusionMatrix[i][i];
-
-      double precision = correctHitsPerClass / (double) colSum[i];
-      double recall = correctHitsPerClass / (double) rowSum[i];
-      double F1 = 2 * ((precision * recall) / (precision + recall));
-
-      LOG.info("Class: " + i + " Precision: " + precision + " Recall: "
-          + recall + " F1: " + F1);
-    }
-
-    // Macro-average: Average precision, recall, or F1 over the classes of
-    // interest.
-
-    // Micro-average: Sum corresponding cells to create a 2 x 2 confusion
-    // matrix, and calculate precision in terms of the new matrix.
-    // (In this set-up, precision, recall, and F1 are all the same.)
-
-    return confusionMatrix;
   }
 
   public static void coarseGrainedParamterSearch(svm_problem svmProb,
@@ -433,6 +344,98 @@ public class SVM {
     }
 
     return predictedClass;
+  }
+
+  public static int[][] getConfusionMatrix(double[] actualClass,
+      double[] predictedClass) {
+    if (actualClass.length != predictedClass.length) {
+      return null;
+    }
+
+    // find the total number of classes
+    int maxClassNum = 0;
+    for (int i = 0; i < actualClass.length; i++) {
+      if (actualClass[i] > maxClassNum)
+        maxClassNum = (int) actualClass[i];
+    }
+    // add 1 because of class zero
+    maxClassNum++;
+
+    // create confusion matrix
+    // rows represent the instances in an actual class
+    // cols represent the instances in a predicted class
+    int[][] confusionMatrix = new int[maxClassNum][maxClassNum];
+    for (int i = 0; i < actualClass.length; i++) {
+      confusionMatrix[(int) actualClass[i]][(int) predictedClass[i]]++;
+    }
+    return confusionMatrix;
+  }
+
+  public static void printStats(int[][] confusionMatrix) {
+    int totalClasses = confusionMatrix.length;
+    int total = 0;
+    int totalCorrect = 0;
+
+    int[] rowSum = new int[totalClasses];
+    int[] colSum = new int[totalClasses];
+    for (int i = 0; i < totalClasses; i++) {
+      for (int j = 0; j < totalClasses; j++) {
+        total += confusionMatrix[i][j];
+        rowSum[i] += confusionMatrix[i][j];
+        colSum[i] += confusionMatrix[j][i];
+      }
+      totalCorrect += confusionMatrix[i][i];
+    }
+
+    LOG.info("Confusion Matrix:");
+    // print header
+    StringBuffer sb = new StringBuffer();
+    sb.append("\t\t");
+    for (int i = 0; i < totalClasses; i++) {
+      sb.append("\t").append(i);
+    }
+    sb.append("\t").append("total");
+    LOG.info(sb.toString());
+    // print matrix
+    for (int i = 0; i < totalClasses; i++) {
+      int[] predictedClasses = confusionMatrix[i];
+      sb = new StringBuffer();
+      sb.append("Class:\t" + i);
+      for (int j = 0; j < predictedClasses.length; j++) {
+        sb.append("\t").append(predictedClasses[j]);
+      }
+      sb.append("\t" + rowSum[i]);
+      LOG.info(sb.toString());
+    }
+    sb = new StringBuffer();
+    sb.append("total").append("\t");
+    for (int i = 0; i < totalClasses; i++) {
+      sb.append("\t").append(colSum[i]);
+    }
+    LOG.info(sb.toString() + "\n");
+
+    LOG.info("Total: " + total);
+    LOG.info("Correct: " + totalCorrect);
+    LOG.info("Accuracy: " + (totalCorrect / (double) total));
+
+    LOG.info("Scores per class:");
+    for (int i = 0; i < totalClasses; i++) {
+      int correctHitsPerClass = confusionMatrix[i][i];
+
+      double precision = correctHitsPerClass / (double) colSum[i];
+      double recall = correctHitsPerClass / (double) rowSum[i];
+      double F1 = 2 * ((precision * recall) / (precision + recall));
+
+      LOG.info("Class: " + i + " Precision: " + precision + " Recall: "
+          + recall + " F1: " + F1);
+    }
+
+    // Macro-average: Average precision, recall, or F1 over the classes of
+    // interest.
+
+    // Micro-average: Sum corresponding cells to create a 2 x 2 confusion
+    // matrix, and calculate precision in terms of the new matrix.
+    // (In this set-up, precision, recall, and F1 are all the same.)
   }
 
   public static void svm(DatasetProperty datasetProperty,
@@ -596,7 +599,7 @@ public class SVM {
           startTime = System.currentTimeMillis();
           double accuracy = crossValidate(svmProb,
               datasetProperty.getSVMParam(), nFoldCrossValidation, true);
-          LOG.info("CrossValidation finished after "
+          LOG.info("Cross Validation finished after "
               + (System.currentTimeMillis() - startTime) + " ms");
           LOG.info("Cross Validation Accurancy: " + accuracy);
         }
@@ -604,13 +607,17 @@ public class SVM {
 
       // Evaluate test tweets
       long countMatches = 0;
+      int[][] confusionMatrix = new int[totalClasses][totalClasses];
       LOG.info("Evaluate test tweets...");
+
       long startTime = System.currentTimeMillis();
       for (Tweet tweet : testTweets) {
         double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
-        if (predictedClass == isc.classfyScore(tweet.getScore())) {
+        int actualClass = isc.classfyScore(tweet.getScore());
+        if (predictedClass == actualClass) {
           countMatches++;
         }
+        confusionMatrix[actualClass][(int) predictedClass]++;
       }
 
       LOG.info("Evaluate finished after "
@@ -619,6 +626,8 @@ public class SVM {
       LOG.info("Matches: " + countMatches);
       double accuracy = (double) countMatches / (double) testTweets.size();
       LOG.info("Accuracy: " + accuracy);
+
+      printStats(confusionMatrix);
 
       svm.EXEC_SERV.shutdown();
     }
