@@ -249,9 +249,9 @@ public class Configuration {
     svmParam.weight_label[2] = 2;
     svmParam.weight = new double[svmParam.nr_weight];
     // class weights for train + dev
-    svmParam.weight[0] = 2.96;
+    svmParam.weight[0] = 1; // 2.96; 4;
     svmParam.weight[1] = 1;
-    svmParam.weight[2] = 1.26;
+    svmParam.weight[2] = 1; // 1.26; 2;
 
     return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2013", "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",

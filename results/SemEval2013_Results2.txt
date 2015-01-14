@@ -1,0 +1,45 @@
+SemEval 2013
+
+Train + Dev Dataset
+Class: 0 1806 (negative)
+Class: 1 5341 (neutral)
+Class: 2 4235 (positive)
+Total: 11382
+
+Train Class Weights:
+Class: 0 2.96
+Class: 1 1.0
+Class: 2 1.26
+
+#### Train + Dev cross validation
+
+Confusion Matrix:
+			0		1		2		total
+Class:	0	818		700		288		1806
+Class:	1	316		4170	855		5341
+Class:	2	196		1129	2910	4235
+total		1330	5999	4053
+
+Total: 11382 Correct: 7898 Accuracy: 0.6939026533122474
+
+Scores per class:
+Class: 0 Precision: 0.6150375939849624 Recall: 0.4529346622369878 F1: 0.5216836734693877
+Class: 1 Precision: 0.6951158526421071 Recall: 0.7807526680396929 F1: 0.7354497354497355
+Class: 2 Precision: 0.7179866765358993 Recall: 0.6871310507674144 F1: 0.7022200772200773
+
+#### Evaluate test dataset
+
+Confusion Matrix:
+			0		1		2		total
+Class:	0	371		158		72		601
+Class:	1	153		1241	246		1640
+Class:	2	148		403		1021	1572
+total		672		1802	1339
+
+Total: 3813 Correct: 2633 Accuracy: 0.6905323891948597
+
+Scores per class:
+Class: 0 Precision: 0.5520833333333334 Recall: 0.6173044925124792 F1: 0.5828750981932442
+Class: 1 Precision: 0.6886792452830188 Recall: 0.7567073170731707 F1: 0.7210923881464264
+Class: 2 Precision: 0.7625093353248693 Recall: 0.6494910941475827 F1: 0.7014771556166266
+
