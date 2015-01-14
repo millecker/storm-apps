@@ -231,10 +231,9 @@ public class Configuration {
     // svmParam.gamma = Math.pow(2, -5);
 
     return new Dataset(Configuration.getDataSetPath() + File.separator
-        + "SemEval2013" + File.separator + "mixed", "trainingInput.txt",
-        "testingInput.txt", "\t", 0, 3, 1, new String[] { "positive" },
-        new String[] { "neutral" }, new String[] { "negative" }, 0, 1, 2,
-        svmParam);
+        + "SemEval2013_mixed", "trainingInput.txt", null, "testingInput.txt",
+        "\t", 0, 3, 1, new String[] { "negative" }, new String[] { "neutral" },
+        new String[] { "positive" }, 0, 1, 2, svmParam);
   }
 
   public static Dataset getDataSetSemEval2013() {
@@ -244,12 +243,10 @@ public class Configuration {
     svmParam.C = 0.5;
     // TODO
     return new Dataset(Configuration.getDataSetPath() + File.separator
-        + "SemEval2013", "train" + File.separator
-        + "twitter-train-gold-B-2013.tsv", "test" + File.separator
-        + "twitter-test-GOLD-B.tsv", "\t", 0, 2, 3, new String[] { "positive",
-        "\"positive\"" }, new String[] { "neutral", "\"neutral\"",
-        "\"objective-OR-neutral\"", "\"objective\"" }, new String[] {
-        "negative", "\"negative\"" }, 0, 1, 2, svmParam);
+        + "SemEval2013", "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",
+        "twitter-test-gold-B.tsv", "\t", 0, 2, 3, new String[] { "negative",
+            "\"negative\"" }, new String[] { "neutral", "objective-OR-neutral",
+            "objective" }, new String[] { "positive" }, 0, 1, 2, svmParam);
   }
 
   public static Dataset getDataSetSemEval2014() {
@@ -259,11 +256,10 @@ public class Configuration {
     svmParam.C = 0.5;
     // TODO
     return new Dataset(Configuration.getDataSetPath() + File.separator
-        + "SemEval2014", "train" + File.separator
-        + "twitter-train-gold-B-2014.tsv", "test" + File.separator
-        + "SemEval2014-task9-test-B-input.txt", "\t", 0, 2, 3, new String[] {
-        "positive", "\"positive\"" }, new String[] { "neutral", "\"neutral\"",
-        "\"objective-OR-neutral\"" },
-        new String[] { "negative", "\"negative\"" }, 0, 1, 2, svmParam);
+        + "SemEval2014", "twitter-train-gold-B-2014.tsv", null,
+        "SemEval2014-task9-test-B-input.txt", "\t", 0, 2, 3, new String[] {
+            "negative", "\"negative\"" }, new String[] { "neutral",
+            "\"neutral\"", "\"objective-OR-neutral\"" }, new String[] {
+            "positive", "\"positive\"" }, 0, 1, 2, svmParam);
   }
 }

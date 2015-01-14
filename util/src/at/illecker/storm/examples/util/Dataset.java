@@ -17,6 +17,7 @@
 package at.illecker.storm.examples.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,12 @@ import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class Dataset {
+  public static final String SERIAL_EXTENSION = ".ser";
   private static final Logger LOG = LoggerFactory.getLogger(Dataset.class);
 
   private String m_datasetPath;
   private String m_trainDataFile;
+  private String m_devDataFile;
   private String m_testDataFile;
 
   private String m_delimiter;
@@ -46,22 +49,24 @@ public class Dataset {
   private String[] m_neutralLabels;
   private String[] m_negativeLabels;
 
-  private int m_positiveValue;
-  private int m_neutralValue;
   private int m_negativeValue;
+  private int m_neutralValue;
+  private int m_positiveValue;
 
   private svm_parameter m_svmParam;
 
   private List<Tweet> m_trainTweets = null;
+  private List<Tweet> m_devTweets = null;
   private List<Tweet> m_testTweets = null;
 
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      String delimiter, int idIndex, int labelIndex, int textIndex,
-      String[] positiveLabels, String[] neutralLabels, String[] negativeLabels,
-      int positiveValue, int neutralValue, int negativeValue,
-      svm_parameter svmParam) {
+  public Dataset(String datasetPath, String trainDataFile, String devDataFile,
+      String testDataFile, String delimiter, int idIndex, int labelIndex,
+      int textIndex, String[] negativeLabels, String[] neutralLabels,
+      String[] positiveLabels, int negativeValue, int neutralValue,
+      int positiveValue, svm_parameter svmParam) {
     this.m_datasetPath = datasetPath;
     this.m_trainDataFile = trainDataFile;
+    this.m_devDataFile = devDataFile;
     this.m_testDataFile = testDataFile;
 
     this.m_delimiter = delimiter;
@@ -70,13 +75,13 @@ public class Dataset {
     this.m_labelIndex = labelIndex;
     this.m_textIndex = textIndex;
 
-    this.m_positiveLabels = positiveLabels;
-    this.m_neutralLabels = neutralLabels;
     this.m_negativeLabels = negativeLabels;
+    this.m_neutralLabels = neutralLabels;
+    this.m_positiveLabels = positiveLabels;
 
-    this.m_positiveValue = positiveValue;
-    this.m_neutralValue = neutralValue;
     this.m_negativeValue = negativeValue;
+    this.m_neutralValue = neutralValue;
+    this.m_positiveValue = positiveValue;
 
     this.m_svmParam = svmParam;
   }
@@ -86,19 +91,33 @@ public class Dataset {
   }
 
   public String getTrainDataFile() {
-    return m_datasetPath + File.separator + m_trainDataFile;
+    return (m_trainDataFile != null) ? m_datasetPath + File.separator
+        + m_trainDataFile : null;
   }
 
   public String getTrainDataSerializationFile() {
-    return m_datasetPath + File.separator + m_trainDataFile + ".ser";
+    return (m_trainDataFile != null) ? m_datasetPath + File.separator
+        + m_trainDataFile + SERIAL_EXTENSION : null;
+  }
+
+  public String getDevDataFile() {
+    return (m_devDataFile != null) ? m_datasetPath + File.separator
+        + m_devDataFile : null;
+  }
+
+  public String getDevDataSerializationFile() {
+    return (m_devDataFile != null) ? m_datasetPath + File.separator
+        + m_devDataFile + SERIAL_EXTENSION : null;
   }
 
   public String getTestDataFile() {
-    return m_datasetPath + File.separator + m_testDataFile;
+    return (m_testDataFile != null) ? m_datasetPath + File.separator
+        + m_testDataFile : null;
   }
 
   public String getTestDataSerializationFile() {
-    return m_datasetPath + File.separator + m_testDataFile + ".ser";
+    return (m_testDataFile != null) ? m_datasetPath + File.separator
+        + m_testDataFile + SERIAL_EXTENSION : null;
   }
 
   public String getDelimiter() {
@@ -117,125 +136,131 @@ public class Dataset {
     return m_textIndex;
   }
 
-  public String[] getPositiveLabels() {
-    return m_positiveLabels;
+  public String[] getNegativeLabels() {
+    return m_negativeLabels;
   }
 
   public String[] getNeutralLabels() {
     return m_neutralLabels;
   }
 
-  public String[] getNegativeLabels() {
-    return m_negativeLabels;
-  }
-
-  public int getPositiveValue() {
-    return m_positiveValue;
-  }
-
-  public int getNeutralValue() {
-    return m_neutralValue;
+  public String[] getPositiveLabels() {
+    return m_positiveLabels;
   }
 
   public int getNegativeValue() {
     return m_negativeValue;
   }
 
+  public int getNeutralValue() {
+    return m_neutralValue;
+  }
+
+  public int getPositiveValue() {
+    return m_positiveValue;
+  }
+
   public svm_parameter getSVMParam() {
     return m_svmParam;
   }
 
-  public List<Tweet> getTrainTweets() {
-    if (m_trainTweets == null) {
+  public List<Tweet> getTrainTweets(boolean includeDevTweets) {
+    if ((m_trainTweets == null) && (this.getTrainDataFile() != null)) {
       m_trainTweets = FileUtils.readTweets(this.getTrainDataFile(), this);
     }
-    return m_trainTweets;
+
+    // optional include dev tweets in training dataset
+    if (includeDevTweets) {
+      List<Tweet> combinedList = new ArrayList<Tweet>(m_trainTweets);
+      combinedList.addAll(getDevTweets());
+      return combinedList;
+    } else {
+      return m_trainTweets;
+    }
+  }
+
+  public List<Tweet> getDevTweets() {
+    if ((m_devTweets == null) && (this.getDevDataFile() != null)) {
+      LOG.info("devdatafile: " + this.getDevDataFile());
+      m_devTweets = FileUtils.readTweets(this.getDevDataFile(), this);
+    }
+    return m_devTweets;
   }
 
   public List<Tweet> getTestTweets() {
-    if (m_testTweets == null) {
+    if ((m_testTweets == null) && (this.getTestDataFile() != null)) {
       m_testTweets = FileUtils.readTweets(this.getTestDataFile(), this);
     }
     return m_testTweets;
   }
 
-  public void printDatasetStats() {
-    List<Tweet> trainTweets = getTrainTweets();
-    List<Tweet> testTweets = getTestTweets();
+  public void printTweetStats(List<Tweet> tweets) {
+    if (tweets != null) {
+      Map<Integer, Integer> counts = new TreeMap<Integer, Integer>();
+      for (Tweet tweet : tweets) {
+        int key = tweet.getScore().intValue();
+        Integer count = counts.get(key);
+        counts.put(key, ((count != null) ? count + 1 : 1));
+      }
 
-    Map<Integer, Integer> trainCounts = new TreeMap<Integer, Integer>();
-    for (Tweet tweet : trainTweets) {
-      int key = tweet.getScore().intValue();
-      Integer counts = trainCounts.get(key);
-      trainCounts.put(key, ((counts != null) ? counts + 1 : 1));
-    }
+      int total = 0;
+      int max = 0;
+      for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+        LOG.info("Class: \t" + entry.getKey() + "\t" + entry.getValue());
+        total += entry.getValue();
+        if (entry.getValue() > max) {
+          max = entry.getValue();
+        }
+      }
+      LOG.info("Total: " + total);
 
-    Map<Integer, Integer> testCounts = new TreeMap<Integer, Integer>();
-    for (Tweet tweet : testTweets) {
-      int key = tweet.getScore().intValue();
-      Integer counts = testCounts.get(key);
-      testCounts.put(key, ((counts != null) ? counts + 1 : 1));
-    }
-
-    LOG.info("Dataset: " + getDatasetPath());
-    LOG.info("Train Dataset: " + getTrainDataFile());
-    int trainSum = 0;
-    int trainMax = 0;
-    for (Map.Entry<Integer, Integer> entry : trainCounts.entrySet()) {
-      LOG.info("Class: \t" + entry.getKey() + "\t" + entry.getValue());
-      trainSum += entry.getValue();
-      if (entry.getValue() > trainMax) {
-        trainMax = entry.getValue();
+      LOG.info("Train Class Weights: ");
+      for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+        LOG.info("Class: \t" + entry.getKey() + "\t"
+            + (max / (double) entry.getValue()));
       }
     }
-    LOG.info("Total: " + trainSum);
+  }
 
-    LOG.info("Train Class Weights: ");
-    for (Map.Entry<Integer, Integer> entry : trainCounts.entrySet()) {
-      LOG.info("Class: \t" + entry.getKey() + "\t"
-          + (trainMax / (double) entry.getValue()));
-    }
+  public void printDatasetStats() {
+    LOG.info("Dataset: " + getDatasetPath());
+
+    LOG.info("Train Dataset: " + getTrainDataFile());
+    printTweetStats(getTrainTweets(false));
+
+    LOG.info("Dev Dataset: " + getDevDataFile());
+    printTweetStats(getDevTweets());
 
     LOG.info("Test Dataset: " + getTestDataFile());
-    int testSum = 0;
-    int testMax = 0;
-    for (Map.Entry<Integer, Integer> entry : testCounts.entrySet()) {
-      LOG.info("Class: \t" + entry.getKey() + "\t" + entry.getValue());
-      testSum += entry.getValue();
-      if (entry.getValue() > testMax) {
-        testMax = entry.getValue();
-      }
-    }
-    LOG.info("Total: " + testSum);
-
-    LOG.info("Test Class Weights: ");
-    for (Map.Entry<Integer, Integer> entry : testCounts.entrySet()) {
-      LOG.info("Class: \t" + entry.getKey() + "\t"
-          + (testMax / (double) entry.getValue()));
-    }
+    printTweetStats(getTestTweets());
   }
 
   @Override
   public String toString() {
-    return "DatasetProperty [datasetPath=" + m_datasetPath + ", trainDataFile="
-        + m_trainDataFile + ", testDataFile=" + m_testDataFile + ", delimiter="
-        + m_delimiter + ", idIndex=" + m_idIndex + ", textIndex=" + m_textIndex
-        + ", labelIndex=" + m_labelIndex + ", positiveLabels="
-        + Arrays.toString(m_positiveLabels) + ", neutralLabel="
-        + Arrays.toString(m_neutralLabels) + ", negativeLabel="
-        + Arrays.toString(m_negativeLabels) + ", positiveValue="
-        + m_positiveValue + ", neutralValue=" + m_neutralValue
-        + ", negativeValue=" + m_negativeValue + "]";
+    return "Dataset [datasetPath=" + m_datasetPath + ", trainDataFile="
+        + m_trainDataFile + ", devDataFile=" + m_devDataFile
+        + ", testDataFile=" + m_testDataFile + ", delimiter=" + m_delimiter
+        + ", idIndex=" + m_idIndex + ", textIndex=" + m_textIndex
+        + ", labelIndex=" + m_labelIndex + ", negativeLabel="
+        + Arrays.toString(m_negativeLabels) + ", neutralLabel="
+        + Arrays.toString(m_neutralLabels) + ", positiveLabels="
+        + Arrays.toString(m_positiveLabels) + ", negativeValue="
+        + m_negativeValue + ", neutralValue=" + m_neutralValue
+        + ", positiveValue=" + m_positiveValue + "]";
   }
 
   public static void main(String[] args) {
     Dataset dataSet2013Mixed = Configuration.getDataSetSemEval2013Mixed();
+    LOG.info("Dataset: SemEval2013 mixed");
+    LOG.info(dataSet2013Mixed.toString());
     dataSet2013Mixed.printDatasetStats();
 
     Dataset dataSet2013 = Configuration.getDataSetSemEval2013();
+    LOG.info("Dataset: SemEval2013");
     dataSet2013.printDatasetStats();
 
-    Dataset dataSet2014 = Configuration.getDataSetSemEval2014();
-    dataSet2014.printDatasetStats();
+    // Dataset dataSet2014 = Configuration.getDataSetSemEval2014();
+    // LOG.info("Dataset: SemEval2014");
+    // dataSet2014.printDatasetStats();
   }
 }
