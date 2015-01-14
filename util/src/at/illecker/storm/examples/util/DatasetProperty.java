@@ -17,11 +17,23 @@
 package at.illecker.storm.examples.util;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import libsvm.svm_parameter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.svm.SVM;
+import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class DatasetProperty {
+  private static final Logger LOG = LoggerFactory
+      .getLogger(DatasetProperty.class);
+
   private String m_datasetPath;
   private String m_trainDataFile;
   private String m_testDataFile;
@@ -40,6 +52,9 @@ public class DatasetProperty {
   private int m_negativeValue;
 
   private svm_parameter m_svmParam;
+
+  private List<Tweet> m_trainTweets = null;
+  private List<Tweet> m_testTweets = null;
 
   public DatasetProperty(String datasetPath, String trainDataFile,
       String testDataFile, String delimiter, int idIndex, int textIndex,
@@ -174,6 +189,76 @@ public class DatasetProperty {
     return m_svmParam;
   }
 
+  public List<Tweet> getTrainTweets() {
+    if (m_trainTweets == null) {
+      m_trainTweets = FileUtils.readTweets(this.getTrainDataFile(), this);
+    }
+    return m_trainTweets;
+  }
+
+  public List<Tweet> getTestTweets() {
+    if (m_testTweets == null) {
+      m_testTweets = FileUtils.readTweets(this.getTestDataFile(), this);
+    }
+    return m_testTweets;
+  }
+
+  public void printDatasetStats() {
+    List<Tweet> trainTweets = getTrainTweets();
+    List<Tweet> testTweets = getTestTweets();
+
+    Map<Integer, Integer> trainCounts = new TreeMap<Integer, Integer>();
+    for (Tweet tweet : trainTweets) {
+      int key = tweet.getScore().intValue();
+      Integer counts = trainCounts.get(key);
+      trainCounts.put(key, ((counts != null) ? counts + 1 : 1));
+    }
+
+    Map<Integer, Integer> testCounts = new TreeMap<Integer, Integer>();
+    for (Tweet tweet : testTweets) {
+      int key = tweet.getScore().intValue();
+      Integer counts = testCounts.get(key);
+      testCounts.put(key, ((counts != null) ? counts + 1 : 1));
+    }
+
+    LOG.info("Dataset: " + getDatasetPath());
+    LOG.info("Train Dataset:");
+    int trainSum = 0;
+    int trainMax = 0;
+    for (Map.Entry<Integer, Integer> entry : trainCounts.entrySet()) {
+      LOG.info("Class: \t" + entry.getKey() + "\t" + entry.getValue());
+      trainSum += entry.getValue();
+      if (entry.getValue() > trainMax) {
+        trainMax = entry.getValue();
+      }
+    }
+    LOG.info("Total: " + trainSum);
+
+    LOG.info("Train Class Weights: ");
+    for (Map.Entry<Integer, Integer> entry : trainCounts.entrySet()) {
+      LOG.info("Class: \t" + entry.getKey() + "\t"
+          + (trainMax / (double) entry.getValue()));
+    }
+
+    LOG.info("Test Dataset:");
+    int testSum = 0;
+    int testMax = 0;
+    for (Map.Entry<Integer, Integer> entry : testCounts.entrySet()) {
+      LOG.info("Class: \t" + entry.getKey() + "\t" + entry.getValue());
+      testSum += entry.getValue();
+      if (entry.getValue() > testMax) {
+        testMax = entry.getValue();
+      }
+    }
+    LOG.info("Total: " + testSum);
+
+    LOG.info("Test Class Weights: ");
+    for (Map.Entry<Integer, Integer> entry : testCounts.entrySet()) {
+      LOG.info("Class: \t" + entry.getKey() + "\t"
+          + (testMax / (double) entry.getValue()));
+    }
+  }
+
   @Override
   public String toString() {
     return "DatasetProperty [datasetPath=" + m_datasetPath + ", trainDataFile="
@@ -184,5 +269,18 @@ public class DatasetProperty {
         + m_negativeLabel + ", positiveValue=" + m_positiveValue
         + ", neutralValue=" + m_neutralValue + ", negativeValue="
         + m_negativeValue + "]";
+  }
+
+  public static void main(String[] args) {
+
+    DatasetProperty dataSet2013Mixed = Configuration
+        .getDataSetSemEval2013Mixed();
+    dataSet2013Mixed.printDatasetStats();
+
+    DatasetProperty dataSet2013 = Configuration.getDataSetSemEval2013();
+    dataSet2013.printDatasetStats();
+
+    DatasetProperty dataSet2014 = Configuration.getDataSetSemEval2014();
+    dataSet2014.printDatasetStats();
   }
 }
