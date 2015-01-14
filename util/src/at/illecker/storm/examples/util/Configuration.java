@@ -241,7 +241,18 @@ public class Configuration {
     // After Grid search use best C and gamma values
     svmParam.kernel_type = svm_parameter.LINEAR;
     svmParam.C = 0.5;
-    // TODO
+
+    svmParam.nr_weight = 3;
+    svmParam.weight_label = new int[svmParam.nr_weight];
+    svmParam.weight_label[0] = 0;
+    svmParam.weight_label[1] = 1;
+    svmParam.weight_label[2] = 2;
+    svmParam.weight = new double[svmParam.nr_weight];
+    // class weights for train + dev
+    svmParam.weight[0] = 2.96;
+    svmParam.weight[1] = 1;
+    svmParam.weight[2] = 1.26;
+
     return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2013", "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",
         "twitter-test-gold-B.tsv", "\t", 0, 2, 3, new String[] { "negative",

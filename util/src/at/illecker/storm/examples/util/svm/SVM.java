@@ -451,8 +451,9 @@ public class SVM {
 
     if (trainTweets == null) {
       // Read train tweets
-      trainTweets = dataset.getTrainTweets();
+      trainTweets = dataset.getTrainTweets(true);
       LOG.info("Read train tweets from " + dataset.getTrainDataFile());
+      Dataset.printTweetStats(trainTweets);
 
       // Tokenize
       LOG.info("Tokenize train tweets...");
@@ -633,7 +634,7 @@ public class SVM {
   public static void main(String[] args) {
     int nFoldCrossValidation = 3;
     int featureVectorLevel = 2;
-    Dataset dataSet = Configuration.getDataSetSemEval2013Mixed();
+    Dataset dataSet = Configuration.getDataSetSemEval2013();
 
     if (featureVectorLevel == 0) {
       SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,

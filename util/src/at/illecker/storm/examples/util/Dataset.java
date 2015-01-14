@@ -194,7 +194,20 @@ public class Dataset {
     return m_testTweets;
   }
 
-  public void printTweetStats(List<Tweet> tweets) {
+  public void printDatasetStats() {
+    LOG.info("Dataset: " + getDatasetPath());
+
+    LOG.info("Train Dataset: " + getTrainDataFile());
+    printTweetStats(getTrainTweets(false));
+
+    LOG.info("Dev Dataset: " + getDevDataFile());
+    printTweetStats(getDevTweets());
+
+    LOG.info("Test Dataset: " + getTestDataFile());
+    printTweetStats(getTestTweets());
+  }
+
+  public static void printTweetStats(List<Tweet> tweets) {
     if (tweets != null) {
       Map<Integer, Integer> counts = new TreeMap<Integer, Integer>();
       for (Tweet tweet : tweets) {
@@ -220,19 +233,6 @@ public class Dataset {
             + (max / (double) entry.getValue()));
       }
     }
-  }
-
-  public void printDatasetStats() {
-    LOG.info("Dataset: " + getDatasetPath());
-
-    LOG.info("Train Dataset: " + getTrainDataFile());
-    printTweetStats(getTrainTweets(false));
-
-    LOG.info("Dev Dataset: " + getDevDataFile());
-    printTweetStats(getDevTweets());
-
-    LOG.info("Test Dataset: " + getTestDataFile());
-    printTweetStats(getTestTweets());
   }
 
   @Override
