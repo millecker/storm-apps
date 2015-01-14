@@ -109,11 +109,12 @@ public class Tweet implements Serializable {
       return false;
     }
     final Tweet other = (Tweet) obj;
+    // check if id is matching
     if (this.m_id != other.getId()) {
-      // check if Tweet text is matching
-      if (this.m_text.equals(other.getText())) {
-        return true;
-      }
+      return false;
+    }
+    // check if text is matching
+    if (!this.m_text.equals(other.getText())) {
       return false;
     }
     return true;
