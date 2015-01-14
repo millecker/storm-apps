@@ -41,8 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.DatasetProperty;
-import at.illecker.storm.examples.util.io.FileUtils;
+import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
@@ -438,7 +437,7 @@ public class SVM {
     // (In this set-up, precision, recall, and F1 are all the same.)
   }
 
-  public static void svm(DatasetProperty datasetProperty,
+  public static void svm(Dataset dataset,
       Class<? extends FeatureVectorGenerator> featureVectorGenerator,
       int nFoldCrossValidation, boolean parameterSearch) {
     FeatureVectorGenerator fvg = null;
@@ -447,14 +446,13 @@ public class SVM {
 
     // Prepare Train tweets
     LOG.info("Prepare Train data...");
-    List<Tweet> trainTweets = SerializationUtils.deserialize(datasetProperty
+    List<Tweet> trainTweets = SerializationUtils.deserialize(dataset
         .getTrainDataSerializationFile());
 
     if (trainTweets == null) {
       // Read train tweets
-      trainTweets = FileUtils.readTweets(datasetProperty.getTrainDataFile(),
-          datasetProperty);
-      LOG.info("Read train tweets from " + datasetProperty.getTrainDataFile());
+      trainTweets = dataset.getTrainTweets();
+      LOG.info("Read train tweets from " + dataset.getTrainDataFile());
 
       // Tokenize
       LOG.info("Tokenize train tweets...");
@@ -499,12 +497,12 @@ public class SVM {
 
       // Serialize training data
       SerializationUtils.serializeList(trainTweets,
-          datasetProperty.getTrainDataSerializationFile());
+          dataset.getTrainDataSerializationFile());
     }
 
     // Prepare Test tweets
     LOG.info("Prepare Test data...");
-    List<Tweet> testTweets = SerializationUtils.deserialize(datasetProperty
+    List<Tweet> testTweets = SerializationUtils.deserialize(dataset
         .getTestDataSerializationFile());
 
     if (testTweets == null) {
@@ -514,9 +512,8 @@ public class SVM {
       }
 
       // read test tweets
-      testTweets = FileUtils.readTweets(datasetProperty.getTestDataFile(),
-          datasetProperty);
-      LOG.info("Read test tweets from " + datasetProperty.getTestDataFile());
+      testTweets = dataset.getTestTweets();
+      LOG.info("Read test tweets from " + dataset.getTestDataFile());
 
       // Tokenize
       LOG.info("Tokenize test tweets...");
@@ -536,7 +533,7 @@ public class SVM {
 
       // Serialize test data
       SerializationUtils.serializeList(testTweets,
-          datasetProperty.getTestDataSerializationFile());
+          dataset.getTestDataSerializationFile());
     }
 
     // Optional parameter search of C and gamma
@@ -572,33 +569,33 @@ public class SVM {
 
       // deserialize svmModel
       LOG.info("Try loading SVM model...");
-      svm_model svmModel = SerializationUtils.deserialize(datasetProperty
+      svm_model svmModel = SerializationUtils.deserialize(dataset
           .getDatasetPath() + File.separator + SVM_MODEL_FILE_SER);
       if (svmModel == null) {
         LOG.info("Generate SVM problem...");
         svm_problem svmProb = generateProblem(trainTweets, isc);
 
         // save svm problem in libSVM format
-        saveProblem(svmProb, datasetProperty.getDatasetPath() + File.separator
+        saveProblem(svmProb, dataset.getDatasetPath() + File.separator
             + SVM_PROBLEM_FILE);
 
         // train model
         LOG.info("Train SVM model...");
         long startTime = System.currentTimeMillis();
-        svmModel = train(svmProb, datasetProperty.getSVMParam());
+        svmModel = train(svmProb, dataset.getSVMParam());
         LOG.info("Train SVM model finished after "
             + (System.currentTimeMillis() - startTime) + " ms");
 
         // serialize svm model
-        SerializationUtils.serialize(svmModel, datasetProperty.getDatasetPath()
+        SerializationUtils.serialize(svmModel, dataset.getDatasetPath()
             + File.separator + SVM_MODEL_FILE_SER);
 
         // Run n-fold cross validation
         if (nFoldCrossValidation > 1) {
           LOG.info("Run n-fold cross validation...");
           startTime = System.currentTimeMillis();
-          double accuracy = crossValidate(svmProb,
-              datasetProperty.getSVMParam(), nFoldCrossValidation, true);
+          double accuracy = crossValidate(svmProb, dataset.getSVMParam(),
+              nFoldCrossValidation, true);
           LOG.info("Cross Validation finished after "
               + (System.currentTimeMillis() - startTime) + " ms");
           LOG.info("Cross Validation Accurancy: " + accuracy);
@@ -636,7 +633,7 @@ public class SVM {
   public static void main(String[] args) {
     int nFoldCrossValidation = 3;
     int featureVectorLevel = 2;
-    DatasetProperty dataSet = Configuration.getDataSetSemEval2013Mixed();
+    Dataset dataSet = Configuration.getDataSetSemEval2013Mixed();
 
     if (featureVectorLevel == 0) {
       SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,

@@ -30,18 +30,18 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.DatasetProperty;
+import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.dictionaries.WordListMap;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class FileUtils {
   private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
-  public static List<Tweet> readTweets(String file, DatasetProperty property) {
+  public static List<Tweet> readTweets(String file, Dataset property) {
     return readTweets(IOUtils.getInputStream(file), property);
   }
 
-  public static List<Tweet> readTweets(InputStream is, DatasetProperty property) {
+  public static List<Tweet> readTweets(InputStream is, Dataset dataset) {
     List<Tweet> tweets = new ArrayList<Tweet>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -50,17 +50,17 @@ public class FileUtils {
       br = new BufferedReader(isr);
       String line = "";
       while ((line = br.readLine()) != null) {
-        String[] values = line.split(property.getDelimiter());
-        long id = Long.parseLong(values[property.getIdIndex()]);
-        String text = values[property.getTextIndex()];
-        String label = values[property.getLabelIndex()].toLowerCase().trim();
+        String[] values = line.split(dataset.getDelimiter());
+        long id = Long.parseLong(values[dataset.getIdIndex()]);
+        String text = values[dataset.getTextIndex()];
+        String label = values[dataset.getLabelIndex()].toLowerCase().trim();
         double score = -1;
-        if (label.equals(property.getNegativeLabel())) {
-          score = property.getNegativeValue();
-        } else if (label.equals(property.getNeutralLabel())) {
-          score = property.getNeutralValue();
-        } else if (label.equals(property.getPositiveLabel())) {
-          score = property.getPositiveValue();
+        if (label.equals(dataset.getNegativeLabel())) {
+          score = dataset.getNegativeValue();
+        } else if (label.equals(dataset.getNeutralLabel())) {
+          score = dataset.getNeutralValue();
+        } else if (label.equals(dataset.getPositiveLabel())) {
+          score = dataset.getPositiveValue();
         }
         tweets.add(new Tweet(id, text, score));
       }

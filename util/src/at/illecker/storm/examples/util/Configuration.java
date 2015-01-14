@@ -222,37 +222,38 @@ public class Configuration {
     return USER_DIR_PATH + File.separator + DATASET_PATH;
   }
 
-  public static DatasetProperty getDataSetSemEval2013Mixed() {
+  public static Dataset getDataSetSemEval2013Mixed() {
     svm_parameter svmParam = SVM.getDefaultParameter();
     // After Grid search use best C and gamma values
     svmParam.kernel_type = svm_parameter.LINEAR;
     svmParam.C = 0.5;
     // svmParam.C = Math.pow(2, 6);
     // svmParam.gamma = Math.pow(2, -5);
-    return new DatasetProperty(Configuration.getDataSetPath() + File.separator
+
+    return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2013" + File.separator + "mixed", "trainingInput.txt",
         "testingInput.txt", "\t", 0, 1, 3, svmParam);
   }
 
-  public static DatasetProperty getDataSetSemEval2013() {
+  public static Dataset getDataSetSemEval2013() {
     svm_parameter svmParam = SVM.getDefaultParameter();
     // After Grid search use best C and gamma values
     svmParam.kernel_type = svm_parameter.LINEAR;
     svmParam.C = 0.5;
     // TODO
-    return new DatasetProperty(Configuration.getDataSetPath() + File.separator
+    return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2013", "train" + File.separator
         + "twitter-train-gold-B-2013.tsv", "test" + File.separator
         + "twitter-test-GOLD-B.tsv", "\t", 0, 1, 3, svmParam);
   }
 
-  public static DatasetProperty getDataSetSemEval2014() {
+  public static Dataset getDataSetSemEval2014() {
     svm_parameter svmParam = SVM.getDefaultParameter();
     // After Grid search use best C and gamma values
     svmParam.kernel_type = svm_parameter.LINEAR;
     svmParam.C = 0.5;
     // TODO
-    return new DatasetProperty(Configuration.getDataSetPath() + File.separator
+    return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2014", "train" + File.separator
         + "twitter-train-gold-B-2014.tsv", "test" + File.separator
         + "SemEval2014-task9-test-B-input.txt", "\t", 0, 1, 3, svmParam);
