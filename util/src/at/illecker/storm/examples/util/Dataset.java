@@ -17,6 +17,7 @@
 package at.illecker.storm.examples.util;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.io.FileUtils;
-import at.illecker.storm.examples.util.svm.SVM;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class Dataset {
@@ -39,12 +39,12 @@ public class Dataset {
 
   private String m_delimiter;
   private int m_idIndex;
-  private int m_textIndex;
   private int m_labelIndex;
+  private int m_textIndex;
 
-  private String m_positiveLabel;
-  private String m_neutralLabel;
-  private String m_negativeLabel;
+  private String[] m_positiveLabels;
+  private String[] m_neutralLabels;
+  private String[] m_negativeLabels;
 
   private int m_positiveValue;
   private int m_neutralValue;
@@ -56,8 +56,8 @@ public class Dataset {
   private List<Tweet> m_testTweets = null;
 
   public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      String delimiter, int idIndex, int textIndex, int labelIndex,
-      String positiveLabel, String neutralLabel, String negativeLabel,
+      String delimiter, int idIndex, int labelIndex, int textIndex,
+      String[] positiveLabels, String[] neutralLabels, String[] negativeLabels,
       int positiveValue, int neutralValue, int negativeValue,
       svm_parameter svmParam) {
     this.m_datasetPath = datasetPath;
@@ -65,60 +65,20 @@ public class Dataset {
     this.m_testDataFile = testDataFile;
 
     this.m_delimiter = delimiter;
-    this.m_idIndex = idIndex;
-    this.m_textIndex = textIndex;
-    this.m_labelIndex = labelIndex;
 
-    this.m_positiveLabel = positiveLabel;
-    this.m_neutralLabel = neutralLabel;
-    this.m_negativeLabel = negativeLabel;
+    this.m_idIndex = idIndex;
+    this.m_labelIndex = labelIndex;
+    this.m_textIndex = textIndex;
+
+    this.m_positiveLabels = positiveLabels;
+    this.m_neutralLabels = neutralLabels;
+    this.m_negativeLabels = negativeLabels;
 
     this.m_positiveValue = positiveValue;
     this.m_neutralValue = neutralValue;
     this.m_negativeValue = negativeValue;
 
     this.m_svmParam = svmParam;
-  }
-
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      String delimiter, int idIndex, int textIndex, int labelIndex,
-      String positiveLabel, String neutralLabel, String negativeLabel,
-      svm_parameter svmParam) {
-    this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
-        textIndex, labelIndex, positiveLabel, neutralLabel, negativeLabel, 0,
-        1, 2, svmParam);
-  }
-
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      String delimiter, int idIndex, int textIndex, int labelIndex,
-      String positiveLabel, String neutralLabel, String negativeLabel) {
-    this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
-        textIndex, labelIndex, positiveLabel, neutralLabel, negativeLabel, 0,
-        1, 2, SVM.getDefaultParameter());
-  }
-
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      String delimiter, int idIndex, int textIndex, int labelIndex,
-      svm_parameter svmParam) {
-    this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
-        textIndex, labelIndex, "positive", "neutral", "negative", svmParam);
-  }
-
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      String delimiter, int idIndex, int textIndex, int labelIndex) {
-    this(datasetPath, trainDataFile, testDataFile, delimiter, idIndex,
-        textIndex, labelIndex, "positive", "neutral", "negative", SVM
-            .getDefaultParameter());
-  }
-
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile,
-      svm_parameter svmParam) {
-    this(datasetPath, trainDataFile, testDataFile, "\t", 0, 1, 2, svmParam);
-  }
-
-  public Dataset(String datasetPath, String trainDataFile, String testDataFile) {
-    this(datasetPath, trainDataFile, testDataFile, "\t", 0, 1, 2, SVM
-        .getDefaultParameter());
   }
 
   public String getDatasetPath() {
@@ -149,24 +109,24 @@ public class Dataset {
     return m_idIndex;
   }
 
-  public int getTextIndex() {
-    return m_textIndex;
-  }
-
   public int getLabelIndex() {
     return m_labelIndex;
   }
 
-  public String getPositiveLabel() {
-    return m_positiveLabel;
+  public int getTextIndex() {
+    return m_textIndex;
   }
 
-  public String getNeutralLabel() {
-    return m_neutralLabel;
+  public String[] getPositiveLabels() {
+    return m_positiveLabels;
   }
 
-  public String getNegativeLabel() {
-    return m_negativeLabel;
+  public String[] getNeutralLabels() {
+    return m_neutralLabels;
+  }
+
+  public String[] getNegativeLabels() {
+    return m_negativeLabels;
   }
 
   public int getPositiveValue() {
@@ -218,7 +178,7 @@ public class Dataset {
     }
 
     LOG.info("Dataset: " + getDatasetPath());
-    LOG.info("Train Dataset:");
+    LOG.info("Train Dataset: " + getTrainDataFile());
     int trainSum = 0;
     int trainMax = 0;
     for (Map.Entry<Integer, Integer> entry : trainCounts.entrySet()) {
@@ -236,7 +196,7 @@ public class Dataset {
           + (trainMax / (double) entry.getValue()));
     }
 
-    LOG.info("Test Dataset:");
+    LOG.info("Test Dataset: " + getTestDataFile());
     int testSum = 0;
     int testMax = 0;
     for (Map.Entry<Integer, Integer> entry : testCounts.entrySet()) {
@@ -260,15 +220,15 @@ public class Dataset {
     return "DatasetProperty [datasetPath=" + m_datasetPath + ", trainDataFile="
         + m_trainDataFile + ", testDataFile=" + m_testDataFile + ", delimiter="
         + m_delimiter + ", idIndex=" + m_idIndex + ", textIndex=" + m_textIndex
-        + ", labelIndex=" + m_labelIndex + ", positiveLabel=" + m_positiveLabel
-        + ", neutralLabel=" + m_neutralLabel + ", negativeLabel="
-        + m_negativeLabel + ", positiveValue=" + m_positiveValue
-        + ", neutralValue=" + m_neutralValue + ", negativeValue="
-        + m_negativeValue + "]";
+        + ", labelIndex=" + m_labelIndex + ", positiveLabels="
+        + Arrays.toString(m_positiveLabels) + ", neutralLabel="
+        + Arrays.toString(m_neutralLabels) + ", negativeLabel="
+        + Arrays.toString(m_negativeLabels) + ", positiveValue="
+        + m_positiveValue + ", neutralValue=" + m_neutralValue
+        + ", negativeValue=" + m_negativeValue + "]";
   }
 
   public static void main(String[] args) {
-
     Dataset dataSet2013Mixed = Configuration.getDataSetSemEval2013Mixed();
     dataSet2013Mixed.printDatasetStats();
 

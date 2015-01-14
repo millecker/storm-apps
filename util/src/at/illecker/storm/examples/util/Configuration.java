@@ -232,7 +232,9 @@ public class Configuration {
 
     return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2013" + File.separator + "mixed", "trainingInput.txt",
-        "testingInput.txt", "\t", 0, 1, 3, svmParam);
+        "testingInput.txt", "\t", 0, 3, 1, new String[] { "positive" },
+        new String[] { "neutral" }, new String[] { "negative" }, 0, 1, 2,
+        svmParam);
   }
 
   public static Dataset getDataSetSemEval2013() {
@@ -244,7 +246,10 @@ public class Configuration {
     return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2013", "train" + File.separator
         + "twitter-train-gold-B-2013.tsv", "test" + File.separator
-        + "twitter-test-GOLD-B.tsv", "\t", 0, 1, 3, svmParam);
+        + "twitter-test-GOLD-B.tsv", "\t", 0, 2, 3, new String[] { "positive",
+        "\"positive\"" }, new String[] { "neutral", "\"neutral\"",
+        "\"objective-OR-neutral\"", "\"objective\"" }, new String[] {
+        "negative", "\"negative\"" }, 0, 1, 2, svmParam);
   }
 
   public static Dataset getDataSetSemEval2014() {
@@ -256,6 +261,9 @@ public class Configuration {
     return new Dataset(Configuration.getDataSetPath() + File.separator
         + "SemEval2014", "train" + File.separator
         + "twitter-train-gold-B-2014.tsv", "test" + File.separator
-        + "SemEval2014-task9-test-B-input.txt", "\t", 0, 1, 3, svmParam);
+        + "SemEval2014-task9-test-B-input.txt", "\t", 0, 2, 3, new String[] {
+        "positive", "\"positive\"" }, new String[] { "neutral", "\"neutral\"",
+        "\"objective-OR-neutral\"" },
+        new String[] { "negative", "\"negative\"" }, 0, 1, 2, svmParam);
   }
 }

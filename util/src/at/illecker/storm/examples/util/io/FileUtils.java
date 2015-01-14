@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,9 @@ public class FileUtils {
   }
 
   public static List<Tweet> readTweets(InputStream is, Dataset dataset) {
+    List<String> negativeLabels = Arrays.asList(dataset.getNegativeLabels());
+    List<String> neutralLabels = Arrays.asList(dataset.getNeutralLabels());
+    List<String> positiveLabels = Arrays.asList(dataset.getPositiveLabels());
     List<Tweet> tweets = new ArrayList<Tweet>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -51,16 +55,23 @@ public class FileUtils {
       String line = "";
       while ((line = br.readLine()) != null) {
         String[] values = line.split(dataset.getDelimiter());
-        long id = Long.parseLong(values[dataset.getIdIndex()]);
+        long id = 0;
+        try {
+          id = Long.parseLong(values[dataset.getIdIndex()]);
+        } catch (NumberFormatException e) {
+          id = 0;
+        }
         String text = values[dataset.getTextIndex()];
-        String label = values[dataset.getLabelIndex()].toLowerCase().trim();
+        String label = values[dataset.getLabelIndex()];
         double score = -1;
-        if (label.equals(dataset.getNegativeLabel())) {
+        if (negativeLabels.contains(label)) {
           score = dataset.getNegativeValue();
-        } else if (label.equals(dataset.getNeutralLabel())) {
+        } else if (neutralLabels.contains(label)) {
           score = dataset.getNeutralValue();
-        } else if (label.equals(dataset.getPositiveLabel())) {
+        } else if (positiveLabels.contains(label)) {
           score = dataset.getPositiveValue();
+        } else {
+          LOG.info("Label: '" + label + "' does not match!");
         }
         tweets.add(new Tweet(id, text, score));
       }
