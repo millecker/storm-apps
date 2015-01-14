@@ -6,7 +6,7 @@ Class: 1 5341 (neutral)
 Class: 2 4235 (positive)
 Total: 11382
 
-Train Class Weights:
+Class Weights:
 Class: 0 4
 Class: 1 1
 Class: 2 2
@@ -14,11 +14,11 @@ Class: 2 2
 #### Train + Dev cross validation
 
 Confusion Matrix:
-			0		1		2		total
+		0		1		2		total
 Class:	0	819		686		301		1806
-Class:	1	309		4091	941		5341
-Class:	2	200		1098	2937	4235
-total		1328	5875	4179
+Class:	1	309		4091		941		5341
+Class:	2	200		1098		2937		4235
+total		1328		5875		4179
 
 Total: 11382 Correct: 7847 Accuracy: 0.6894218942189422
 
@@ -30,11 +30,11 @@ Class: 2 Precision: 0.7027997128499641 Recall: 0.6935064935064935 F1: 0.69812217
 #### Evaluate test dataset
 
 Confusion Matrix:
-			0		1		2		total
+		0		1		2		total
 Class:	0	371		131		99		601
-Class:	1	169		1073	398		1640
-Class:	2	145		283		1144	1572
-total		685		1487	1641
+Class:	1	169		1073		398		1640
+Class:	2	145		283		1144		1572
+total		685		1487		1641
 
 Total: 3813 Correct: 2588 Accuracy: 0.6787306582743247
 
