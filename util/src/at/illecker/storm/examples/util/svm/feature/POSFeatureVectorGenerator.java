@@ -34,7 +34,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(POSFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
-
+  private static final int VECTOR_SIZE = 7;
   private int m_vectorStartId = 1;
 
   public POSFeatureVectorGenerator() {
@@ -49,7 +49,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
   public int getFeatureVectorSize() {
     // Nouns/wc, Verbs/wc, Adjectives/wc, Adverbs/wc, Interjections/wc,
     // Punctuations/wc, Hashtags/wc
-    return 7;
+    return VECTOR_SIZE;
   }
 
   @Override
