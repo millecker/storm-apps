@@ -16,8 +16,10 @@
  */
 package at.illecker.storm.examples.util.preprocessor;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -62,9 +64,20 @@ public class Preprocessor {
   }
 
   public List<String> preprocess(List<String> tokens) {
-    List<String> processedTokens = new ArrayList<String>();
+    // run tail recursion
+    return preprocessAccumulator(new LinkedList<String>(tokens),
+        new ArrayList<String>());
+  }
 
-    for (String token : tokens) {
+  private List<String> preprocessAccumulator(LinkedList<String> tokens,
+      List<String> processedTokens) {
+
+    if (tokens.isEmpty()) {
+      return processedTokens;
+
+    } else {
+
+      String token = tokens.removeFirst();
       boolean tokenIsURL = StringUtils.isURL(token);
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
@@ -73,20 +86,30 @@ public class Preprocessor {
       // TODO only if unicode in token
       token = UnicodeUtils.replaceUnicodeSymbols(token);
 
-      // check if token is a emoticon after Unicode replacement
-      boolean tokenIsEmoticon = m_emoticons.isEmoticon(token.toLowerCase());
+      // Step 2) Check if token contains a Emoticon after Unicode replacement
+      // Splits word and emoticons
+      SimpleEntry<Boolean, String[]> tokenContainsEmoticon = m_emoticons
+          .containsEmoticon(token.toLowerCase());
+      boolean tokenIsEmoticon = tokenContainsEmoticon.getKey();
+      if (tokenIsEmoticon) {
+        String[] splittedTokens = tokenContainsEmoticon.getValue();
+        if (splittedTokens.length > 1) {
+          LOG.info("tokenHasEmoticon: " + Arrays.toString(splittedTokens));
+          tokens.add(0, splittedTokens[0]);
+          tokens.add(0, splittedTokens[1]);
+          return preprocessAccumulator(tokens, processedTokens);
+        }
+      }
 
-      // TODO split word and emoticon
-
-      // Step 2) Replace HTML symbols
+      // Step 3) Replace HTML symbols
       token = StringUtils.replaceHTMLSymbols(token);
 
-      // Step 3) Remove punctuation and special chars at beginning and ending
+      // Step 4) Remove punctuation and special chars at beginning and ending
       if ((!tokenIsEmoticon) && (!tokenIsUSR) && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 4) unify emoticons
+      // Step 4) unify emoticons, remove repeating chars
       if (tokenIsEmoticon) {
         Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
         if (matcher.find()) {
@@ -98,28 +121,27 @@ public class Preprocessor {
       }
 
       // Step 5) slang correction
-      // TODO
-      // 'FC' to [fruit, cake]
+      // TODO 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
       if (!tokenIsEmoticon) {
-        String[] correction = m_slangCorrection.getCorrection(token
+        String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
-        if (correction != null) {
-          for (int i = 0; i < correction.length; i++) {
-            processedTokens.add(correction[i]);
+        if (slangCorrection != null) {
+          for (int i = 0; i < slangCorrection.length; i++) {
+            processedTokens.add(slangCorrection[i]);
           }
           if (LOGGING) {
             LOG.info("slang correction from '" + token + "' to "
-                + Arrays.toString(correction));
+                + Arrays.toString(slangCorrection));
           }
-          token = "";
+          return preprocessAccumulator(tokens, processedTokens);
         }
       }
 
       // Step 6) Fix omission of final g in gerund forms (goin)
-      if ((!token.isEmpty()) && (!tokenIsUSR) && (!tokenIsHashTag)
-          && (token.endsWith("in")) && (!m_firstNames.isFirstName(token))
+      if ((!tokenIsUSR) && (!tokenIsHashTag) && (token.endsWith("in"))
+          && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
         // append "g" if a word ends with "in" and is not in the vocabulary
         if (LOGGING) {
@@ -129,34 +151,30 @@ public class Preprocessor {
       }
 
       // Step 7) Remove elongations of characters (suuuper)
-      if ((!token.isEmpty()) && (!tokenIsURL) && (!tokenIsUSR)
-          && (!tokenIsHashTag) && (!tokenIsEmoticon)
-          && (!StringUtils.isNumeric(token))) {
+      if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
+          && (!tokenIsEmoticon) && (!StringUtils.isNumeric(token))) {
 
         token = removeRepeatingChars(token);
 
         // Step 7b) Try slang correction again
-        String[] correction = m_slangCorrection.getCorrection(token
+        String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
-        if (correction != null) {
-          for (int i = 0; i < correction.length; i++) {
-            processedTokens.add(correction[i]);
+        if (slangCorrection != null) {
+          for (int i = 0; i < slangCorrection.length; i++) {
+            processedTokens.add(slangCorrection[i]);
           }
           if (LOGGING) {
             LOG.info("slang correction from '" + token + "' to "
-                + Arrays.toString(correction));
+                + Arrays.toString(slangCorrection));
           }
-          token = "";
         }
       }
 
-      // add unmodified token
-      if (!token.isEmpty()) {
-        processedTokens.add(token);
-      }
-    }
+      // add token to processed list
+      processedTokens.add(token);
 
-    return processedTokens;
+      return preprocessAccumulator(tokens, processedTokens);
+    }
   }
 
   private String removeRepeatingChars(String value) {
@@ -259,6 +277,8 @@ public class Preprocessor {
               "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
       tweets.add(new Tweet(0, "Martin martin kevin Kevin Justin justin"));
       tweets.add(new Tweet(0, "10,000 1000 +111 -111,0000.4444"));
+      tweets
+          .add(new Tweet(0, "bankruptcy\ud83d\ude05 happy:-) said:-) ;-)yeah"));
     }
 
     // compute tweets
