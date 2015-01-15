@@ -16,7 +16,21 @@
  */
 package at.illecker.storm.examples.util;
 
+import java.lang.Character.UnicodeBlock;
+
 public class UnicodeUtils {
+
+  public static boolean containsUnicode(String str) {
+    if (str == null) {
+      return false;
+    }
+    for (int i = 0; i < str.length(); i++) {
+      if (UnicodeBlock.of(str.charAt(i)) != UnicodeBlock.BASIC_LATIN) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public static String toUnicode(String s) {
     String result = "";
@@ -159,13 +173,19 @@ public class UnicodeUtils {
   }
 
   public static void main(String[] args) {
-    // test Unicode.replaceUnicodeSymbols
-    String[] testUnicode = new String[] { "\uD83D\uDE00", "\uD83D\uDE01",
-        "\uD83D\uDE02", "\uD83D\uDE03", "\uD83D\uDE04" };
-
-    for (String s : testUnicode) {
+    // test replaceUnicodeSymbols
+    String[] testUnicodeSymbols = new String[] { "\uD83D\uDE00",
+        "\uD83D\uDE01", "\uD83D\uDE02", "\uD83D\uDE03", "\uD83D\uDE04" };
+    for (String s : testUnicodeSymbols) {
       System.out.println("replaceUnicodeSymbols(" + s + "): "
           + replaceUnicodeSymbols(s));
+    }
+
+    // test containsUnicode
+    String[] testContainsUnicode = new String[] { "\uD83D\uDE00", "test",
+        "test\uDE02" };
+    for (String s : testContainsUnicode) {
+      System.out.println("containsUnicode(" + s + "): " + containsUnicode(s));
     }
   }
 }

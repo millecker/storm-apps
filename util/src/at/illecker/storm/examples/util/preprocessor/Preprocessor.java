@@ -76,14 +76,17 @@ public class Preprocessor {
       return processedTokens;
     } else {
       String token = tokens.removeFirst();
+
       boolean tokenIsURL = StringUtils.isURL(token);
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
 
       // Step 1) Replace Unicode symbols
-      // TODO only if unicode in token
-      token = UnicodeUtils.replaceUnicodeSymbols(token);
+      if (UnicodeUtils.containsUnicode(token)) {
+        token = UnicodeUtils.replaceUnicodeSymbols(token);
+        LOG.info("Replaced Unicode symbols: " + token);
+      }
 
       // Step 2) Check if token contains a Emoticon after Unicode replacement
       // Splits word and emoticons if necessary
@@ -93,7 +96,7 @@ public class Preprocessor {
       if (tokenIsEmoticon) {
         String[] splittedTokens = tokenContainsEmoticon.getValue();
         if (splittedTokens.length > 1) {
-          LOG.info("tokenHasEmoticon: " + Arrays.toString(splittedTokens));
+          LOG.info("tokenContainsEmoticon: " + Arrays.toString(splittedTokens));
           tokens.add(0, splittedTokens[1]);
           tokens.add(0, splittedTokens[0]);
           return preprocessAccumulator(tokens, processedTokens);
