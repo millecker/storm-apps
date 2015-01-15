@@ -35,7 +35,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
-
+  private static final int VECTOR_SIZE = 7;
   private SentimentWordLists m_sentimentWordLists;
   private int m_vectorStartId = 1;
 
@@ -55,41 +55,55 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   @Override
   public int getFeatureVectorSize() {
     // PosCount, NeutralCount, NegCount, Sum, Count, MaxPos, MaxNeg
-    return 7;
+    return VECTOR_SIZE * m_sentimentWordLists.getSentimentWordListCount();
   }
 
   @Override
   public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
-    SentimentResult tweetSentiment = m_sentimentWordLists
+    Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
         .getTweetSentiment(tweet);
-    if (tweetSentiment != null) {
-      // LOG.info("tweetSentiment: " + tweetSentiment);
-      if (tweetSentiment.getPosCount() != 0)
-        resultFeatureVector.put(m_vectorStartId,
-            (double) tweetSentiment.getPosCount());
-      if (tweetSentiment.getNeutralCount() != 0)
-        resultFeatureVector.put(m_vectorStartId + 1,
-            (double) tweetSentiment.getNeutralCount());
-      if (tweetSentiment.getNegCount() != 0)
-        resultFeatureVector.put(m_vectorStartId + 2,
-            (double) tweetSentiment.getNegCount());
-      if (tweetSentiment.getSum() != 0)
-        resultFeatureVector.put(m_vectorStartId + 3, tweetSentiment.getSum());
-      if (tweetSentiment.getCount() != 0)
-        resultFeatureVector.put(m_vectorStartId + 4,
-            (double) tweetSentiment.getCount());
-      if (tweetSentiment.getMaxPos() != 0)
-        resultFeatureVector
-            .put(m_vectorStartId + 5, tweetSentiment.getMaxPos());
-      if (tweetSentiment.getMaxNeg() != 0)
-        resultFeatureVector
-            .put(m_vectorStartId + 6, tweetSentiment.getMaxNeg());
-    }
 
-    if (LOGGING) {
-      LOG.info("TweetSentiment: " + tweetSentiment);
+    for (Map.Entry<Integer, SentimentResult> tweetSentiment : tweetSentiments
+        .entrySet()) {
+
+      int key = tweetSentiment.getKey();
+      SentimentResult sentimentResult = tweetSentiment.getValue();
+      // LOG.info("TweetSentiment: " + sentimentResult);
+
+      if (sentimentResult.getPosCount() != 0) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE),
+            (double) sentimentResult.getPosCount());
+      }
+      if (sentimentResult.getNeutralCount() != 0) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 1,
+            (double) sentimentResult.getNeutralCount());
+      }
+      if (sentimentResult.getNegCount() != 0) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 2,
+            (double) sentimentResult.getNegCount());
+      }
+      if (sentimentResult.getSum() != 0) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 3,
+            sentimentResult.getSum());
+      }
+      if (sentimentResult.getCount() != 0) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 4,
+            (double) sentimentResult.getCount());
+      }
+      if (sentimentResult.getMaxPos() != null) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 5,
+            sentimentResult.getMaxPos());
+      }
+      if (sentimentResult.getMaxNeg() != null) {
+        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 6,
+            sentimentResult.getMaxNeg());
+      }
+
+      if (LOGGING) {
+        LOG.info("TweetSentiment: " + sentimentResult);
+      }
     }
 
     return resultFeatureVector;

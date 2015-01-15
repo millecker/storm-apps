@@ -16,6 +16,8 @@
  */
 package at.illecker.storm.examples.util.dictionaries;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,7 +35,6 @@ import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
-import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SentimentWordLists {
@@ -43,11 +44,14 @@ public class SentimentWordLists {
   private static final SentimentWordLists instance = new SentimentWordLists();
 
   private WordNet m_wordnet;
-  private Map<String, Double> m_wordList = null;
-  private WordListMap<Double> m_wordListMap = null;
+  private List<Map<String, Double>> m_wordLists = null;
+  private List<WordListMap<Double>> m_wordListMaps = null;
 
   private SentimentWordLists() {
     m_wordnet = WordNet.getInstance();
+    m_wordLists = new ArrayList<Map<String, Double>>();
+    m_wordListMaps = new ArrayList<WordListMap<Double>>();
+
     Map<String, Properties> wordLists = Configuration.getSentimentWordlists();
     for (Map.Entry<String, Properties> wordListEntry : wordLists.entrySet()) {
       String file = wordListEntry.getKey();
@@ -60,32 +64,12 @@ public class SentimentWordLists {
 
       if (containsRegex) {
         LOG.info("Load WordListMap including Regex from: " + file);
-        if (m_wordListMap == null) {
-          m_wordListMap = FileUtils.readWordListMap(file, separator,
-              featureScaling, minValue, maxValue);
-        } else {
-          WordListMap<Double> wordListMap = FileUtils.readWordListMap(file,
-              separator, featureScaling, minValue, maxValue);
-          for (Map.Entry<String, Double> entry : wordListMap.entrySet()) {
-            if (!m_wordListMap.containsKey(entry.getKey())) {
-              m_wordListMap.put(entry.getKey(), entry.getValue());
-            }
-          }
-        }
+        m_wordListMaps.add(FileUtils.readWordListMap(file, separator,
+            featureScaling, minValue, maxValue));
       } else {
         LOG.info("Load WordList from: " + file);
-        if (m_wordList == null) {
-          m_wordList = FileUtils.readFile(file, separator, featureScaling,
-              minValue, maxValue);
-        } else {
-          Map<String, Double> wordList = FileUtils.readFile(file, separator,
-              featureScaling, minValue, maxValue);
-          for (Map.Entry<String, Double> entry : wordList.entrySet()) {
-            if (!m_wordList.containsKey(entry.getKey())) {
-              m_wordList.put(entry.getKey(), entry.getValue());
-            }
-          }
-        }
+        m_wordLists.add(FileUtils.readFile(file, separator, featureScaling,
+            minValue, maxValue));
       }
     }
   }
@@ -98,25 +82,39 @@ public class SentimentWordLists {
     m_wordnet.close();
   }
 
-  public Double getWordSentiment(String word) {
-    Double sentimentScore = null;
-    // First check word lists
-    if (m_wordList != null) {
-      sentimentScore = m_wordList.get(word);
+  public int getSentimentWordListCount() {
+    return m_wordLists.size() + m_wordListMaps.size();
+  }
+
+  public Map<Integer, Double> getWordSentiments(String word) {
+    Map<Integer, Double> sentimentScores = new HashMap<Integer, Double>();
+
+    // 1) check wordLists
+    for (int i = 0; i < m_wordLists.size(); i++) {
+      Double sentimentScore = m_wordLists.get(i).get(word);
+      if (sentimentScore != null) {
+        sentimentScores.put(i, sentimentScore);
+      }
     }
 
-    // Second check word list maps including regex
-    if ((sentimentScore == null) && (m_wordListMap != null)) {
-      sentimentScore = m_wordListMap.matchKey(word);
+    // 2) check wordListMaps including regex
+    int wordListMapOffset = m_wordLists.size();
+    for (int i = 0; i < m_wordListMaps.size(); i++) {
+      Double sentimentScore = m_wordListMaps.get(i).matchKey(word);
+      if (sentimentScore != null) {
+        sentimentScores.put(i + wordListMapOffset, sentimentScore);
+      }
     }
 
     if (LOGGING) {
-      LOG.info("getWordSentiment('" + word + "'): " + sentimentScore);
+      LOG.info("getWordSentiment('" + word + "'): " + sentimentScores);
     }
-    return sentimentScore;
+
+    return (sentimentScores.size() > 0) ? sentimentScores : null;
   }
 
-  public Double getWordSentimentWithStemming(String word, String pennTag) {
+  public Map<Integer, Double> getWordSentimentWithStemming(String word,
+      String pennTag) {
     // convert pennTag to POS (NOUN, VERB, ADJECTIVE, ADVERB)
     POS posTag = POSTag.convertString(pennTag);
 
@@ -140,81 +138,89 @@ public class SentimentWordLists {
       word = word.toLowerCase();
     }
 
-    Double sentimentScore = getWordSentiment(word);
+    Map<Integer, Double> sentimentScores = getWordSentiments(word);
     // use word stemming if sentimentScore is null
-    if (sentimentScore == null) {
+    if (sentimentScores == null) {
       if (LOGGING) {
-        LOG.info(" findStems for (" + word + "," + posTag + ")");
+        LOG.info("findStems for (" + word + "," + posTag + ")");
       }
       List<String> stemmedWords = m_wordnet.findStems(word, posTag);
       for (String stemmedWord : stemmedWords) {
         if (!stemmedWord.equals(word)) {
-          sentimentScore = getWordSentiment(stemmedWord);
+          sentimentScores = getWordSentiments(stemmedWord);
         }
-        if (sentimentScore != null) {
+        if (sentimentScores != null) {
           break;
         }
       }
     }
+
     if (LOGGING) {
       LOG.info("getWordSentimentWithStemming('" + word + "'\'" + posTag
-          + "'): " + sentimentScore);
+          + "'): " + sentimentScores);
     }
-    return sentimentScore;
+
+    return sentimentScores;
   }
 
-  public Double getSentenceSentiment(List<HasWord> sentence) {
-    double sentenceScore = 0;
-    int count = 0;
-    for (HasWord w : sentence) {
-      String word = w.word().toLowerCase().trim();
-      Double wordSentiment = getWordSentiment(word);
-      if (wordSentiment != null) {
-        sentenceScore += wordSentiment;
-        count++;
-      }
-    }
-    return (count > 0) ? sentenceScore / count : null;
-  }
+  public Map<Integer, SentimentResult> getSentenceSentiment(
+      List<TaggedWord> sentence) {
+    Map<Integer, SentimentResult> sentimentResults = new HashMap<Integer, SentimentResult>();
 
-  public SentimentResult getTaggedSentenceSentiment(List<TaggedWord> sentence) {
-    SentimentResult sentimentResult = new SentimentResult(0, 0.5);
     for (TaggedWord w : sentence) {
-      Double wordSentiment = getWordSentimentWithStemming(w.word(), w.tag());
-      if (wordSentiment != null) {
-        if (wordSentiment < 0.45) { // NEGATIV
-          sentimentResult.incNegCount();
-          if (wordSentiment < sentimentResult.getMaxNeg()) { // MAX_NEG_SCORE
-            sentimentResult.setMaxNeg(wordSentiment);
+      Map<Integer, Double> wordSentiments = getWordSentimentWithStemming(
+          w.word(), w.tag());
+
+      if (wordSentiments != null) {
+        for (Map.Entry<Integer, Double> wordSentiment : wordSentiments
+            .entrySet()) {
+
+          int key = wordSentiment.getKey();
+          double sentimentScore = wordSentiment.getValue();
+
+          SentimentResult sentimentResult = sentimentResults.get(key);
+          if (sentimentResult == null) {
+            sentimentResult = new SentimentResult();
           }
-        } else if (wordSentiment > 0.55) { // POSITIV
-          sentimentResult.incPosCount();
-          if (wordSentiment > sentimentResult.getMaxPos()) { // MAX_POS_SCORE
-            sentimentResult.setMaxPos(wordSentiment);
-          }
-        } else if ((wordSentiment <= 0.55) && (wordSentiment >= 0.45)) {
-          sentimentResult.incNeutralCount(); // NEUTRAL
+
+          // add score value
+          sentimentResult.addScore(sentimentScore);
+
+          // update sentimentResult
+          sentimentResults.put(key, sentimentResult);
         }
-        // add score value
-        sentimentResult.addScore(wordSentiment);
       }
     }
 
-    return (sentimentResult.getCount() > 0) ? sentimentResult : null;
+    return (sentimentResults.size() > 0) ? sentimentResults : null;
   }
 
-  public SentimentResult getTweetSentiment(Tweet tweet) {
-    SentimentResult tweetSentiment = new SentimentResult();
+  public Map<Integer, SentimentResult> getTweetSentiment(Tweet tweet) {
+    Map<Integer, SentimentResult> tweetSentiments = new HashMap<Integer, SentimentResult>();
+
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
       if (LOGGING) {
-        LOG.info("taggedSentence: " + sentence.toString());
+        LOG.info("TaggedSentence: " + sentence.toString());
       }
-      SentimentResult sentenceSentiment = getTaggedSentenceSentiment(sentence);
-      if (sentenceSentiment != null) {
-        tweetSentiment.add(sentenceSentiment);
+      Map<Integer, SentimentResult> sentenceSentiments = getSentenceSentiment(sentence);
+      if (sentenceSentiments != null) {
+        for (Map.Entry<Integer, SentimentResult> sentenceSentiment : sentenceSentiments
+            .entrySet()) {
+          int key = sentenceSentiment.getKey();
+          SentimentResult tweetSentiment = tweetSentiments.get(key);
+          if (tweetSentiment != null) {
+            tweetSentiment.add(sentenceSentiment.getValue());
+          } else {
+            tweetSentiment = sentenceSentiment.getValue();
+          }
+          tweetSentiments.put(key, tweetSentiment);
+        }
       }
     }
-    return (tweetSentiment.getCount() > 0) ? tweetSentiment : null;
+    if (LOGGING) {
+      LOG.info("Sentiment: " + tweetSentiments);
+    }
+    return (tweetSentiments.size() > 0) ? tweetSentiments : null;
   }
 
   public static void main(String[] args) {
@@ -237,10 +243,11 @@ public class SentimentWordLists {
       tweet.addTaggedSentence(taggedSentence);
 
       // Calculate Sentiment
-      SentimentResult sentimentResult = sentimentWordLists
-          .getTaggedSentenceSentiment(taggedSentence);
+      Map<Integer, SentimentResult> sentimentResult = sentimentWordLists
+          .getSentenceSentiment(taggedSentence);
 
       LOG.info("Tweet: '" + tweet + "'");
+      LOG.info("Preprocessed: " + preprocessedTokens);
       LOG.info("Sentiment: " + sentimentResult);
     }
 
