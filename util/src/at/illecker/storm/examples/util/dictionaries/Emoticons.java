@@ -16,7 +16,9 @@
  */
 package at.illecker.storm.examples.util.dictionaries;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ public class Emoticons {
 
   private Set<String> m_emoticons = null;
   private List<Pattern> m_emoticonPatterns = null;
+  private List<Pattern> m_emoticonPatternsStrict = null;
 
   private Emoticons() {
     Map<String, Properties> emoticonFiles = Configuration.getEmoticons();
@@ -51,9 +54,11 @@ public class Emoticons {
         LOG.info("Loaded Emoticons including regex patterns from: " + file);
         if (m_emoticonPatterns == null) {
           m_emoticonPatterns = new ArrayList<Pattern>();
+          m_emoticonPatternsStrict = new ArrayList<Pattern>();
         }
         for (String emoticon : emoticons) {
-          m_emoticonPatterns.add(Pattern.compile("^" + emoticon + "$"));
+          m_emoticonPatterns.add(Pattern.compile(emoticon));
+          m_emoticonPatternsStrict.add(Pattern.compile("^" + emoticon + "$"));
         }
       } else {
         LOG.info("Loaded Emoticons from: " + file);
@@ -69,31 +74,46 @@ public class Emoticons {
     return instance;
   }
 
-  public boolean isEmoticon(String value) {
+  public SimpleEntry<Boolean, String[]> containsEmoticon(String value) {
     value = value.toLowerCase();
-    boolean result = false;
-    if (m_emoticons != null) {
-      result = m_emoticons.contains(value);
+    if ((m_emoticons != null) && (m_emoticons.contains(value))) {
+      return new SimpleEntry<Boolean, String[]>(true, new String[] { value });
     }
 
-    if ((result == false) && (m_emoticonPatterns != null)) {
-      for (Pattern emoticon : m_emoticonPatterns) {
+    if (m_emoticonPatterns != null) {
+      for (int i = 0; i < m_emoticonPatterns.size(); i++) {
+        Pattern emoticon = m_emoticonPatterns.get(i);
         Matcher m = emoticon.matcher(value);
         if (m.find()) {
-          return true;
+          Pattern emoticonStrict = m_emoticonPatternsStrict.get(i);
+          // check if it's a strict match
+          if (emoticonStrict.matcher(value).find()) {
+            return new SimpleEntry<Boolean, String[]>(true,
+                new String[] { value });
+          } else {
+            if (m.start() == 0) {
+              return new SimpleEntry<Boolean, String[]>(true, new String[] {
+                  value.substring(0, m.end()), value.substring(m.end()) });
+            } else if (m.end() == value.length()) {
+              return new SimpleEntry<Boolean, String[]>(true, new String[] {
+                  value.substring(0, m.start()), value.substring(m.start()) });
+            }
+          }
         }
       }
     }
-
-    return result;
+    return new SimpleEntry<Boolean, String[]>(false, null);
   }
 
   public static void main(String[] args) {
     Emoticons emoticons = Emoticons.getInstance();
     // test Emoticons
-    String[] testEmoticons = new String[] { ":)", ":-)", ":))))" };
+    String[] testEmoticons = new String[] { ":)", ":-)", ":))))", "happy:-)",
+        "sad:-(", ";-)yeah", "test" };
     for (String s : testEmoticons) {
-      System.out.println("isEmoticon(" + s + "): " + emoticons.isEmoticon(s));
+      System.out.println("containsEmoticon(" + s + "): "
+          + emoticons.containsEmoticon(s).getKey() + " "
+          + Arrays.toString(emoticons.containsEmoticon(s).getValue()));
     }
   }
 }
