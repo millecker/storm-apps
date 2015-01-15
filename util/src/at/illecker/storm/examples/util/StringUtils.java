@@ -113,44 +113,7 @@ public class StringUtils {
     return result;
   }
 
-  public static String toUnicode(String s) {
-    String result = "";
-    char[] arr = s.toCharArray();
-    for (int i = 0; i < arr.length; i++) {
-      result += toUnicode(arr[i]);
-    }
-    return result;
-  }
-
-  public static String toUnicode(char ch) {
-    return String.format("\\u%04x", (int) ch);
-  }
-
-  public static String replaceUnicodeSymbols(String value) {
-    // LOG.info("token: '" + value + "' unicode: " + toUnicode(value));
-
-    // http://www.iemoji.com/view/emoji/885/people/grinning-face
-    String result = value;
-    result = result.replaceAll("\\uD83D\\uDE00", ":D");
-    // U+1F603
-    result = result.replaceAll("\\uD83D\\uDE03", ":)");
-    // U+1F604
-    result = result.replaceAll("\\uD83D\\uDE04", ":)");
-    // U+1F605 :sweat_smile:
-    result = result.replaceAll("\\uD83D\\uDE05", ":)");
-
-    return result;
-  }
-
   public static void main(String[] args) {
-    // test Unicode
-    String[] testUnicode = new String[] { "\uD83D\uDE00", "\uD83D\uDE01",
-        "\uD83D\uDE02", "\uD83D\uDE03", "\uD83D\uDE04" };
-    for (String s : testUnicode) {
-      System.out.println("replaceUnicodeSymbols(" + s + "): "
-          + replaceUnicodeSymbols(s));
-    }
-
     // test URLs
     String[] testURLs = new String[] { "www.google.com",
         "http://www.google.com", "https://www.google.com",

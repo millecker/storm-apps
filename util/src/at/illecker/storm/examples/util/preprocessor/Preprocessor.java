@@ -28,6 +28,7 @@ import twitter4j.Status;
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
+import at.illecker.storm.examples.util.UnicodeUtils;
 import at.illecker.storm.examples.util.dictionaries.Emoticons;
 import at.illecker.storm.examples.util.dictionaries.FirstNames;
 import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
@@ -69,9 +70,10 @@ public class Preprocessor {
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
 
       // Step 1) Replace Unicode symbols
-      token = StringUtils.replaceUnicodeSymbols(token);
+      // TODO only if unicode in token
+      token = UnicodeUtils.replaceUnicodeSymbols(token);
 
-      // check if is emoticon after Unicode replacement
+      // check if token is a emoticon after Unicode replacement
       boolean tokenIsEmoticon = m_emoticons.isEmoticon(token.toLowerCase());
 
       // Step 2) Replace HTML symbols
