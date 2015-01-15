@@ -20,14 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SentimentResult {
+  public static final double NEGATIVE_THRESHOLD = 0.45; // < 0.45
+  public static final double POSITIVE_THRESHOLD = 0.55; // > 0.55
   private int m_posCount;
   private int m_neutralCount;
   private int m_negCount;
   private double m_sum;
-  private double m_maxPos;
-  private double m_maxNeg;
   private double m_initialMaxPos;
+  private double m_maxPos;
   private double m_initialMaxNeg;
+  private double m_maxNeg;
   private List<Double> m_scores;
 
   public SentimentResult() {
@@ -35,10 +37,10 @@ public class SentimentResult {
     this.m_neutralCount = 0;
     this.m_negCount = 0;
     this.m_sum = 0;
-    this.m_maxPos = 0;
-    this.m_maxNeg = 0;
-    this.m_initialMaxPos = 0;
-    this.m_initialMaxNeg = 0;
+    this.m_initialMaxPos = POSITIVE_THRESHOLD;
+    this.m_maxPos = POSITIVE_THRESHOLD;
+    this.m_initialMaxNeg = SentimentResult.NEGATIVE_THRESHOLD;
+    this.m_maxNeg = SentimentResult.NEGATIVE_THRESHOLD;
     this.m_scores = new ArrayList<Double>();
   }
 
@@ -58,10 +60,6 @@ public class SentimentResult {
     return m_posCount / (double) m_scores.size();
   }
 
-  public void incPosCount() {
-    this.m_posCount++;
-  }
-
   public int getNeutralCount() {
     return m_neutralCount;
   }
@@ -70,20 +68,12 @@ public class SentimentResult {
     return m_neutralCount / (double) m_scores.size();
   }
 
-  public void incNeutralCount() {
-    this.m_neutralCount++;
-  }
-
   public int getNegCount() {
     return m_negCount;
   }
 
   public double getAvgNegCount() {
     return m_negCount / (double) m_scores.size();
-  }
-
-  public void incNegCount() {
-    this.m_negCount++;
   }
 
   public double getSum() {
@@ -98,33 +88,49 @@ public class SentimentResult {
     return m_scores.size();
   }
 
-  public double getMaxPos() {
-    return m_maxPos;
-  }
-
-  public void setMaxPos(double maxPos) {
-    this.m_maxPos = maxPos;
-  }
-
   public double getInitalMaxPos() {
     return m_initialMaxPos;
   }
 
-  public double getMaxNeg() {
-    return m_maxNeg;
-  }
-
-  public void setMaxNeg(double maxNeg) {
-    this.m_maxNeg = maxNeg;
+  public Double getMaxPos() {
+    return (m_maxPos != m_initialMaxPos) ? m_maxPos : null;
   }
 
   public double getInitalMaxNeg() {
     return m_initialMaxNeg;
   }
 
-  public void addScore(double value) {
-    this.m_scores.add(value);
-    this.m_sum += value;
+  public Double getMaxNeg() {
+    return (m_maxNeg != m_initialMaxNeg) ? m_maxNeg : null;
+  }
+
+  public void addScore(double score) {
+    this.m_scores.add(score);
+    this.m_sum += score;
+
+    // update negative positive neutral counts
+    if (score < NEGATIVE_THRESHOLD) { // NEGATIVE
+      this.m_negCount++;
+      Double maxNeg = this.getMaxNeg();
+      if (maxNeg == null) {
+        maxNeg = this.getInitalMaxNeg();
+      }
+      if (score < maxNeg) { // MAX_NEG_SCORE
+        this.m_maxNeg = score;
+      }
+    } else if (score > POSITIVE_THRESHOLD) { // POSITIVE
+      this.m_posCount++;
+      Double maxPos = this.getMaxPos();
+      if (maxPos == null) {
+        maxPos = this.getInitalMaxPos();
+      }
+      if (score > maxPos) { // MAX_POS_SCORE
+        this.m_maxPos = score;
+      }
+    } else if ((score >= SentimentResult.NEGATIVE_THRESHOLD)
+        && (score <= SentimentResult.POSITIVE_THRESHOLD)) { // NEUTRAL
+      this.m_neutralCount++;
+    }
   }
 
   public void add(SentimentResult sentimentResult) {
