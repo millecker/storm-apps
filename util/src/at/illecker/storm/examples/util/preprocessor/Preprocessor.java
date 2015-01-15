@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.preprocessor;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -88,46 +87,45 @@ public class Preprocessor {
         LOG.info("Replaced Unicode symbols: " + token);
       }
 
-      // Step 2) Check if token contains a Emoticon after Unicode replacement
-      // Splits word and emoticons if necessary
-      SimpleEntry<Boolean, String[]> tokenContainsEmoticon = m_emoticons
-          .containsEmoticon(token.toLowerCase());
-      boolean tokenIsEmoticon = tokenContainsEmoticon.getKey();
-      if (tokenIsEmoticon) {
-        String[] splittedTokens = tokenContainsEmoticon.getValue();
-        if (splittedTokens.length > 1) {
-          LOG.info("tokenContainsEmoticon: " + Arrays.toString(splittedTokens));
+      // Step 2) Replace HTML symbols
+      token = StringUtils.replaceHTMLSymbols(token);
+
+      // Step 3) Check if token contains a Emoticon after Unicode replacement
+      boolean tokenContainsEmoticon = m_emoticons.containsEmoticon(token);
+      if ((tokenContainsEmoticon) && (!tokenIsURL)) {
+
+        // Step 3a) Split word and emoticons if necessary
+        String[] splittedTokens = m_emoticons.splitEmoticon(token);
+        if ((splittedTokens != null) && (splittedTokens.length > 1)) {
+          LOG.info("splitEmoticon: " + Arrays.toString(splittedTokens));
           tokens.add(0, splittedTokens[1]);
           tokens.add(0, splittedTokens[0]);
           return preprocessAccumulator(tokens, processedTokens);
         }
+
+        // Step 3b) Unify emoticons, remove repeating chars
+        Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
+        if (matcher.find()) {
+          String reducedToken = matcher.replaceAll("$1");
+          LOG.info("Unify emoticon from '" + token + "' to '" + reducedToken);
+          tokens.add(0, reducedToken);
+          // preprocess token again if there are recursive patterns in it
+          // e.g., :):):) -> :):) -> :)
+          return preprocessAccumulator(tokens, processedTokens);
+        }
       }
 
-      // Step 3) Replace HTML symbols
-      token = StringUtils.replaceHTMLSymbols(token);
-
       // Step 4) Remove punctuation and special chars at beginning and ending
-      if ((!tokenIsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
+      if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
           && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 5) Unify emoticons, remove repeating chars
-      if (tokenIsEmoticon) {
-        Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
-        if (matcher.find()) {
-          String reducedToken = matcher.replaceAll("$1");
-          LOG.info("unify emoticon from '" + token + "' to '" + reducedToken
-              + "'");
-          token = reducedToken;
-        }
-      }
-
-      // Step 6) slang correction
+      // Step 5) slang correction
       // TODO 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
-      if (!tokenIsEmoticon) {
+      if (!tokenContainsEmoticon) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -142,7 +140,7 @@ public class Preprocessor {
         }
       }
 
-      // Step 7) Fix omission of final g in gerund forms (goin)
+      // Step 6) Fix omission of final g in gerund forms (goin)
       if ((!tokenIsUSR) && (!tokenIsHashTag) && (token.endsWith("in"))
           && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
@@ -153,13 +151,14 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 8) Remove elongations of characters (suuuper)
+      // Step 7) Remove elongations of characters (suuuper)
+      // 'lollll' to 'loll' because 'loll' is found in dict
       if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
-          && (!tokenIsEmoticon) && (!tokenIsNumeric)) {
+          && (!tokenContainsEmoticon) && (!tokenIsNumeric)) {
 
         token = removeRepeatingChars(token);
 
-        // Step 8b) Try slang correction again
+        // Step 7b) Try slang correction again
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -170,11 +169,14 @@ public class Preprocessor {
             LOG.info("slang correction from '" + token + "' to "
                 + Arrays.toString(slangCorrection));
           }
+          return preprocessAccumulator(tokens, processedTokens);
         }
       }
 
       // add token to processed list
-      processedTokens.add(token);
+      if (!token.isEmpty()) { // trimPunctuation could make token empty
+        processedTokens.add(token);
+      }
 
       return preprocessAccumulator(tokens, processedTokens);
     }
