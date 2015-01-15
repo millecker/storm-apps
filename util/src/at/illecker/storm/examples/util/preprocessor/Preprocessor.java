@@ -95,8 +95,8 @@ public class Preprocessor {
         String[] splittedTokens = tokenContainsEmoticon.getValue();
         if (splittedTokens.length > 1) {
           LOG.info("tokenHasEmoticon: " + Arrays.toString(splittedTokens));
-          tokens.add(0, splittedTokens[0]);
           tokens.add(0, splittedTokens[1]);
+          tokens.add(0, splittedTokens[0]);
           return preprocessAccumulator(tokens, processedTokens);
         }
       }
