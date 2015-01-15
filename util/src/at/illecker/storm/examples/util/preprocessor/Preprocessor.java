@@ -24,6 +24,8 @@ import java.util.regex.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import twitter4j.Status;
+import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.dictionaries.Emoticons;
@@ -65,17 +67,23 @@ public class Preprocessor {
       boolean tokenIsURL = StringUtils.isURL(token);
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
+
+      // Step 1) Replace Unicode symbols
+      token = StringUtils.replaceUnicodeSymbols(token);
+
+      // check if is emoticon after Unicode replacement
       boolean tokenIsEmoticon = m_emoticons.isEmoticon(token.toLowerCase());
 
-      // Step 1) Replace HTML symbols
+      // Step 2) Replace HTML symbols
       token = StringUtils.replaceHTMLSymbols(token);
 
-      // Step 2) Remove punctuation and special chars at beginning and ending
+      // Step 3) Remove punctuation and special chars at beginning and ending
       if ((!tokenIsEmoticon) && (!tokenIsUSR) && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 3) unify emoticons
+      // Step 4) unify emoticons
+      // TODO unify emoticon from ';)' to ';)'
       if (tokenIsEmoticon) {
         Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
         String reducedToken = matcher.replaceAll("$1");
@@ -84,7 +92,7 @@ public class Preprocessor {
         token = reducedToken;
       }
 
-      // Step 4) slang correction
+      // Step 5) slang correction
       // TODO
       // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
@@ -104,7 +112,7 @@ public class Preprocessor {
         }
       }
 
-      // Step 5) Fix omission of final g in gerund forms (goin)
+      // Step 6) Fix omission of final g in gerund forms (goin)
       if ((!token.isEmpty()) && (!tokenIsUSR) && (!tokenIsHashTag)
           && (token.endsWith("in")) && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
@@ -115,14 +123,14 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 6) Remove elongations of characters (suuuper)
+      // Step 7) Remove elongations of characters (suuuper)
       if ((!token.isEmpty()) && (!tokenIsURL) && (!tokenIsUSR)
           && (!tokenIsHashTag) && (!tokenIsEmoticon)
           && (!StringUtils.isNumeric(token))) {
 
         token = removeRepeatingChars(token);
 
-        // Step 7) Try slang correction again
+        // Step 7b) Try slang correction again
         String[] correction = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (correction != null) {
@@ -224,15 +232,31 @@ public class Preprocessor {
 
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
-    List<Tweet> tweets = Tweet.getTestTweets();
-    tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool lollll"));
-    tweets
-        .add(new Tweet(
-            0,
-            "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
-    tweets.add(new Tweet(0, "Martin martin kevin Kevin Justin justin"));
-    tweets.add(new Tweet(0, "10,000 1000 +111 -111,0000.4444"));
+    List<Tweet> tweets = null;
+    boolean extendedTest = false;
 
+    // load tweets
+    if (extendedTest) {
+      List<Status> extendedTweets = Configuration
+          .getDataSetUibkCrawlerTest("en");
+
+      tweets = new ArrayList<Tweet>();
+      for (Status tweet : extendedTweets) {
+        tweets.add(new Tweet(tweet.getId(), tweet.getText(), 0));
+      }
+
+    } else {
+      tweets = Tweet.getTestTweets();
+      tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool lollll"));
+      tweets
+          .add(new Tweet(
+              0,
+              "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
+      tweets.add(new Tweet(0, "Martin martin kevin Kevin Justin justin"));
+      tweets.add(new Tweet(0, "10,000 1000 +111 -111,0000.4444"));
+    }
+
+    // compute tweets
     for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
@@ -246,4 +270,5 @@ public class Preprocessor {
       LOG.info("Preprocessed: '" + preprocessedTokens + "'");
     }
   }
+
 }

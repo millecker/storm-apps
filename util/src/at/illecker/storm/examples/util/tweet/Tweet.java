@@ -179,6 +179,12 @@ public class Tweet implements Serializable {
             10,
             "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \""));
 
+    tweets.add(new Tweet(11, ":-))) xDD XDD ;) :)"));
+    tweets
+        .add(new Tweet(
+            12,
+            "\"All the money you've spent on my credit card I'm taking it out of your account\".... Hi I'm Sydney and I'm filing bankruptcy\ud83d\ude05\ud83d\ude05\ud83d\ude05\ud83d\ude05 \ud83d\ude05"));
+
     return tweets;
   }
 }
