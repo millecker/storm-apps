@@ -75,6 +75,7 @@ public class StringUtils {
         break;
       }
     }
+
     // count ending punctuations
     int endingPunctuations = 0;
     for (int i = valueLen - 1; i >= 0; i--) {
@@ -84,21 +85,29 @@ public class StringUtils {
         break;
       }
     }
+
     // case 1) no characters were punctuation
     if ((startingPunctuations == 0) && (endingPunctuations == 0)) {
       return value;
     }
+
     // case 2) all characters were punctuation
     if ((startingPunctuations == valueLen) && (endingPunctuations == valueLen)) {
       return "";
     }
+
     // case 3) substring
-    int substringLen = valueLen - endingPunctuations - startingPunctuations;
-    if (startingPunctuations >= substringLen) {
-      LOG.info("trimPunctuation is not possible for '" + value + "'");
+    int endIndex = valueLen - endingPunctuations;
+    if (startingPunctuations >= endIndex) {
+      LOG.error("trimPunctuation is not possible for '" + value
+          + "' valueLen: " + valueLen + " startingPunc: "
+          + startingPunctuations + " endingPunc: " + endingPunctuations
+          + " endIndex: " + endIndex);
       return value;
     } else {
-      return value.substring(startingPunctuations, substringLen);
+      LOG.info("trimPunctuation from '" + value + "' to '"
+          + value.substring(startingPunctuations, endIndex) + "'");
+      return value.substring(startingPunctuations, endIndex);
     }
   }
 
@@ -144,7 +153,7 @@ public class StringUtils {
 
     // test punctuations
     String[] testPunctuations = new String[] { ".asdf.", "asdf.:--",
-        "--asdf-!", ":-)", ">:-[" };
+        "--asdf-!", ":-)", ">:-[", "\"All", "\"abc\"", "\"abc\".." };
     for (String s : testPunctuations) {
       System.out.println("trimPunctuation(" + s + "): " + trimPunctuation(s));
     }
