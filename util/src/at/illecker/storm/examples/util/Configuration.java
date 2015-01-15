@@ -19,11 +19,14 @@ package at.illecker.storm.examples.util;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import libsvm.svm_parameter;
+import twitter4j.Status;
+import at.illecker.storm.examples.util.io.JsonUtils;
 import at.illecker.storm.examples.util.svm.SVM;
 
 public class Configuration {
@@ -222,6 +225,17 @@ public class Configuration {
     return USER_DIR_PATH + File.separator + DATASET_PATH;
   }
 
+  public static List<Status> getDataSetUibkCrawler(String filterLanguage) {
+    String tweetsDir = getDataSetPath() + File.separator + "uibk_crawler";
+    return JsonUtils.readTweetsDirectory(tweetsDir, filterLanguage);
+  }
+
+  public static List<Status> getDataSetUibkCrawlerTest(String filterLanguage) {
+    String tweetsDir = getDataSetPath() + File.separator + "uibk_crawler"
+        + File.separator + "test";
+    return JsonUtils.readTweetsDirectory(tweetsDir, filterLanguage);
+  }
+
   public static Dataset getDataSetSemEval2013Mixed() {
     svm_parameter svmParam = SVM.getDefaultParameter();
     // After Grid search use best C and gamma values
@@ -230,9 +244,9 @@ public class Configuration {
     // svmParam.C = Math.pow(2, 6);
     // svmParam.gamma = Math.pow(2, -5);
 
-    return new Dataset(Configuration.getDataSetPath() + File.separator
-        + "SemEval2013_mixed", "trainingInput.txt", null, "testingInput.txt",
-        "\t", 0, 3, 1, new String[] { "negative" }, new String[] { "neutral" },
+    return new Dataset(getDataSetPath() + File.separator + "SemEval2013_mixed",
+        "trainingInput.txt", null, "testingInput.txt", "\t", 0, 3, 1,
+        new String[] { "negative" }, new String[] { "neutral" },
         new String[] { "positive" }, 0, 1, 2, svmParam);
   }
 
@@ -253,8 +267,8 @@ public class Configuration {
     svmParam.weight[1] = 1;
     svmParam.weight[2] = 1.25; // 1.26; 2;
 
-    return new Dataset(Configuration.getDataSetPath() + File.separator
-        + "SemEval2013", "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",
+    return new Dataset(getDataSetPath() + File.separator + "SemEval2013",
+        "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",
         "twitter-test-gold-B.tsv", "\t", 0, 2, 3, new String[] { "negative",
             "\"negative\"" }, new String[] { "neutral", "objective-OR-neutral",
             "objective" }, new String[] { "positive" }, 0, 1, 2, svmParam);
@@ -266,8 +280,8 @@ public class Configuration {
     svmParam.kernel_type = svm_parameter.LINEAR;
     svmParam.C = 0.5;
     // TODO
-    return new Dataset(Configuration.getDataSetPath() + File.separator
-        + "SemEval2014", "twitter-train-gold-B-2014.tsv", null,
+    return new Dataset(getDataSetPath() + File.separator + "SemEval2014",
+        "twitter-train-gold-B-2014.tsv", null,
         "SemEval2014-task9-test-B-input.txt", "\t", 0, 2, 3, new String[] {
             "negative", "\"negative\"" }, new String[] { "neutral",
             "\"neutral\"", "\"objective-OR-neutral\"" }, new String[] {
