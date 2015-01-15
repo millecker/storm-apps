@@ -131,7 +131,7 @@ public class JsonUtils {
         }
       }
     }
-    LOG.info("Loaded total " + tweets.size() + " tweets");
+    LOG.info("Loaded " + tweets.size() + " tweets");
     return tweets;
   }
 

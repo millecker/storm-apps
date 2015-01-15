@@ -109,7 +109,6 @@ public class StringUtils {
     result = result.replaceAll("&lt;", "<");
     result = result.replaceAll("&gt;", ">");
     result = result.replaceAll("&nbsp;", " ");
-
     return result;
   }
 

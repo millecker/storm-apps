@@ -77,7 +77,7 @@ public class FileUtils {
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.error("IOException: " + e.getMessage());
     } finally {
       if (br != null) {
         try {
