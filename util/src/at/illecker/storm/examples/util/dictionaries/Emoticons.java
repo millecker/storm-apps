@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.dictionaries;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -74,10 +73,25 @@ public class Emoticons {
     return instance;
   }
 
-  public SimpleEntry<Boolean, String[]> containsEmoticon(String value) {
+  public boolean containsEmoticon(String value) {
     value = value.toLowerCase();
     if ((m_emoticons != null) && (m_emoticons.contains(value))) {
-      return new SimpleEntry<Boolean, String[]>(true, new String[] { value });
+      return true;
+    }
+    if (m_emoticonPatterns != null) {
+      for (Pattern emoticonPattern : m_emoticonPatterns) {
+        if (emoticonPattern.matcher(value).find()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public String[] splitEmoticon(String value) {
+    value = value.toLowerCase();
+    if ((m_emoticons != null) && (m_emoticons.contains(value))) {
+      return new String[] { value };
     }
 
     if (m_emoticonPatterns != null) {
@@ -88,21 +102,20 @@ public class Emoticons {
           Pattern emoticonStrict = m_emoticonPatternsStrict.get(i);
           // check if it's a strict match
           if (emoticonStrict.matcher(value).find()) {
-            return new SimpleEntry<Boolean, String[]>(true,
-                new String[] { value });
+            return new String[] { value };
           } else {
             if (m.start() == 0) {
-              return new SimpleEntry<Boolean, String[]>(true, new String[] {
-                  value.substring(0, m.end()), value.substring(m.end()) });
+              return new String[] { value.substring(0, m.end()),
+                  value.substring(m.end()) };
             } else if (m.end() == value.length()) {
-              return new SimpleEntry<Boolean, String[]>(true, new String[] {
-                  value.substring(0, m.start()), value.substring(m.start()) });
+              return new String[] { value.substring(0, m.start()),
+                  value.substring(m.start()) };
             }
           }
         }
       }
     }
-    return new SimpleEntry<Boolean, String[]>(false, null);
+    return null;
   }
 
   public static void main(String[] args) {
@@ -112,8 +125,9 @@ public class Emoticons {
         "sad:-(", ";-)yeah", "test" };
     for (String s : testEmoticons) {
       System.out.println("containsEmoticon(" + s + "): "
-          + emoticons.containsEmoticon(s).getKey() + " "
-          + Arrays.toString(emoticons.containsEmoticon(s).getValue()));
+          + emoticons.containsEmoticon(s));
+      System.out.println("containsEmoticon(" + s + "): "
+          + Arrays.toString(emoticons.splitEmoticon(s)));
     }
   }
 }

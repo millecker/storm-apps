@@ -116,7 +116,7 @@ public class POSTagger {
 
       // Interjections
       if ((m_interjections.isInterjection(token))
-          || (m_emoticons.isEmoticon(token))) {
+          || (m_emoticons.containsEmoticon(token))) {
         if (LOGGING) {
           LOG.info("Interjection or Emoticon labelled for " + token);
         }
