@@ -100,6 +100,28 @@ public class IOUtils {
     return in;
   }
 
+  public static InputStream getInputStream(File file) {
+    InputStream in = null;
+    try {
+      in = new FileInputStream(file);
+
+      // unzip if necessary
+      if (file.getName().endsWith(".gz")) {
+        in = new GZIPInputStream(in, GZIP_FILE_BUFFER_SIZE);
+      }
+
+      // buffer input stream
+      in = new BufferedInputStream(in);
+
+    } catch (FileNotFoundException e) {
+      LOG.error("FileNotFoundException: " + e.getMessage());
+    } catch (IOException e) {
+      LOG.error("IOException: " + e.getMessage());
+    }
+
+    return in;
+  }
+
   public static void extractTarGz(String inputTarGz, String outDir) {
     extractTarGz(getInputStream(inputTarGz), outDir, false);
   }
