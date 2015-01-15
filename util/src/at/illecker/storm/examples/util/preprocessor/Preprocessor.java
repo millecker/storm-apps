@@ -76,6 +76,8 @@ public class Preprocessor {
       // check if token is a emoticon after Unicode replacement
       boolean tokenIsEmoticon = m_emoticons.isEmoticon(token.toLowerCase());
 
+      // TODO split word and emoticon
+
       // Step 2) Replace HTML symbols
       token = StringUtils.replaceHTMLSymbols(token);
 
@@ -85,13 +87,14 @@ public class Preprocessor {
       }
 
       // Step 4) unify emoticons
-      // TODO unify emoticon from ';)' to ';)'
       if (tokenIsEmoticon) {
         Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
-        String reducedToken = matcher.replaceAll("$1");
-        LOG.info("unify emoticon from '" + token + "' to '" + reducedToken
-            + "'");
-        token = reducedToken;
+        if (matcher.find()) {
+          String reducedToken = matcher.replaceAll("$1");
+          LOG.info("unify emoticon from '" + token + "' to '" + reducedToken
+              + "'");
+          token = reducedToken;
+        }
       }
 
       // Step 5) slang correction
