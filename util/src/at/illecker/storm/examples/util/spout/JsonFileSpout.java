@@ -55,12 +55,7 @@ public class JsonFileSpout extends BaseRichSpout {
 
     if (config.get(CONF_JSON_FILE) != null) {
       String jsonFilePath = config.get(CONF_JSON_FILE).toString();
-      File jsonFile = new File(jsonFilePath);
-      if (jsonFile.isFile()) {
-        m_elements = JsonUtils.readJsonFile(jsonFile);
-      } else {
-        throw new RuntimeException("Error reading directory " + jsonFile);
-      }
+      m_elements = JsonUtils.readJsonFile(jsonFilePath);
     } else {
       throw new RuntimeException(CONF_JSON_FILE + " property was not set!");
     }
