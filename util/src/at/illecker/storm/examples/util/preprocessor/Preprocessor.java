@@ -75,25 +75,36 @@ public class Preprocessor {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 3) slang correction
-      // TODO 'xD' to [extreme, droll]
+      // Step 3) unify emoticons
+      if (tokenIsEmoticon) {
+        Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
+        String reducedToken = matcher.replaceAll("$1");
+        LOG.info("unify emoticon from '" + token + "' to '" + reducedToken
+            + "'");
+        token = reducedToken;
+      }
+
+      // Step 4) slang correction
+      // TODO
       // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
-      String[] correction = m_slangCorrection
-          .getCorrection(token.toLowerCase());
-      if (correction != null) {
-        for (int i = 0; i < correction.length; i++) {
-          processedTokens.add(correction[i]);
+      if (!tokenIsEmoticon) {
+        String[] correction = m_slangCorrection.getCorrection(token
+            .toLowerCase());
+        if (correction != null) {
+          for (int i = 0; i < correction.length; i++) {
+            processedTokens.add(correction[i]);
+          }
+          if (LOGGING) {
+            LOG.info("slang correction from '" + token + "' to "
+                + Arrays.toString(correction));
+          }
+          token = "";
         }
-        if (LOGGING) {
-          LOG.info("slang correction from '" + token + "' to "
-              + Arrays.toString(correction));
-        }
-        token = "";
       }
 
-      // Step 4) Fix omission of final g in gerund forms (goin)
+      // Step 5) Fix omission of final g in gerund forms (goin)
       if ((!token.isEmpty()) && (!tokenIsUSR) && (!tokenIsHashTag)
           && (token.endsWith("in")) && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
@@ -104,15 +115,16 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 5) Remove elongations of characters (suuuper)
+      // Step 6) Remove elongations of characters (suuuper)
       if ((!token.isEmpty()) && (!tokenIsURL) && (!tokenIsUSR)
           && (!tokenIsHashTag) && (!tokenIsEmoticon)
           && (!StringUtils.isNumeric(token))) {
 
         token = removeRepeatingChars(token);
 
-        // Try slang correction again
-        correction = m_slangCorrection.getCorrection(token.toLowerCase());
+        // Step 7) Try slang correction again
+        String[] correction = m_slangCorrection.getCorrection(token
+            .toLowerCase());
         if (correction != null) {
           for (int i = 0; i < correction.length; i++) {
             processedTokens.add(correction[i]);
