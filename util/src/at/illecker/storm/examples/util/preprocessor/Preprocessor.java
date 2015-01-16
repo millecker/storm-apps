@@ -167,7 +167,8 @@ public class Preprocessor {
       }
 
       // Step 6) Check if there are punctuations between words
-      if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)) {
+      if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)
+          && (!tokenIsHashTag) && (!StringUtils.isEmail(token))) {
 
         // check if it is a special number $5 5% or 5pm
         Matcher m = RegexUtils.IS_SPECIAL_NUMERIC.matcher(token);
@@ -187,8 +188,7 @@ public class Preprocessor {
           }
 
           // if no special number and no numeric try remove punctuations
-        } else if ((!StringUtils.isEmail(token))
-            && (!RegexUtils.IS_SEPARATED_NUMERIC.matcher(token).matches())) {
+        } else if (!RegexUtils.IS_SEPARATED_NUMERIC.matcher(token).matches()) {
 
           m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
           if (m.find()) {
