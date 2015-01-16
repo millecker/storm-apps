@@ -84,6 +84,9 @@ public class Preprocessor {
 
       boolean tokenIsURL = (forceIsURL != null) ? forceIsURL : StringUtils
           .isURL(token);
+      if ((tokenIsURL == false) && (token.startsWith("http://"))) {
+        tokenIsURL = true; // force true when starts with http://
+      }
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
@@ -113,6 +116,7 @@ public class Preprocessor {
       // Step 3) Check if token contains a Emoticon after Unicode replacement
       boolean tokenContainsEmoticon = m_emoticons.containsEmoticon(token);
       if ((tokenContainsEmoticon) && (!tokenIsURL)) {
+        // TODO Missing =.=
 
         // Step 3a) Split word and emoticons if necessary
         String[] splittedTokens = m_emoticons.splitEmoticon(token);
@@ -126,7 +130,6 @@ public class Preprocessor {
         // Step 3b) Unify emoticons, remove repeating chars
         // TODO
         // Unify emoticon from '^^' to '^
-        // Unify emoticon from 'http://t' to 'htp:/t
         Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
         if (matcher.find()) {
           String reducedToken = matcher.replaceAll("$1");
@@ -147,12 +150,18 @@ public class Preprocessor {
         tokenIsNumeric = StringUtils.isNumeric(token);
         // check if token is now a hashTag e.g., #okaaaay! -> #okaaaay
         tokenIsHashTag = StringUtils.isHashTag(token);
+        // check if token is now a URL e.g., www.scotlandrugbyteam.org.
+        tokenIsURL = StringUtils.isURL(token);
       }
 
       // Step 5) slang correction
-      // TODO 'FC' to [fruit, cake]
+      // TODO
+      // 1) prevent slang correction if all UPPERCASE
+      // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
+      // 2) update dictionary
+      // t/m k/o w/my b/slisten Rt/follow S/o
       if (!tokenContainsEmoticon) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
@@ -194,6 +203,10 @@ public class Preprocessor {
 
           m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
           if (m.find()) {
+            // TODO
+            // check group 1 for w/
+            // e.g., w/Biden w/deals w/you w/the w/her
+
             LOG.info("Remove punctuations between words: '" + token + "' to '"
                 + m.group(1) + "' and '" + m.group(2) + "'");
             tokens.add(0, m.group(2));
@@ -216,6 +229,7 @@ public class Preprocessor {
 
       // Step 8) Remove elongations of characters (suuuper)
       // 'lollll' to 'loll' because 'loll' is found in dict
+      // TODO 'AHHHHH' to 'AH'
       if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
           && (!tokenContainsEmoticon) && (!tokenIsNumeric)) {
 
@@ -370,7 +384,8 @@ public class Preprocessor {
               "(6ft.10) 2),Chap 85.3%(6513 (att@m80.com) awayDAWN.com www.asdf.org"));
     }
 
-    // compute tweets
+    // preprocess tweets
+    long startTime = System.currentTimeMillis();
     for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
@@ -383,6 +398,8 @@ public class Preprocessor {
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("Preprocessed: '" + preprocessedTokens + "'");
     }
+    LOG.info("Preprocess finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
   }
 
 }
