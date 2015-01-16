@@ -66,18 +66,24 @@ public class Preprocessor {
   public List<String> preprocess(List<String> tokens) {
     // run tail recursion
     return preprocessAccumulator(new LinkedList<String>(tokens),
-        new ArrayList<String>());
+        new ArrayList<String>(), null);
   }
 
   private List<String> preprocessAccumulator(LinkedList<String> tokens,
       List<String> processedTokens) {
+    return preprocessAccumulator(tokens, processedTokens, null);
+  }
+
+  private List<String> preprocessAccumulator(LinkedList<String> tokens,
+      List<String> processedTokens, Boolean forceIsURL) {
 
     if (tokens.isEmpty()) {
       return processedTokens;
     } else {
       String token = tokens.removeFirst();
 
-      boolean tokenIsURL = StringUtils.isURL(token);
+      boolean tokenIsURL = (forceIsURL != null) ? forceIsURL : StringUtils
+          .isURL(token);
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
@@ -167,7 +173,7 @@ public class Preprocessor {
                 + m.group(1) + "' and '" + m.group(2) + "'");
             tokens.add(0, m.group(2));
             tokens.add(0, m.group(1));
-            return preprocessAccumulator(tokens, processedTokens);
+            return preprocessAccumulator(tokens, processedTokens, false);
           }
         }
       }
@@ -346,8 +352,9 @@ public class Preprocessor {
               "like...and vegas.just hosp.now lies\u002c1st lies,1st candy....wasn\u2019t Nevada\u002cFlorida\u002cOhio\u002cTuesday lol.,.lol lol...lol.."));
       tweets.add(new Tweet(0, "L.O.V.E D.R.U.G.S K.R.I.T"));
       tweets
-          .add(new Tweet(0,
-              "Lamar.....I free.edom star.Kisses,Star Yes..a Oh,I it!!!Go Jenks/sagna"));
+          .add(new Tweet(
+              0,
+              "Lamar.....I free..edom free.edom star.Kisses,Star Yes..a Oh,I it!!!Go Jenks/sagna"));
       tweets
           .add(new Tweet(
               0,
