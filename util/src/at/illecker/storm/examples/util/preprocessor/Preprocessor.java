@@ -146,6 +146,12 @@ public class Preprocessor {
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
           && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
+
+        // stop if token is empty
+        if (token.isEmpty()) {
+          return preprocessAccumulator(tokens, processedTokens);
+        }
+
         // check if token is numeric again e.g., 20,000+ -> 20,000 after trim
         tokenIsNumeric = StringUtils.isNumeric(token);
         // check if token is now a hashTag e.g., #okaaaay! -> #okaaaay
@@ -199,7 +205,8 @@ public class Preprocessor {
           }
 
           // if no special number and no numeric try remove punctuations
-        } else if (!RegexUtils.IS_SEPARATED_NUMERIC.matcher(token).matches()) {
+        } else if ((!RegexUtils.IS_SEPARATED_NUMERIC.matcher(token).matches())
+            && (!m_wordnet.contains(token))) {
 
           m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
           if (m.find()) {

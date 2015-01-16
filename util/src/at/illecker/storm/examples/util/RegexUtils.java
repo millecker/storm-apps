@@ -122,8 +122,8 @@ public class RegexUtils {
 
   // punctuation between words
   public static final Pattern PUNCTUATION_BETWEEN_WORDS = Pattern
-      .compile("^(.*[^\\.|\\,|\\!|\\/])" + "[\\.|\\,|\\!|\\/]+"
-          + "([^\\.|\\,|\\!|\\/].*)$");
+      .compile("^(.*[^\\.|\\,|\\!|\\/|\\-])" + "[\\.|\\,|\\!|\\/|\\-]+"
+          + "([^\\.|\\,|\\!|\\/|\\-].*)$");
 
   // alternating letter dot pattern e.g., L.O.V.E
   public static final Pattern LETTER_DOT_PATTERN = Pattern
