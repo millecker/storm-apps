@@ -111,16 +111,6 @@ public class StringUtils {
     }
   }
 
-  public static String replaceHTMLSymbols(String value) {
-    String result = value;
-    result = result.replaceAll("&quot;", "\"");
-    result = result.replaceAll("&amp;", "&");
-    result = result.replaceAll("&lt;", "<");
-    result = result.replaceAll("&gt;", ">");
-    result = result.replaceAll("&nbsp;", " ");
-    return result;
-  }
-
   public static void main(String[] args) {
     // test URLs
     String[] testURLs = new String[] { "www.google.com",

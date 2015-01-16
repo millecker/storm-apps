@@ -102,4 +102,8 @@ public class RegexUtils {
   // isNumeric
   public static final Pattern IS_NUMERIC = Pattern.compile("^[+-]?" + "\\d+"
       + "(\\,\\d+)?" + "(\\.\\d+)?$");
+
+  // contains HTML symbols
+  public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
+      .compile("&#[0-9]{2,4};" + "|" + "&[a-zA-Z0-9]{2,6};");
 }
