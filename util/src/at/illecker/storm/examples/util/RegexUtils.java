@@ -99,9 +99,14 @@ public class RegexUtils {
   public static final Pattern STARTS_WITH_ALPHABETIC_CHAR = Pattern
       .compile("^[a-zA-Z].*$");
 
-  // isNumeric
+  // is numeric
   public static final Pattern IS_NUMERIC = Pattern.compile("^[+-]?" + "\\d+"
       + "(\\,\\d+)?" + "(\\.\\d+)?$");
+
+  // is a special numeric
+  public static final Pattern IS_SPECIAL_NUMERIC = Pattern
+      .compile("^(\\@)?\\$?" + "[+-]?" + "(\\d+)" + "([\\.|\\,]\\d+)?"
+          + "([\\.|\\,]\\d+)?" + "(?i)(%|fm|am|pm)?$");
 
   // contains HTML symbols
   public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
@@ -109,9 +114,11 @@ public class RegexUtils {
 
   // contains Unicode symbols
   public static final Pattern CONTAINS_UNICODE_SYMBOLS = Pattern
-      .compile("[^\\u0000-\\u007F]+" + "|" + "\\\\u[a-zA-Z0-9]{4,5}+");
+      .compile("[^\\u0000-\\u007F]+" + "|" + "\\\\u[0-9a-fA-F]{4,5}+");
 
   // punctuation between words
   public static final Pattern PUNCTUATION_BETWEEN_WORDS = Pattern
-      .compile("^(.+[^\\.|\\,])" + "[\\.|\\,]+" + "(.+[^\\.|\\,])$");
+      .compile("^(.*[^\\.|\\,|\\!|\\/])" + "[\\.|\\,|\\!|\\/]+"
+          + "([^\\.|\\,|\\!|\\/].*)$");
+
 }

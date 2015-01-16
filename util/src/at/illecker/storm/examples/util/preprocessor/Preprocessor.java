@@ -118,10 +118,14 @@ public class Preprocessor {
         }
 
         // Step 3b) Unify emoticons, remove repeating chars
+        // TODO
+        // Unify emoticon from '^^' to '^
+        // Unify emoticon from 'http://t' to 'htp:/t
         Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
         if (matcher.find()) {
           String reducedToken = matcher.replaceAll("$1");
-          LOG.info("Unify emoticon from '" + token + "' to '" + reducedToken);
+          LOG.info("Unify emoticon from '" + token + "' to '" + reducedToken
+              + "'");
           tokens.add(0, reducedToken);
           // preprocess token again if there are recursive patterns in it
           // e.g., :):):) -> :):) -> :)
@@ -133,16 +137,32 @@ public class Preprocessor {
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
           && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
+        // check if token is numeric again e.g., 20,000+ -> 20,000 after trim
+        tokenIsNumeric = StringUtils.isNumeric(token);
       }
 
       // Step 5) Check if there are punctuations between words
-      Matcher m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
-      if (m.find()) {
-        // LOG.info("Remove punctuations between words: '" + token + "' to '"
-        // + m.group(1) + "' and '" + m.group(2) + "'");
-        tokens.add(0, m.group(2));
-        tokens.add(0, m.group(1));
-        return preprocessAccumulator(tokens, processedTokens);
+      if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)) {
+
+        // check if it is a special number $5 5% or 5pm
+        Matcher m = RegexUtils.IS_SPECIAL_NUMERIC.matcher(token);
+        if (m.matches()) { // if special number check if there is an @
+          if (m.group(1) != null) { // @ before number
+            tokens.add(0, token.substring(1));
+            tokens.add(0, m.group(1)); // @ -> at
+            return preprocessAccumulator(tokens, processedTokens);
+          }
+          // if no special number and no numeric try remove punctuations
+        } else if (!StringUtils.isEmail(token)) {
+          m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
+          if (m.find()) {
+            LOG.info("Remove punctuations between words: '" + token + "' to '"
+                + m.group(1) + "' and '" + m.group(2) + "'");
+            tokens.add(0, m.group(2));
+            tokens.add(0, m.group(1));
+            return preprocessAccumulator(tokens, processedTokens);
+          }
+        }
       }
 
       // Step 6) slang correction
@@ -285,7 +305,7 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = null;
-    boolean extendedTest = true;
+    boolean extendedTest = false;
 
     // load tweets
     if (extendedTest) {
@@ -316,7 +336,18 @@ public class Preprocessor {
       tweets
           .add(new Tweet(
               0,
-              "like...and vegas.just hosp.now lies\u002c1st lies,1st candy....wasn\u2019t Nevada\u002cFlorida\u002cOhio\u002cTuesday lol...lol lol.,.lol lol...lol.."));
+              "like...and vegas.just hosp.now lies\u002c1st lies,1st candy....wasn\u2019t Nevada\u002cFlorida\u002cOhio\u002cTuesday lol.,.lol lol...lol.."));
+      tweets.add(new Tweet(0, "L.O.V.E D.R.U.G.S K.R.I.T"));
+      tweets
+          .add(new Tweet(0,
+              "Lamar.....I free.edom star.Kisses,Star Yes..a Oh,I it!!!Go Jenks/sagna"));
+      tweets
+          .add(new Tweet(
+              0,
+              "32.50 $3.25 49.3% 97.1FM 97.1fm 8.30pm 12.45am 12.45AM 12.45PM @9.15 tonight... 10,000 199,400 149,597,900 20,000+ 10.45,9"));
+      tweets
+          .add(new Tweet(0,
+              "(6ft.10) 2),Chap 85.3%(6513 (att@m80.com) awayDAWN.com www.asdf.org"));
     }
 
     // compute tweets
@@ -333,5 +364,4 @@ public class Preprocessor {
       LOG.info("Preprocessed: '" + preprocessedTokens + "'");
     }
   }
-
 }
