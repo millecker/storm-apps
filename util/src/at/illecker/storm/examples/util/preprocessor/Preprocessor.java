@@ -145,6 +145,8 @@ public class Preprocessor {
         token = StringUtils.trimPunctuation(token);
         // check if token is numeric again e.g., 20,000+ -> 20,000 after trim
         tokenIsNumeric = StringUtils.isNumeric(token);
+        // check if token is now a hashTag e.g., #okaaaay! -> #okaaaay
+        tokenIsHashTag = StringUtils.isHashTag(token);
       }
 
       // Step 5) slang correction
