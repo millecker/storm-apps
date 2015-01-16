@@ -362,7 +362,7 @@ public class Preprocessor {
       tweets
           .add(new Tweet(
               0,
-              "32.50 $3.25 49.3% 97.1FM 97.1fm 8.30pm 12.45am 12.45AM 12.45PM @9.15 tonight... 10,000 199,400 149,597,900 20,000+ 10.45,9"));
+              "32.50 $3.25 49.3% 97.1FM 97.1fm 8.30pm 12.45am 12.45AM 12.45PM @9.15 tonight... 10,000 199,400 149,597,900 20,000+ 10.45,9 8/11/12"));
       tweets
           .add(new Tweet(0,
               "(6ft.10) 2),Chap 85.3%(6513 (att@m80.com) awayDAWN.com www.asdf.org"));

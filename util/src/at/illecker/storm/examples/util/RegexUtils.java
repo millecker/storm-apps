@@ -109,8 +109,8 @@ public class RegexUtils {
           + "([\\.|\\,]\\d+)?" + "(?i)(%|fm|am|pm)?$");
 
   // is separated numeric
-  public static final Pattern IS_SEPARATED_NUMERIC = Pattern.compile("^\\d+"
-      + "[\\/|\\,]" + "\\d+$");
+  public static final Pattern IS_SEPARATED_NUMERIC = Pattern
+      .compile("^\\d+[\\/|\\,]\\d+" + "([\\/|\\,]\\d+)*" + "$");
 
   // contains HTML symbols
   public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
