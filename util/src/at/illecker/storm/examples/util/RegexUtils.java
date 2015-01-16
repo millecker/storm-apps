@@ -108,6 +108,10 @@ public class RegexUtils {
       .compile("^(\\@)?\\$?" + "[+-]?" + "(\\d+)" + "([\\.|\\,]\\d+)?"
           + "([\\.|\\,]\\d+)?" + "(?i)(%|fm|am|pm)?$");
 
+  // is separated numeric
+  public static final Pattern IS_SEPARATED_NUMERIC = Pattern.compile("^\\d+"
+      + "[\\/|\\,]" + "\\d+$");
+
   // contains HTML symbols
   public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
       .compile("&#[0-9]{2,4};" + "|" + "&[a-zA-Z0-9]{2,6};");

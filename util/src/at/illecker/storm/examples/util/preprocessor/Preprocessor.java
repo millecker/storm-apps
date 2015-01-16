@@ -166,7 +166,9 @@ public class Preprocessor {
           return preprocessAccumulator(tokens, processedTokens);
 
           // if no special number and no numeric try remove punctuations
-        } else if (!StringUtils.isEmail(token)) {
+        } else if ((!StringUtils.isEmail(token))
+            && (!RegexUtils.IS_SEPARATED_NUMERIC.matcher(token).matches())) {
+
           m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
           if (m.find()) {
             LOG.info("Remove punctuations between words: '" + token + "' to '"
@@ -318,7 +320,7 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = null;
-    boolean extendedTest = false;
+    boolean extendedTest = true;
 
     // load tweets
     if (extendedTest) {
