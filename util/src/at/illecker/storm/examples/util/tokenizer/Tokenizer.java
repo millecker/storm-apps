@@ -23,6 +23,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.HtmlUtils;
+import at.illecker.storm.examples.util.UnicodeUtils;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
@@ -38,13 +40,36 @@ public class Tokenizer {
     text = text.trim();
 
     // split at one or more blanks
-    String[] inputTokens = text.split("\\s+");
+    String[] tokens = text.split("\\s+");
 
-    List<String> tokens = new ArrayList<String>();
-    for (String inputToken : inputTokens) {
-      tokens.add(inputToken);
+    List<String> resultTokens = new ArrayList<String>();
+    for (String token : tokens) {
+
+      // Step 1) Replace Unicode symbols \u0000
+      if (UnicodeUtils.containsUnicode(token)) {
+        String replacedToken = UnicodeUtils.replaceUnicodeSymbols(token);
+        // LOG.info("Replaced Unicode symbols from '" + token + "' to '"
+        // + replacedToken + "'");
+        if (replacedToken.equals(token)) {
+          LOG.error("Unicode symbols could not be replaced: '" + token + "'");
+        }
+        token = replacedToken;
+      }
+
+      // Step 2) Replace HTML symbols &#[0-9];
+      if (HtmlUtils.containsHtml(token)) {
+        String replacedToken = HtmlUtils.replaceHtmlSymbols(token);
+        // LOG.info("Replaced HTML symbols from '" + token + "' to '"
+        // + replacedToken + "'");
+        if (replacedToken.equals(token)) {
+          LOG.error("HTML symbols could not be replaced: '" + token + "'");
+        }
+        token = replacedToken;
+      }
+
+      resultTokens.add(token);
     }
-    return tokens;
+    return resultTokens;
   }
 
   public static void tokenizeTweets(List<Tweet> tweets) {

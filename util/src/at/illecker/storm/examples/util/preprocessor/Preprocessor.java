@@ -27,10 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Dataset;
-import at.illecker.storm.examples.util.HtmlUtils;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
-import at.illecker.storm.examples.util.UnicodeUtils;
 import at.illecker.storm.examples.util.dictionaries.Emoticons;
 import at.illecker.storm.examples.util.dictionaries.FirstNames;
 import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
@@ -96,35 +94,13 @@ public class Preprocessor {
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
 
-      // Step 1) Replace Unicode symbols \u0000
-      if (UnicodeUtils.containsUnicode(token)) {
-        String replacedToken = UnicodeUtils.replaceUnicodeSymbols(token);
-        // LOG.info("Replaced Unicode symbols from '" + token + "' to '"
-        // + replacedToken + "'");
-        if (replacedToken.equals(token)) {
-          LOG.error("Unicode symbols could not be replaced: '" + token + "'");
-        }
-        token = replacedToken;
-      }
-
-      // Step 2) Replace HTML symbols &#[0-9];
-      if (HtmlUtils.containsHtml(token)) {
-        String replacedToken = HtmlUtils.replaceHtmlSymbols(token);
-        // LOG.info("Replaced HTML symbols from '" + token + "' to '"
-        // + replacedToken + "'");
-        if (replacedToken.equals(token)) {
-          LOG.error("HTML symbols could not be replaced: '" + token + "'");
-        }
-        token = replacedToken;
-      }
-
-      // Step 3) Check if token contains a Emoticon after Unicode replacement
+      // Step 1) Check if token contains a Emoticon
       boolean tokenContainsEmoticon = m_emoticons.containsEmoticon(token);
       if ((tokenContainsEmoticon) && (!tokenIsURL)) {
         // TODO
         // Missing =.= o.0
 
-        // Step 3a) Split word and emoticons if necessary
+        // Step 1a) Split word and emoticons if necessary
         String[] splittedTokens = m_emoticons.splitEmoticon(token);
         if ((splittedTokens != null) && (splittedTokens.length > 1)) {
           // TODO
@@ -136,7 +112,7 @@ public class Preprocessor {
           return preprocessAccumulator(tokens, processedTokens);
         }
 
-        // Step 3b) Unify emoticons, remove repeating chars
+        // Step 1b) Unify emoticons, remove repeating chars
         // TODO
         // Unify emoticon from '^^' to '^
         Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
@@ -154,7 +130,7 @@ public class Preprocessor {
       // TODO slang correction should be before trim
       // e.g., trimPunctuation from 'w/' to 'w'
 
-      // Step 4) Trim punctuation and special chars at beginning and ending
+      // Step 2) Trim punctuation and special chars at beginning and ending
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
           && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
@@ -173,7 +149,7 @@ public class Preprocessor {
             .isURL(token);
       }
 
-      // Step 5) slang correction
+      // Step 3) slang correction
       // TODO
       // 1) prevent slang correction if all UPPERCASE
       // 'FC' to [fruit, cake]
@@ -202,7 +178,7 @@ public class Preprocessor {
         }
       }
 
-      // Step 6) Check if there are punctuations between words
+      // Step 4) Check if there are punctuations between words
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)
           && (!tokenIsHashTag) && (!StringUtils.isEmail(token))) {
 
@@ -254,7 +230,7 @@ public class Preprocessor {
         }
       }
 
-      // Step 7) Fix omission of final g in gerund forms (goin)
+      // Step 5) Fix omission of final g in gerund forms (goin)
       if ((!tokenIsUSR) && (!tokenIsHashTag) && (token.endsWith("in"))
           && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
@@ -265,7 +241,7 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 8) Remove elongations of characters (suuuper)
+      // Step 6) Remove elongations of characters (suuuper)
       // 'lollll' to 'loll' because 'loll' is found in dict
       // TODO 'AHHHHH' to 'AH'
       if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
@@ -273,7 +249,7 @@ public class Preprocessor {
 
         token = removeRepeatingChars(token);
 
-        // Step 8b) Try slang correction again
+        // Step 6b) Try slang correction again
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
