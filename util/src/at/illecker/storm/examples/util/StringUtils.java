@@ -78,7 +78,8 @@ public class StringUtils {
   public static boolean isSpecialChar(char c) {
     return c == '-' || c == '_' || c == '&' || c == '|' || c == '/'
         || c == '\\' || c == '"' || c == '\'' || c == '`' || c == '´'
-        || c == '<' || c == '>';
+        || c == '<' || c == '>' || c == '~' || c == '*' || c == '+' || c == '('
+        || c == ')' || c == '[' || c == ']';
   }
 
   public static boolean startsWithAlphabeticChar(String str) {
