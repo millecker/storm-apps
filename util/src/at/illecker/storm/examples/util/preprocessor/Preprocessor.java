@@ -147,7 +147,26 @@ public class Preprocessor {
         tokenIsNumeric = StringUtils.isNumeric(token);
       }
 
-      // Step 5) Check if there are punctuations between words
+      // Step 5) slang correction
+      // TODO 'FC' to [fruit, cake]
+      // 'Ajax' to [Asynchronous, Javascript, and, XML]
+      // 'TL' to [dr too, long, didn't, read]
+      if (!tokenContainsEmoticon) {
+        String[] slangCorrection = m_slangCorrection.getCorrection(token
+            .toLowerCase());
+        if (slangCorrection != null) {
+          for (int i = 0; i < slangCorrection.length; i++) {
+            processedTokens.add(slangCorrection[i]);
+          }
+          if (LOGGING) {
+            LOG.info("slang correction from '" + token + "' to "
+                + Arrays.toString(slangCorrection));
+          }
+          return preprocessAccumulator(tokens, processedTokens);
+        }
+      }
+
+      // Step 6) Check if there are punctuations between words
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)) {
 
         // check if it is a special number $5 5% or 5pm
@@ -177,25 +196,6 @@ public class Preprocessor {
             tokens.add(0, m.group(1));
             return preprocessAccumulator(tokens, processedTokens, false);
           }
-        }
-      }
-
-      // Step 6) slang correction
-      // TODO 'FC' to [fruit, cake]
-      // 'Ajax' to [Asynchronous, Javascript, and, XML]
-      // 'TL' to [dr too, long, didn't, read]
-      if (!tokenContainsEmoticon) {
-        String[] slangCorrection = m_slangCorrection.getCorrection(token
-            .toLowerCase());
-        if (slangCorrection != null) {
-          for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(slangCorrection[i]);
-          }
-          if (LOGGING) {
-            LOG.info("slang correction from '" + token + "' to "
-                + Arrays.toString(slangCorrection));
-          }
-          return preprocessAccumulator(tokens, processedTokens);
         }
       }
 
