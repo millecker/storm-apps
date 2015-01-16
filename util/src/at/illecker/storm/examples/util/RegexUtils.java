@@ -110,4 +110,8 @@ public class RegexUtils {
   // contains Unicode symbols
   public static final Pattern CONTAINS_UNICODE_SYMBOLS = Pattern
       .compile("[^\\u0000-\\u007F]+" + "|" + "\\\\u[a-zA-Z0-9]{4,5}+");
+
+  // punctuation between words
+  public static final Pattern PUNCTUATION_BETWEEN_WORDS = Pattern
+      .compile("^(.+[^\\.|\\,])" + "[\\.|\\,]+" + "(.+[^\\.|\\,])$");
 }

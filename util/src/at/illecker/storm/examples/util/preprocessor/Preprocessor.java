@@ -135,7 +135,17 @@ public class Preprocessor {
         token = StringUtils.trimPunctuation(token);
       }
 
-      // Step 5) slang correction
+      // Step 5) Check if there are punctuations between words
+      Matcher m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
+      if (m.find()) {
+        // LOG.info("Remove punctuations between words: '" + token + "' to '"
+        // + m.group(1) + "' and '" + m.group(2) + "'");
+        tokens.add(0, m.group(2));
+        tokens.add(0, m.group(1));
+        return preprocessAccumulator(tokens, processedTokens);
+      }
+
+      // Step 6) slang correction
       // TODO 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
@@ -154,7 +164,7 @@ public class Preprocessor {
         }
       }
 
-      // Step 6) Fix omission of final g in gerund forms (goin)
+      // Step 7) Fix omission of final g in gerund forms (goin)
       if ((!tokenIsUSR) && (!tokenIsHashTag) && (token.endsWith("in"))
           && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
@@ -165,14 +175,14 @@ public class Preprocessor {
         token = token + "g";
       }
 
-      // Step 7) Remove elongations of characters (suuuper)
+      // Step 8) Remove elongations of characters (suuuper)
       // 'lollll' to 'loll' because 'loll' is found in dict
       if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
           && (!tokenContainsEmoticon) && (!tokenIsNumeric)) {
 
         token = removeRepeatingChars(token);
 
-        // Step 7b) Try slang correction again
+        // Step 8b) Try slang correction again
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -275,11 +285,10 @@ public class Preprocessor {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = null;
-    boolean extendedTest = false;
+    boolean extendedTest = true;
 
     // load tweets
     if (extendedTest) {
-
       // Twitter crawler
       // List<Status> extendedTweets = Configuration
       // .getDataSetUibkCrawlerTest("en");
@@ -304,6 +313,10 @@ public class Preprocessor {
       tweets
           .add(new Tweet(0, "bankruptcy\ud83d\ude05 happy:-) said:-) ;-)yeah"));
       tweets.add(new Tweet(0, "I\u2019m shit\u002c fan\\u002c \\u2019t"));
+      tweets
+          .add(new Tweet(
+              0,
+              "like...and vegas.just hosp.now lies\u002c1st lies,1st candy....wasn\u2019t Nevada\u002cFlorida\u002cOhio\u002cTuesday lol...lol lol.,.lol lol...lol.."));
     }
 
     // compute tweets
