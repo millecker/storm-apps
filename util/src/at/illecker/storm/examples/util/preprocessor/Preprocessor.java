@@ -25,8 +25,9 @@ import java.util.regex.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import twitter4j.Status;
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.Dataset;
+import at.illecker.storm.examples.util.HtmlUtils;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.UnicodeUtils;
@@ -81,14 +82,27 @@ public class Preprocessor {
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
 
-      // Step 1) Replace Unicode symbols
+      // Step 1) Replace Unicode symbols \u0000
       if (UnicodeUtils.containsUnicode(token)) {
-        token = UnicodeUtils.replaceUnicodeSymbols(token);
-        LOG.info("Replaced Unicode symbols: " + token);
+        String replacedToken = UnicodeUtils.replaceUnicodeSymbols(token);
+        // LOG.info("Replaced Unicode symbols from '" + token + "' to '"
+        // + replacedToken + "'");
+        if (replacedToken.equals(token)) {
+          LOG.error("Unicode symbols could not be replaced: '" + token + "'");
+        }
+        token = replacedToken;
       }
 
-      // Step 2) Replace HTML symbols
-      token = StringUtils.replaceHTMLSymbols(token);
+      // Step 2) Replace HTML symbols &#[0-9];
+      if (HtmlUtils.containsHtml(token)) {
+        String replacedToken = HtmlUtils.replaceHtmlSymbols(token);
+        // LOG.info("Replaced HTML symbols from '" + token + "' to '"
+        // + replacedToken + "'");
+        if (replacedToken.equals(token)) {
+          LOG.error("HTML symbols could not be replaced: '" + token + "'");
+        }
+        token = replacedToken;
+      }
 
       // Step 3) Check if token contains a Emoticon after Unicode replacement
       boolean tokenContainsEmoticon = m_emoticons.containsEmoticon(token);
@@ -265,15 +279,20 @@ public class Preprocessor {
 
     // load tweets
     if (extendedTest) {
-      List<Status> extendedTweets = Configuration
-          .getDataSetUibkCrawlerTest("en");
 
-      tweets = new ArrayList<Tweet>();
-      for (Status tweet : extendedTweets) {
-        tweets.add(new Tweet(tweet.getId(), tweet.getText(), 0));
-      }
+      // Twitter crawler
+      // List<Status> extendedTweets = Configuration
+      // .getDataSetUibkCrawlerTest("en");
+      // tweets = new ArrayList<Tweet>();
+      // for (Status tweet : extendedTweets) {
+      // tweets.add(new Tweet(tweet.getId(), tweet.getText(), 0));
+      // }
 
-    } else {
+      // SemEval2013
+      Dataset dataset = Configuration.getDataSetSemEval2013();
+      tweets = dataset.getTrainTweets(true);
+
+    } else { // test tweets
       tweets = Tweet.getTestTweets();
       tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool lollll"));
       tweets
@@ -284,6 +303,7 @@ public class Preprocessor {
       tweets.add(new Tweet(0, "10,000 1000 +111 -111,0000.4444"));
       tweets
           .add(new Tweet(0, "bankruptcy\ud83d\ude05 happy:-) said:-) ;-)yeah"));
+      tweets.add(new Tweet(0, "I\u2019m shit\u002c fan\\u002c \\u2019t"));
     }
 
     // compute tweets
