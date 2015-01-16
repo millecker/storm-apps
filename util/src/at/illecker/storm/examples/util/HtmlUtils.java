@@ -27,8 +27,9 @@ public class HtmlUtils {
 
   public static String replaceHtmlSymbols(String str) {
     String result = str;
-    // http://www.ascii.cl/htmlcodes.htm
+    result = result.replaceAll("<p>|</p>", "");
 
+    // http://www.ascii.cl/htmlcodes.htm
     // space
     result = result.replaceAll("&#32;|&#032;", " ");
     // exclamation point
@@ -93,16 +94,27 @@ public class HtmlUtils {
     result = result.replaceAll("&#125;", "}");
     // equivalency sign - tilde
     result = result.replaceAll("&#126;", "~");
+
     // non-breaking space
     result = result.replaceAll("&nbsp;|&#160;", " ");
 
-    return result;
+    // en dash & em dash
+    result = result.replaceAll("&#8211;|&#8212;", "-");
+    // left & right single quotation mark
+    result = result.replaceAll("&#8216;|&#8217;", "'");
+    // single low-9 quotation mark
+    result = result.replaceAll("&#8218;", ",");
+    // left & right double quotation mark
+    result = result.replaceAll("&#8220;|&#8221;", "\"");
+
+    return result.trim();
   }
 
   public static void main(String[] args) {
     // test replaceHtmlSymbols
     String[] testReplaceHtmlSymbols = new String[] { "Hugo&quot;Boss",
-        "Hugo&#160;Boss", "Hugo&amp;Boss", "Hello&nbsp;&nbsp;Kevin", "&gt;" };
+        "Hugo&#160;Boss", "Hugo&amp;Boss", "Hello&nbsp;&nbsp;Kevin", "&gt;",
+        "<p>&nbsp;</p><p>Ricky" };
     for (String s : testReplaceHtmlSymbols) {
       System.out.println("containsHtml(" + s + "): " + containsHtml(s));
       System.out.println("replaceHtmlSymbols(" + s + "): '"
