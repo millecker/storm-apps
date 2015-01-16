@@ -180,9 +180,11 @@ public class Preprocessor {
 
           // remove alternating letter dot pattern e.g., L.O.V.E
         } else if (RegexUtils.LETTER_DOT_PATTERN.matcher(token).matches()) {
-          token = token.replaceAll("\\.", "");
-          tokens.add(0, token);
-          return preprocessAccumulator(tokens, processedTokens);
+          String newToken = token.replaceAll("\\.", "");
+          if (m_wordnet.contains(newToken)) {
+            tokens.add(0, newToken);
+            return preprocessAccumulator(tokens, processedTokens);
+          }
 
           // if no special number and no numeric try remove punctuations
         } else if ((!StringUtils.isEmail(token))
