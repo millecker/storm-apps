@@ -80,12 +80,17 @@ public class Preprocessor {
     if (tokens.isEmpty()) {
       return processedTokens;
     } else {
+      // remove token from queue
       String token = tokens.removeFirst();
 
-      boolean tokenIsURL = (forceIsURL != null) ? forceIsURL : StringUtils
-          .isURL(token);
-      if ((tokenIsURL == false) && (token.startsWith("http://"))) {
-        tokenIsURL = true; // force true when starts with http://
+      boolean tokenIsURL;
+      if (forceIsURL == null) {
+        tokenIsURL = StringUtils.isURL(token);
+        if ((tokenIsURL == false) && (token.startsWith("http://"))) {
+          tokenIsURL = true; // force true when starts with http://
+        }
+      } else {
+        tokenIsURL = forceIsURL;
       }
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
@@ -116,11 +121,15 @@ public class Preprocessor {
       // Step 3) Check if token contains a Emoticon after Unicode replacement
       boolean tokenContainsEmoticon = m_emoticons.containsEmoticon(token);
       if ((tokenContainsEmoticon) && (!tokenIsURL)) {
-        // TODO Missing =.=
+        // TODO
+        // Missing =.= o.0
 
         // Step 3a) Split word and emoticons if necessary
         String[] splittedTokens = m_emoticons.splitEmoticon(token);
         if ((splittedTokens != null) && (splittedTokens.length > 1)) {
+          // TODO
+          // check if emoticon is at the end of token
+          // e.g., Find-A-Friend:
           LOG.info("splitEmoticon: " + Arrays.toString(splittedTokens));
           tokens.add(0, splittedTokens[1]);
           tokens.add(0, splittedTokens[0]);
@@ -142,7 +151,10 @@ public class Preprocessor {
         }
       }
 
-      // Step 4) Remove punctuation and special chars at beginning and ending
+      // TODO slang correction should be before trim
+      // e.g., trimPunctuation from 'w/' to 'w'
+
+      // Step 4) Trim punctuation and special chars at beginning and ending
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
           && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
@@ -157,7 +169,8 @@ public class Preprocessor {
         // check if token is now a hashTag e.g., #okaaaay! -> #okaaaay
         tokenIsHashTag = StringUtils.isHashTag(token);
         // check if token is now a URL e.g., www.scotlandrugbyteam.org.
-        tokenIsURL = StringUtils.isURL(token);
+        tokenIsURL = (forceIsURL != null) ? forceIsURL : StringUtils
+            .isURL(token);
       }
 
       // Step 5) slang correction
@@ -166,8 +179,14 @@ public class Preprocessor {
       // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
+      // S.O.L - SOL - [s**t, outta, luck]
+      // 'AC/DC' to 'AC' and 'DC' - 'DC' to [don't, care]
+      // 'sci-fi' to 'sci' and 'fi' --> 'fi' to [f**k, it]
+
       // 2) update dictionary
-      // t/m k/o w/my b/slisten Rt/follow S/o
+      // t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A
+      // don,t didnt o/wise
+
       if (!tokenContainsEmoticon) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
@@ -189,7 +208,8 @@ public class Preprocessor {
 
         // check if it is a special number $5 5% or 5pm
         Matcher m = RegexUtils.IS_SPECIAL_NUMERIC.matcher(token);
-        if (m.matches()) { // if special number check if there is an @
+        // if special number check if there is an @
+        if (m.matches()) {
           if (m.group(1) != null) { // @ before number
             tokens.add(0, token.substring(1));
             tokens.add(0, m.group(1)); // @ -> at
@@ -211,8 +231,19 @@ public class Preprocessor {
           m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
           if (m.find()) {
             // TODO
-            // check group 1 for w/
+            // 1) check group 1 for w/
             // e.g., w/Biden w/deals w/you w/the w/her
+
+            // 2) check for tokens
+            // pre-season pre-order pre-orders pre-sale co-host
+            // error-ridden head-coach sub-grid round-up
+            // two-man mid-upper ex-leader re-airing in-depth All-Stars
+            // re-enforcing mid-Nov Re-Up Blu-ray re-scheduled Semi-finals
+            // Free-TV 2-year 18-month left-might 1-night after-effects
+            // three-year K-Pop half-inch head-dress X-Men Re-Charge
+            // double-sided Comic-Con High-School story-wise car-free
+            // Hi-lites day-long Prime-Time #9/11 give-aways century-style
+            // re-run low-rated NUMBER-WORD
 
             LOG.info("Remove punctuations between words: '" + token + "' to '"
                 + m.group(1) + "' and '" + m.group(2) + "'");
@@ -385,7 +416,7 @@ public class Preprocessor {
       tweets
           .add(new Tweet(
               0,
-              "32.50 $3.25 49.3% 97.1FM 97.1fm 8.30pm 12.45am 12.45AM 12.45PM @9.15 tonight... 10,000 199,400 149,597,900 20,000+ 10.45,9 8/11/12"));
+              "32.50 $3.25 49.3% 97.1FM 97.1fm 8.30pm 12.45am 12.45AM 12.45PM 6-7pm 5-8p 6pm-9pm @9.15 tonight... 10,000 199,400 149,597,900 20,000+ 10.45,9 8/11/12"));
       tweets
           .add(new Tweet(0,
               "(6ft.10) 2),Chap 85.3%(6513 (att@m80.com) awayDAWN.com www.asdf.org"));

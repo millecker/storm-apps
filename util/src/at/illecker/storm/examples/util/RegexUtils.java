@@ -105,8 +105,8 @@ public class RegexUtils {
 
   // is a special numeric
   public static final Pattern IS_SPECIAL_NUMERIC = Pattern
-      .compile("^(\\@)?\\$?" + "[+-]?" + "(\\d+)" + "([\\.|\\,]\\d+)?"
-          + "([\\.|\\,]\\d+)?" + "(?i)(%|fm|am|pm)?$");
+      .compile("^(\\@)?\\$?" + "[+-]?" + "(\\d+)" + "(?i)(am|pm)?"
+          + "([\\.|\\,|\\-]\\d+)*" + "(?i)(%|fm|am|pm|p|lb)?$");
 
   // is separated numeric
   public static final Pattern IS_SEPARATED_NUMERIC = Pattern.compile("^\\d+"
