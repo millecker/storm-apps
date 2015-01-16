@@ -106,4 +106,8 @@ public class RegexUtils {
   // contains HTML symbols
   public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
       .compile("&#[0-9]{2,4};" + "|" + "&[a-zA-Z0-9]{2,6};");
+
+  // contains Unicode symbols
+  public static final Pattern CONTAINS_UNICODE_SYMBOLS = Pattern
+      .compile("[^\\u0000-\\u007F]+" + "|" + "\\\\u[a-zA-Z0-9]{4,5}+");
 }

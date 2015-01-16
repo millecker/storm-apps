@@ -16,25 +16,18 @@
  */
 package at.illecker.storm.examples.util;
 
-import java.lang.Character.UnicodeBlock;
-
 public class UnicodeUtils {
 
   public static boolean containsUnicode(String str) {
     if (str == null) {
       return false;
     }
-    for (int i = 0; i < str.length(); i++) {
-      if (UnicodeBlock.of(str.charAt(i)) != UnicodeBlock.BASIC_LATIN) {
-        return true;
-      }
-    }
-    return false;
+    return RegexUtils.CONTAINS_UNICODE_SYMBOLS.matcher(str).find();
   }
 
-  public static String toUnicode(String s) {
+  public static String toUnicode(String str) {
     String result = "";
-    char[] arr = s.toCharArray();
+    char[] arr = str.toCharArray();
     for (int i = 0; i < arr.length; i++) {
       result += toUnicode(arr[i]);
     }
@@ -45,10 +38,17 @@ public class UnicodeUtils {
     return String.format("\\u%04x", (int) ch);
   }
 
-  public static String replaceUnicodeSymbols(String value) {
+  public static String replaceUnicodeSymbols(String str) {
     // LOG.info("token: '" + value + "' unicode: " + toUnicode(value));
+    String result = str;
 
-    String result = value;
+    // Punctuations
+    // U+2019 RIGHT SINGLE QUOTATION MARK
+    result = result.replaceAll("\u2019|\\\\u2019", "'");
+    // U+002C COMMA
+    result = result.replaceAll("\u002c|\\\\u002c", ",");
+
+    // Emoticons
     // http://www.fileformat.info/info/unicode/block/emoticons/images.htm
     // http://www.iemoji.com/view/emoji/885/people/grinning-face
 
@@ -173,19 +173,16 @@ public class UnicodeUtils {
   }
 
   public static void main(String[] args) {
-    // test replaceUnicodeSymbols
+    // test Unicode Symbols
     String[] testUnicodeSymbols = new String[] { "\uD83D\uDE00",
-        "\uD83D\uDE01", "\uD83D\uDE02", "\uD83D\uDE03", "\uD83D\uDE04" };
+        "\uD83D\uDE01", "\uD83D\uDE02", "\uD83D\uDE03", "\uD83D\uDE04", "test",
+        "test\uDE02", "I\u2019m", "shit\u002c", "fan\\u002c", "can\u2019t",
+        "can\\u2019t" };
     for (String s : testUnicodeSymbols) {
+      System.out.println("containsUnicode(" + s + "): " + containsUnicode(s));
       System.out.println("replaceUnicodeSymbols(" + s + "): "
           + replaceUnicodeSymbols(s));
-    }
-
-    // test containsUnicode
-    String[] testContainsUnicode = new String[] { "\uD83D\uDE00", "test",
-        "test\uDE02" };
-    for (String s : testContainsUnicode) {
-      System.out.println("containsUnicode(" + s + "): " + containsUnicode(s));
+      // System.out.println("toUnicode(" + s + "): " + toUnicode(s));
     }
   }
 }
