@@ -110,7 +110,7 @@ public class RegexUtils {
 
   // is separated numeric
   public static final Pattern IS_SEPARATED_NUMERIC = Pattern
-      .compile("^\\d+[\\/|\\,]\\d+" + "([\\/|\\,]\\d+)*" + "(c)?$");
+      .compile("^\\d+[\\/|\\,]\\d+" + "([\\/|\\,]\\d+)*" + "(c|st|nd|rd|th)?$");
 
   // contains HTML symbols
   public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
