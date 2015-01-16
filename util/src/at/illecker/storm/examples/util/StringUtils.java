@@ -22,32 +22,53 @@ import org.slf4j.LoggerFactory;
 public class StringUtils {
   private static final Logger LOG = LoggerFactory.getLogger(StringUtils.class);
 
-  public static boolean isURL(String value) {
-    return RegexUtils.WEB_URL.matcher(value).matches();
+  public static boolean isURL(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.WEB_URL.matcher(str).matches();
   }
 
-  public static boolean isEmail(String value) {
-    return RegexUtils.EMAIL_ADDRESS.matcher(value).matches();
+  public static boolean isEmail(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.EMAIL_ADDRESS.matcher(str).matches();
   }
 
-  public static boolean isHashTag(String value) {
-    return RegexUtils.HASHTAG.matcher(value).matches();
+  public static boolean isHashTag(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.HASHTAG.matcher(str).matches();
   }
 
-  public static boolean isUser(String value) {
-    return RegexUtils.USER.matcher(value).matches();
+  public static boolean isUser(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.USER.matcher(str).matches();
   }
 
-  public static boolean isRetweet(String value) {
-    return RegexUtils.RETWEET.matcher(value).matches();
+  public static boolean isRetweet(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.RETWEET.matcher(str).matches();
   }
 
-  public static boolean consitsOfPunctuations(String value) {
-    return RegexUtils.ONE_OR_MORE_PUNCTUATIONS.matcher(value).matches();
+  public static boolean consitsOfPunctuations(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.ONE_OR_MORE_PUNCTUATIONS.matcher(str).matches();
   }
 
-  public static boolean isNumeric(String value) {
-    return RegexUtils.IS_NUMERIC.matcher(value).matches();
+  public static boolean isNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.IS_NUMERIC.matcher(str).matches();
   }
 
   public static boolean isPunctuation(char c) {
@@ -60,16 +81,19 @@ public class StringUtils {
         || c == '<' || c == '>';
   }
 
-  public static boolean startsWithAlphabeticChar(String value) {
-    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR.matcher(value).matches();
+  public static boolean startsWithAlphabeticChar(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR.matcher(str).matches();
   }
 
-  public static String trimPunctuation(String value) {
-    int valueLen = value.length();
+  public static String trimPunctuation(String str) {
+    int valueLen = str.length();
     // count starting punctuations
     int startingPunctuations = 0;
     for (int i = 0; i < valueLen; i++) {
-      if (isPunctuation(value.charAt(i)) || isSpecialChar((value.charAt(i)))) {
+      if (isPunctuation(str.charAt(i)) || isSpecialChar((str.charAt(i)))) {
         startingPunctuations++;
       } else {
         break;
@@ -79,7 +103,7 @@ public class StringUtils {
     // count ending punctuations
     int endingPunctuations = 0;
     for (int i = valueLen - 1; i >= 0; i--) {
-      if (isPunctuation(value.charAt(i)) || isSpecialChar((value.charAt(i)))) {
+      if (isPunctuation(str.charAt(i)) || isSpecialChar((str.charAt(i)))) {
         endingPunctuations++;
       } else {
         break;
@@ -88,7 +112,7 @@ public class StringUtils {
 
     // case 1) no characters were punctuation
     if ((startingPunctuations == 0) && (endingPunctuations == 0)) {
-      return value;
+      return str;
     }
 
     // case 2) all characters were punctuation
@@ -99,15 +123,14 @@ public class StringUtils {
     // case 3) substring
     int endIndex = valueLen - endingPunctuations;
     if (startingPunctuations >= endIndex) {
-      LOG.error("trimPunctuation is not possible for '" + value
-          + "' valueLen: " + valueLen + " startingPunc: "
-          + startingPunctuations + " endingPunc: " + endingPunctuations
-          + " endIndex: " + endIndex);
-      return value;
+      LOG.error("trimPunctuation is not possible for '" + str + "' valueLen: "
+          + valueLen + " startingPunc: " + startingPunctuations
+          + " endingPunc: " + endingPunctuations + " endIndex: " + endIndex);
+      return str;
     } else {
-      LOG.info("trimPunctuation from '" + value + "' to '"
-          + value.substring(startingPunctuations, endIndex) + "'");
-      return value.substring(startingPunctuations, endIndex);
+      LOG.info("trimPunctuation from '" + str + "' to '"
+          + str.substring(startingPunctuations, endIndex) + "'");
+      return str.substring(startingPunctuations, endIndex);
     }
   }
 
