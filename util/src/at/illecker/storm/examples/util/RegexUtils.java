@@ -121,4 +121,8 @@ public class RegexUtils {
       .compile("^(.*[^\\.|\\,|\\!|\\/])" + "[\\.|\\,|\\!|\\/]+"
           + "([^\\.|\\,|\\!|\\/].*)$");
 
+  // alternating letter dot pattern e.g., L.O.V.E
+  public static final Pattern LETTER_DOT_PATTERN = Pattern
+      .compile("^[a-zA-Z]\\.([a-zA-Z](\\.)?)+$");
+
 }

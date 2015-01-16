@@ -152,6 +152,13 @@ public class Preprocessor {
             tokens.add(0, m.group(1)); // @ -> at
             return preprocessAccumulator(tokens, processedTokens);
           }
+
+          // remove alternating letter dot pattern e.g., L.O.V.E
+        } else if (RegexUtils.LETTER_DOT_PATTERN.matcher(token).matches()) {
+          token = token.replaceAll("\\.", "");
+          tokens.add(0, token);
+          return preprocessAccumulator(tokens, processedTokens);
+
           // if no special number and no numeric try remove punctuations
         } else if (!StringUtils.isEmail(token)) {
           m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
@@ -364,4 +371,5 @@ public class Preprocessor {
       LOG.info("Preprocessed: '" + preprocessedTokens + "'");
     }
   }
+
 }
