@@ -22,7 +22,7 @@ public class UnicodeUtils {
     if (str == null) {
       return false;
     }
-    return RegexUtils.CONTAINS_UNICODE_SYMBOLS.matcher(str).find();
+    return RegexUtils.CONTAINS_UNICODE_SYMBOLS_PATTERN.matcher(str).find();
   }
 
   public static String toUnicode(String str) {

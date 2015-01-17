@@ -20,114 +20,128 @@ import java.util.regex.Pattern;
 
 public class RegexUtils {
 
-  /**
-   * Good characters for Internationalized Resource Identifiers (IRI). This
-   * comprises most common used Unicode characters allowed in IRI as detailed in
-   * RFC 3987. Specifically, those two byte Unicode characters are not included.
-   */
-  private static final String GOOD_IRI_CHAR = "a-zA-Z0-9\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF";
+  public static final String URL = "(?:" + "(?i)(https?|ftp)://" + "(-\\.)?"
+      + "([^\\s/?\\.#-]+\\.?)+(/[^\\s\\.]*)?" + ")";
+  public static final Pattern URL_PATTERN = Pattern.compile(URL);
 
-  /**
-   * RFC 1035 Section 2.3.4 limits the labels to a maximum 63 octets.
-   */
-  private static final String IRI = "[" + GOOD_IRI_CHAR + "]([" + GOOD_IRI_CHAR
-      + "\\-]{0,61}[" + GOOD_IRI_CHAR + "]){0,1}";
+  public static final String EMAIL_ADDRESS = "(?:"
+      + "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" + "\\@"
+      + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\."
+      + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+" + ")";
+  public static final Pattern EMAIL_ADDRESS_PATTERN = Pattern
+      .compile(EMAIL_ADDRESS);
 
-  private static final String GOOD_GTLD_CHAR = "a-zA-Z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF";
-  private static final String GTLD = "[" + GOOD_GTLD_CHAR + "]{2,63}";
-  private static final String HOST_NAME = "(" + IRI + "\\.)+" + GTLD;
+  public static final String PHONE = "(?:" + "(?:\\+?[01][\\-\\s.]*)?"
+      + "(?:[\\(]?\\d{3}[\\-\\s.\\)]*)?" + "\\d{3}" + "[\\-\\s.]*" + "\\d{4}"
+      + ")";
+  public static final Pattern PHONE_PATTERN = Pattern.compile(PHONE);
 
-  public static final Pattern IP_ADDRESS = Pattern
-      .compile("((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]"
-          + "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]"
-          + "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}"
-          + "|[1-9][0-9]|[0-9]))");
+  public static final String USER_NAME = "(?:" + "\\@+([A-Za-z]+[A-Za-z0-9_]+)"
+      + ")";
+  public static final Pattern USER_NAME_PATTERN = Pattern.compile(USER_NAME);
 
-  public static final Pattern DOMAIN_NAME = Pattern.compile("(" + HOST_NAME
-      + "|" + IP_ADDRESS + ")");
+  public static final String HASH_TAG = "(?:"
+      + "\\#+([A-Za-z]+[A-Za-z0-9_\\'\\-]*[A-Za-z0-9_]+)" + ")";
+  public static final Pattern HASH_TAG_PATTERN = Pattern.compile(HASH_TAG);
 
-  /**
-   * Regular expression pattern to match most part of RFC 3987 Internationalized
-   * URLs, aka IRIs. Commonly used Unicode characters are added.
-   */
-  // "(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?"
-  public static final Pattern WEB_URL = Pattern
-      .compile("((?:(http|https|Http|Https|ftp|Ftp|rtsp|Rtsp):\\/\\/(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)"
-          + "\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_"
-          + "\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,25})?\\@)?)?"
-          + "(?:"
-          + DOMAIN_NAME
-          + ")"
-          + "(?:\\:\\d{1,5})?)" // plus option port number
-          + "(\\/(?:(?:["
-          + GOOD_IRI_CHAR
-          + "\\;\\/\\?\\:\\@\\&\\=\\#\\~" // plus option query params
-          + "\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%[a-fA-F0-9]{2}))*)?"
-          + "(?:\\b|$)"); // and finally, a word boundary or end of
-                          // input. This is to stop foo.sure from
-                          // matching as foo.su
+  public static final String RETWEET = "(?:" + "(?i)(RT|retweet|from|via)"
+      + "((?:\\b\\W*\\@\\w+)*)" + ")";
+  public static final Pattern RETWEET_PATTERN = Pattern.compile(RETWEET);
 
-  public static final Pattern EMAIL_ADDRESS = Pattern
-      .compile("[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" + "\\@"
-          + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\."
-          + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+");
+  // matches a HTML tag
+  public static final String HTML_TAG = "<[^>]+>";
+  public static final Pattern HTML_TAG_PATTERN = Pattern.compile(HTML_TAG);
 
-  public static final Pattern USER = Pattern.compile("\\p{Blank}*" + "[@]+"
-      + "([A-Za-z]+[A-Za-z0-9_]+)");
+  // contains HTML symbols
+  public static final String CONTAINS_HTML_SYMBOLS = "(?:" + "&#[0-9]{2,4};)"
+      + "|" + "(?:&[a-zA-Z0-9]{2,6};" + ")";
+  public static final Pattern CONTAINS_HTML_SYMBOLS_PATTERN = Pattern
+      .compile(CONTAINS_HTML_SYMBOLS);
 
-  public static final Pattern HASHTAG = Pattern.compile("\\p{Blank}*" + "[#]+"
-      + "([A-Za-z]+[A-Za-z0-9_]+)");
-
-  public static final Pattern RETWEET = Pattern.compile("(RT|retweet|from|via)"
-      + "((?:\\b\\W*@\\w+)*)", Pattern.CASE_INSENSITIVE);
+  // contains Unicode symbols
+  public static final String CONTAINS_UNICODE_SYMBOLS = "(?:"
+      + "[^\\u0000-\\u007F]+" + ")" + "|" + "(?:" + "\\\\u[0-9a-fA-F]{4,5}+"
+      + ")";
+  public static final Pattern CONTAINS_UNICODE_SYMBOLS_PATTERN = Pattern
+      .compile(CONTAINS_UNICODE_SYMBOLS);
 
   // "(.)\\1{1,}" means any character (added to group 1)
   // followed by itself at least one times, this means two equal chars
-  public static final Pattern TWO_OR_MORE_REPEATING_CHARS = Pattern
-      .compile("(.+)\\1{1,}");
+  public static final String TWO_OR_MORE_REPEATING_CHARS = "(.+)\\1{1,}";
+  public static final Pattern TWO_OR_MORE_REPEATING_CHARS_PATTERN = Pattern
+      .compile(TWO_OR_MORE_REPEATING_CHARS);
 
   // "(.)\\1{2,}" means any character (added to group 1)
   // followed by itself at least two times, this means three equal chars
-  public static final Pattern THREE_OR_MORE_REPEATING_CHARS = Pattern
-      .compile("(.)\\1{2,}");
+  public static final String THREE_OR_MORE_REPEATING_CHARS = "(.+)\\1{2,}";
+  public static final Pattern THREE_OR_MORE_REPEATING_CHARS_PATTERN = Pattern
+      .compile(THREE_OR_MORE_REPEATING_CHARS);
 
   // one or more punctuations
-  public static final Pattern ONE_OR_MORE_PUNCTUATIONS = Pattern
-      .compile("^\\p{Punct}+$");
+  public static final String ONE_OR_MORE_PUNCTUATIONS = "^\\p{Punct}+$";
+  public static final Pattern ONE_OR_MORE_PUNCTUATIONS_PATTERN = Pattern
+      .compile(ONE_OR_MORE_PUNCTUATIONS);
 
   // starts with an alphabetic character
-  public static final Pattern STARTS_WITH_ALPHABETIC_CHAR = Pattern
-      .compile("^[a-zA-Z].*$");
+  public static final String STARTS_WITH_ALPHABETIC_CHAR = "^[a-zA-Z].*$";
+  public static final Pattern STARTS_WITH_ALPHABETIC_CHAR_PATTERN = Pattern
+      .compile(STARTS_WITH_ALPHABETIC_CHAR);
 
-  // is numeric
-  public static final Pattern IS_NUMERIC = Pattern.compile("^[+-]?" + "\\d+"
-      + "(\\,\\d+)?" + "(\\.\\d+)?$");
+  // number
+  public static final String NUMBER = "(?:" + "[+\\-]?" + "\\d+" + "(\\,\\d+)?"
+      + "(\\.\\d+)?" + ")";
+  public static final Pattern NUMBER_PATTERN = Pattern.compile(NUMBER);
 
-  // is a special numeric
-  public static final Pattern IS_SPECIAL_NUMERIC = Pattern
-      .compile("^(\\@)?\\$?" + "[+-]?" + "(\\d+)" + "(?i)(am|pm)?"
-          + "([\\.|\\,|\\-]\\d+)*" + "(?i)(%|fm|am|pm|p|lb)?$");
+  // special number
+  public static final String SPECIAL_NUMBER = "(?:" + "(\\@)?\\$?" + "[+\\-]?"
+      + "(\\d+)" + "(?i)(am|pm)?" + "([\\.|\\,|\\:|\\-]\\d+)*" + "[+\\-]?"
+      + "(?i)(%|fm|am|pm|p|lb)?" + ")";
+  public static final Pattern SPECIAL_NUMBER_PATTERN = Pattern
+      .compile(SPECIAL_NUMBER);
 
-  // is separated numeric
-  public static final Pattern IS_SEPARATED_NUMERIC = Pattern.compile("^\\d+"
+  // separated number
+  public static final String SEPARATED_NUMBER = "(?:" + "\\d+"
       + "(c|st|nd|rd|th)?" + "[\\/|\\,|\\-]\\d+" + "([\\/|\\,|\\-]\\d+)*"
-      + "(c|st|nd|rd|th)?$");
-
-  // contains HTML symbols
-  public static final Pattern CONTAINS_HTML_SYMBOLS = Pattern
-      .compile("&#[0-9]{2,4};" + "|" + "&[a-zA-Z0-9]{2,6};");
-
-  // contains Unicode symbols
-  public static final Pattern CONTAINS_UNICODE_SYMBOLS = Pattern
-      .compile("[^\\u0000-\\u007F]+" + "|" + "\\\\u[0-9a-fA-F]{4,5}+");
+      + "(c|st|nd|rd|th)?" + ")";
+  public static final Pattern SEPARATED_NUMBER_PATTERN = Pattern
+      .compile(SEPARATED_NUMBER);
 
   // punctuation between words
-  public static final Pattern PUNCTUATION_BETWEEN_WORDS = Pattern
-      .compile("^(.*[^\\.|\\,|\\!|\\/|\\-])" + "[\\.|\\,|\\!|\\/|\\-]+"
-          + "([^\\.|\\,|\\!|\\/|\\-].*)$");
+  public static final String PUNCTUATION_BETWEEN_WORDS = "^(.*[^\\.|\\,|\\!|\\/|\\-])"
+      + "[\\.|\\,|\\!|\\/|\\-]+" + "([^\\.|\\,|\\!|\\/|\\-].*)$";
+  public static final Pattern PUNCTUATION_BETWEEN_WORDS_PATTERN = Pattern
+      .compile(PUNCTUATION_BETWEEN_WORDS);
 
   // alternating letter dot pattern e.g., L.O.V.E
-  public static final Pattern LETTER_DOT_PATTERN = Pattern
-      .compile("^[a-zA-Z]\\.([a-zA-Z](\\.)?)+$");
+  public static final String ALTERNATING_LETTER_DOT = "^[a-zA-Z]\\.([a-zA-Z](\\.)?)+$";
+  public static final Pattern ALTERNATING_LETTER_DOT_PATTERN = Pattern
+      .compile(ALTERNATING_LETTER_DOT);
 
+  // words with apostrophes or dashes
+  public static final String WORDS_WITH_APOSTROPHES_DASHES = "(?:"
+      + "[a-zA-Z][a-zA-Z\\'\\-\\_]+[a-zA-Z]" + ")";
+
+  // words without apostrophes or dashes
+  public static final String WORDS_WITHOUT_APOSTROPHES_DASHES = "(?:"
+      + "[\\w_]+" + ")";
+
+  // ellipsis dots, sequences of two or more periods
+  public static final String ELLIPSIS_DOTS = "(?:" + "\\.(?:\\s*\\.){1,}" + ")";
+
+  // non-whitespace char
+  public static final String NOT_A_WHITESPACE = "(?:" + "\\S" + ")";
+
+  // emoticon
+  public static final String EMOTICON = "(?:" + "[<>]?" + "[:;=8]"
+      + "[\\-o\\*\\']?" + "[\\)\\]\\(\\[dDpP\\/\\}\\{\\@\\|\\\\]+" + "|"
+      + "[\\)\\]\\(\\[dDpP\\/\\:\\}\\{\\@\\|\\\\]+" + "[\\-o\\*\\']?"
+      + "[:;=8]" + "[<>]?" + ")";
+
+  public static final Pattern TOKENIZER_PATTERN = Pattern
+      .compile(EMOTICON + "|" + URL + "|" + EMAIL_ADDRESS + "|" + PHONE + "|"
+          + HTML_TAG + "|" + USER_NAME + "|" + HASH_TAG + "|"
+          + WORDS_WITH_APOSTROPHES_DASHES + "|"
+          + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + SPECIAL_NUMBER + "|"
+          + SEPARATED_NUMBER_PATTERN + "|" + ELLIPSIS_DOTS + "|"
+          + NOT_A_WHITESPACE);
 }

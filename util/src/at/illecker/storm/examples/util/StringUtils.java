@@ -26,49 +26,49 @@ public class StringUtils {
     if (str == null) {
       return false;
     }
-    return RegexUtils.WEB_URL.matcher(str).matches();
+    return RegexUtils.URL_PATTERN.matcher(str).matches();
   }
 
   public static boolean isEmail(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.EMAIL_ADDRESS.matcher(str).matches();
+    return RegexUtils.EMAIL_ADDRESS_PATTERN.matcher(str).matches();
   }
 
   public static boolean isHashTag(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.HASHTAG.matcher(str).matches();
+    return RegexUtils.HASH_TAG_PATTERN.matcher(str).matches();
   }
 
   public static boolean isUser(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.USER.matcher(str).matches();
+    return RegexUtils.USER_NAME_PATTERN.matcher(str).matches();
   }
 
   public static boolean isRetweet(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.RETWEET.matcher(str).matches();
+    return RegexUtils.RETWEET_PATTERN.matcher(str).matches();
   }
 
   public static boolean consitsOfPunctuations(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.ONE_OR_MORE_PUNCTUATIONS.matcher(str).matches();
+    return RegexUtils.ONE_OR_MORE_PUNCTUATIONS_PATTERN.matcher(str).matches();
   }
 
   public static boolean isNumeric(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.IS_NUMERIC.matcher(str).matches();
+    return RegexUtils.NUMBER_PATTERN.matcher(str).matches();
   }
 
   public static boolean isPunctuation(char c) {
@@ -86,7 +86,8 @@ public class StringUtils {
     if (str == null) {
       return false;
     }
-    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR.matcher(str).matches();
+    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR_PATTERN.matcher(str)
+        .matches();
   }
 
   public static String trimPunctuation(String str) {
