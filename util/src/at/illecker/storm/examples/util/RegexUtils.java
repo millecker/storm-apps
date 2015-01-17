@@ -133,15 +133,19 @@ public class RegexUtils {
   public static final String NOT_A_WHITESPACE = "(?:" + "\\S" + ")";
 
   // emoticon
-  public static final String EMOTICON = "(?:" + "[<>]?" + "[:;=8]"
-      + "[\\-o\\*\\']?" + "[\\)\\]\\(\\[dDpP\\/\\}\\{\\@\\|\\\\]+" + "|"
-      + "[\\)\\]\\(\\[dDpP\\/\\:\\}\\{\\@\\|\\\\]+" + "[\\-o\\*\\']?"
-      + "[:;=8]" + "[<>]?" + ")";
+  private static final String EMOTICON_EYES = "[:;=8xXoO*<>|#%]"; // eyes
+  private static final String EMOTICON_NOSE = "[']?" + "[-_c^]?"; // nose
+  private static final String EMOTICON_MOUTH = "[\\)\\]\\(\\[\\/}{*.><@|,bdDpPLScoO0$X#J3&\\\\]+";
+  public static final String EMOTICON = "(?:" + "[<>oO0}3|]?" + EMOTICON_EYES
+      + EMOTICON_NOSE + EMOTICON_MOUTH + "|" /* reverse */
+      + EMOTICON_MOUTH + EMOTICON_EYES + "[<>]?" + ")";
+  public static final Pattern EMOTICON_PATTERN = Pattern.compile(EMOTICON);
 
   // Attention the order does matter
-  public static final Pattern TOKENIZER_PATTERN = Pattern.compile(EMOTICON
-      + "|" + HTML_TAG + "|" + URL + "|" + EMAIL_ADDRESS + "|" + USER_NAME
-      + "|" + HASH_TAG + "|" + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
+  public static final Pattern TOKENIZER_PATTERN = Pattern.compile(HTML_TAG
+      + "|" + URL + "|" + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG
+      + "|" + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
       + WORDS_WITH_APOSTROPHES_DASHES + "|" + WORDS_WITHOUT_APOSTROPHES_DASHES
-      + "|" + PHONE + "|" + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
+      + "|" + EMOTICON + "|" + PHONE + "|" + ELLIPSIS_DOTS + "|"
+      + NOT_A_WHITESPACE);
 }

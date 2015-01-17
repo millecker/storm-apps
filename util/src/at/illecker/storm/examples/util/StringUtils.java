@@ -16,6 +16,8 @@
  */
 package at.illecker.storm.examples.util;
 
+import junit.framework.Assert;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,13 @@ public class StringUtils {
       return false;
     }
     return RegexUtils.URL_PATTERN.matcher(str).matches();
+  }
+
+  public static boolean isEmoticon(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.EMOTICON_PATTERN.matcher(str).matches();
   }
 
   public static boolean isEmail(String str) {
@@ -186,6 +195,26 @@ public class StringUtils {
         "+1.0", "+1.", "-.5", "000000" };
     for (String s : testNumerics) {
       System.out.println("isNumeric(" + s + "): " + isNumeric(s));
+    }
+
+    // test emoticon
+    String testEmoticons = ":-) :-)) :) :D :o) :] :3 :c) :> =] 8) =) :} :^)"
+        + " :-D 8-D 8D x-D xD X-D XD =-D =D =-3 =3"
+        + " >:[ :-( :( :-c :c :-< :< :-[ :[ :{" + " ;( :-|| :@ >:("
+        + " :'-( :'( :'-) :')" + " D:< D: D8 D; D= DX"
+        + " >:O :-O :O :-o :o 8-0 O_O o-o O_o o_O o_o O-O" + " :* :^*"
+        + " ;-) ;) *-) *) ;-] ;] ;D ;^) :-,"
+        + " >:P :-P :P X-P x-p xp XP :-p :p =p :-b :b d:"
+        + " >:\\ >:/ :-/ :-. :/ :\\ =/ =\\ :L =L :S >.<" + " :| :-|" + " :$"
+        + " :-X :X :-# :#" + " O:-) 0:-3 0:3 0:-) 0:) 0;^)" + " >:) >;) >:-)"
+        + " }:-) }:) 3:-) 3:)" + " o/\\o" + " |;-) |-O" + " :-J" + " :-& :&"
+        + " #-)" + " %-) %)" + " <:-|" + " <3" + " </3";
+    for (String s : testEmoticons.split(" ")) {
+      boolean isEmoticon = isEmoticon(s);
+      if (!isEmoticon) {
+        System.out.println("isEmoticon( " + s + " ): " + isEmoticon(s));
+      }
+      Assert.assertTrue(isEmoticon(s));
     }
   }
 }
