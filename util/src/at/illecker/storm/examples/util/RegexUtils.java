@@ -144,10 +144,10 @@ public class RegexUtils {
   public static final Pattern EMOTICON_PATTERN = Pattern.compile(EMOTICON);
 
   // Attention the order does matter
-  public static final Pattern TOKENIZER_PATTERN = Pattern.compile(HTML_TAG
-      + "|" + URL + "|" + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG
-      + "|" + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
-      + ALTERNATING_LETTER_DOT + "|" + WORDS_WITH_APOSTROPHES_DASHES + "|"
+  public static final Pattern TOKENIZER_PATTERN = Pattern.compile(URL + "|"
+      + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG + "|"
+      + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|" + ALTERNATING_LETTER_DOT
+      + "|" + WORDS_WITH_APOSTROPHES_DASHES + "|"
       + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + EMOTICON + "|" + PHONE + "|"
       + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
 }
