@@ -114,7 +114,7 @@ public class RegexUtils {
       .compile(PUNCTUATION_BETWEEN_WORDS);
 
   // alternating letter dot pattern e.g., L.O.V.E
-  public static final String ALTERNATING_LETTER_DOT = "^[a-zA-Z]\\.([a-zA-Z](\\.)?)+$";
+  public static final String ALTERNATING_LETTER_DOT = "[a-zA-Z]\\.(?:[a-zA-Z](\\.)?)+";
   public static final Pattern ALTERNATING_LETTER_DOT_PATTERN = Pattern
       .compile(ALTERNATING_LETTER_DOT);
 
@@ -145,7 +145,7 @@ public class RegexUtils {
   public static final Pattern TOKENIZER_PATTERN = Pattern.compile(HTML_TAG
       + "|" + URL + "|" + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG
       + "|" + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
-      + WORDS_WITH_APOSTROPHES_DASHES + "|" + WORDS_WITHOUT_APOSTROPHES_DASHES
-      + "|" + EMOTICON + "|" + PHONE + "|" + ELLIPSIS_DOTS + "|"
-      + NOT_A_WHITESPACE);
+      + ALTERNATING_LETTER_DOT + "|" + WORDS_WITH_APOSTROPHES_DASHES + "|"
+      + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + EMOTICON + "|" + PHONE + "|"
+      + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
 }
