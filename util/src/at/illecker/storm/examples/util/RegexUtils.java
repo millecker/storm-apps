@@ -133,7 +133,7 @@ public class RegexUtils {
   public static final String NOT_A_WHITESPACE = "(?:" + "\\S" + ")";
 
   // emoticon
-  // TODO Moon:Oct Thursday:...
+  // TODO Moon:Oct
   private static final String EMOTICON_EYES = "[:;=8xXoO*<>=^|#%]"; // eyes
   private static final String EMOTICON_NOSE = "[']?" + "[-_co^./]?" + "[\\\\]?"; // nose
   private static final String EMOTICON_MOUTH = "(" // mouth
@@ -144,11 +144,11 @@ public class RegexUtils {
   public static final Pattern EMOTICON_PATTERN = Pattern.compile(EMOTICON);
 
   // Attention the order does matter
-  // 1) Emoticons have to be in first place for :-))))+
-  public static final Pattern TOKENIZER_PATTERN = Pattern.compile(EMOTICON
-      + "|" + URL + "|" + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG
-      + "|" + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
-      + ALTERNATING_LETTER_DOT + "|" + WORDS_WITH_APOSTROPHES_DASHES + "|"
-      + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + PHONE + "|" + ELLIPSIS_DOTS
-      + "|" + NOT_A_WHITESPACE);
+  public static final Pattern TOKENIZER_PATTERN = Pattern
+      .compile(WORDS_WITHOUT_APOSTROPHES_DASHES + "|"
+          + WORDS_WITH_APOSTROPHES_DASHES + "|" + EMOTICON + "|" + URL + "|"
+          + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG + "|"
+          + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
+          + ALTERNATING_LETTER_DOT + "|" + PHONE + "|" + ELLIPSIS_DOTS + "|"
+          + NOT_A_WHITESPACE);
 }
