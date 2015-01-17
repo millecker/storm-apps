@@ -145,7 +145,7 @@ public class StringUtils {
 
   public static void main(String[] args) {
     // test URLs
-    String[] testURLs = new String[] { "www.google.com",
+    String[] testURLs = new String[] { "http://", "www.google.com",
         "http://www.google.com", "https://www.google.com",
         "ftp://www.google.com", "google.com" };
     for (String s : testURLs) {

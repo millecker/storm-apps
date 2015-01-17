@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
   public static final String URL = "(?:" + "(?i)(https?|ftp)://" + "(-\\.)?"
-      + "([^\\s/?\\.#-]+\\.?)+(/[^\\s\\.]*)?" + ")";
+      + "([^\\s/?\\.#-]+\\.?)*(/[^\\s\\.]*)?" + ")";
   public static final Pattern URL_PATTERN = Pattern.compile(URL);
 
   public static final String EMAIL_ADDRESS = "(?:"
