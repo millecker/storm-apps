@@ -67,13 +67,13 @@ public class RegexUtils {
 
   // "(.)\\1{1,}" means any character (added to group 1)
   // followed by itself at least one times, this means two equal chars
-  public static final String TWO_OR_MORE_REPEATING_CHARS = "(.+)\\1{1,}";
+  public static final String TWO_OR_MORE_REPEATING_CHARS = "(.)\\1{1,}";
   public static final Pattern TWO_OR_MORE_REPEATING_CHARS_PATTERN = Pattern
       .compile(TWO_OR_MORE_REPEATING_CHARS);
 
   // "(.)\\1{2,}" means any character (added to group 1)
   // followed by itself at least two times, this means three equal chars
-  public static final String THREE_OR_MORE_REPEATING_CHARS = "(.+)\\1{2,}";
+  public static final String THREE_OR_MORE_REPEATING_CHARS = "(.)\\1{2,}";
   public static final Pattern THREE_OR_MORE_REPEATING_CHARS_PATTERN = Pattern
       .compile(THREE_OR_MORE_REPEATING_CHARS);
 
