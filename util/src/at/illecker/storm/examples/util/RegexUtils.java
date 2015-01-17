@@ -19,6 +19,15 @@ package at.illecker.storm.examples.util;
 import java.util.regex.Pattern;
 
 public class RegexUtils {
+  private static final String SPACE_EXCEPTIONS = "\\n\\r";
+  public static final String SPACE_CHAR_CLASS = "\\p{C}\\p{Z}&&[^"
+      + SPACE_EXCEPTIONS + "\\p{Cs}]";
+  public static final String SPACE_REGEX = "[" + SPACE_CHAR_CLASS + "]";
+
+  public static final String PUNCTUATION_CHAR_CLASS = "\\p{P}\\p{M}\\p{S}"
+      + SPACE_EXCEPTIONS;
+  public static final String PUNCTUATION_REGEX = "[" + PUNCTUATION_CHAR_CLASS
+      + "]";
 
   public static final String URL = "(?:" + "(?i)(https?|ftp)://" + "(-\\.)?"
       + "([^\\s/?\\.#-]+\\.?)*(/[^\\s\\.]*)?" + ")";
@@ -133,7 +142,7 @@ public class RegexUtils {
   public static final String NOT_A_WHITESPACE = "(?:" + "\\S" + ")";
 
   // emoticon
-  // TODO Moon:Oct
+  // TODO word:-) is not valid
   private static final String EMOTICON_EYES = "[:;=8xXoO*<>=^|#%]"; // eyes
   private static final String EMOTICON_NOSE = "[']?" + "[-_co^./]?" + "[\\\\]?"; // nose
   private static final String EMOTICON_MOUTH = "(" // mouth
@@ -141,14 +150,18 @@ public class RegexUtils {
   public static final String EMOTICON = "(?:" + "[<>oO0}3|]?" + EMOTICON_EYES
       + EMOTICON_NOSE + EMOTICON_MOUTH + "|" /* reverse */
       + EMOTICON_MOUTH + EMOTICON_EYES + "[<>]?" + ")";
-  public static final Pattern EMOTICON_PATTERN = Pattern.compile(EMOTICON);
+  private static final String EMOTICON_DELIMITER = SPACE_REGEX + "|"
+      + PUNCTUATION_REGEX;
+  public static final Pattern EMOTICON_PATTERN = Pattern.compile("(?<=^|"
+      + EMOTICON_DELIMITER + ")" + EMOTICON + "(?=$|" + EMOTICON_DELIMITER
+      + ")");
 
   // Attention the order does matter
   public static final Pattern TOKENIZER_PATTERN = Pattern
-      .compile(WORDS_WITHOUT_APOSTROPHES_DASHES + "|"
-          + WORDS_WITH_APOSTROPHES_DASHES + "|" + EMOTICON + "|" + URL + "|"
-          + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG + "|"
-          + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
-          + ALTERNATING_LETTER_DOT + "|" + PHONE + "|" + ELLIPSIS_DOTS + "|"
+      .compile(EMOTICON_PATTERN + "|" + URL + "|" + PHONE + "|" + EMAIL_ADDRESS
+          + "|" + USER_NAME + "|" + HASH_TAG + "|"
+          + WORDS_WITH_APOSTROPHES_DASHES + "|" + SEPARATED_NUMBER + "|"
+          + SPECIAL_NUMBER + "|" + WORDS_WITHOUT_APOSTROPHES_DASHES + "|"
+          + ALTERNATING_LETTER_DOT + "|" + ELLIPSIS_DOTS + "|"
           + NOT_A_WHITESPACE);
 }
