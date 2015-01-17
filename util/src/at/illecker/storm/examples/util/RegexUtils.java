@@ -93,16 +93,17 @@ public class RegexUtils {
   public static final Pattern NUMBER_PATTERN = Pattern.compile(NUMBER);
 
   // special number
-  public static final String SPECIAL_NUMBER = "(?:" + "(\\@)?\\$?" + "[+\\-]?"
+  public static final String SPECIAL_NUMBER = "(?:" + "\\@?\\$?" + "[+\\-]?"
       + "(\\d+)" + "(?i)(am|pm)?" + "([\\.|\\,|\\:|\\-]\\d+)*" + "[+\\-]?"
       + "(?i)(%|fm|am|pm|p|lb)?" + ")";
   public static final Pattern SPECIAL_NUMBER_PATTERN = Pattern
       .compile(SPECIAL_NUMBER);
 
   // separated number
-  public static final String SEPARATED_NUMBER = "(?:" + "\\d+"
-      + "(c|st|nd|rd|th)?" + "[\\/|\\,|\\-]\\d+" + "([\\/|\\,|\\-]\\d+)*"
-      + "(c|st|nd|rd|th)?" + ")";
+  public static final String SEPARATED_NUMBER = "(?:" + "\\d+" + "(?:"
+      + "(?i)(am|pm)" + "|" + "(c|st|nd|rd|th)" + ")?" + "[\\/|\\,|\\-]+"
+      + "\\d+" + "([\\/|\\,|\\-]\\d+)*" + "(?:" + "(?i)(%|fm|am|pm|lb)" + "|"
+      + "(c|p|st|nd|rd|th)" + ")?" + ")";
   public static final Pattern SEPARATED_NUMBER_PATTERN = Pattern
       .compile(SEPARATED_NUMBER);
 
@@ -137,11 +138,10 @@ public class RegexUtils {
       + "[\\)\\]\\(\\[dDpP\\/\\:\\}\\{\\@\\|\\\\]+" + "[\\-o\\*\\']?"
       + "[:;=8]" + "[<>]?" + ")";
 
-  public static final Pattern TOKENIZER_PATTERN = Pattern
-      .compile(EMOTICON + "|" + URL + "|" + EMAIL_ADDRESS + "|" + PHONE + "|"
-          + HTML_TAG + "|" + USER_NAME + "|" + HASH_TAG + "|"
-          + WORDS_WITH_APOSTROPHES_DASHES + "|"
-          + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + SPECIAL_NUMBER + "|"
-          + SEPARATED_NUMBER_PATTERN + "|" + ELLIPSIS_DOTS + "|"
-          + NOT_A_WHITESPACE);
+  // Attention the order does matter
+  public static final Pattern TOKENIZER_PATTERN = Pattern.compile(EMOTICON
+      + "|" + HTML_TAG + "|" + URL + "|" + EMAIL_ADDRESS + "|" + USER_NAME
+      + "|" + HASH_TAG + "|" + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
+      + WORDS_WITH_APOSTROPHES_DASHES + "|" + WORDS_WITHOUT_APOSTROPHES_DASHES
+      + "|" + PHONE + "|" + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
 }
