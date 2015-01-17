@@ -19,11 +19,15 @@ package at.illecker.storm.examples.util.tokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.HtmlUtils;
+import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.UnicodeUtils;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.HasWord;
@@ -35,41 +39,47 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 public class Tokenizer {
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
 
-  public static List<String> tokenize(String text) {
-    // trim text
-    text = text.trim();
+  public static List<String> tokenize(String str) {
+    // Step 1) Trim text
+    str = str.trim();
 
-    // split at one or more blanks
-    String[] tokens = text.split("\\s+");
+    // Step 2) Replace Unicode symbols \u0000
+    if (UnicodeUtils.containsUnicode(str)) {
+      String replacedText = UnicodeUtils.replaceUnicodeSymbols(str);
+      // LOG.info("Replaced Unicode symbols from '" + str + "' to '"
+      // + replacedText + "'");
+      if (replacedText.equals(str)) {
+        LOG.error("Unicode symbols could not be replaced: '" + str + "'");
+      }
+      str = replacedText;
+    }
 
+    // Step 3) Replace HTML symbols &#[0-9];
+    if (HtmlUtils.containsHtml(str)) {
+      String replacedText = HtmlUtils.replaceHtmlSymbols(str);
+      // LOG.info("Replaced HTML symbols from '" + text + "' to '"
+      // + replacedText + "'");
+      if (replacedText.equals(str)) {
+        LOG.error("HTML symbols could not be replaced: '" + str + "'");
+      }
+      str = replacedText;
+    }
+
+    // Step 4) Tokenize string by multiple regex patterns
     List<String> resultTokens = new ArrayList<String>();
-    for (String token : tokens) {
-
-      // Step 1) Replace Unicode symbols \u0000
-      if (UnicodeUtils.containsUnicode(token)) {
-        String replacedToken = UnicodeUtils.replaceUnicodeSymbols(token);
-        // LOG.info("Replaced Unicode symbols from '" + token + "' to '"
-        // + replacedToken + "'");
-        if (replacedToken.equals(token)) {
-          LOG.error("Unicode symbols could not be replaced: '" + token + "'");
-        }
-        token = replacedToken;
-      }
-
-      // Step 2) Replace HTML symbols &#[0-9];
-      if (HtmlUtils.containsHtml(token)) {
-        String replacedToken = HtmlUtils.replaceHtmlSymbols(token);
-        // LOG.info("Replaced HTML symbols from '" + token + "' to '"
-        // + replacedToken + "'");
-        if (replacedToken.equals(token)) {
-          LOG.error("HTML symbols could not be replaced: '" + token + "'");
-        }
-        token = replacedToken;
-      }
-
-      resultTokens.add(token);
+    Matcher m = RegexUtils.TOKENIZER_PATTERN.matcher(str);
+    while (m.find()) {
+      resultTokens.add(m.group());
     }
     return resultTokens;
+  }
+
+  public static List<List<HasWord>> tokenizeTreebank(String str) {
+    TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
+        .newTokenizerFactory();
+    tokenizer.setOptions("ptb3Escaping=false");
+
+    return MaxentTagger.tokenizeText(new StringReader(str), tokenizer);
   }
 
   public static void tokenizeTweets(List<Tweet> tweets) {
@@ -79,20 +89,21 @@ public class Tokenizer {
     }
   }
 
-  public static List<List<HasWord>> tokenizeSentences(String text) {
-    TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
-        .newTokenizerFactory();
-    tokenizer.setOptions("ptb3Escaping=false");
-
-    return MaxentTagger.tokenizeText(new StringReader(text), tokenizer);
-  }
-
   public static void main(String[] args) {
-    for (Tweet tweet : Tweet.getTestTweets()) {
+    boolean extendedTest = false;
+    List<Tweet> tweets = null;
+
+    // load tweets
+    if (extendedTest) {
+      Dataset dataset = Configuration.getDataSetSemEval2013();
+      tweets = dataset.getTrainTweets(true);
+    } else { // test tweets
+      tweets = Tweet.getTestTweets();
+    }
+
+    for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
-
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("Tokens: " + tokens);
     }

@@ -141,7 +141,7 @@ public class Tweet implements Serializable {
     tweets
         .add(new Tweet(
             3,
-            "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56",
+            "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56.",
             0.5));
     tweets
         .add(new Tweet(
@@ -184,7 +184,6 @@ public class Tweet implements Serializable {
         .add(new Tweet(
             12,
             "\"All the money you've spent on my credit card I'm taking it out of your account\".... Hi I'm Sydney and I'm filing bankruptcy\ud83d\ude05\ud83d\ude05\ud83d\ude05\ud83d\ude05 \ud83d\ude05"));
-
     return tweets;
   }
 }
