@@ -93,9 +93,9 @@ public class RegexUtils {
   public static final Pattern NUMBER_PATTERN = Pattern.compile(NUMBER);
 
   // special number
-  public static final String SPECIAL_NUMBER = "(?:" + "\\@?\\$?" + "[+\\-]?"
-      + "(\\d+)" + "(?i)(am|pm)?" + "([\\.|\\,|\\:|\\-]\\d+)*" + "[+\\-]?"
-      + "(?i)(%|fm|am|pm|p|lb)?" + ")";
+  public static final String SPECIAL_NUMBER = "(?:" + "\\$?" + "[+\\-]?"
+      + "\\d+" + "(?:" + "(?i)(%|fm|am|pm|p|lb)" + "|" + "(c|p|st|nd|rd|th)"
+      + ")?" + ")";
   public static final Pattern SPECIAL_NUMBER_PATTERN = Pattern
       .compile(SPECIAL_NUMBER);
 
