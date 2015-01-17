@@ -77,10 +77,10 @@ public class RegexUtils {
   public static final Pattern THREE_OR_MORE_REPEATING_CHARS_PATTERN = Pattern
       .compile(THREE_OR_MORE_REPEATING_CHARS);
 
-  // one or more punctuations
-  public static final String ONE_OR_MORE_PUNCTUATIONS = "^\\p{Punct}+$";
-  public static final Pattern ONE_OR_MORE_PUNCTUATIONS_PATTERN = Pattern
-      .compile(ONE_OR_MORE_PUNCTUATIONS);
+  // punctuations
+  public static final String PUNCTUATIONS = "^[\\p{Punct}\\s]+$";
+  public static final Pattern PUNCTUATIONS_PATTERN = Pattern
+      .compile(PUNCTUATIONS);
 
   // starts with an alphabetic character
   public static final String STARTS_WITH_ALPHABETIC_CHAR = "^[a-zA-Z].*$";
@@ -133,7 +133,7 @@ public class RegexUtils {
   public static final String NOT_A_WHITESPACE = "(?:" + "\\S" + ")";
 
   // emoticon
-  // TODO Moon:Oct
+  // TODO Moon:Oct Thursday:...
   private static final String EMOTICON_EYES = "[:;=8xXoO*<>|#%]"; // eyes
   private static final String EMOTICON_NOSE = "[']?" + "[-_co^./]?" + "[\\\\]?"; // nose
   private static final String EMOTICON_MOUTH = "(" // mouth

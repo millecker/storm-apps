@@ -68,7 +68,7 @@ public class StringUtils {
     if (str == null) {
       return false;
     }
-    return RegexUtils.ONE_OR_MORE_PUNCTUATIONS_PATTERN.matcher(str).matches();
+    return RegexUtils.PUNCTUATIONS_PATTERN.matcher(str).matches();
   }
 
   public static boolean isNumeric(String str) {
@@ -174,8 +174,13 @@ public class StringUtils {
     }
 
     // test punctuations
-    String[] testPunctuations = new String[] { ".asdf.", "asdf.:--",
-        "--asdf-!", ":-)", ">:-[", "\"All", "\"abc\"", "\"abc\".." };
+    String[] testPunctuations = new String[] { ".a .", "..--", ".. --" };
+    for (String s : testPunctuations) {
+      System.out.println("consitsOfPunctuations(" + s + "): "
+          + consitsOfPunctuations(s));
+    }
+    testPunctuations = new String[] { ".asdf.", "asdf.:--", "--asdf-!", ":-)",
+        ">:-[", "\"All", "\"abc\"", "\"abc\".." };
     for (String s : testPunctuations) {
       System.out.println("trimPunctuation(" + s + "): " + trimPunctuation(s));
     }
