@@ -133,6 +133,7 @@ public class RegexUtils {
   public static final String NOT_A_WHITESPACE = "(?:" + "\\S" + ")";
 
   // emoticon
+  // TODO Moon:Oct
   private static final String EMOTICON_EYES = "[:;=8xXoO*<>|#%]"; // eyes
   private static final String EMOTICON_NOSE = "[']?" + "[-_co^./]?" + "[\\\\]?"; // nose
   private static final String EMOTICON_MOUTH = "(" // mouth

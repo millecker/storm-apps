@@ -185,7 +185,7 @@ public class Tweet implements Serializable {
             ":-))) xDD XDD ;) :) :-) :) :D :o) :] :3 :c) :> =] 8) =) :} :^) :-D 8-D 8D x-D xD X-D XD =-D =D =-3 =3"));
     tweets
         .add(new Tweet(12,
-            ">:[ :-( :(  :-c :c :-< :< :-[ :[ :{ ;( :-|| :@ >:( :'-( :'( :'-) :')"));
+            ">:[ :-( :(  :-c :c :-< :< :-[ :[ :{ ;( :-|| :@ >:( :'-( :'( :'-) :') Moon:Oct"));
     tweets
         .add(new Tweet(
             13,
