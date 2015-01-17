@@ -94,8 +94,8 @@ public class RegexUtils {
 
   // special number
   public static final String SPECIAL_NUMBER = "(?:" + "\\$?" + "[+\\-]?"
-      + "\\d+" + "(?:" + "(?i)(%|fm|am|pm|p|lb)" + "|" + "(c|p|st|nd|rd|th)"
-      + ")?" + ")";
+      + "\\d+" + "([\\.|\\,|\\:|\\-]\\d+)*" + "(?:" + "(?i)(%|fm|am|pm|p|lb)"
+      + "|" + "(c|p|st|nd|rd|th)" + ")?" + ")";
   public static final Pattern SPECIAL_NUMBER_PATTERN = Pattern
       .compile(SPECIAL_NUMBER);
 
