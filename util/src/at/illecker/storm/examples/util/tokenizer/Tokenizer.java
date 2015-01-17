@@ -90,7 +90,7 @@ public class Tokenizer {
   }
 
   public static void main(String[] args) {
-    boolean extendedTest = false;
+    boolean extendedTest = true;
     List<Tweet> tweets = null;
 
     // load tweets
@@ -101,11 +101,14 @@ public class Tokenizer {
       tweets = Tweet.getTestTweets();
     }
 
+    // Tokenize tweets
+    long startTime = System.currentTimeMillis();
     for (Tweet tweet : tweets) {
-      // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("Tokens: " + tokens);
     }
+    LOG.info("Tokenize finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
   }
 }
