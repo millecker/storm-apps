@@ -72,6 +72,8 @@ public class Preprocessor {
     return preprocessAccumulator(tokens, processedTokens, null);
   }
 
+  // TODO return List<TaggedWord>
+  // TODO create Matcher and use reset() method
   private List<String> preprocessAccumulator(LinkedList<String> tokens,
       List<String> processedTokens, Boolean forceIsURL) {
 
@@ -80,57 +82,54 @@ public class Preprocessor {
     } else {
       // remove token from queue
       String token = tokens.removeFirst();
-
+      
       boolean tokenIsURL;
       if (forceIsURL == null) {
         tokenIsURL = StringUtils.isURL(token);
-        if ((tokenIsURL == false) && (token.startsWith("http://"))) {
-          tokenIsURL = true; // force true when starts with http://
-        }
       } else {
         tokenIsURL = forceIsURL;
       }
+      boolean tokenContainsPunctuation = StringUtils.consitsOfPunctuations(token);
       boolean tokenIsUSR = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
 
-      // Step 1) Check if token contains a Emoticon
-      boolean tokenContainsEmoticon = m_emoticons.containsEmoticon(token);
+      // Step 1) Unify Emoticons remove repeating chars
+      // TODO use new Emoticon regex instead of dictionary
+      boolean tokenContainsEmoticon = m_emoticons.isEmoticon(token);
       if ((tokenContainsEmoticon) && (!tokenIsURL)) {
-        // TODO
-        // Missing =.= o.0
 
-        // Step 1a) Split word and emoticons if necessary
-        String[] splittedTokens = m_emoticons.splitEmoticon(token);
-        if ((splittedTokens != null) && (splittedTokens.length > 1)) {
-          // TODO
-          // check if emoticon is at the end of token
-          // e.g., Find-A-Friend:
-          LOG.info("splitEmoticon: " + Arrays.toString(splittedTokens));
-          tokens.add(0, splittedTokens[1]);
-          tokens.add(0, splittedTokens[0]);
-          return preprocessAccumulator(tokens, processedTokens);
-        }
-
-        // Step 1b) Unify emoticons, remove repeating chars
-        // TODO
-        // Unify emoticon from '^^' to '^
-        Matcher matcher = RegexUtils.TWO_OR_MORE_REPEATING_CHARS.matcher(token);
-        if (matcher.find()) {
-          String reducedToken = matcher.replaceAll("$1");
+        Matcher m = RegexUtils.TWO_OR_MORE_REPEATING_CHARS_PATTERN
+            .matcher(token);
+        if (m.find()) {
+          boolean isSpecialEmoticon = m.group(1).equals("^");
+          String reducedToken = m.replaceAll("$1");
+          if (isSpecialEmoticon) {
+            reducedToken += "^";
+          } else {
+            // Preprocess token again if there are recursive patterns in it
+            // e.g., :):):) -> :):) -> :)
+            tokens.add(0, reducedToken);
+          }
           LOG.info("Unify emoticon from '" + token + "' to '" + reducedToken
               + "'");
-          tokens.add(0, reducedToken);
-          // preprocess token again if there are recursive patterns in it
-          // e.g., :):):) -> :):) -> :)
           return preprocessAccumulator(tokens, processedTokens);
         }
+      } else if (tokenContainsPunctuation) {
+        // If token is no Emoticon then there is no further 
+        // preprocessing for punctuations
+        if (token.length()>1){
+            LOG.info("punctuation: '"+token+"'");
+        }
+        processedTokens.add(token);
+        return preprocessAccumulator(tokens, processedTokens);
       }
 
       // TODO slang correction should be before trim
       // e.g., trimPunctuation from 'w/' to 'w'
 
       // Step 2) Trim punctuation and special chars at beginning and ending
+      /*
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
           && (!tokenIsURL)) {
         token = StringUtils.trimPunctuation(token);
@@ -148,7 +147,8 @@ public class Preprocessor {
         tokenIsURL = (forceIsURL != null) ? forceIsURL : StringUtils
             .isURL(token);
       }
-
+      */
+      
       // Step 3) slang correction
       // TODO
       // 1) prevent slang correction if all UPPERCASE
@@ -179,11 +179,12 @@ public class Preprocessor {
       }
 
       // Step 4) Check if there are punctuations between words
+      /*
       if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)
           && (!tokenIsHashTag) && (!StringUtils.isEmail(token))) {
 
         // check if it is a special number $5 5% or 5pm
-        Matcher m = RegexUtils.IS_SPECIAL_NUMERIC.matcher(token);
+        Matcher m = RegexUtils.SPECIAL_NUMBER_PATTERN.matcher(token);
         // if special number check if there is an @
         if (m.matches()) {
           if (m.group(1) != null) { // @ before number
@@ -193,7 +194,8 @@ public class Preprocessor {
           }
 
           // remove alternating letter dot pattern e.g., L.O.V.E
-        } else if (RegexUtils.LETTER_DOT_PATTERN.matcher(token).matches()) {
+        } else if (RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token)
+            .matches()) {
           String newToken = token.replaceAll("\\.", "");
           if (m_wordnet.contains(newToken)) {
             tokens.add(0, newToken);
@@ -201,10 +203,10 @@ public class Preprocessor {
           }
 
           // if no special number and no numeric try remove punctuations
-        } else if ((!RegexUtils.IS_SEPARATED_NUMERIC.matcher(token).matches())
-            && (!m_wordnet.contains(token))) {
+        } else if ((!RegexUtils.SEPARATED_NUMBER_PATTERN.matcher(token)
+            .matches()) && (!m_wordnet.contains(token))) {
 
-          m = RegexUtils.PUNCTUATION_BETWEEN_WORDS.matcher(token);
+          m = RegexUtils.PUNCTUATION_BETWEEN_WORDS_PATTERN.matcher(token);
           if (m.find()) {
             // TODO
             // 1) check group 1 for w/
@@ -229,7 +231,8 @@ public class Preprocessor {
           }
         }
       }
-
+       */
+      
       // Step 5) Fix omission of final g in gerund forms (goin)
       if ((!tokenIsUSR) && (!tokenIsHashTag) && (token.endsWith("in"))
           && (!m_firstNames.isFirstName(token))
@@ -281,7 +284,8 @@ public class Preprocessor {
     // collect matches for sub-token search
     List<int[]> matches = new ArrayList<int[]>();
 
-    Matcher matcher = RegexUtils.THREE_OR_MORE_REPEATING_CHARS.matcher(value);
+    Matcher matcher = RegexUtils.THREE_OR_MORE_REPEATING_CHARS_PATTERN
+        .matcher(value);
     while (matcher.find()) {
       int start = matcher.start();
       int end = matcher.end();
