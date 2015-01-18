@@ -29,18 +29,25 @@ public class StringUtils {
     return RegexUtils.URL_PATTERN.matcher(str).matches();
   }
 
-  public static boolean isEmoticon(String str) {
-    if (str == null) {
-      return false;
-    }
-    return RegexUtils.EMOTICON_PATTERN.matcher(str).matches();
-  }
-
   public static boolean isEmail(String str) {
     if (str == null) {
       return false;
     }
     return RegexUtils.EMAIL_ADDRESS_PATTERN.matcher(str).matches();
+  }
+
+  public static boolean isPhone(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.PHONE_PATTERN.matcher(str).matches();
+  }
+
+  public static boolean isEmoticon(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.EMOTICON_PATTERN.matcher(str).matches();
   }
 
   public static boolean isHashTag(String str) {
@@ -232,8 +239,8 @@ public class StringUtils {
         + " >:\\ >:/ :-/ :-. :/ :\\ =/ =\\ :L =L :S >.<" + " :| :-|" + " :$"
         + " :-X :X :-# :#" + " O:-) 0:-3 0:3 0:-) 0:) 0;^)" + " >:) >;) >:-)"
         + " }:-) }:) 3:-) 3:)" + " o/\\o" + " |;-) |-O" + " :-J" + " :-& :&"
-        + " #-)" + " %-) %)" + " <:-|" + " <3" + " </3 :Oc =.= o.0 ^^ Odd 0:00 3:00"
-        + " \\m/";
+        + " #-)" + " %-) %)" + " <:-|" + " <3"
+        + " </3 :Oc =.= o.0 ^^ Odd 0:00 3:00" + " \\m/";
     for (String s : testEmoticons.split(" ")) {
       boolean isEmoticon = isEmoticon(s);
       if (!isEmoticon) {

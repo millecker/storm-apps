@@ -96,8 +96,11 @@ public class Preprocessor {
           // e.g., :):):) -> :):) -> :) Not possible because of Tokenizer
           // tokens.add(0, reducedToken);
           // }
-          LOG.info("Unify Emoticon from '" + token + "' to '" + reducedToken
-              + "'");
+          if (LOGGING) {
+            LOG.info("Unify Emoticon from '" + token + "' to '" + reducedToken
+                + "'");
+          }
+          processedTokens.add(reducedToken);
           return preprocessAccumulator(tokens, processedTokens);
         }
       } else if (tokenContainsPunctuation) {
@@ -111,6 +114,10 @@ public class Preprocessor {
       boolean tokenIsUser = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsSlang = StringUtils.isSlang(token);
+      boolean tokenIsEmail = StringUtils.isEmail(token);
+      boolean tokenIsPhone = StringUtils.isPhone(token);
+      boolean tokenIsSpecialNumeric = StringUtils.isSpecialNumeric(token);
+      boolean tokenIsSeparatedNumeric = StringUtils.isSeparatedNumeric(token);
 
       // Step 2) Slang Correction
       // TODO prevent slang correction if all UPPERCASE
@@ -121,7 +128,8 @@ public class Preprocessor {
       // 'AC/DC' to 'AC' and 'DC' - 'DC' to [don't, care]
       // TODO update dictionary O/U O/A
       if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
-          && (!tokenIsHashTag) && (!tokenIsNumeric)) {
+          && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
+          && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -137,9 +145,15 @@ public class Preprocessor {
           if (token.startsWith("w/")) {
             processedTokens.add("with");
             processedTokens.add(token.substring(2));
+            if (LOGGING) {
+              LOG.info("Slang Correction from '" + token + "' to " + "[with, "
+                  + token.substring(2) + "]");
+            }
             return preprocessAccumulator(tokens, processedTokens);
           } else {
-            LOG.info("Slang Correction might be missing for '" + token + "'");
+            if (LOGGING) {
+              LOG.info("Slang Correction might be missing for '" + token + "'");
+            }
           }
         }
       }
@@ -147,16 +161,17 @@ public class Preprocessor {
       // Step 3) Check if there are punctuations between words
       // e.g., L.O.V.E
       if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
-          && (!tokenIsHashTag) && (!tokenIsNumeric)
-          && (!StringUtils.isEmail(token))) {
-
+          && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
+          && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
         // remove alternating letter dot pattern e.g., L.O.V.E
         Matcher m = RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token);
         if (m.matches()) {
           String newToken = token.replaceAll("\\.", "");
           if (m_wordnet.contains(newToken)) {
-            LOG.info("Remove punctuations in word from '" + token + "' to '"
-                + newToken + "'");
+            if (LOGGING) {
+              LOG.info("Remove punctuations in word from '" + token + "' to '"
+                  + newToken + "'");
+            }
             token = newToken;
           }
           processedTokens.add(token);
@@ -180,8 +195,9 @@ public class Preprocessor {
       // Step 5) Remove elongations of characters (suuuper)
       // 'lollll' to 'loll' because 'loll' is found in dict
       // TODO 'AHHHHH' to 'AH'
-      if ((!tokenIsURL) && (!tokenIsUser) && (!tokenIsHashTag)
-          && (!tokenIsEmoticon) && (!tokenIsNumeric)) {
+      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
+          && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
+          && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
 
         // remove repeating chars
         token = removeRepeatingChars(token);
@@ -236,8 +252,10 @@ public class Preprocessor {
           // LOG.info("check token: '" + sb.toString() + "'");
           // check if token is in the vocabulary
           if (m_wordnet.contains(sb.toString())) {
-            LOG.info("removeRepeatingChars from token '" + value + "' to '"
-                + sb + "'");
+            if (LOGGING) {
+              LOG.info("removeRepeatingChars from token '" + value + "' to '"
+                  + sb + "'");
+            }
             return sb.toString();
           }
 
@@ -253,8 +271,10 @@ public class Preprocessor {
 
                 // LOG.info("check subtoken: '" + subSb.toString() + "'");
                 if (m_wordnet.contains(subSb.toString())) {
-                  LOG.info("removeRepeatingChars from '" + value + "' to '"
-                      + subSb + "'");
+                  if (LOGGING) {
+                    LOG.info("removeRepeatingChars from '" + value + "' to '"
+                        + subSb + "'");
+                  }
                   return subSb.toString();
                 }
               }
@@ -268,8 +288,10 @@ public class Preprocessor {
     // reduce all repeating chars
     if (!matches.isEmpty()) {
       String reducedToken = matcher.replaceAll("$1");
-      LOG.info("removeRepeatingChars(not found in dict) from '" + value
-          + "' to '" + reducedToken + "'");
+      if (LOGGING) {
+        LOG.info("removeRepeatingChars(not found in dict) from '" + value
+            + "' to '" + reducedToken + "'");
+      }
       value = reducedToken;
     }
     return value;

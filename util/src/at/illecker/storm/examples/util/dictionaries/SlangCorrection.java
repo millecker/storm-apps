@@ -66,7 +66,7 @@ public class SlangCorrection {
 
     // test testSlangCorrection
     String[] testSlangCorrection = new String[] { "afaik", "cum", "w/", "Fri",
-        "fri", "Sat", "sat", "Sun", "sun" };
+        "fri", "Sat", "sat", "Sun", "sun", "U.S.", "U.K." };
     for (String s : testSlangCorrection) {
       System.out.println("slang correction of '" + s + "': '"
           + Arrays.toString(slangCorrection.getCorrection(s)) + "'");
