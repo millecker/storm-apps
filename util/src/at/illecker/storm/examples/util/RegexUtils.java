@@ -91,6 +91,11 @@ public class RegexUtils {
   public static final Pattern PUNCTUATIONS_PATTERN = Pattern
       .compile(PUNCTUATIONS);
 
+  // underscores
+  public static final String UNDERSCORES = "^_+$";
+  public static final Pattern UNDERSCORES_PATTERN = Pattern
+      .compile(UNDERSCORES);
+
   // starts with an alphabetic character
   public static final String STARTS_WITH_ALPHABETIC_CHAR = "^[a-zA-Z].*$";
   public static final Pattern STARTS_WITH_ALPHABETIC_CHAR_PATTERN = Pattern

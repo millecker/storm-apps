@@ -125,8 +125,12 @@ public class SentimentWordLists {
       } else {
         word = word.substring(1);
       }
-    } else if (StringUtils.consitsOfPunctuations(word)) {
-      // ignore punctuation
+    } else if ((!pennTag.equals("UH"))
+        && StringUtils.consitsOfPunctuations(word)) {
+      // ignore all punctuations except emoticons
+      return null;
+    } else if (StringUtils.consitsOfUnderscores(word)) {
+      // ignore tokens with one or more underscores
       return null;
     }
 

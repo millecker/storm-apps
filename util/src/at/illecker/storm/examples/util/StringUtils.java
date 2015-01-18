@@ -78,6 +78,13 @@ public class StringUtils {
     return RegexUtils.PUNCTUATIONS_PATTERN.matcher(str).matches();
   }
 
+  public static boolean consitsOfUnderscores(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.UNDERSCORES_PATTERN.matcher(str).matches();
+  }
+
   public static boolean isNumeric(String str) {
     if (str == null) {
       return false;
@@ -211,6 +218,16 @@ public class StringUtils {
         ">:-[", "\"All", "\"abc\"", "\"abc\".." };
     for (String s : testPunctuations) {
       System.out.println("trimPunctuation(" + s + "): " + trimPunctuation(s));
+    }
+
+    // test underscores
+    String testUnderscores = "_ 1__ ____ _2___ __2";
+    for (String s : testUnderscores.split(" ")) {
+      boolean consitsOfUnderscores = consitsOfUnderscores(s);
+      if (!consitsOfUnderscores) {
+        System.out.println("consitsOfUnderscores(" + s + "): "
+            + consitsOfUnderscores(s));
+      }
     }
 
     // test startsWithAlphabeticChar
