@@ -78,6 +78,13 @@ public class StringUtils {
     return RegexUtils.NUMBER_PATTERN.matcher(str).matches();
   }
 
+  public static boolean isSlang(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.SLANG_PATTERN.matcher(str).matches();
+  }
+
   public static boolean isPunctuation(char c) {
     return c == ',' || c == '.' || c == '!' || c == '?' || c == ':' || c == ';';
   }
@@ -217,6 +224,12 @@ public class StringUtils {
       if (!isEmoticon) {
         System.out.println("isEmoticon( " + s + " ): " + isEmoticon(s));
       }
+    }
+
+    // test slang
+    String testSlang = "t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A w/ w/Biden w/deals w/you w/the w/her";
+    for (String s : testSlang.split(" ")) {
+      System.out.println("isSlang(" + s + "): " + isSlang(s));
     }
   }
 }
