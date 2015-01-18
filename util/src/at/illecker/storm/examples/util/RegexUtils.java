@@ -157,7 +157,7 @@ public class RegexUtils {
       + ")");
 
   // slang pattern to match w/
-  public static final String SLANG = "[a-zA-Z]\\/[a-zA-z]*";
+  public static final String SLANG = "[a-zA-Z]\\/[a-zA-z]*" + "|" + "\\\\m\\/";
   public static final Pattern SLANG_PATTERN = Pattern.compile("(?<=^|"
       + EMOTICON_DELIMITER + ")" + SLANG + "(?=$|" + EMOTICON_DELIMITER + ")");
 

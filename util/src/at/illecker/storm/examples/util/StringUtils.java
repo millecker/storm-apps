@@ -218,7 +218,8 @@ public class StringUtils {
         + " >:\\ >:/ :-/ :-. :/ :\\ =/ =\\ :L =L :S >.<" + " :| :-|" + " :$"
         + " :-X :X :-# :#" + " O:-) 0:-3 0:3 0:-) 0:) 0;^)" + " >:) >;) >:-)"
         + " }:-) }:) 3:-) 3:)" + " o/\\o" + " |;-) |-O" + " :-J" + " :-& :&"
-        + " #-)" + " %-) %)" + " <:-|" + " <3" + " </3 :Oc =.= o.0 ^^";
+        + " #-)" + " %-) %)" + " <:-|" + " <3" + " </3 :Oc =.= o.0 ^^"
+        + " \\m/";
     for (String s : testEmoticons.split(" ")) {
       boolean isEmoticon = isEmoticon(s);
       if (!isEmoticon) {
@@ -229,7 +230,10 @@ public class StringUtils {
     // test slang
     String testSlang = "t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A w/ w/Biden w/deals w/you w/the w/her";
     for (String s : testSlang.split(" ")) {
-      System.out.println("isSlang(" + s + "): " + isSlang(s));
+      boolean isSlang = isSlang(s);
+      if (!isSlang) {
+        System.out.println("isSlang(" + s + "): " + isSlang(s));
+      }
     }
   }
 }
