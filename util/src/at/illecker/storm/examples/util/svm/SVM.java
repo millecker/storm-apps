@@ -445,6 +445,10 @@ public class SVM {
         / (colSum[0] + colSum[1]);
     LOG.info("F-Score weighted(pos,neg): " + FScoreWeightedPosNeg);
 
+    // F-Score average of positive and negative
+    double FScoreAveragePosNeg = (FScores[0] + FScores[1]) / 2;
+    LOG.info("F-Score average(pos,neg): " + FScoreAveragePosNeg);
+
     // Macro-average: Average precision, recall, or F1 over the classes of
     // interest.
 
@@ -455,15 +459,19 @@ public class SVM {
 
   public static void svm(Dataset dataset,
       Class<? extends FeatureVectorGenerator> featureVectorGenerator,
-      int nFoldCrossValidation, boolean parameterSearch) {
+      int nFoldCrossValidation, boolean parameterSearch,
+      boolean useSerialization) {
     FeatureVectorGenerator fvg = null;
     Preprocessor preprocessor = null;
     POSTagger posTagger = null;
 
     // Prepare Train tweets
     LOG.info("Prepare Train data...");
-    List<Tweet> trainTweets = SerializationUtils.deserialize(dataset
-        .getTrainDataSerializationFile());
+    List<Tweet> trainTweets = null;
+    if (useSerialization) {
+      trainTweets = SerializationUtils.deserialize(dataset
+          .getTrainDataSerializationFile());
+    }
 
     if (trainTweets == null) {
       // Read train tweets
@@ -513,14 +521,18 @@ public class SVM {
       fvg.generateFeatureVectors(trainTweets);
 
       // Serialize training data
-      SerializationUtils.serializeList(trainTweets,
-          dataset.getTrainDataSerializationFile());
+      if (useSerialization) {
+        SerializationUtils.serializeList(trainTweets,
+            dataset.getTrainDataSerializationFile());
+      }
     }
 
     // Prepare Test tweets
     LOG.info("Prepare Test data...");
-    List<Tweet> testTweets = SerializationUtils.deserialize(dataset
-        .getTestDataSerializationFile());
+    List<Tweet> testTweets = null;
+    if (useSerialization) {
+      SerializationUtils.deserialize(dataset.getTestDataSerializationFile());
+    }
 
     if (testTweets == null) {
       if (fvg == null) {
@@ -549,8 +561,10 @@ public class SVM {
       fvg.generateFeatureVectors(testTweets);
 
       // Serialize test data
-      SerializationUtils.serializeList(testTweets,
-          dataset.getTestDataSerializationFile());
+      if (useSerialization) {
+        SerializationUtils.serializeList(testTweets,
+            dataset.getTestDataSerializationFile());
+      }
     }
 
     // Optional parameter search of C and gamma
@@ -584,10 +598,14 @@ public class SVM {
       // classes 0 = negative, 1 = neutral, 2 = positive
       IdentityScoreClassifier isc = new IdentityScoreClassifier();
 
-      // deserialize svmModel
+      svm_model svmModel = null;
       LOG.info("Try loading SVM model...");
-      svm_model svmModel = SerializationUtils.deserialize(dataset
-          .getDatasetPath() + File.separator + SVM_MODEL_FILE_SER);
+      // deserialize svmModel
+      if (useSerialization) {
+        SerializationUtils.deserialize(dataset.getDatasetPath()
+            + File.separator + SVM_MODEL_FILE_SER);
+      }
+
       if (svmModel == null) {
         LOG.info("Generate SVM problem...");
         svm_problem svmProb = generateProblem(trainTweets, isc);
@@ -604,8 +622,10 @@ public class SVM {
             + (System.currentTimeMillis() - startTime) + " ms");
 
         // serialize svm model
-        SerializationUtils.serialize(svmModel, dataset.getDatasetPath()
-            + File.separator + SVM_MODEL_FILE_SER);
+        if (useSerialization) {
+          SerializationUtils.serialize(svmModel, dataset.getDatasetPath()
+              + File.separator + SVM_MODEL_FILE_SER);
+        }
 
         // Run n-fold cross validation
         if (nFoldCrossValidation > 1) {
@@ -654,13 +674,13 @@ public class SVM {
 
     if (featureVectorLevel == 0) {
       SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,
-          nFoldCrossValidation, false);
+          nFoldCrossValidation, false, false);
     } else if (featureVectorLevel == 1) {
       SVM.svm(dataSet, TfIdfFeatureVectorGenerator.class, nFoldCrossValidation,
-          false);
+          false, false);
     } else {
       SVM.svm(dataSet, CombinedFeatureVectorGenerator.class,
-          nFoldCrossValidation, false);
+          nFoldCrossValidation, false, false);
     }
   }
 }
