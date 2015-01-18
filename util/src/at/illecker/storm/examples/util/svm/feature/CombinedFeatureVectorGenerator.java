@@ -22,6 +22,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
@@ -76,11 +78,22 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   public static void main(String[] args) {
-    List<Tweet> tweets = Tweet.getTestTweets();
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
+    List<Tweet> tweets = null;
+    boolean extendedTest = true;
+
+    // load tweets
+    if (extendedTest) {
+      // SemEval2013
+      Dataset dataset = Configuration.getDataSetSemEval2013();
+      tweets = dataset.getTrainTweets(true);
+    } else { // test tweets
+      tweets = Tweet.getTestTweets();
+    }
 
     // prepare Tweets
+    long startTime = System.currentTimeMillis();
     for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
@@ -95,20 +108,24 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
           .tagSentence(preprocessedTokens);
       tweet.addTaggedSentence(taggedSentence);
     }
+    LOG.info("Preparation of Tweets finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
 
+    // Calculate Tf-Idf
     boolean usePOSTags = true; // use POS tags in terms
-    // calculate Tf-Idf
     TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, TfType.RAW,
         TfIdfNormalization.COS, usePOSTags);
     CombinedFeatureVectorGenerator cfvg = new CombinedFeatureVectorGenerator(
         tweetTfIdf);
 
-    // debug
-    TweetTfIdf.print("Term Frequency", tweetTfIdf.getTermFreqs(),
-        tweetTfIdf.getInverseDocFreq());
-    TweetTfIdf.print("Inverse Document Frequency",
-        tweetTfIdf.getInverseDocFreq());
-
+    // Debug
+    if (!extendedTest) {
+      TweetTfIdf.print("Term Frequency", tweetTfIdf.getTermFreqs(),
+          tweetTfIdf.getInverseDocFreq());
+      TweetTfIdf.print("Inverse Document Frequency",
+          tweetTfIdf.getInverseDocFreq());
+    }
+    
     // Feature Vector Generation
     for (Tweet tweet : tweets) {
       String featureVectorStr = "";

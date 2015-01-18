@@ -37,7 +37,7 @@ import at.illecker.storm.examples.util.wordnet.WordNet;
 
 public class Preprocessor {
   private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
-  private static final boolean LOGGING = true;
+  private static final boolean LOGGING = false;
   private static final Preprocessor instance = new Preprocessor();
 
   private WordNet m_wordnet;
