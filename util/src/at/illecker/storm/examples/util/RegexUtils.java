@@ -143,10 +143,10 @@ public class RegexUtils {
 
   // emoticon
   // TODO word:-) is not valid
-  private static final String EMOTICON_EYES = "[:;=8xXoO*<>=^|#%]"; // eyes
+  private static final String EMOTICON_EYES = "[:;=8xX*<>=^|#%]"; // eyes
   private static final String EMOTICON_NOSE = "[']?" + "[-_co^./]?" + "[\\\\]?"; // nose
-  private static final String EMOTICON_MOUTH = "(" // mouth
-      + "[\\(\\)\\[\\]\\/\\\\}{*.^<>=@|,bdDpPLScoO0$X#J3&]" + ")\\1{0,}";
+  private static final String EMOTICON_MOUTH = "[0]?" // mouth
+      + "([\\(\\)\\[\\]\\/\\\\}{*.^<>=@|,bdDpPLScoO$X#J3&]" + ")\\1{0,}";
   public static final String EMOTICON = "(?:" + "[<>oO0}3|]?" + EMOTICON_EYES
       + EMOTICON_NOSE + EMOTICON_MOUTH + "|" /* reverse */
       + EMOTICON_MOUTH + EMOTICON_EYES + "[<>]?" + ")";

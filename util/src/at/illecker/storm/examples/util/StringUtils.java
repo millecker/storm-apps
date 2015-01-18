@@ -78,6 +78,20 @@ public class StringUtils {
     return RegexUtils.NUMBER_PATTERN.matcher(str).matches();
   }
 
+  public static boolean isSpecialNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.SPECIAL_NUMBER_PATTERN.matcher(str).matches();
+  }
+
+  public static boolean isSeparatedNumeric(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.SEPARATED_NUMBER_PATTERN.matcher(str).matches();
+  }
+
   public static boolean isSlang(String str) {
     if (str == null) {
       return false;
@@ -218,7 +232,7 @@ public class StringUtils {
         + " >:\\ >:/ :-/ :-. :/ :\\ =/ =\\ :L =L :S >.<" + " :| :-|" + " :$"
         + " :-X :X :-# :#" + " O:-) 0:-3 0:3 0:-) 0:) 0;^)" + " >:) >;) >:-)"
         + " }:-) }:) 3:-) 3:)" + " o/\\o" + " |;-) |-O" + " :-J" + " :-& :&"
-        + " #-)" + " %-) %)" + " <:-|" + " <3" + " </3 :Oc =.= o.0 ^^"
+        + " #-)" + " %-) %)" + " <:-|" + " <3" + " </3 :Oc =.= o.0 ^^ Odd 0:00 3:00"
         + " \\m/";
     for (String s : testEmoticons.split(" ")) {
       boolean isEmoticon = isEmoticon(s);
