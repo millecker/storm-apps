@@ -29,7 +29,6 @@ import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
-import at.illecker.storm.examples.util.dictionaries.Emoticons;
 import at.illecker.storm.examples.util.dictionaries.FirstNames;
 import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
@@ -43,7 +42,6 @@ public class Preprocessor {
 
   private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
-  private Emoticons m_emoticons;
   private FirstNames m_firstNames;
 
   private Preprocessor() {
@@ -51,8 +49,6 @@ public class Preprocessor {
     m_wordnet = WordNet.getInstance();
     // Load Slang correction vocabulary
     m_slangCorrection = SlangCorrection.getInstance();
-    // Load Emoticons
-    m_emoticons = Emoticons.getInstance();
     // Load FirstNames
     m_firstNames = FirstNames.getInstance();
   }
@@ -64,18 +60,13 @@ public class Preprocessor {
   public List<String> preprocess(List<String> tokens) {
     // run tail recursion
     return preprocessAccumulator(new LinkedList<String>(tokens),
-        new ArrayList<String>(), null);
+        new ArrayList<String>());
   }
-
-  private List<String> preprocessAccumulator(LinkedList<String> tokens,
-      List<String> processedTokens) {
-    return preprocessAccumulator(tokens, processedTokens, null);
-  }
-
+  
   // TODO return List<TaggedWord>
   // TODO create Matcher and use reset() method
   private List<String> preprocessAccumulator(LinkedList<String> tokens,
-      List<String> processedTokens, Boolean forceIsURL) {
+      List<String> processedTokens) {
 
     if (tokens.isEmpty()) {
       return processedTokens;
@@ -83,34 +74,27 @@ public class Preprocessor {
       // remove token from queue
       String token = tokens.removeFirst();
       
-      boolean tokenIsURL;
-      if (forceIsURL == null) {
-        tokenIsURL = StringUtils.isURL(token);
-      } else {
-        tokenIsURL = forceIsURL;
-      }
+      // identify token
       boolean tokenContainsPunctuation = StringUtils.consitsOfPunctuations(token);
-      boolean tokenIsUSR = StringUtils.isUser(token);
-      boolean tokenIsHashTag = StringUtils.isHashTag(token);
+      boolean tokenIsEmoticon = StringUtils.isEmoticon(token);
+      boolean tokenIsURL = StringUtils.isURL(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
-
+      
       // Step 1) Unify Emoticons remove repeating chars
-      // TODO use new Emoticon regex instead of dictionary
-      boolean tokenContainsEmoticon = m_emoticons.isEmoticon(token);
-      if ((tokenContainsEmoticon) && (!tokenIsURL)) {
-
+      if ((tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsNumeric)) {
         Matcher m = RegexUtils.TWO_OR_MORE_REPEATING_CHARS_PATTERN
             .matcher(token);
         if (m.find()) {
           boolean isSpecialEmoticon = m.group(1).equals("^");
           String reducedToken = m.replaceAll("$1");
-          if (isSpecialEmoticon) {
+          if (isSpecialEmoticon) { // keep ^^
             reducedToken += "^";
-          } else {
+          } 
+          // else {
             // Preprocess token again if there are recursive patterns in it
-            // e.g., :):):) -> :):) -> :)
-            tokens.add(0, reducedToken);
-          }
+            // e.g., :):):) -> :):) -> :) Not possible because of Tokenizer
+            // tokens.add(0, reducedToken);
+          // }
           LOG.info("Unify emoticon from '" + token + "' to '" + reducedToken
               + "'");
           return preprocessAccumulator(tokens, processedTokens);
@@ -118,52 +102,24 @@ public class Preprocessor {
       } else if (tokenContainsPunctuation) {
         // If token is no Emoticon then there is no further 
         // preprocessing for punctuations
-        if (token.length()>1){
-            LOG.info("punctuation: '"+token+"'");
-        }
         processedTokens.add(token);
         return preprocessAccumulator(tokens, processedTokens);
       }
-
-      // TODO slang correction should be before trim
-      // e.g., trimPunctuation from 'w/' to 'w'
-
-      // Step 2) Trim punctuation and special chars at beginning and ending
-      /*
-      if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsUSR)
-          && (!tokenIsURL)) {
-        token = StringUtils.trimPunctuation(token);
-
-        // stop if token is empty
-        if (token.isEmpty()) {
-          return preprocessAccumulator(tokens, processedTokens);
-        }
-
-        // check if token is numeric again e.g., 20,000+ -> 20,000 after trim
-        tokenIsNumeric = StringUtils.isNumeric(token);
-        // check if token is now a hashTag e.g., #okaaaay! -> #okaaaay
-        tokenIsHashTag = StringUtils.isHashTag(token);
-        // check if token is now a URL e.g., www.scotlandrugbyteam.org.
-        tokenIsURL = (forceIsURL != null) ? forceIsURL : StringUtils
-            .isURL(token);
-      }
-      */
+     
+      // identify token further
+      boolean tokenIsUSR = StringUtils.isUser(token);
+      boolean tokenIsHashTag = StringUtils.isHashTag(token);
+      boolean tokenIsSlang = StringUtils.isSlang(token);
       
-      // Step 3) slang correction
-      // TODO
-      // 1) prevent slang correction if all UPPERCASE
+      // Step 2) slang correction
+      // TODO prevent slang correction if all UPPERCASE
       // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
       // S.O.L - SOL - [s**t, outta, luck]
       // 'AC/DC' to 'AC' and 'DC' - 'DC' to [don't, care]
-      // 'sci-fi' to 'sci' and 'fi' --> 'fi' to [f**k, it]
-
-      // 2) update dictionary
-      // t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A
-      // don,t didnt o/wise
-
-      if (!tokenContainsEmoticon) {
+      // TODO b) update dictionary O/U O/A
+      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -175,6 +131,14 @@ public class Preprocessor {
                 + Arrays.toString(slangCorrection));
           }
           return preprocessAccumulator(tokens, processedTokens);
+        } else if (tokenIsSlang){
+          if (token.startsWith("w/")) {
+            processedTokens.add("with");
+            processedTokens.add(token.substring(2));
+            return preprocessAccumulator(tokens, processedTokens);
+          } else {
+            LOG.info("slang correction is missing for '"+token+"'");
+          }
         }
       }
 
@@ -201,34 +165,6 @@ public class Preprocessor {
             tokens.add(0, newToken);
             return preprocessAccumulator(tokens, processedTokens);
           }
-
-          // if no special number and no numeric try remove punctuations
-        } else if ((!RegexUtils.SEPARATED_NUMBER_PATTERN.matcher(token)
-            .matches()) && (!m_wordnet.contains(token))) {
-
-          m = RegexUtils.PUNCTUATION_BETWEEN_WORDS_PATTERN.matcher(token);
-          if (m.find()) {
-            // TODO
-            // 1) check group 1 for w/
-            // e.g., w/Biden w/deals w/you w/the w/her
-
-            // 2) check for tokens
-            // pre-season pre-order pre-orders pre-sale co-host
-            // error-ridden head-coach sub-grid round-up
-            // two-man mid-upper ex-leader re-airing in-depth All-Stars
-            // re-enforcing mid-Nov Re-Up Blu-ray re-scheduled Semi-finals
-            // Free-TV 2-year 18-month left-might 1-night after-effects
-            // three-year K-Pop half-inch head-dress X-Men Re-Charge
-            // double-sided Comic-Con High-School story-wise car-free
-            // Hi-lites day-long Prime-Time #9/11 give-aways century-style
-            // re-run low-rated NUMBER-WORD
-
-            LOG.info("Remove punctuations between words: '" + token + "' to '"
-                + m.group(1) + "' and '" + m.group(2) + "'");
-            tokens.add(0, m.group(2));
-            tokens.add(0, m.group(1));
-            return preprocessAccumulator(tokens, processedTokens, false);
-          }
         }
       }
        */
@@ -248,7 +184,7 @@ public class Preprocessor {
       // 'lollll' to 'loll' because 'loll' is found in dict
       // TODO 'AHHHHH' to 'AH'
       if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
-          && (!tokenContainsEmoticon) && (!tokenIsNumeric)) {
+          && (!tokenIsEmoticon) && (!tokenIsNumeric)) {
 
         token = removeRepeatingChars(token);
 
