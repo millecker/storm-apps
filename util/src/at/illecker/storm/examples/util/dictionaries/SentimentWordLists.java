@@ -125,12 +125,8 @@ public class SentimentWordLists {
       } else {
         word = word.substring(1);
       }
-    } else if (pennTag.equals("UH")) {
-      if (word.length() == 1) {
-        return null; // ignore single char interjection
-      }
-    } else if ((posTag == null) || (StringUtils.consitsOfPunctuations(word))) {
-      // ignore punctuation and all non valid POS tags
+    } else if (StringUtils.consitsOfPunctuations(word)) {
+      // ignore punctuation
       return null;
     }
 
