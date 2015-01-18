@@ -41,7 +41,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
 
   public SentimentFeatureVectorGenerator() {
     this.m_sentimentWordLists = SentimentWordLists.getInstance();
-    LOG.info("Sentiment feature vector size: " + getFeatureVectorSize());
+    LOG.info("VectorSize: " + getFeatureVectorSize());
   }
 
   public SentimentFeatureVectorGenerator(int vectorStartId) {

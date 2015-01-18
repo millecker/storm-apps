@@ -52,7 +52,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
         tweetTfIdf, m_sentimentFeatureVectorGenerator.getFeatureVectorSize()
             + m_POSFeatureVectorGenerator.getFeatureVectorSize() + 1);
 
-    LOG.info("Total feature vector size: " + getFeatureVectorSize());
+    LOG.info("VectorSize: " + getFeatureVectorSize());
   }
 
   @Override
@@ -125,7 +125,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
       TweetTfIdf.print("Inverse Document Frequency",
           tweetTfIdf.getInverseDocFreq());
     }
-    
+
     // Feature Vector Generation
     for (Tweet tweet : tweets) {
       String featureVectorStr = "";
@@ -133,7 +133,6 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
           tweet).entrySet()) {
         featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
-
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("FeatureVector: " + featureVectorStr);
     }

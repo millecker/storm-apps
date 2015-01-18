@@ -39,9 +39,11 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
 
   public POSFeatureVectorGenerator() {
     this.m_vectorStartId = 1;
+    LOG.info("VectorSize: " + getFeatureVectorSize());
   }
 
   public POSFeatureVectorGenerator(int vectorStartId) {
+    this();
     this.m_vectorStartId = vectorStartId;
   }
 

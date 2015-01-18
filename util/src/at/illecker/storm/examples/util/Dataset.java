@@ -181,7 +181,6 @@ public class Dataset {
 
   public List<Tweet> getDevTweets() {
     if ((m_devTweets == null) && (this.getDevDataFile() != null)) {
-      LOG.info("devdatafile: " + this.getDevDataFile());
       m_devTweets = FileUtils.readTweets(this.getDevDataFile(), this);
     }
     return m_devTweets;
