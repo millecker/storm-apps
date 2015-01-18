@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.dictionaries.Emoticons;
 import at.illecker.storm.examples.util.dictionaries.Interjections;
@@ -80,6 +81,7 @@ public class POSTagger {
       TaggedWord preTaggedToken = new TaggedWord(token);
 
       // set custom tags
+      // TODO move set custom tags to Preprocessor
       if (StringUtils.isHashTag(token)) {
         preTaggedToken.setTag("HT");
         // if ((token.length() == 1) && (iter.hasNext())) {
@@ -228,8 +230,29 @@ public class POSTagger {
   public static void main(String[] args) {
     POSTagger posTagger = POSTagger.getInstance();
     Preprocessor preprocessor = Preprocessor.getInstance();
+    List<Tweet> tweets = null;
+    boolean extendedTest = true;
 
-    for (Tweet tweet : Tweet.getTestTweets()) {
+    // load tweets
+    if (extendedTest) {
+      // Twitter crawler
+      // List<Status> extendedTweets = Configuration
+      // .getDataSetUibkCrawlerTest("en");
+      // tweets = new ArrayList<Tweet>();
+      // for (Status tweet : extendedTweets) {
+      // tweets.add(new Tweet(tweet.getId(), tweet.getText(), 0));
+      // }
+
+      // SemEval2013
+      Dataset dataset = Configuration.getDataSetSemEval2013();
+      tweets = dataset.getTrainTweets(true);
+    } else {
+      tweets = Tweet.getTestTweets();
+    }
+
+    // process tweets
+    long startTime = System.currentTimeMillis();
+    for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
       tweet.addSentence(tokens);
@@ -246,5 +269,7 @@ public class POSTagger {
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("TaggedSentence: " + taggedSentence);
     }
+    LOG.info("POSTagger finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
   }
 }
