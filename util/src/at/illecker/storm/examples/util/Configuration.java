@@ -246,8 +246,8 @@ public class Configuration {
 
     return new Dataset(getDataSetPath() + File.separator + "SemEval2013_mixed",
         "trainingInput.txt", null, "testingInput.txt", "\t", 0, 3, 1,
-        new String[] { "negative" }, new String[] { "neutral" },
-        new String[] { "positive" }, 0, 1, 2, svmParam);
+        new String[] { "positive" }, new String[] { "negative" },
+        new String[] { "neutral" }, 0, 1, 2, svmParam);
   }
 
   public static Dataset getDataSetSemEval2013() {
@@ -263,15 +263,15 @@ public class Configuration {
     svmParam.weight_label[2] = 2;
     svmParam.weight = new double[svmParam.nr_weight];
     // class weights for train + dev
-    svmParam.weight[0] = 2; // 2.96; 4;
-    svmParam.weight[1] = 1;
-    svmParam.weight[2] = 1.25; // 1.26; 2;
+    svmParam.weight[0] = 1.26;
+    svmParam.weight[1] = 2.95;
+    svmParam.weight[2] = 1;
 
     return new Dataset(getDataSetPath() + File.separator + "SemEval2013",
         "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",
-        "twitter-test-gold-B.tsv", "\t", 0, 2, 3, new String[] { "negative",
-            "\"negative\"" }, new String[] { "neutral", "objective-OR-neutral",
-            "objective" }, new String[] { "positive" }, 0, 1, 2, svmParam);
+        "twitter-test-gold-B.tsv", "\t", 0, 2, 3, new String[] { "positive" },
+        new String[] { "negative", "\"negative\"" }, new String[] { "neutral",
+            "objective-OR-neutral", "objective" }, 0, 1, 2, svmParam);
   }
 
   public static Dataset getDataSetSemEval2014() {
@@ -283,8 +283,8 @@ public class Configuration {
     return new Dataset(getDataSetPath() + File.separator + "SemEval2014",
         "twitter-train-gold-B-2014.tsv", null,
         "SemEval2014-task9-test-B-input.txt", "\t", 0, 2, 3, new String[] {
-            "negative", "\"negative\"" }, new String[] { "neutral",
-            "\"neutral\"", "\"objective-OR-neutral\"" }, new String[] {
-            "positive", "\"positive\"" }, 0, 1, 2, svmParam);
+            "positive", "\"positive\"" }, new String[] { "negative",
+            "\"negative\"" }, new String[] { "neutral", "\"neutral\"",
+            "\"objective-OR-neutral\"" }, 0, 1, 2, svmParam);
   }
 }

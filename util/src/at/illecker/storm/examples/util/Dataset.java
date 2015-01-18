@@ -46,12 +46,12 @@ public class Dataset {
   private int m_textIndex;
 
   private String[] m_positiveLabels;
-  private String[] m_neutralLabels;
   private String[] m_negativeLabels;
+  private String[] m_neutralLabels;
 
+  private int m_positiveValue;
   private int m_negativeValue;
   private int m_neutralValue;
-  private int m_positiveValue;
 
   private svm_parameter m_svmParam;
 
@@ -61,9 +61,9 @@ public class Dataset {
 
   public Dataset(String datasetPath, String trainDataFile, String devDataFile,
       String testDataFile, String delimiter, int idIndex, int labelIndex,
-      int textIndex, String[] negativeLabels, String[] neutralLabels,
-      String[] positiveLabels, int negativeValue, int neutralValue,
-      int positiveValue, svm_parameter svmParam) {
+      int textIndex, String[] positiveLabels, String[] negativeLabels,
+      String[] neutralLabels, int positiveValue, int negativeValue,
+      int neutralValue, svm_parameter svmParam) {
     this.m_datasetPath = datasetPath;
     this.m_trainDataFile = trainDataFile;
     this.m_devDataFile = devDataFile;
@@ -75,13 +75,13 @@ public class Dataset {
     this.m_labelIndex = labelIndex;
     this.m_textIndex = textIndex;
 
+    this.m_positiveLabels = positiveLabels;
     this.m_negativeLabels = negativeLabels;
     this.m_neutralLabels = neutralLabels;
-    this.m_positiveLabels = positiveLabels;
 
+    this.m_positiveValue = positiveValue;
     this.m_negativeValue = negativeValue;
     this.m_neutralValue = neutralValue;
-    this.m_positiveValue = positiveValue;
 
     this.m_svmParam = svmParam;
   }
@@ -226,7 +226,7 @@ public class Dataset {
       }
       LOG.info("Total: " + total);
 
-      LOG.info("Train Class Weights: ");
+      LOG.info("Optimal Class Weights: ");
       for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
         LOG.info("Class: \t" + entry.getKey() + "\t"
             + (max / (double) entry.getValue()));
@@ -240,12 +240,12 @@ public class Dataset {
         + m_trainDataFile + ", devDataFile=" + m_devDataFile
         + ", testDataFile=" + m_testDataFile + ", delimiter=" + m_delimiter
         + ", idIndex=" + m_idIndex + ", textIndex=" + m_textIndex
-        + ", labelIndex=" + m_labelIndex + ", negativeLabel="
+        + ", labelIndex=" + m_labelIndex + ", positiveLabels="
+        + Arrays.toString(m_positiveLabels) + ", negativeLabel="
         + Arrays.toString(m_negativeLabels) + ", neutralLabel="
-        + Arrays.toString(m_neutralLabels) + ", positiveLabels="
-        + Arrays.toString(m_positiveLabels) + ", negativeValue="
-        + m_negativeValue + ", neutralValue=" + m_neutralValue
-        + ", positiveValue=" + m_positiveValue + "]";
+        + Arrays.toString(m_neutralLabels) + ", positiveValue="
+        + m_positiveValue + ", negativeValue=" + m_negativeValue
+        + ", neutralValue=" + m_neutralValue + "]";
   }
 
   public static void main(String[] args) {
