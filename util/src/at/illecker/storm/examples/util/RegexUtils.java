@@ -156,12 +156,17 @@ public class RegexUtils {
       + EMOTICON_DELIMITER + ")" + EMOTICON + "(?=$|" + EMOTICON_DELIMITER
       + ")");
 
+  // slang pattern to match w/
+  public static final String SLANG = "[a-zA-Z]\\/[a-zA-z]*";
+  public static final Pattern SLANG_PATTERN = Pattern.compile("(?<=^|"
+      + EMOTICON_DELIMITER + ")" + SLANG + "(?=$|" + EMOTICON_DELIMITER + ")");
+
   // Attention the order does matter
   public static final Pattern TOKENIZER_PATTERN = Pattern
-      .compile(EMOTICON_PATTERN + "|" + URL + "|" + PHONE + "|" + EMAIL_ADDRESS
-          + "|" + USER_NAME + "|" + HASH_TAG + "|"
-          + WORDS_WITH_APOSTROPHES_DASHES + "|" + SEPARATED_NUMBER + "|"
-          + SPECIAL_NUMBER + "|" + WORDS_WITHOUT_APOSTROPHES_DASHES + "|"
-          + ALTERNATING_LETTER_DOT + "|" + ELLIPSIS_DOTS + "|"
-          + NOT_A_WHITESPACE);
+      .compile(EMOTICON_PATTERN.pattern() + "|" + URL + "|" + PHONE + "|"
+          + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG + "|"
+          + SLANG_PATTERN.pattern() + "|" + WORDS_WITH_APOSTROPHES_DASHES + "|"
+          + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
+          + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + ALTERNATING_LETTER_DOT
+          + "|" + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
 }
