@@ -193,11 +193,13 @@ public class Tweet implements Serializable {
     tweets
         .add(new Tweet(
             14,
-            "word:-) Moon:Oct Jobs! Thursday:... http://t.co/TZZzrrKa +1 (000) 123-4567, (000) 123-4567, and 123-4567 "));
+            "word:-) Moon:Oct Jobs! Thursday:... L.O.V.E http://t.co/TZZzrrKa +1 (000) 123-4567, (000) 123-4567, and 123-4567 "));
     tweets
         .add(new Tweet(
             15,
             "t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A w/ w/Biden w/deals w/you w/the w/her"));
+    tweets.add(new Tweet(16, "5pm 5Am 5% $5 5-6am 7am-10pm"));
+
     return tweets;
   }
 }

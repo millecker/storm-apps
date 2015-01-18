@@ -165,8 +165,8 @@ public class RegexUtils {
   public static final Pattern TOKENIZER_PATTERN = Pattern
       .compile(EMOTICON_PATTERN.pattern() + "|" + URL + "|" + PHONE + "|"
           + EMAIL_ADDRESS + "|" + USER_NAME + "|" + HASH_TAG + "|"
-          + SLANG_PATTERN.pattern() + "|" + WORDS_WITH_APOSTROPHES_DASHES + "|"
-          + SEPARATED_NUMBER + "|" + SPECIAL_NUMBER + "|"
-          + WORDS_WITHOUT_APOSTROPHES_DASHES + "|" + ALTERNATING_LETTER_DOT
-          + "|" + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
+          + SLANG_PATTERN.pattern() + "|" + ALTERNATING_LETTER_DOT + "|"
+          + WORDS_WITH_APOSTROPHES_DASHES + "|" + SEPARATED_NUMBER + "|"
+          + SPECIAL_NUMBER + "|" + WORDS_WITHOUT_APOSTROPHES_DASHES + "|"
+          + ELLIPSIS_DOTS + "|" + NOT_A_WHITESPACE);
 }
