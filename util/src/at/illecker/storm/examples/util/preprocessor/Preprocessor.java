@@ -62,7 +62,7 @@ public class Preprocessor {
     return preprocessAccumulator(new LinkedList<String>(tokens),
         new ArrayList<String>());
   }
-  
+
   // TODO return List<TaggedWord>
   // TODO create Matcher and use reset() method
   private List<String> preprocessAccumulator(LinkedList<String> tokens,
@@ -73,13 +73,14 @@ public class Preprocessor {
     } else {
       // remove token from queue
       String token = tokens.removeFirst();
-      
+
       // identify token
-      boolean tokenContainsPunctuation = StringUtils.consitsOfPunctuations(token);
+      boolean tokenContainsPunctuation = StringUtils
+          .consitsOfPunctuations(token);
       boolean tokenIsEmoticon = StringUtils.isEmoticon(token);
       boolean tokenIsURL = StringUtils.isURL(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
-      
+
       // Step 1) Unify Emoticons remove repeating chars
       if ((tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsNumeric)) {
         Matcher m = RegexUtils.TWO_OR_MORE_REPEATING_CHARS_PATTERN
@@ -89,37 +90,38 @@ public class Preprocessor {
           String reducedToken = m.replaceAll("$1");
           if (isSpecialEmoticon) { // keep ^^
             reducedToken += "^";
-          } 
+          }
           // else {
-            // Preprocess token again if there are recursive patterns in it
-            // e.g., :):):) -> :):) -> :) Not possible because of Tokenizer
-            // tokens.add(0, reducedToken);
+          // Preprocess token again if there are recursive patterns in it
+          // e.g., :):):) -> :):) -> :) Not possible because of Tokenizer
+          // tokens.add(0, reducedToken);
           // }
-          LOG.info("Unify emoticon from '" + token + "' to '" + reducedToken
+          LOG.info("Unify Emoticon from '" + token + "' to '" + reducedToken
               + "'");
           return preprocessAccumulator(tokens, processedTokens);
         }
       } else if (tokenContainsPunctuation) {
-        // If token is no Emoticon then there is no further 
+        // If token is no Emoticon then there is no further
         // preprocessing for punctuations
         processedTokens.add(token);
         return preprocessAccumulator(tokens, processedTokens);
       }
-     
+
       // identify token further
-      boolean tokenIsUSR = StringUtils.isUser(token);
+      boolean tokenIsUser = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsSlang = StringUtils.isSlang(token);
-      
-      // Step 2) slang correction
+
+      // Step 2) Slang Correction
       // TODO prevent slang correction if all UPPERCASE
       // 'FC' to [fruit, cake]
       // 'Ajax' to [Asynchronous, Javascript, and, XML]
       // 'TL' to [dr too, long, didn't, read]
       // S.O.L - SOL - [s**t, outta, luck]
       // 'AC/DC' to 'AC' and 'DC' - 'DC' to [don't, care]
-      // TODO b) update dictionary O/U O/A
-      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)) {
+      // TODO update dictionary O/U O/A
+      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
+          && (!tokenIsHashTag) && (!tokenIsNumeric)) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -127,50 +129,43 @@ public class Preprocessor {
             processedTokens.add(slangCorrection[i]);
           }
           if (LOGGING) {
-            LOG.info("slang correction from '" + token + "' to "
+            LOG.info("Slang Correction from '" + token + "' to "
                 + Arrays.toString(slangCorrection));
           }
           return preprocessAccumulator(tokens, processedTokens);
-        } else if (tokenIsSlang){
+        } else if (tokenIsSlang) {
           if (token.startsWith("w/")) {
             processedTokens.add("with");
             processedTokens.add(token.substring(2));
             return preprocessAccumulator(tokens, processedTokens);
           } else {
-            LOG.info("slang correction is missing for '"+token+"'");
+            LOG.info("Slang Correction might be missing for '" + token + "'");
           }
         }
       }
 
-      // Step 4) Check if there are punctuations between words
-      /*
-      if ((!tokenContainsEmoticon) && (!tokenIsNumeric) && (!tokenIsURL)
-          && (!tokenIsHashTag) && (!StringUtils.isEmail(token))) {
+      // Step 3) Check if there are punctuations between words
+      // e.g., L.O.V.E
+      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
+          && (!tokenIsHashTag) && (!tokenIsNumeric)
+          && (!StringUtils.isEmail(token))) {
 
-        // check if it is a special number $5 5% or 5pm
-        Matcher m = RegexUtils.SPECIAL_NUMBER_PATTERN.matcher(token);
-        // if special number check if there is an @
+        // remove alternating letter dot pattern e.g., L.O.V.E
+        Matcher m = RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token);
         if (m.matches()) {
-          if (m.group(1) != null) { // @ before number
-            tokens.add(0, token.substring(1));
-            tokens.add(0, m.group(1)); // @ -> at
-            return preprocessAccumulator(tokens, processedTokens);
-          }
-
-          // remove alternating letter dot pattern e.g., L.O.V.E
-        } else if (RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token)
-            .matches()) {
           String newToken = token.replaceAll("\\.", "");
           if (m_wordnet.contains(newToken)) {
-            tokens.add(0, newToken);
-            return preprocessAccumulator(tokens, processedTokens);
+            LOG.info("Remove punctuations in word from '" + token + "' to '"
+                + newToken + "'");
+            token = newToken;
           }
+          processedTokens.add(token);
+          return preprocessAccumulator(tokens, processedTokens);
         }
       }
-       */
-      
-      // Step 5) Fix omission of final g in gerund forms (goin)
-      if ((!tokenIsUSR) && (!tokenIsHashTag) && (token.endsWith("in"))
+
+      // Step 4) Add missing g in gerund forms e.g., goin
+      if ((!tokenIsUser) && (!tokenIsHashTag) && (token.endsWith("in"))
           && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
         // append "g" if a word ends with "in" and is not in the vocabulary
@@ -178,17 +173,20 @@ public class Preprocessor {
           LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
         }
         token = token + "g";
+        processedTokens.add(token);
+        return preprocessAccumulator(tokens, processedTokens);
       }
 
-      // Step 6) Remove elongations of characters (suuuper)
+      // Step 5) Remove elongations of characters (suuuper)
       // 'lollll' to 'loll' because 'loll' is found in dict
       // TODO 'AHHHHH' to 'AH'
-      if ((!tokenIsURL) && (!tokenIsUSR) && (!tokenIsHashTag)
+      if ((!tokenIsURL) && (!tokenIsUser) && (!tokenIsHashTag)
           && (!tokenIsEmoticon) && (!tokenIsNumeric)) {
 
+        // remove repeating chars
         token = removeRepeatingChars(token);
 
-        // Step 6b) Try slang correction again
+        // Step 5b) Try Slang Correction again
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
@@ -196,7 +194,7 @@ public class Preprocessor {
             processedTokens.add(slangCorrection[i]);
           }
           if (LOGGING) {
-            LOG.info("slang correction from '" + token + "' to "
+            LOG.info("Slang Correction from '" + token + "' to "
                 + Arrays.toString(slangCorrection));
           }
           return preprocessAccumulator(tokens, processedTokens);
@@ -204,10 +202,7 @@ public class Preprocessor {
       }
 
       // add token to processed list
-      if (!token.isEmpty()) { // trimPunctuation could make token empty
-        processedTokens.add(token);
-      }
-
+      processedTokens.add(token);
       return preprocessAccumulator(tokens, processedTokens);
     }
   }
