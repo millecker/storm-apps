@@ -99,6 +99,27 @@ public class Tokenizer {
       tweets = dataset.getTrainTweets(true);
     } else { // test tweets
       tweets = Tweet.getTestTweets();
+      tweets
+          .add(new Tweet(
+              0,
+              ":-))) xDD XDD ;) :) :-) :) :D :o) :] :3 :c) :> =] 8) =) :} :^) :-D 8-D 8D x-D xD X-D XD =-D =D =-3 =3"));
+      tweets
+          .add(new Tweet(12,
+              ">:[ :-( :(  :-c :c :-< :< :-[ :[ :{ ;( :-|| :@ >:( :'-( :'( :'-) :') \\m/"));
+      tweets
+          .add(new Tweet(
+              0,
+              "\"All the money you've spent on my credit card I'm taking it out of your account\".... Hi I'm Sydney and I'm filing bankruptcy\ud83d\ude05\ud83d\ude05\ud83d\ude05\ud83d\ude05 \ud83d\ude05"));
+      tweets
+          .add(new Tweet(
+              0,
+              "word:-) Moon:Oct Jobs! Thursday:... http://t.co/TZZzrrKa +1 (000) 123-4567, (000) 123-4567, and 123-4567 "));
+      tweets
+          .add(new Tweet(
+              0,
+              "t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A w/ w/Biden w/deals w/you w/the w/her"));
+      tweets
+          .add(new Tweet(0, "5pm 5Am 5% $5 5-6am 7am-10pm U.S. U.K. L.O.V.E"));
     }
 
     // Tokenize tweets
