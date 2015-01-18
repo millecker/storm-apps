@@ -418,16 +418,32 @@ public class SVM {
     LOG.info("Accuracy: " + (totalCorrect / (double) total));
 
     LOG.info("Scores per class:");
+    double[] FScores = new double[totalClasses];
     for (int i = 0; i < totalClasses; i++) {
       int correctHitsPerClass = confusionMatrix[i][i];
 
       double precision = correctHitsPerClass / (double) colSum[i];
       double recall = correctHitsPerClass / (double) rowSum[i];
-      double F1 = 2 * ((precision * recall) / (precision + recall));
+      FScores[i] = 2 * ((precision * recall) / (precision + recall));
 
       LOG.info("Class: " + i + " Precision: " + precision + " Recall: "
-          + recall + " F1: " + F1);
+          + recall + " F-Score: " + FScores[i]);
     }
+
+    // FScoreWeighted is a weighted average of the classes' f-scores, weighted
+    // by the proportion of how many elements are in each class.
+    double FScoreWeighted = 0;
+    for (int i = 0; i < totalClasses; i++) {
+      FScoreWeighted += FScores[i] * colSum[i];
+    }
+    FScoreWeighted /= total;
+    LOG.info("F-Score weighted: " + FScoreWeighted);
+
+    // F-Score weighted positive and negative
+    double FScoreWeightedPosNeg = (FScores[0] * colSum[0] + FScores[1]
+        * colSum[1])
+        / (colSum[0] + colSum[1]);
+    LOG.info("F-Score weighted(pos,neg): " + FScoreWeightedPosNeg);
 
     // Macro-average: Average precision, recall, or F1 over the classes of
     // interest.
