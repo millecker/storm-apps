@@ -41,6 +41,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
 
   public SentimentFeatureVectorGenerator() {
     this.m_sentimentWordLists = SentimentWordLists.getInstance();
+    LOG.info("Sentiment feature vector size: " + getFeatureVectorSize());
   }
 
   public SentimentFeatureVectorGenerator(int vectorStartId) {
@@ -65,44 +66,46 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
         .getTweetSentiment(tweet);
 
-    for (Map.Entry<Integer, SentimentResult> tweetSentiment : tweetSentiments
-        .entrySet()) {
+    if (tweetSentiments != null) {
+      for (Map.Entry<Integer, SentimentResult> tweetSentiment : tweetSentiments
+          .entrySet()) {
 
-      int key = tweetSentiment.getKey();
-      SentimentResult sentimentResult = tweetSentiment.getValue();
-      // LOG.info("TweetSentiment: " + sentimentResult);
+        int key = tweetSentiment.getKey();
+        SentimentResult sentimentResult = tweetSentiment.getValue();
+        // LOG.info("TweetSentiment: " + sentimentResult);
 
-      if (sentimentResult.getPosCount() != 0) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE),
-            (double) sentimentResult.getPosCount());
-      }
-      if (sentimentResult.getNeutralCount() != 0) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 1,
-            (double) sentimentResult.getNeutralCount());
-      }
-      if (sentimentResult.getNegCount() != 0) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 2,
-            (double) sentimentResult.getNegCount());
-      }
-      if (sentimentResult.getSum() != 0) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 3,
-            sentimentResult.getSum());
-      }
-      if (sentimentResult.getCount() != 0) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 4,
-            (double) sentimentResult.getCount());
-      }
-      if (sentimentResult.getMaxPos() != null) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 5,
-            sentimentResult.getMaxPos());
-      }
-      if (sentimentResult.getMaxNeg() != null) {
-        resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 6,
-            sentimentResult.getMaxNeg());
-      }
+        if (sentimentResult.getPosCount() != 0) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE),
+              (double) sentimentResult.getPosCount());
+        }
+        if (sentimentResult.getNeutralCount() != 0) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 1,
+              (double) sentimentResult.getNeutralCount());
+        }
+        if (sentimentResult.getNegCount() != 0) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 2,
+              (double) sentimentResult.getNegCount());
+        }
+        if (sentimentResult.getSum() != 0) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 3,
+              sentimentResult.getSum());
+        }
+        if (sentimentResult.getCount() != 0) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 4,
+              (double) sentimentResult.getCount());
+        }
+        if (sentimentResult.getMaxPos() != null) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 5,
+              sentimentResult.getMaxPos());
+        }
+        if (sentimentResult.getMaxNeg() != null) {
+          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 6,
+              sentimentResult.getMaxNeg());
+        }
 
-      if (LOGGING) {
-        LOG.info("TweetSentiment: " + sentimentResult);
+        if (LOGGING) {
+          LOG.info("TweetSentiment: " + sentimentResult);
+        }
       }
     }
 
