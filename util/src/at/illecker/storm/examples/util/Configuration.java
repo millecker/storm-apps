@@ -93,7 +93,7 @@ public class Configuration {
     props.put("maxValue", Double.valueOf(1));
 
     wordLists.put(wordListDir
-        + "SentStrength_Data_Sept2011_EmoticonLookupTable.txt", props);
+        + "SentiStrength_Data_Sept2011_EmoticonLookupTable.txt", props);
 
     // Add SentStrength EmotionLookupTable using Regex = true
     // SentStrength word list (minValue -5 and maxValue +5)
@@ -104,7 +104,7 @@ public class Configuration {
     props.put("minValue", Double.valueOf(-5));
     props.put("maxValue", Double.valueOf(5));
     wordLists.put(wordListDir
-        + "SentStrength_Data_Sept2011_EmotionLookupTable.txt", props);
+        + "SentiStrength_Data_Sept2011_EmotionLookupTable.txt", props);
 
     return wordLists;
   }
@@ -134,7 +134,7 @@ public class Configuration {
     props = new Properties();
     props.put("separator", "\t");
     slangWordLists.put(wordListDir
-        + "SentStrength_Data_Sept2011_SlangLookupTable.txt", props);
+        + "SentiStrength_Data_Sept2011_SlangLookupTable.txt", props);
 
     return slangWordLists;
   }
