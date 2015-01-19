@@ -168,7 +168,7 @@ public class SVM {
   }
 
   public static svm_model train(svm_problem svmProb, svm_parameter svmParam) {
-    // set gamma to default 1/num_features if 0
+    // set gamma to default 1/num_features if not specified
     if (svmParam.gamma == Double.MIN_VALUE) {
       svmParam.gamma = 1 / (double) svmProb.l;
     }
@@ -189,7 +189,7 @@ public class SVM {
   public static double crossValidate(svm_problem svmProb,
       svm_parameter svmParam, int nFold, boolean printStats) {
 
-    // set gamma to default 1/num_features if 0
+    // set gamma to default 1/num_features if not specified
     if (svmParam.gamma == Double.MIN_VALUE) {
       svmParam.gamma = 1 / (double) svmProb.l;
     }
