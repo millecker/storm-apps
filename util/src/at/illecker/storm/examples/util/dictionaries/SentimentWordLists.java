@@ -57,6 +57,7 @@ public class SentimentWordLists {
       String file = wordListEntry.getKey();
       Properties props = wordListEntry.getValue();
       String separator = props.getProperty("separator");
+      boolean containsPOSTags = (Boolean) props.get("containsPOSTags");
       boolean containsRegex = (Boolean) props.get("containsRegex");
       boolean featureScaling = (Boolean) props.get("featureScaling");
       double minValue = (Double) props.get("minValue");
@@ -65,11 +66,11 @@ public class SentimentWordLists {
       if (containsRegex) {
         LOG.info("Load WordListMap including Regex from: " + file);
         m_wordListMaps.add(FileUtils.readWordListMap(file, separator,
-            featureScaling, minValue, maxValue));
+            containsPOSTags, featureScaling, minValue, maxValue));
       } else {
         LOG.info("Load WordList from: " + file);
-        m_wordLists.add(FileUtils.readFile(file, separator, featureScaling,
-            minValue, maxValue));
+        m_wordLists.add(FileUtils.readFile(file, separator, containsPOSTags,
+            featureScaling, minValue, maxValue));
       }
     }
   }

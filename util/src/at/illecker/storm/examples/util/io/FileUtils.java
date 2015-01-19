@@ -153,13 +153,22 @@ public class FileUtils {
   }
 
   public static Map<String, Double> readFile(String file, String splitRegex,
-      boolean featureScaling, double minValue, double maxValue) {
-    return readFile(IOUtils.getInputStream(file), splitRegex, featureScaling,
-        minValue, maxValue, false);
+      boolean containsPOSTags, boolean featureScaling, double minValue,
+      double maxValue) {
+    return readFile(IOUtils.getInputStream(file), splitRegex, containsPOSTags,
+        featureScaling, minValue, maxValue, false);
+  }
+
+  public static Map<String, Double> readFile(String file, String splitRegex,
+      boolean containsPOSTags, boolean featureScaling, double minValue,
+      double maxValue, boolean logging) {
+    return readFile(IOUtils.getInputStream(file), splitRegex, containsPOSTags,
+        featureScaling, minValue, maxValue, logging);
   }
 
   public static Map<String, Double> readFile(InputStream is, String splitRegex,
-      boolean featureScaling, double minValue, double maxValue, boolean logging) {
+      boolean containsPOSTags, boolean featureScaling, double minValue,
+      double maxValue, boolean logging) {
     Map<String, Double> map = new HashMap<String, Double>();
     InputStreamReader isr = null;
     BufferedReader br = null;
@@ -173,8 +182,15 @@ public class FileUtils {
         if (line.trim().length() == 0) {
           continue;
         }
-        String[] values = line.split(splitRegex, 2);
+        String[] values = line.split(splitRegex);
+
         String key = values[0].trim();
+        if (containsPOSTags) {
+          String[] posToken = key.split("#");
+          key = posToken[0];
+          // ignore POS tag for now
+        }
+
         double value = Double.parseDouble(values[1].trim());
 
         if (featureScaling) {
@@ -182,7 +198,7 @@ public class FileUtils {
           double normalizedValue = (value - minValue) / (maxValue - minValue);
 
           if (logging) {
-            LOG.info("Add Key: '" + key + "' Value: '" + value
+            LOG.info("Add entry key: '" + key + "' value: '" + value
                 + "' normalizedValue: '" + normalizedValue + "'");
           }
 
@@ -198,7 +214,7 @@ public class FileUtils {
         }
 
         map.put(key, value);
-        if (logging) {
+        if ((logging) && (!featureScaling)) {
           LOG.info("Add entry key: '" + key + "' value: '" + value + "'");
         }
       }
@@ -243,15 +259,22 @@ public class FileUtils {
   }
 
   public static WordListMap<Double> readWordListMap(String file,
-      String splitRegex, boolean featureScaling, double minValue,
-      double maxValue) {
+      String splitRegex, boolean containsPOSTags, boolean featureScaling,
+      double minValue, double maxValue) {
     return readWordListMap(IOUtils.getInputStream(file), splitRegex,
-        featureScaling, minValue, maxValue, false);
+        containsPOSTags, featureScaling, minValue, maxValue, false);
+  }
+
+  public static WordListMap<Double> readWordListMap(String file,
+      String splitRegex, boolean containsPOSTags, boolean featureScaling,
+      double minValue, double maxValue, boolean logging) {
+    return readWordListMap(IOUtils.getInputStream(file), splitRegex,
+        containsPOSTags, featureScaling, minValue, maxValue, logging);
   }
 
   public static WordListMap<Double> readWordListMap(InputStream is,
-      String splitRegex, boolean featureScaling, double minValue,
-      double maxValue, boolean logging) {
+      String splitRegex, boolean containsPOSTags, boolean featureScaling,
+      double minValue, double maxValue, boolean logging) {
     WordListMap<Double> wordListMap = new WordListMap<Double>();
     InputStreamReader isr = null;
     BufferedReader br = null;

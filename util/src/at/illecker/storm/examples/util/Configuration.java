@@ -72,39 +72,96 @@ public class Configuration {
     String wordListDir = USER_DIR_PATH + File.separator
         + SENTIMENT_DICTIONARIES_PATH + File.separator;
     Map<String, Properties> wordLists = new HashMap<String, Properties>();
+    Properties props = null;
 
-    // Add AFINN word list using Regex = false
-    // AFINN word list (minValue -5 and maxValue +5)
-    Properties props = new Properties();
+    // Add AFINN word list using Regex=false, containsPOSTags=false
+    // AFINN lexicon (minValue -5 and maxValue +5)
+    // http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010
+    props = new Properties();
     props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(false));
     props.put("containsRegex", Boolean.valueOf(false));
     props.put("featureScaling", Boolean.valueOf(true));
     props.put("minValue", Double.valueOf(-5));
     props.put("maxValue", Double.valueOf(5));
     wordLists.put(wordListDir + "AFINN-111.txt", props);
 
-    // Add SentStrength EmoticonLookupTable using Regex = false
-    // SentStrength emoticons (minValue -1 and maxValue +1)
+    // Add SentiStrength EmotionLookupTable using Regex=true
+    // SentStrength lexicon (minValue -5 and maxValue +5)
+    // http://sentistrength.wlv.ac.uk/#Download
     props = new Properties();
     props.put("separator", "\t");
-    props.put("containsRegex", Boolean.valueOf(false));
-    props.put("featureScaling", Boolean.valueOf(true));
-    props.put("minValue", Double.valueOf(-1));
-    props.put("maxValue", Double.valueOf(1));
-
-    wordLists.put(wordListDir
-        + "SentiStrength_Data_Sept2011_EmoticonLookupTable.txt", props);
-
-    // Add SentStrength EmotionLookupTable using Regex = true
-    // SentStrength word list (minValue -5 and maxValue +5)
-    props = new Properties();
-    props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(false));
     props.put("containsRegex", Boolean.valueOf(true));
     props.put("featureScaling", Boolean.valueOf(true));
     props.put("minValue", Double.valueOf(-5));
     props.put("maxValue", Double.valueOf(5));
     wordLists.put(wordListDir
         + "SentiStrength_Data_Sept2011_EmotionLookupTable.txt", props);
+
+    // Add SentStrength EmoticonLookupTable using Regex=false
+    // SentStrength emoticons lexicon (minValue -1 and maxValue +1)
+    // http://sentistrength.wlv.ac.uk/#Download
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(false));
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-1));
+    props.put("maxValue", Double.valueOf(1));
+    wordLists.put(wordListDir
+        + "SentiStrength_Data_Sept2011_EmoticonLookupTable.txt", props);
+
+    // Add SentiWords using Regex=false, containsPOSTags=true
+    // SentiWords lexicon (minValue -1 and maxValue +1)
+    // Real minValue -0.935 and maxValue 0.88257
+    // Words might contain an underscore -> blank
+    // https://hlt.fbk.eu/technologies/sentiwords
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(true));
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-0.935));
+    props.put("maxValue", Double.valueOf(0.88257));
+    wordLists.put(wordListDir + "SentiWords_1.0.txt", props);
+
+    // Add Sentiment140 Lexicon using Regex=false, containsPOSTags=false
+    // Sentiment140 lexicon (minValue -5 and maxValue +5)
+    // Real minValue -4.999 and maxValue 5
+    // http://www.saifmohammad.com/WebPages/lexicons.html
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(false));
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-4.999));
+    props.put("maxValue", Double.valueOf(5));
+    wordLists.put(wordListDir + "Sentiment140_unigrams_pmilexicon.txt", props);
+
+    // Add Bing Liu Lexicon using Regex=false, containsPOSTags=false
+    // Bing Liu lexicon (minValue -1 and maxValue 1)
+    // http://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(false));
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-1));
+    props.put("maxValue", Double.valueOf(1));
+    wordLists.put(wordListDir + "Bing_Liu.txt", props);
+
+    // Add MPQA Subjectivity Lexicon using Regex=false, containsPOSTags=false
+    // MPQA Subjectivity Lexicon (minValue -1 and maxValue 1)
+    // http://mpqa.cs.pitt.edu/lexicons/subj_lexicon/
+    props = new Properties();
+    props.put("separator", "\t");
+    props.put("containsPOSTags", Boolean.valueOf(false));
+    props.put("containsRegex", Boolean.valueOf(false));
+    props.put("featureScaling", Boolean.valueOf(true));
+    props.put("minValue", Double.valueOf(-1));
+    props.put("maxValue", Double.valueOf(1));
+    wordLists.put(wordListDir + "MPQA_subjclueslen1-HLTEMNLP05.txt", props);
 
     return wordLists;
   }
@@ -130,7 +187,7 @@ public class Configuration {
     props.put("separator", ",");
     slangWordLists.put(wordListDir + "GATE_slang.en.csv", props);
 
-    // Add SentStrength SlangLookupTable
+    // Add SentiStrength SlangLookupTable
     props = new Properties();
     props.put("separator", "\t");
     slangWordLists.put(wordListDir
