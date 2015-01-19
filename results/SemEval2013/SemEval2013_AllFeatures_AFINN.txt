@@ -1,0 +1,46 @@
+All Features - without AFINN Lexicon - 3-fold Cross Validation
+
+Train SVM model finished after 275453 ms
+
+Run n-fold cross validation...
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	2865	190	1180	4235
+Class:	1	257	887	662	1806
+Class:	2	827	323	4191	5341
+total		3949	1400	6033
+
+Total: 11382
+Correct: 7943
+Accuracy: 0.6978562642769285
+Scores per class:
+Class: 0 Precision: 0.7255001266143327 Recall: 0.6765053128689492 F-Score: 0.7001466275659823
+Class: 1 Precision: 0.6335714285714286 Recall: 0.491140642303433 F-Score: 0.553337492202121
+Class: 2 Precision: 0.6946792640477375 Recall: 0.7846845160082382 F-Score: 0.7369439071566731
+F-Score weighted: 0.7015932273077881
+F-Score average(pos,neg): 0.6267420598840516
+Cross Validation finished after 389354 ms
+Cross Validation Accurancy: 0.6978562642769285
+
+
+Evaluate test tweets...
+Evaluate finished after 2107 ms
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	1015	149	408	1572
+Class:	1	64	404	133	601
+Class:	2	274	159	1207	1640
+total		1353	712	1748
+
+Total: 3813
+Correct: 2626
+Accuracy: 0.6886965643849987
+Scores per class:
+Class: 0 Precision: 0.7501847745750185 Recall: 0.6456743002544529 F-Score: 0.694017094017094
+Class: 1 Precision: 0.5674157303370787 Recall: 0.6722129783693843 F-Score: 0.6153846153846154
+Class: 2 Precision: 0.6905034324942791 Recall: 0.7359756097560975 F-Score: 0.7125147579693035
+F-Score weighted: 0.6878139971910088
+F-Score average(pos,neg): 0.6547008547008547
+
