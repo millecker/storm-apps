@@ -1,4 +1,4 @@
-All Features - without Bing Liu Lexicon Lexicon - 3-fold Cross Validation
+All Features - without Bing Liu Lexicon - 3-fold Cross Validation
 
 Train SVM model finished after 288728 ms
 
