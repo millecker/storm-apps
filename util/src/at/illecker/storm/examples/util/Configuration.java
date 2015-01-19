@@ -87,7 +87,7 @@ public class Configuration {
     wordLists.put(wordListDir + "AFINN-111.txt", props);
 
     // Add SentiStrength EmotionLookupTable using Regex=true
-    // SentStrength lexicon (minValue -5 and maxValue +5)
+    // SentiStrength lexicon (minValue -5 and maxValue +5)
     // http://sentistrength.wlv.ac.uk/#Download
     props = new Properties();
     props.put("separator", "\t");
@@ -99,8 +99,8 @@ public class Configuration {
     wordLists.put(wordListDir
         + "SentiStrength_Data_Sept2011_EmotionLookupTable.txt", props);
 
-    // Add SentStrength EmoticonLookupTable using Regex=false
-    // SentStrength emoticons lexicon (minValue -1 and maxValue +1)
+    // Add SentiStrength EmoticonLookupTable using Regex=false
+    // SentiStrength emoticons lexicon (minValue -1 and maxValue +1)
     // http://sentistrength.wlv.ac.uk/#Download
     props = new Properties();
     props.put("separator", "\t");
