@@ -1,0 +1,46 @@
+All Features - without SentiStrength Emoticon Lexicon - 3-fold Cross Validation
+
+Train SVM model finished after 303040 ms
+
+Run n-fold cross validation...
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	2844	233	1158	4235
+Class:	1	283	852	671	1806
+Class:	2	828	305	4208	5341
+total		3955	1390	6037
+
+Total: 11382
+Correct: 7904
+Accuracy: 0.6944298014408715
+Scores per class:
+Class: 0 Precision: 0.7190897597977244 Recall: 0.6715466351829988 F-Score: 0.6945054945054945
+Class: 1 Precision: 0.6129496402877698 Recall: 0.4717607973421927 F-Score: 0.5331664580725908
+Class: 2 Precision: 0.6970349511346695 Recall: 0.7878674405542033 F-Score: 0.7396730532606786
+F-Score weighted: 0.6987591662295597
+F-Score average(pos,neg): 0.6138359762890426
+Cross Validation finished after 437779 ms
+Cross Validation Accurancy: 0.6944298014408715
+
+
+Evaluate test tweets...
+Evaluate finished after 2559 ms
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	1032	153	387	1572
+Class:	1	63	397	141	601
+Class:	2	255	133	1252	1640
+total		1350	683	1780
+
+Total: 3813
+Correct: 2681
+Accuracy: 0.7031209021767637
+Scores per class:
+Class: 0 Precision: 0.7644444444444445 Recall: 0.6564885496183206 F-Score: 0.7063655030800822
+Class: 1 Precision: 0.5812591508052709 Recall: 0.6605657237936772 F-Score: 0.6183800623052959
+Class: 2 Precision: 0.7033707865168539 Recall: 0.7634146341463415 F-Score: 0.7321637426900585
+F-Score weighted: 0.7026484326517
+F-Score average(pos,neg): 0.6623727826926891
+
