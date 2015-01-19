@@ -1,0 +1,46 @@
+All Features - without Bing Liu Lexicon Lexicon - 3-fold Cross Validation
+
+Train SVM model finished after 288728 ms
+
+Run n-fold cross validation...
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	2899	202	1134	4235
+Class:	1	234	898	674	1806
+Class:	2	843	329	4169	5341
+total		3976	1429	5977
+
+Total: 11382
+Correct: 7966
+Accuracy: 0.6998769987699877
+Scores per class:
+Class: 0 Precision: 0.7291247484909457 Recall: 0.6845336481700118 F-Score: 0.7061259286323225
+Class: 1 Precision: 0.6284114765570329 Recall: 0.49723145071982283 F-Score: 0.555177743431221
+Class: 2 Precision: 0.6975071105905973 Recall: 0.7805654371840479 F-Score: 0.7367025976320905
+F-Score weighted: 0.7032311644396709
+F-Score average(pos,neg): 0.6306518360317717
+Cross Validation finished after 410780 ms
+Cross Validation Accurancy: 0.6998769987699877
+
+
+Evaluate test tweets...
+Evaluate finished after 2099 ms
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	1023	158	391	1572
+Class:	1	74	397	130	601
+Class:	2	254	139	1247	1640
+total		1351	694	1768
+
+Total: 3813
+Correct: 2667
+Accuracy: 0.6994492525570417
+Scores per class:
+Class: 0 Precision: 0.7572168763878608 Recall: 0.6507633587786259 F-Score: 0.6999657885733834
+Class: 1 Precision: 0.5720461095100865 Recall: 0.6605657237936772 F-Score: 0.6131274131274131
+Class: 2 Precision: 0.705316742081448 Recall: 0.7603658536585366 F-Score: 0.7318075117370891
+F-Score weighted: 0.6989247012389822
+F-Score average(pos,neg): 0.6565466008503983
+

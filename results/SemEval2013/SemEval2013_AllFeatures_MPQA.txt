@@ -1,0 +1,46 @@
+All Features - without MPQA Subjectivity Lexicon - 3-fold Cross Validation
+
+Train SVM model finished after 267825 ms
+
+Run n-fold cross validation...
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	2943	203	1089	4235
+Class:	1	231	923	652	1806
+Class:	2	848	327	4166	5341
+total		4022	1453	5907
+
+Total: 11382
+Correct: 8032
+Accuracy: 0.7056756281848533
+Scores per class:
+Class: 0 Precision: 0.7317255096966683 Recall: 0.6949232585596222 F-Score: 0.7128497032820638
+Class: 1 Precision: 0.635237439779766 Recall: 0.5110741971207088 F-Score: 0.5664314206811905
+Class: 2 Precision: 0.7052649399018114 Recall: 0.7800037446171129 F-Score: 0.7407539118065434
+F-Score weighted: 0.7086399330426535
+F-Score average(pos,neg): 0.6396405619816271
+Cross Validation finished after 385323 ms
+Cross Validation Accurancy: 0.7056756281848533
+
+
+Evaluate test tweets...
+Evaluate finished after 2194 ms
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	1038	157	377	1572
+Class:	1	65	396	140	601
+Class:	2	252	132	1256	1640
+total		1355	685	1773
+
+Total: 3813
+Correct: 2690
+Accuracy: 0.7054812483608707
+Scores per class:
+Class: 0 Precision: 0.7660516605166051 Recall: 0.6603053435114504 F-Score: 0.7092586265801162
+Class: 1 Precision: 0.5781021897810219 Recall: 0.6589018302828619 F-Score: 0.6158631415241058
+Class: 2 Precision: 0.7084038353073886 Recall: 0.7658536585365854 F-Score: 0.7360093759156168
+F-Score weighted: 0.7049190439177704
+F-Score average(pos,neg): 0.662560884052111
+
