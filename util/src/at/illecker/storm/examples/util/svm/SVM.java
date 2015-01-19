@@ -662,7 +662,7 @@ public class SVM {
   }
 
   public static void main(String[] args) {
-    int nFoldCrossValidation = 10;
+    int nFoldCrossValidation = 3;
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
 
