@@ -439,12 +439,6 @@ public class SVM {
     FScoreWeighted /= total;
     LOG.info("F-Score weighted: " + FScoreWeighted);
 
-    // F-Score weighted positive and negative
-    double FScoreWeightedPosNeg = (FScores[0] * colSum[0] + FScores[1]
-        * colSum[1])
-        / (colSum[0] + colSum[1]);
-    LOG.info("F-Score weighted(pos,neg): " + FScoreWeightedPosNeg);
-
     // F-Score average of positive and negative
     double FScoreAveragePosNeg = (FScores[0] + FScores[1]) / 2;
     LOG.info("F-Score average(pos,neg): " + FScoreAveragePosNeg);
@@ -668,7 +662,7 @@ public class SVM {
   }
 
   public static void main(String[] args) {
-    int nFoldCrossValidation = 3;
+    int nFoldCrossValidation = 10;
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
 
