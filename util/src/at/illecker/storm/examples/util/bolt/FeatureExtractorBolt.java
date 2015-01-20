@@ -37,12 +37,21 @@ public class FeatureExtractorBolt extends BaseRichBolt {
   private static final long serialVersionUID = 6342287897604628238L;
   private static final Logger LOG = LoggerFactory
       .getLogger(FeatureExtractorBolt.class);
-
+  private String m_inputField;
+  private String m_outputField;
   private OutputCollector m_collector;
   private FeatureVectorGenerator m_fvg = null;
 
+  public FeatureExtractorBolt(String inputField, String outputField) {
+    this.m_inputField = inputField;
+    this.m_outputField = outputField;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("featuredTweet")); // key of output tuples
+    // key of output tuples
+    if (m_outputField != null) {
+      declarer.declare(new Fields(m_outputField));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -54,7 +63,7 @@ public class FeatureExtractorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
     // LOG.info(tweet.toString());
 
     // Generate Feature Vector for tweet

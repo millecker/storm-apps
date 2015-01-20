@@ -33,26 +33,26 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import edu.stanford.nlp.ling.TaggedWord;
 
-/**
- * POSTaggerBolt is based on the Stanford NLP library and the
- * gate-EN-twitter-fast.model
- *
- * http://nlp.stanford.edu/software/corenlp.shtml
- * http://nlp.stanford.edu:8080/corenlp/process
- * https://gate.ac.uk/wiki/twitter-postagger.html
- * 
- */
 public class POSTaggerBolt extends BaseRichBolt {
   public static final String ID = "pos-tagger-bolt";
   private static final long serialVersionUID = -2931810659942708343L;
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
-
+  private String m_inputField;
+  private String m_outputField;
   private OutputCollector m_collector;
   private POSTagger m_posTagger;
 
+  public POSTaggerBolt(String inputField, String outputField) {
+    this.m_inputField = inputField;
+    this.m_outputField = outputField;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("taggedTweet")); // key of output tuples
+    // key of output tuples
+    if (m_outputField != null) {
+      declarer.declare(new Fields(m_outputField));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -62,7 +62,7 @@ public class POSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("preprocessedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
     // LOG.info(tweet.toString());
 
     for (List<String> sentence : tweet.getSentences()) {

@@ -28,6 +28,7 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -36,12 +37,21 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   private static final long serialVersionUID = -3279220626656829348L;
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentDetectionBolt.class);
-
+  private String m_inputField;
+  private String m_outputField;
   private OutputCollector m_collector;
   private SentimentWordLists m_sentimentWordLists;
 
+  public SentimentDetectionBolt(String inputField, String outputField) {
+    this.m_inputField = inputField;
+    this.m_outputField = outputField;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    // no output
+    // key of output tuples
+    if (m_outputField != null) {
+      declarer.declare(new Fields(m_outputField));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -55,7 +65,7 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("taggedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
     // LOG.info(tweet.toString());
 
     double tweetSentiment = 0;
@@ -83,8 +93,9 @@ public class SentimentDetectionBolt extends BaseRichBolt {
 
         sentenceWords++;
 
-        Double rating = m_sentimentWordLists.getWordSentimentWithStemming(word,
-            tag);
+        Map<Integer, Double> sentiments = m_sentimentWordLists
+            .getWordSentimentWithStemming(word, tag);
+
         // Update sentiment sum
         if (rating != null) {
           sentenceSentiment += rating;

@@ -37,11 +37,20 @@ public class TokenizerBolt extends BaseRichBolt {
   private static final long serialVersionUID = -2932822073019567061L;
   private static final Logger LOG = LoggerFactory
       .getLogger(TokenizerBolt.class);
-
+  private String m_inputField;
+  private String m_outputField;
   private OutputCollector m_collector;
 
+  public TokenizerBolt(String inputField, String outputField) {
+    this.m_inputField = inputField;
+    this.m_outputField = outputField;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("splittedTweet")); // key of output tuples
+    // key of output tuples
+    if (m_outputField != null) {
+      declarer.declare(new Fields(m_outputField));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -50,7 +59,7 @@ public class TokenizerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("tweet");
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
     // LOG.info(tweet.toString());
 
     // Split tweet into tokens

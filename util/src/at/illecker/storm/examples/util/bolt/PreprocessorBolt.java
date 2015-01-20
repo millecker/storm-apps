@@ -37,12 +37,21 @@ public class PreprocessorBolt extends BaseRichBolt {
   private static final long serialVersionUID = 5767153574646034298L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PreprocessorBolt.class);
-
+  private String m_inputField;
+  private String m_outputField;
   private OutputCollector m_collector;
   private Preprocessor m_preprocessor;
 
+  public PreprocessorBolt(String inputField, String outputField) {
+    this.m_inputField = inputField;
+    this.m_outputField = outputField;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("preprocessedTweet")); // key of output tuples
+    // key of output tuples
+    if (m_outputField != null) {
+      declarer.declare(new Fields(m_outputField));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -52,7 +61,7 @@ public class PreprocessorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField("splittedTweet");
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
     // LOG.info(tweet.toString());
 
     for (List<String> sentence : tweet.getSentences()) {
