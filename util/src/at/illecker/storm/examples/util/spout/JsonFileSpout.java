@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.examples.util.spout;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -37,16 +36,18 @@ public class JsonFileSpout extends BaseRichSpout {
   private static final long serialVersionUID = -566909258413711921L;
   private static final Logger LOG = LoggerFactory
       .getLogger(JsonFileSpout.class);
-
+  private String m_outputField;
   private SpoutOutputCollector m_collector;
   private List<Map<String, Object>> m_elements;
   private int m_index = 0;
 
-  public JsonFileSpout() {
+  public JsonFileSpout(String outputField) {
+    this.m_outputField = outputField;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("jsonElement")); // key of output tuples
+    // key of output tuples
+    declarer.declare(new Fields(m_outputField));
   }
 
   public void open(Map config, TopologyContext context,
