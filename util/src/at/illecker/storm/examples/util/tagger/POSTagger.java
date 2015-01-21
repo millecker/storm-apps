@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.StringUtils;
-import at.illecker.storm.examples.util.dictionaries.Emoticons;
 import at.illecker.storm.examples.util.dictionaries.Interjections;
 import at.illecker.storm.examples.util.dictionaries.NameEntities;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
@@ -44,10 +43,9 @@ public class POSTagger {
   private static final boolean LOGGING = false;
   private static final POSTagger instance = new POSTagger();
 
-  private MaxentTagger m_posTagger; // Standford POS Tagger
+  private MaxentTagger m_posTagger;
   private NameEntities m_nameEntities;
   private Interjections m_interjections;
-  private Emoticons m_emoticons;
 
   private POSTagger() {
     // Load POS Tagger
@@ -63,8 +61,6 @@ public class POSTagger {
     m_nameEntities = NameEntities.getInstance();
     // Load Interjections
     m_interjections = Interjections.getInstance();
-    // Load emoticons
-    m_emoticons = Emoticons.getInstance();
   }
 
   public static POSTagger getInstance() {
@@ -118,7 +114,7 @@ public class POSTagger {
 
       // Interjections
       if ((m_interjections.isInterjection(token))
-          || (m_emoticons.isEmoticon(token))) {
+          || (StringUtils.isEmoticon(token))) {
         if (LOGGING) {
           LOG.info("Interjection or Emoticon labelled for " + token);
         }
@@ -137,7 +133,7 @@ public class POSTagger {
   public void tagTweets(List<Tweet> tweets) {
     for (Tweet tweet : tweets) {
       for (List<String> sentence : tweet.getPreprocessedSentences()) {
-        List<TaggedWord> taggedSentence = this.tagSentence(sentence);
+        List<TaggedWord> taggedSentence = tagSentence(sentence);
         tweet.addTaggedSentence(taggedSentence);
       }
     }

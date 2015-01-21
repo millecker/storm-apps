@@ -23,7 +23,7 @@ import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
 import at.illecker.storm.examples.util.bolt.TokenizerBolt;
 import at.illecker.storm.examples.util.spout.TwitterFilesSpout;
-import at.illecker.storm.examples.util.spout.TwitterSpout;
+import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -82,18 +82,21 @@ public class POSTaggerTopology {
     String spoutID = "";
     if (twitterDir.isDirectory()) {
       conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
-      spout = new TwitterFilesSpout(FILTER_LANG);
+      spout = new TwitterFilesSpout(new String[] { "tweet" }, FILTER_LANG);
       spoutID = TwitterFilesSpout.ID;
     } else {
-      spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
-          accessTokenSecret, keyWords, FILTER_LANG);
-      spoutID = TwitterSpout.ID;
+      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
+          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts
-    TokenizerBolt tokenizerBolt = new TokenizerBolt();
-    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
-    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
+    TokenizerBolt tokenizerBolt = new TokenizerBolt(new String[] { "tweet" },
+        new String[] { "splittedTweet" });
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt(
+        new String[] { "splittedTweet" }, new String[] { "preprocessedTweet" });
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt(
+        new String[] { "preprocessedTweet" }, new String[] { "taggedTweet" });
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();

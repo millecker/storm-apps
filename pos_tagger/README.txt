@@ -19,7 +19,7 @@ ant run-cpu [ -DtwitterDir=dir \
  [-DkeyWords='word1 word2']
 
 # Example
-ant clean && ant run-cpu -DtwitterDir=../resources/twitter2/
+ant clean && ant run-cpu -DtwitterDir=../resources/datasets/uibk_crawler/test/
 
 # Modify file conf/storm_env.ini
 STORM_JAR_JVM_OPTS:-Xmx8g
