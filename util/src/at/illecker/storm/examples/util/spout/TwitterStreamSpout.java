@@ -28,6 +28,7 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.Config;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -135,7 +136,8 @@ public class TwitterStreamSpout extends BaseRichSpout {
     if (tweet == null) {
       Utils.sleep(50);
     } else {
-      m_collector.emit(new Values(tweet));
+      // Emit tweet
+      m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
     }
   }
 

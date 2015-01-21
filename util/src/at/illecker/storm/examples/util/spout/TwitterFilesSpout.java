@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import twitter4j.Status;
 import at.illecker.storm.examples.util.io.JsonUtils;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -67,11 +68,13 @@ public class TwitterFilesSpout extends BaseRichSpout {
   }
 
   public void nextTuple() {
-    this.m_collector.emit(new Values(m_tweets.get(m_index)));
+    Status tweet = m_tweets.get(m_index);
     m_index++;
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
+    // Emit tweet
+    m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
     try {
       Thread.sleep(1000); // for development
       // TODO minimize sleep time
