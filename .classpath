@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="util/src"/>
 	<classpathentry kind="src" path="wordcount/src"/>
 	<classpathentry kind="src" path="pos_tagger/src"/>
-	<classpathentry kind="src" path="n_gram/src"/>
 	<classpathentry kind="src" path="sentiment_analysis/src"/>
 	<classpathentry kind="src" path="svm/src"/>
 
