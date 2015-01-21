@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -32,15 +33,15 @@ public class SampleTweetSpout extends BaseRichSpout {
   private static final long serialVersionUID = 3621927972989123163L;
   private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
-  private List<String> m_tweets;
+  private List<Tweet> m_tweets;
   private int m_index = 0;
 
   public SampleTweetSpout(String[] outputFields) {
     m_outputFields = outputFields;
-    m_tweets = new ArrayList<String>();
-    m_tweets.add("this is the first tweet");
-    m_tweets.add("followed by a second tweet");
-    m_tweets.add("and a third tweet");
+    m_tweets = new ArrayList<Tweet>();
+    m_tweets.add(new Tweet(1, "this is the first tweet"));
+    m_tweets.add(new Tweet(2, "followed by a second tweet"));
+    m_tweets.add(new Tweet(3, "and a third tweet"));
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {

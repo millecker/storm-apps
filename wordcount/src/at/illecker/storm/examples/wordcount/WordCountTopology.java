@@ -18,7 +18,7 @@ package at.illecker.storm.examples.wordcount;
 
 import java.util.Arrays;
 
-import at.illecker.storm.examples.util.spout.TwitterSpout;
+import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
 import at.illecker.storm.examples.wordcount.bolt.ReportWordCountBolt;
 import at.illecker.storm.examples.wordcount.bolt.SplitTweetBolt;
 import at.illecker.storm.examples.wordcount.bolt.WordCountBolt;
@@ -70,9 +70,9 @@ public class WordCountTopology {
       spout = new SampleTweetSpout(new String[] { "tweet" });
       spoutID = SampleTweetSpout.ID;
     } else {
-      spout = new TwitterSpout(new String[] { "tweet" }, consumerKey,
+      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
           consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
-      spoutID = TwitterSpout.ID;
+      spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts

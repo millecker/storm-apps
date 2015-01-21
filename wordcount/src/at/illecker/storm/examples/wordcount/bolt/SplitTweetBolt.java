@@ -18,6 +18,7 @@ package at.illecker.storm.examples.wordcount.bolt;
 
 import java.util.Map;
 
+import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -51,8 +52,8 @@ public class SplitTweetBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    String tweet = tuple.getStringByField(m_inputFields[0]);
-    String[] words = tweet.split(" ");
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
+    String[] words = tweet.getText().split(" ");
     for (String word : words) {
       this.m_collector.emit(tuple, new Values(word));
     }
