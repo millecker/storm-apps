@@ -38,20 +38,20 @@ public class POSTaggerBolt extends BaseRichBolt {
   private static final long serialVersionUID = -2931810659942708343L;
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
-  private String m_inputField;
-  private String m_outputField;
+  private String[] m_inputFields;
+  private String[] m_outputFields;
   private OutputCollector m_collector;
   private POSTagger m_posTagger;
 
-  public POSTaggerBolt(String inputField, String outputField) {
-    this.m_inputField = inputField;
-    this.m_outputField = outputField;
+  public POSTaggerBolt(String inputFields[], String outputFields[]) {
+    this.m_inputFields = inputFields;
+    this.m_outputFields = outputFields;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputField != null) {
-      declarer.declare(new Fields(m_outputField));
+    if (m_outputFields != null) {
+      declarer.declare(new Fields(m_outputFields));
     }
   }
 
@@ -62,7 +62,7 @@ public class POSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
     for (List<String> sentence : tweet.getSentences()) {

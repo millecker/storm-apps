@@ -35,19 +35,19 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
   private static final long serialVersionUID = -7467317303659214525L;
   private static final Logger LOG = LoggerFactory
       .getLogger(JsonTweetExtractorBolt.class);
-  private String m_inputField;
-  private String m_outputField;
+  private String[] m_inputFields;
+  private String[] m_outputFields;
   private OutputCollector m_collector;
 
-  public JsonTweetExtractorBolt(String inputField, String outputField) {
-    this.m_inputField = inputField;
-    this.m_outputField = outputField;
+  public JsonTweetExtractorBolt(String[] inputFields, String[] outputFields) {
+    this.m_inputFields = inputFields;
+    this.m_outputFields = outputFields;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputField != null) {
-      declarer.declare(new Fields(m_outputField));
+    if (m_outputFields != null) {
+      declarer.declare(new Fields(m_outputFields));
     }
   }
 
@@ -58,7 +58,7 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     Map<String, Object> element = (Map<String, Object>) tuple
-        .getValueByField(m_inputField);
+        .getValueByField(m_inputFields[0]);
 
     SentimentTweet tweet = SentimentTweet.fromJsonElement(element);
     // LOG.info(tweet.toString());

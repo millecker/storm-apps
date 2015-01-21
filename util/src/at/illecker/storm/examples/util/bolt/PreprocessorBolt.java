@@ -37,20 +37,20 @@ public class PreprocessorBolt extends BaseRichBolt {
   private static final long serialVersionUID = 5767153574646034298L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PreprocessorBolt.class);
-  private String m_inputField;
-  private String m_outputField;
+  private String[] m_inputFields;
+  private String[] m_outputFields;
   private OutputCollector m_collector;
   private Preprocessor m_preprocessor;
 
-  public PreprocessorBolt(String inputField, String outputField) {
-    this.m_inputField = inputField;
-    this.m_outputField = outputField;
+  public PreprocessorBolt(String[] inputFields, String[] outputFields) {
+    this.m_inputFields = inputFields;
+    this.m_outputFields = outputFields;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputField != null) {
-      declarer.declare(new Fields(m_outputField));
+    if (m_outputFields != null) {
+      declarer.declare(new Fields(m_outputFields));
     }
   }
 
@@ -61,7 +61,7 @@ public class PreprocessorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
     for (List<String> sentence : tweet.getSentences()) {
