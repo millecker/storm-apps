@@ -19,9 +19,6 @@ package at.illecker.storm.examples.util.spout;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import twitter4j.Status;
 import at.illecker.storm.examples.util.io.JsonUtils;
 import at.illecker.storm.examples.util.tweet.Tweet;
@@ -31,13 +28,12 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import backtype.storm.utils.Utils;
 
 public class TwitterFilesSpout extends BaseRichSpout {
   public static final String ID = "twitter-files-spout";
   public static final String CONF_TWITTER_DIR = "twitter.dir";
   private static final long serialVersionUID = -4277696098291748609L;
-  private static final Logger LOG = LoggerFactory
-      .getLogger(TwitterFilesSpout.class);
   private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Status> m_tweets;
@@ -75,11 +71,8 @@ public class TwitterFilesSpout extends BaseRichSpout {
     }
     // Emit tweet
     m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
-    try {
-      Thread.sleep(500); // for development
-      // TODO minimize sleep time
-      // sleep 1 ms
-    } catch (InterruptedException e) {
-    }
+    // TODO minimize sleep time
+    // default sleep 1 ms
+    Utils.sleep(500); // for development
   }
 }

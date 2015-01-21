@@ -19,7 +19,8 @@ package at.illecker.storm.examples.util.spout;
 import java.util.List;
 import java.util.Map;
 
-import at.illecker.storm.examples.util.io.JsonUtils;
+import at.illecker.storm.examples.util.Dataset;
+import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -28,17 +29,18 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
-public class JsonFileSpout extends BaseRichSpout {
-  public static final String ID = "json-file-spout";
-  public static final String CONF_JSON_FILE = "json.file";
-  private static final long serialVersionUID = -566909258413711921L;
+public class DatasetSpout extends BaseRichSpout {
+  public static final String ID = "dataset-spout";
+  private static final long serialVersionUID = -7033277532867702166L;
   private String[] m_outputFields;
+  private Dataset m_dataset;
   private SpoutOutputCollector m_collector;
-  private List<Map<String, Object>> m_elements;
+  private List<Tweet> m_tweets;
   private int m_index = 0;
 
-  public JsonFileSpout(String[] outputFields) {
+  public DatasetSpout(String[] outputFields, Dataset dataset) {
     this.m_outputFields = outputFields;
+    this.m_dataset = dataset;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -49,21 +51,17 @@ public class JsonFileSpout extends BaseRichSpout {
   public void open(Map config, TopologyContext context,
       SpoutOutputCollector collector) {
     this.m_collector = collector;
-
-    if (config.get(CONF_JSON_FILE) != null) {
-      String jsonFilePath = config.get(CONF_JSON_FILE).toString();
-      m_elements = JsonUtils.readJsonFile(jsonFilePath);
-    } else {
-      throw new RuntimeException(CONF_JSON_FILE + " property was not set!");
-    }
+    this.m_tweets = m_dataset.getTestTweets();
   }
 
   public void nextTuple() {
-    this.m_collector.emit(new Values(m_elements.get(m_index)));
+    Tweet tweet = m_tweets.get(m_index);
     m_index++;
-    if (m_index >= m_elements.size()) {
+    if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
+    // Emit tweet
+    m_collector.emit(new Values(tweet));
     // TODO minimize sleep time
     // default sleep 1 ms
     Utils.sleep(500); // for development
