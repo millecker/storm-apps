@@ -32,19 +32,22 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class FeatureExtractorBolt extends BaseRichBolt {
+public class FeatureGenerationBolt extends BaseRichBolt {
   public static final String ID = "json-tweet-extractor-bolt";
   private static final long serialVersionUID = 6342287897604628238L;
   private static final Logger LOG = LoggerFactory
-      .getLogger(FeatureExtractorBolt.class);
+      .getLogger(FeatureGenerationBolt.class);
   private String[] m_inputFields;
   private String[] m_outputFields;
   private OutputCollector m_collector;
+  private Class<? extends FeatureVectorGenerator> m_featureVectorGenerationClass;
   private FeatureVectorGenerator m_fvg = null;
 
-  public FeatureExtractorBolt(String[] inputFields, String[] outputFields) {
+  public FeatureGenerationBolt(String[] inputFields, String[] outputFields,
+      Class<? extends FeatureVectorGenerator> featureVectorGenerationClass) {
     this.m_inputFields = inputFields;
     this.m_outputFields = outputFields;
+    this.m_featureVectorGenerationClass = featureVectorGenerationClass;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -58,6 +61,7 @@ public class FeatureExtractorBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
+    // TODO load m_featureVectorGenerationClass
     LOG.info("Load SentimentFeatureVectorGenerator...");
     m_fvg = new SentimentFeatureVectorGenerator();
   }
