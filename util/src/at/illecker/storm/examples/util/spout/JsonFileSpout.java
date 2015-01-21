@@ -36,18 +36,18 @@ public class JsonFileSpout extends BaseRichSpout {
   private static final long serialVersionUID = -566909258413711921L;
   private static final Logger LOG = LoggerFactory
       .getLogger(JsonFileSpout.class);
-  private String m_outputField;
+  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Map<String, Object>> m_elements;
   private int m_index = 0;
 
-  public JsonFileSpout(String outputField) {
-    this.m_outputField = outputField;
+  public JsonFileSpout(String[] outputFields) {
+    this.m_outputFields = outputFields;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputField));
+    declarer.declare(new Fields(m_outputFields));
   }
 
   public void open(Map config, TopologyContext context,

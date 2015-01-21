@@ -40,7 +40,7 @@ import backtype.storm.utils.Utils;
 public class TwitterSpout extends BaseRichSpout {
   public static final String ID = "twitter-spout";
   private static final long serialVersionUID = 1208142390795660693L;
-  private String m_outputField;
+  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private LinkedBlockingQueue<Status> m_queue = null;
   private TwitterStream m_twitterStream;
@@ -51,10 +51,10 @@ public class TwitterSpout extends BaseRichSpout {
   private String[] m_keyWords;
   private String m_filterLanguage;
 
-  public TwitterSpout(String outputField, String consumerKey,
+  public TwitterSpout(String[] outputFields, String consumerKey,
       String consumerSecret, String accessToken, String accessTokenSecret,
       String[] keyWords, String filterLanguage) {
-    this.m_outputField = outputField;
+    this.m_outputFields = outputFields;
     this.m_consumerKey = consumerKey;
     this.m_consumerSecret = consumerSecret;
     this.m_accessToken = accessToken;
@@ -66,7 +66,7 @@ public class TwitterSpout extends BaseRichSpout {
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputField));
+    declarer.declare(new Fields(m_outputFields));
   }
 
   @Override

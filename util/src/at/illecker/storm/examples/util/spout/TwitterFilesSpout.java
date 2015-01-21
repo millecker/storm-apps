@@ -37,20 +37,20 @@ public class TwitterFilesSpout extends BaseRichSpout {
   private static final long serialVersionUID = -4277696098291748609L;
   private static final Logger LOG = LoggerFactory
       .getLogger(TwitterFilesSpout.class);
-  private String m_outputField;
+  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Status> m_tweets;
   private int m_index = 0;
   private String m_filterLanguage;
 
-  public TwitterFilesSpout(String outputField, String filterLanguage) {
-    this.m_outputField = outputField;
+  public TwitterFilesSpout(String[] outputFields, String filterLanguage) {
+    this.m_outputFields = outputFields;
     this.m_filterLanguage = filterLanguage; // "en"
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputField));
+    declarer.declare(new Fields(m_outputFields));
   }
 
   public void open(Map config, TopologyContext context,
