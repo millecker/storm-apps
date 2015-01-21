@@ -16,12 +16,12 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.dictionaries.SentimentResult;
 import at.illecker.storm.examples.util.dictionaries.SentimentWordLists;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
@@ -30,27 +30,26 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import edu.stanford.nlp.ling.TaggedWord;
 
 public class SentimentDetectionBolt extends BaseRichBolt {
   public static final String ID = "sentiment-detection-bolt";
   private static final long serialVersionUID = -3279220626656829348L;
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentDetectionBolt.class);
-  private String m_inputField;
-  private String m_outputField;
+  private String[] m_inputFields;
+  private String[] m_outputFields;
   private OutputCollector m_collector;
   private SentimentWordLists m_sentimentWordLists;
 
-  public SentimentDetectionBolt(String inputField, String outputField) {
-    this.m_inputField = inputField;
-    this.m_outputField = outputField;
+  public SentimentDetectionBolt(String[] inputFields, String[] outputFields) {
+    this.m_inputFields = inputFields;
+    this.m_outputFields = outputFields;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputField != null) {
-      declarer.declare(new Fields(m_outputField));
+    if (m_outputFields != null) {
+      declarer.declare(new Fields(m_outputFields));
     }
   }
 
@@ -65,59 +64,15 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputField);
+    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
-    double tweetSentiment = 0;
-    int tweetWords = 0;
-    for (List<TaggedWord> taggedSentence : tweet.getTaggedSentences()) {
-      // LOG.info("TaggedSentence: " + taggedSentence.toString());
-
-      String sentimentSentenceString = "";
-      double sentenceSentiment = 0;
-      int sentenceWords = 0;
-      for (TaggedWord taggedWord : taggedSentence) {
-
-        String word = taggedWord.word().toLowerCase().trim();
-        String tag = taggedWord.tag();
-
-        // Skip punctuations
-        // See tags http://www.clips.ua.ac.be/pages/mbsp-tags
-        if (tag.equals(".") || tag.equals(",") || tag.equals(":")) {
-          continue;
-        }
-        // Skip cardinal numbers and symbols
-        if (tag.equals("CD") || tag.equals("SYM")) {
-          continue;
-        }
-
-        sentenceWords++;
-
-        Map<Integer, Double> sentiments = m_sentimentWordLists
-            .getWordSentimentWithStemming(word, tag);
-
-        // Update sentiment sum
-        if (rating != null) {
-          sentenceSentiment += rating;
-        }
-
-        sentimentSentenceString += word + "/"
-            + ((rating != null) ? rating : "NA") + " ";
-      }
-      tweetWords += sentenceWords;
-      tweetSentiment += sentenceSentiment;
-
-      // Debug
-      LOG.info("TaggedSentence: " + taggedSentence.toString()
-          + " SentimentSentence: " + sentimentSentenceString + " Words: "
-          + sentenceWords + " SentenceSentiment: " + sentenceSentiment
-          + " SentimentScore: " + (sentenceSentiment / sentenceWords));
-    }
+    Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
+        .getTweetSentiment(tweet);
 
     // Debug
-    LOG.info("Tweet: " + tweet.toString() + " Words: " + tweetWords
-        + " TweetSentiment: " + tweetSentiment + " SentimentScore: "
-        + (tweetSentiment / tweetWords));
+    LOG.info("Tweet: " + tweet.toString() + " TweetSentiment: "
+        + tweetSentiments);
 
     this.m_collector.ack(tuple);
   }
