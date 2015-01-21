@@ -6,6 +6,7 @@
 	<property name="util.src.dir" value="../util/src" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar" />
+	<property name="libfiles.cpu" value="" />
 	<property name="libjars.bench" value="" />
 	<property name="rootbeer.package.dir" value="" />
 	<property name="rootbeer.classes" value="" />

@@ -34,22 +34,32 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class ReportWordCountBolt extends BaseRichBolt {
+  public static final String ID = "report-wordcount-bolt";
   private static final long serialVersionUID = -5143042721802719313L;
   private static final Logger LOG = LoggerFactory
       .getLogger(ReportWordCountBolt.class);
+  private String[] m_inputFields;
+  private String[] m_outputFields;
   private OutputCollector m_collector;
   private Map<String, Long> m_counts;
   private int m_timerPeriod;
 
-  public ReportWordCountBolt(int timerPeriod) {
+  public ReportWordCountBolt(String[] inputFields, String[] outputFields,
+      int timerPeriod) {
+    m_inputFields = inputFields;
+    m_outputFields = outputFields;
     m_timerPeriod = timerPeriod;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    // this bolt does not emit anything
+    // key of output tuples
+    if (m_outputFields != null) {
+      declarer.declare(new Fields(m_outputFields));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -65,8 +75,8 @@ public class ReportWordCountBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     // LOG.info(tuple.toString());
     // LOG.info("WordCounts: " + m_counts.size());
-    String word = tuple.getStringByField("word");
-    Long count = tuple.getLongByField("count");
+    String word = tuple.getStringByField(m_inputFields[0]);
+    Long count = tuple.getLongByField(m_inputFields[1]);
     this.m_counts.put(word, count);
     this.m_collector.ack(tuple);
   }

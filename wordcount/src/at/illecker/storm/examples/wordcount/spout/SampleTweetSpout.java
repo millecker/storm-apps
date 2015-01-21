@@ -28,12 +28,15 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 
 public class SampleTweetSpout extends BaseRichSpout {
+  public static final String ID = "sample-tweet-spout";
   private static final long serialVersionUID = 3621927972989123163L;
+  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<String> m_tweets;
   private int m_index = 0;
 
-  public SampleTweetSpout() {
+  public SampleTweetSpout(String[] outputFields) {
+    m_outputFields = outputFields;
     m_tweets = new ArrayList<String>();
     m_tweets.add("this is the first tweet");
     m_tweets.add("followed by a second tweet");
@@ -41,7 +44,7 @@ public class SampleTweetSpout extends BaseRichSpout {
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("tweet")); // key of output tuples
+    declarer.declare(new Fields(m_outputFields)); // key of output tuples
   }
 
   public void open(Map config, TopologyContext context,

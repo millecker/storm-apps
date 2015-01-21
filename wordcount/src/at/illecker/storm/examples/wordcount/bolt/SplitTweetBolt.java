@@ -27,11 +27,22 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class SplitTweetBolt extends BaseRichBolt {
+  public static final String ID = "split-tweet-bolt";
   private static final long serialVersionUID = 883934440113385476L;
+  private String[] m_inputFields;
+  private String[] m_outputFields;
   private OutputCollector m_collector;
 
+  public SplitTweetBolt(String[] inputFields, String[] outputFields) {
+    this.m_inputFields = inputFields;
+    this.m_outputFields = outputFields;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("word")); // key of output tuples
+    // key of output tuples
+    if (m_outputFields != null) {
+      declarer.declare(new Fields(m_outputFields));
+    }
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -40,7 +51,7 @@ public class SplitTweetBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    String tweet = tuple.getStringByField("tweet");
+    String tweet = tuple.getStringByField(m_inputFields[0]);
     String[] words = tweet.split(" ");
     for (String word : words) {
       this.m_collector.emit(tuple, new Values(word));

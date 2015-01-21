@@ -30,11 +30,6 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 
 public class WordCountTopology {
-
-  private static final String TWEET_SPOUT_ID = "tweet-spout";
-  private static final String SPLIT_BOLT_ID = "split-bolt";
-  private static final String COUNT_BOLT_ID = "count-bolt";
-  private static final String REPORT_BOLT_ID = "report-bolt";
   private static final String TOPOLOGY_NAME = "word-count-topology";
   private static final int REPORT_PERIOD = 10000;
   private static final String FILTER_LANG = "en";
@@ -70,29 +65,40 @@ public class WordCountTopology {
 
     // Create Spout
     IRichSpout spout;
+    String spoutID;
     if (consumerKey.isEmpty()) {
-      spout = new SampleTweetSpout();
+      spout = new SampleTweetSpout(new String[] { "tweet" });
+      spoutID = SampleTweetSpout.ID;
     } else {
-      spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
-          accessTokenSecret, keyWords, FILTER_LANG);
+      spout = new TwitterSpout(new String[] { "tweet" }, consumerKey,
+          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterSpout.ID;
     }
 
     // Create Bolts
-    SplitTweetBolt splitBolt = new SplitTweetBolt();
-    WordCountBolt countBolt = new WordCountBolt();
-    ReportWordCountBolt reportBolt = new ReportWordCountBolt(REPORT_PERIOD);
+    SplitTweetBolt splitTweetBolt = new SplitTweetBolt(
+        new String[] { "tweet" }, new String[] { "word" });
+    WordCountBolt wordCountBolt = new WordCountBolt(new String[] { "word" },
+        new String[] { "word", "count" });
+    ReportWordCountBolt reportWordCountBolt = new ReportWordCountBolt(
+        new String[] { "word", "count" }, null, REPORT_PERIOD);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
+
     // Set Spout
-    builder.setSpout(TWEET_SPOUT_ID, spout);
+    builder.setSpout(spoutID, spout);
+
     // Set Spout --> SplitTweetBolt
-    builder.setBolt(SPLIT_BOLT_ID, splitBolt).shuffleGrouping(TWEET_SPOUT_ID);
+    builder.setBolt(SplitTweetBolt.ID, splitTweetBolt).shuffleGrouping(spoutID);
+
     // Set SplitTweetBolt --> WordCountBolt
-    builder.setBolt(COUNT_BOLT_ID, countBolt).fieldsGrouping(SPLIT_BOLT_ID,
-        new Fields("word"));
+    builder.setBolt(WordCountBolt.ID, wordCountBolt).fieldsGrouping(
+        SplitTweetBolt.ID, new Fields("word"));
+
     // Set WordCountBolt --> ReportWordCountBolt
-    builder.setBolt(REPORT_BOLT_ID, reportBolt).globalGrouping(COUNT_BOLT_ID);
+    builder.setBolt(ReportWordCountBolt.ID, reportWordCountBolt)
+        .globalGrouping(WordCountBolt.ID);
 
     Config conf = new Config();
     StormSubmitter
