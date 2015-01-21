@@ -19,7 +19,13 @@ ant run-cpu [ -DtwitterDir=dir \
  [-DkeyWords='word1 word2']
 
 # Example
-ant clean && ant run-cpu -DtwitterDir=../resources/datasets/uibk_crawler/test/
+ant clean && ant run-cpu \
+ -DtwitterDir=../resources/datasets/uibk_crawler/test/
+ 
+ant clean && ant run-cpu \
+  -DconsumerKey=XXXX  -DconsumerSecret=XXXX \
+  -DaccessToken=XXXX  -DaccessTokenSecret=XXXX
+
 
 # Modify file conf/storm_env.ini
 STORM_JAR_JVM_OPTS:-Xmx8g

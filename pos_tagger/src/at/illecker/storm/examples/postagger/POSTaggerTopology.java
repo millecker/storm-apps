@@ -34,8 +34,7 @@ public class POSTaggerTopology {
   public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
-    String twitterDirPath = "";
-    String consumerKey = "";
+    String twitterDirOrConsumerKey = "";
     String consumerSecret = "";
     String accessToken = "";
     String accessTokenSecret = "";
@@ -43,15 +42,13 @@ public class POSTaggerTopology {
 
     if (args.length > 0) {
       if (args.length >= 1) {
-        twitterDirPath = args[0];
-        if (args.length >= 5) {
-          consumerKey = args[1];
-          System.out.println("TwitterSpout using ConsumerKey: " + consumerKey);
-          consumerSecret = args[2];
-          accessToken = args[3];
-          accessTokenSecret = args[4];
-          if (args.length == 6) {
-            keyWords = args[5].split(" ");
+        twitterDirOrConsumerKey = args[0];
+        if (args.length >= 4) {
+          consumerSecret = args[1];
+          accessToken = args[2];
+          accessTokenSecret = args[3];
+          if (args.length == 5) {
+            keyWords = args[4].split(" ");
             System.out.println("TwitterSpout using KeyWords: "
                 + Arrays.toString(keyWords));
           }
@@ -59,19 +56,20 @@ public class POSTaggerTopology {
       }
     } else {
       System.out.println("Wrong argument size!");
-      System.out.println("    Argument1=twitterDir");
-      System.out.println("    Argument2=consumerKey");
-      System.out.println("    Argument3=consumerSecret");
-      System.out.println("    Argument4=accessToken");
-      System.out.println("    Argument5=accessTokenSecret");
-      System.out.println("    [Argument6=keyWords]");
+      System.out.println("    Argument1=[twitterDir|consumerKey]");
+      System.out.println("    Argument2=consumerSecret");
+      System.out.println("    Argument3=accessToken");
+      System.out.println("    Argument4=accessTokenSecret");
+      System.out.println("    [Argument5=keyWords]");
     }
 
     // Check twitterDir and consumerKey
-    File twitterDir = new File(twitterDirPath);
-    if ((!twitterDir.isDirectory()) && (consumerKey.isEmpty())) {
+    File twitterDir = new File(twitterDirOrConsumerKey);
+    if ((!twitterDir.isDirectory())
+        && ((consumerSecret.isEmpty()) || (accessToken.isEmpty()) || (accessTokenSecret
+            .isEmpty()))) {
       System.out
-          .println("TwitterDirectory does not exist and consumerKey is empty!");
+          .println("TwitterDirectory does not exist and consumerSecret, accessToken or accessTokenSecret is empty!");
       System.exit(1);
     }
 
@@ -85,8 +83,9 @@ public class POSTaggerTopology {
       spout = new TwitterFilesSpout(new String[] { "tweet" }, FILTER_LANG);
       spoutID = TwitterFilesSpout.ID;
     } else {
-      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
-          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      spout = new TwitterStreamSpout(new String[] { "tweet" },
+          twitterDirOrConsumerKey, consumerSecret, accessToken,
+          accessTokenSecret, keyWords, FILTER_LANG);
       spoutID = TwitterStreamSpout.ID;
     }
 

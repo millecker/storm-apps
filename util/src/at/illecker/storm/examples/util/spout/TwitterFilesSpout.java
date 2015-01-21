@@ -76,7 +76,7 @@ public class TwitterFilesSpout extends BaseRichSpout {
     // Emit tweet
     m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
     try {
-      Thread.sleep(1000); // for development
+      Thread.sleep(500); // for development
       // TODO minimize sleep time
       // sleep 1 ms
     } catch (InterruptedException e) {
