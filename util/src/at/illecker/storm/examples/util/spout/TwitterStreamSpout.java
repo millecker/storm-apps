@@ -37,12 +37,12 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
-public class TwitterSpout extends BaseRichSpout {
-  public static final String ID = "twitter-spout";
+public class TwitterStreamSpout extends BaseRichSpout {
+  public static final String ID = "twitter-stream-spout";
   private static final long serialVersionUID = 1208142390795660693L;
   private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
-  private LinkedBlockingQueue<Status> m_queue = null;
+  private LinkedBlockingQueue<Status> m_tweetsQueue = null;
   private TwitterStream m_twitterStream;
   private String m_consumerKey;
   private String m_consumerSecret;
@@ -51,7 +51,7 @@ public class TwitterSpout extends BaseRichSpout {
   private String[] m_keyWords;
   private String m_filterLanguage;
 
-  public TwitterSpout(String[] outputFields, String consumerKey,
+  public TwitterStreamSpout(String[] outputFields, String consumerKey,
       String consumerSecret, String accessToken, String accessTokenSecret,
       String[] keyWords, String filterLanguage) {
     this.m_outputFields = outputFields;
@@ -73,7 +73,7 @@ public class TwitterSpout extends BaseRichSpout {
   public void open(Map conf, TopologyContext context,
       SpoutOutputCollector collector) {
     m_collector = collector;
-    m_queue = new LinkedBlockingQueue<Status>(1000);
+    m_tweetsQueue = new LinkedBlockingQueue<Status>(1000);
 
     TwitterStream twitterStream = new TwitterStreamFactory(
         new ConfigurationBuilder().setJSONStoreEnabled(true).build())
@@ -83,7 +83,7 @@ public class TwitterSpout extends BaseRichSpout {
     twitterStream.addListener(new StatusListener() {
       @Override
       public void onStatus(Status status) {
-        m_queue.offer(status); // add tweet into queue
+        m_tweetsQueue.offer(status); // add tweet into queue
       }
 
       @Override
@@ -131,11 +131,11 @@ public class TwitterSpout extends BaseRichSpout {
 
   @Override
   public void nextTuple() {
-    Status ret = m_queue.poll();
-    if (ret == null) {
+    Status tweet = m_tweetsQueue.poll();
+    if (tweet == null) {
       Utils.sleep(50);
     } else {
-      m_collector.emit(new Values(ret.getText()));
+      m_collector.emit(new Values(tweet));
     }
   }
 
