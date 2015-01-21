@@ -42,10 +42,10 @@
     <property name="application.args" value="arg0 arg1 arg2" />
     -->
 	<!-- if properties were already defined, it has no effect! -->
-  <property name="util.src.dir" value="" />
+	<property name="util.src.dir" value="" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="" />
-  <property name="libfiles.cpu" value="" />
+	<property name="libfiles.cpu" value="" />
 	<property name="libjars.bench" value="" />
 	<property name="rootbeer.package.dir" value="" />
 	<property name="rootbeer.class" value="" />
