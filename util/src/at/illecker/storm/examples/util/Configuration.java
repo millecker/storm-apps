@@ -33,17 +33,23 @@ public class Configuration {
 
   public static final boolean LOGGING = false;
 
-  public static final String MODELS_PATH = "resources" + File.separator
-      + "models";
+  public static final boolean RUNNING_WITHIN_JAR = Configuration.class
+      .getResource("Configuration.class").toString().startsWith("jar:");
 
-  public static final String POS_MODEL_PATH = MODELS_PATH + File.separator
-      + "pos";
+  public static final String WORKING_DIR_PATH = (RUNNING_WITHIN_JAR) ? ""
+      : System.getProperty("user.dir") + File.separator;
 
-  public static final String SVM_MODEL_PATH = MODELS_PATH + File.separator
-      + "svm";
+  public static final String TEMP_DIR_PATH = System
+      .getProperty("java.io.tmpdir");
 
-  public static final String DICTIONARIES_PATH = "resources" + File.separator
-      + "dictionaries";
+  public static final String POS_MODEL_PATH = WORKING_DIR_PATH + "resources"
+      + File.separator + "models" + File.separator + "pos";
+
+  public static final String SVM_MODEL_PATH = WORKING_DIR_PATH + "resources"
+      + File.separator + "models" + File.separator + "svm";
+
+  public static final String DICTIONARIES_PATH = WORKING_DIR_PATH + "resources"
+      + File.separator + "dictionaries";
 
   public static final String SENTIMENT_DICTIONARIES_PATH = DICTIONARIES_PATH
       + File.separator + "sentiment";
@@ -54,23 +60,16 @@ public class Configuration {
   public static final String WORD_NET_PATH = DICTIONARIES_PATH + File.separator
       + "wordnet";
 
-  public static final String DATASET_PATH = "resources" + File.separator
-      + "datasets";
-
-  public static final String USER_DIR_PATH = ((System.getProperty("user.dir") != null) ? System
-      .getProperty("user.dir") : "");
-
-  public static final String TEMP_DIR_PATH = System
-      .getProperty("java.io.tmpdir");
+  public static final String DATASET_PATH = WORKING_DIR_PATH + "resources"
+      + File.separator + "datasets";
 
   public static String getSentiWordNetDict() {
-    return USER_DIR_PATH + File.separator + SENTIMENT_DICTIONARIES_PATH
-        + File.separator + "SentiWordNet_3.0.0_20130122.txt";
+    return SENTIMENT_DICTIONARIES_PATH + File.separator
+        + "SentiWordNet_3.0.0_20130122.txt";
   }
 
   public static Map<String, Properties> getSentimentWordlists() {
-    String wordListDir = USER_DIR_PATH + File.separator
-        + SENTIMENT_DICTIONARIES_PATH + File.separator;
+    String wordListDir = SENTIMENT_DICTIONARIES_PATH + File.separator;
     Map<String, Properties> wordLists = new HashMap<String, Properties>();
     Properties props = null;
 
@@ -167,8 +166,7 @@ public class Configuration {
   }
 
   public static Map<String, Properties> getSlangWordlists() {
-    String wordListDir = USER_DIR_PATH + File.separator
-        + SLANG_DICTIONARIES_PATH + File.separator;
+    String wordListDir = SLANG_DICTIONARIES_PATH + File.separator;
     Map<String, Properties> slangWordLists = new HashMap<String, Properties>();
     Properties props;
 
@@ -197,8 +195,7 @@ public class Configuration {
   }
 
   public static Set<String> getNameEntities() {
-    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
-        + File.separator;
+    String dictDir = DICTIONARIES_PATH + File.separator;
     Set<String> nameEntities = new HashSet<String>();
 
     // Add GATE cities
@@ -214,8 +211,7 @@ public class Configuration {
   }
 
   public static Set<String> getFirstNames() {
-    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
-        + File.separator;
+    String dictDir = DICTIONARIES_PATH + File.separator;
     Set<String> firstNames = new HashSet<String>();
 
     // Oxford Reference
@@ -227,8 +223,7 @@ public class Configuration {
   }
 
   public static Set<String> getStopWords() {
-    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
-        + File.separator;
+    String dictDir = DICTIONARIES_PATH + File.separator;
 
     Set<String> stopWords = new HashSet<String>();
     stopWords.add(dictDir + "Stopwords.txt");
@@ -237,8 +232,7 @@ public class Configuration {
   }
 
   public static Map<String, Properties> getInterjections() {
-    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
-        + File.separator;
+    String dictDir = DICTIONARIES_PATH + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
     // Add GATE interjections including regex patterns
@@ -250,8 +244,7 @@ public class Configuration {
   }
 
   public static Map<String, Properties> getEmoticons() {
-    String dictDir = USER_DIR_PATH + File.separator + DICTIONARIES_PATH
-        + File.separator;
+    String dictDir = DICTIONARIES_PATH + File.separator;
     Map<String, Properties> interjections = new HashMap<String, Properties>();
 
     // Add emoticons including regex patterns
@@ -264,31 +257,24 @@ public class Configuration {
   }
 
   public static String getPOSTaggingModel() {
-    return USER_DIR_PATH + File.separator + POS_MODEL_PATH + File.separator
-        + "gate-EN-twitter.model";
+    return POS_MODEL_PATH + File.separator + "gate-EN-twitter.model";
   }
 
   public static String getPOSTaggingModelFast() {
-    return USER_DIR_PATH + File.separator + POS_MODEL_PATH + File.separator
-        + "gate-EN-twitter-fast.model";
+    return POS_MODEL_PATH + File.separator + "gate-EN-twitter-fast.model";
   }
 
   public static String getWordNetDict() {
-    return USER_DIR_PATH + File.separator + WORD_NET_PATH + File.separator
-        + "wn3.1.dict.tar.gz";
-  }
-
-  public static String getDataSetPath() {
-    return USER_DIR_PATH + File.separator + DATASET_PATH;
+    return WORD_NET_PATH + File.separator + "wn3.1.dict.tar.gz";
   }
 
   public static List<Status> getDataSetUibkCrawler(String filterLanguage) {
-    String tweetsDir = getDataSetPath() + File.separator + "uibk_crawler";
+    String tweetsDir = DATASET_PATH + File.separator + "uibk_crawler";
     return JsonUtils.readTweetsDirectory(tweetsDir, filterLanguage);
   }
 
   public static List<Status> getDataSetUibkCrawlerTest(String filterLanguage) {
-    String tweetsDir = getDataSetPath() + File.separator + "uibk_crawler"
+    String tweetsDir = DATASET_PATH + File.separator + "uibk_crawler"
         + File.separator + "test";
     return JsonUtils.readTweetsDirectory(tweetsDir, filterLanguage);
   }
@@ -301,7 +287,7 @@ public class Configuration {
     // svmParam.C = Math.pow(2, 6);
     // svmParam.gamma = Math.pow(2, -5);
 
-    return new Dataset(getDataSetPath() + File.separator + "SemEval2013_mixed",
+    return new Dataset(DATASET_PATH + File.separator + "SemEval2013_mixed",
         "trainingInput.txt", null, "testingInput.txt", "\t", 0, 3, 1,
         new String[] { "positive" }, new String[] { "negative" },
         new String[] { "neutral" }, 0, 1, 2, svmParam);
@@ -324,7 +310,7 @@ public class Configuration {
     svmParam.weight[1] = 2.95;
     svmParam.weight[2] = 1;
 
-    return new Dataset(getDataSetPath() + File.separator + "SemEval2013",
+    return new Dataset(DATASET_PATH + File.separator + "SemEval2013",
         "twitter-train-full-B.tsv", "twitter-dev-gold-B.tsv",
         "twitter-test-gold-B.tsv", "\t", 0, 2, 3, new String[] { "positive" },
         new String[] { "negative", "\"negative\"" }, new String[] { "neutral",
@@ -337,11 +323,12 @@ public class Configuration {
     svmParam.kernel_type = svm_parameter.LINEAR;
     svmParam.C = 0.5;
     // TODO
-    return new Dataset(getDataSetPath() + File.separator + "SemEval2014",
+    return new Dataset(DATASET_PATH + File.separator + "SemEval2014",
         "twitter-train-gold-B-2014.tsv", null,
         "SemEval2014-task9-test-B-input.txt", "\t", 0, 2, 3, new String[] {
             "positive", "\"positive\"" }, new String[] { "negative",
             "\"negative\"" }, new String[] { "neutral", "\"neutral\"",
             "\"objective-OR-neutral\"" }, 0, 1, 2, svmParam);
   }
+
 }
