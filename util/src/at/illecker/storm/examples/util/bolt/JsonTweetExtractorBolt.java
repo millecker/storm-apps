@@ -57,6 +57,7 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
+    // Fetch JSON element
     Map<String, Object> element = (Map<String, Object>) tuple
         .getValueByField(m_inputFields[0]);
 

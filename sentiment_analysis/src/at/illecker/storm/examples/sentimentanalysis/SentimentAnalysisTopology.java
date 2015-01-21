@@ -16,16 +16,15 @@
  */
 package at.illecker.storm.examples.sentimentanalysis;
 
-import java.io.File;
 import java.util.Arrays;
 
-import at.illecker.storm.examples.util.bolt.JsonTweetExtractorBolt;
+import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
 import at.illecker.storm.examples.util.bolt.SentimentDetectionBolt;
 import at.illecker.storm.examples.util.bolt.TokenizerBolt;
-import at.illecker.storm.examples.util.spout.JsonFileSpout;
-import at.illecker.storm.examples.util.spout.TwitterSpout;
+import at.illecker.storm.examples.util.spout.DatasetSpout;
+import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -44,60 +43,49 @@ public class SentimentAnalysisTopology {
     String[] keyWords = null;
 
     if (args.length > 0) {
-      if (args.length >= 1) {
-        referenceFilePath = args[0];
-        if (args.length >= 5) {
-          consumerKey = args[1];
-          System.out.println("TwitterSpout using ConsumerKey: " + consumerKey);
-          consumerSecret = args[2];
-          accessToken = args[3];
-          accessTokenSecret = args[4];
-          if (args.length == 6) {
-            keyWords = args[5].split(" ");
-            System.out.println("TwitterSpout using KeyWords: "
-                + Arrays.toString(keyWords));
-          }
+      if (args.length >= 4) {
+        consumerKey = args[0];
+        System.out.println("TwitterSpout using ConsumerKey: " + consumerKey);
+        consumerSecret = args[1];
+        accessToken = args[2];
+        accessTokenSecret = args[3];
+        if (args.length == 5) {
+          keyWords = args[4].split(" ");
+          System.out.println("TwitterSpout using KeyWords: "
+              + Arrays.toString(keyWords));
         }
+      } else {
+        System.out.println("Wrong argument size!");
+        System.out.println("    Argument1=consumerKey");
+        System.out.println("    Argument2=consumerSecret");
+        System.out.println("    Argument3=accessToken");
+        System.out.println("    Argument4=accessTokenSecret");
+        System.out.println("    [Argument5=keyWords]");
       }
-    } else {
-      System.out.println("Wrong argument size!");
-      System.out.println("    Argument1=referenceFile");
-      System.out.println("    Argument2=consumerKey");
-      System.out.println("    Argument3=consumerSecret");
-      System.out.println("    Argument4=accessToken");
-      System.out.println("    Argument5=accessTokenSecret");
-      System.out.println("    [Argument6=keyWords]");
     }
-
-    // Check twitterDir and consumerKey
-    File referenceFile = new File(referenceFilePath);
-    if ((!referenceFile.isFile()) && (consumerKey.isEmpty())) {
-      System.out
-          .println("ReferenceFile does not exist and consumerKey is empty!");
-      System.exit(1);
-    }
-
-    Config conf = new Config();
 
     // Create Spout
     IRichSpout spout;
     String spoutID = "";
-    if (referenceFile.isFile()) {
-      conf.put(JsonFileSpout.CONF_JSON_FILE, referenceFile.getAbsolutePath());
-      spout = new JsonFileSpout();
-      spoutID = JsonFileSpout.ID;
+    if (consumerKey.isEmpty()) {
+      spout = new DatasetSpout(new String[] { "tweet" },
+          Configuration.getDataSetSemEval2013());
+      spoutID = DatasetSpout.ID;
     } else {
-      spout = new TwitterSpout(consumerKey, consumerSecret, accessToken,
-          accessTokenSecret, keyWords, FILTER_LANG);
-      spoutID = TwitterSpout.ID;
+      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
+          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts
-    JsonTweetExtractorBolt jsonTweetExtractorBolt = new JsonTweetExtractorBolt();
-    TokenizerBolt tokenizerBolt = new TokenizerBolt();
-    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
-    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
-    SentimentDetectionBolt sentimentDetectionBolt = new SentimentDetectionBolt();
+    TokenizerBolt tokenizerBolt = new TokenizerBolt(new String[] { "tweet" },
+        new String[] { "splittedTweet" });
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt(
+        new String[] { "splittedTweet" }, new String[] { "preprocessedTweet" });
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt(
+        new String[] { "preprocessedTweet" }, new String[] { "taggedTweet" });
+    SentimentDetectionBolt sentimentDetectionBolt = new SentimentDetectionBolt(
+        new String[] { "taggedTweet" }, null);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -105,13 +93,8 @@ public class SentimentAnalysisTopology {
     // Set Spout
     builder.setSpout(spoutID, spout);
 
-    // Spout --> JsonTweetExtractorBolt
-    builder.setBolt(JsonTweetExtractorBolt.ID, jsonTweetExtractorBolt)
-        .shuffleGrouping(spoutID);
-
-    // JsonTweetExtractorBolt --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(
-        JsonTweetExtractorBolt.ID);
+    // Set Spout --> TokenizerBolt
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
     builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
@@ -125,6 +108,7 @@ public class SentimentAnalysisTopology {
     builder.setBolt(SentimentDetectionBolt.ID, sentimentDetectionBolt)
         .shuffleGrouping(POSTaggerBolt.ID);
 
+    Config conf = new Config();
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
 

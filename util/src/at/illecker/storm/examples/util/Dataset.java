@@ -17,6 +17,7 @@
 package at.illecker.storm.examples.util;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
-public class Dataset {
+public class Dataset implements Serializable {
+  private static final long serialVersionUID = -1822543611053727897L;
   public static final String SERIAL_EXTENSION = ".ser";
   private static final Logger LOG = LoggerFactory.getLogger(Dataset.class);
 
