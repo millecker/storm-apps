@@ -96,11 +96,11 @@ public class SentimentAnalysisTopology {
     builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt, 2).shuffleGrouping(
         TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt).shuffleGrouping(
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, 6).shuffleGrouping(
         PreprocessorBolt.ID);
 
     // POSTaggerBolt --> SentimentDetectionBolt
@@ -108,6 +108,8 @@ public class SentimentAnalysisTopology {
         .shuffleGrouping(POSTaggerBolt.ID);
 
     Config conf = new Config();
+    // conf.setNumWorkers(2); // use two worker processes
+
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
 
