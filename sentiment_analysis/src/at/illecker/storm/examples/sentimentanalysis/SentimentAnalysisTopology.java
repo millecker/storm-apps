@@ -35,7 +35,6 @@ public class SentimentAnalysisTopology {
   public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
-    String referenceFilePath = "";
     String consumerKey = "";
     String consumerSecret = "";
     String accessToken = "";
