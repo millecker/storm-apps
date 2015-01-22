@@ -70,9 +70,29 @@ public class SentimentDetectionBolt extends BaseRichBolt {
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
         .getTweetSentiment(tweet);
 
+    double totalSentimentScore = Double.MIN_VALUE;
+    if (tweetSentiments != null) {
+      for (SentimentResult tweetSentiment : tweetSentiments.values()) {
+        totalSentimentScore += tweetSentiment.getAvgSum();
+      }
+      totalSentimentScore /= tweetSentiments.size();
+    }
+
     // Debug
-    LOG.info("Tweet: " + tweet.toString() + " TweetSentiment: "
-        + tweetSentiments);
+    if (totalSentimentScore != Double.MIN_VALUE) {
+      if (totalSentimentScore > SentimentResult.POSITIVE_THRESHOLD) {
+        LOG.info("Tweet: " + tweet.toString() + " Sentiment: POSITIVE Score: "
+            + totalSentimentScore);
+      } else if (totalSentimentScore < SentimentResult.NEGATIVE_THRESHOLD) {
+        LOG.info("Tweet: " + tweet.toString() + " Sentiment: NEGATIVE Score: "
+            + totalSentimentScore);
+      } else {
+        LOG.info("Tweet: " + tweet.toString() + " Sentiment: NEUTAL Score: "
+            + totalSentimentScore);
+      }
+    } else {
+      LOG.info("Tweet: " + tweet.toString() + " Sentiment: UNKNOWN");
+    }
 
     this.m_collector.ack(tuple);
   }
