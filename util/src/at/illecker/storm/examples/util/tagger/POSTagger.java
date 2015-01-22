@@ -30,6 +30,8 @@ import at.illecker.storm.examples.util.dictionaries.Interjections;
 import at.illecker.storm.examples.util.dictionaries.NameEntities;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.HasWord;
@@ -130,13 +132,17 @@ public class POSTagger {
     return m_posTagger.tagSentence(untaggedTokens, true);
   }
 
-  public void tagTweets(List<Tweet> tweets) {
-    for (Tweet tweet : tweets) {
+  public List<TaggedTweet> tagTweets(List<PreprocessedTweet> tweets) {
+    List<TaggedTweet> taggedTweets = new ArrayList<TaggedTweet>();
+    for (PreprocessedTweet tweet : tweets) {
+      List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
       for (List<String> sentence : tweet.getPreprocessedSentences()) {
-        List<TaggedWord> taggedSentence = tagSentence(sentence);
-        tweet.addTaggedSentence(taggedSentence);
+        taggedSentences.add(this.tagSentence(sentence));
       }
+      taggedTweets.add(new TaggedTweet(tweet.getId(), tweet.getText(), tweet
+          .getScore(), taggedSentences));
     }
+    return taggedTweets;
   }
 
   public static void testPOSTagger() {
@@ -251,16 +257,13 @@ public class POSTagger {
     for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
 
       // Preprocess
       List<String> preprocessedTokens = preprocessor.preprocess(tokens);
-      tweet.addPreprocessedSentence(preprocessedTokens);
 
       // POS Tagging
       List<TaggedWord> taggedSentence = posTagger
           .tagSentence(preprocessedTokens);
-      tweet.addTaggedSentence(taggedSentence);
 
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("TaggedSentence: " + taggedSentence);
