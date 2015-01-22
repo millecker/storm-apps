@@ -560,12 +560,11 @@ public class SVM {
 
       // Feature Vector Generation
       LOG.info("Generate Feature Vectors for test tweets...");
-      List<FeaturedTweet> featuredTweets = fvg
-          .generateFeatureVectors(taggedTweets);
+      testFeaturedTweets = fvg.generateFeatureVectors(taggedTweets);
 
       // Serialize test data
       if (useSerialization) {
-        SerializationUtils.serializeList(featuredTweets,
+        SerializationUtils.serializeList(testFeaturedTweets,
             dataset.getTestDataSerializationFile());
       }
     }
