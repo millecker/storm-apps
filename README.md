@@ -6,6 +6,7 @@ This code-sink includes example applications of Apache Storm.
   - [WordCount](wordcount)
   - [POS Tagger](pos_tagger) based on the [Stanford NLP](http://nlp.stanford.edu/software/corenlp.shtml) [MaxentTagger](http://nlp.stanford.edu/nlp/javadoc/javanlp/edu/stanford/nlp/tagger/maxent/MaxentTagger.html) and the [GATE Twitter model](https://gate.ac.uk/wiki/twitter-postagger.html)
   - [Sentiment Analysis](sentiment_analysis)
+  - [Sentiment Analysis using SVM](sentiment_analysis_svm) based on [LIBSVM](http://www.csie.ntu.edu.tw/~cjlin/libsvm/)
 
 ## Compilation and Execution
 Use [Apache Ant](http://ant.apache.org) to build and run the applications.<br>
