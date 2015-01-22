@@ -6,7 +6,7 @@
 	<property name="util.src.dir" value="../util/src" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar,${lib}${file.separator}libsvm-3.2-multithreaded.jar" />
-	<property name="libfiles.cpu" value="resources${file.separator}dictionaries,resources${file.separator}models,resources${file.separator}datasets${file.separator}SemEval2013" />
+	<property name="libfiles.cpu" value="resources${file.separator}dictionaries,resources${file.separator}models,resources${file.separator}datasets${file.separator}SemEval" />
 	<property name="libjars.bench" value="" />
 	<property name="rootbeer.package.dir" value="" />
 	<property name="rootbeer.classes" value="" />
