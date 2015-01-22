@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.svm.bolt;
+package at.illecker.storm.examples.util.bolt;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +47,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class SupportVectorMachineBolt extends BaseRichBolt {
+public class SVMBolt extends BaseRichBolt {
   public static final String ID = "support-vector-maschine-bolt";
   public static final String DATASET_PATH = Configuration.getDataSetPath()
       + "dataset2" + File.separator;
@@ -58,7 +58,7 @@ public class SupportVectorMachineBolt extends BaseRichBolt {
 
   private static final long serialVersionUID = -3393202292186510304L;
   private static final Logger LOG = LoggerFactory
-      .getLogger(SupportVectorMachineBolt.class);
+      .getLogger(SVMBolt.class);
   private static final boolean LOGGING = true;
 
   private OutputCollector m_collector;
