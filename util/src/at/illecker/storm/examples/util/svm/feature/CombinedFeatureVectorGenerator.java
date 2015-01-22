@@ -30,8 +30,10 @@ import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
 import at.illecker.storm.examples.util.tfidf.TfType;
 import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
+import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
-import edu.stanford.nlp.ling.TaggedWord;
 
 public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
@@ -63,7 +65,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
+  public Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet) {
 
     Map<Integer, Double> featureVector = m_sentimentFeatureVectorGenerator
         .calculateFeatureVector(tweet);
@@ -94,26 +96,21 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
 
     // prepare Tweets
     long startTime = System.currentTimeMillis();
-    for (Tweet tweet : tweets) {
-      // Tokenize
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
+    // Tokenize tweets
+    List<TokenizedTweet> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
-      // Preprocess
-      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
-      tweet.addPreprocessedSentence(preprocessedTokens);
+    // Preprocess
+    List<PreprocessedTweet> preprocessedTweets = preprocessor
+        .preprocessTweets(tokenizedTweets);
 
-      // POS Tagging
-      List<TaggedWord> taggedSentence = posTagger
-          .tagSentence(preprocessedTokens);
-      tweet.addTaggedSentence(taggedSentence);
-    }
+    // POS Tagging
+    List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
     LOG.info("Preparation of Tweets finished after "
         + (System.currentTimeMillis() - startTime) + " ms");
 
     // Calculate Tf-Idf
     boolean usePOSTags = true; // use POS tags in terms
-    TweetTfIdf tweetTfIdf = new TweetTfIdf(tweets, TfType.RAW,
+    TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
         TfIdfNormalization.COS, usePOSTags);
     CombinedFeatureVectorGenerator cfvg = new CombinedFeatureVectorGenerator(
         tweetTfIdf);
@@ -127,7 +124,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
     }
 
     // Feature Vector Generation
-    for (Tweet tweet : tweets) {
+    for (TaggedTweet tweet : taggedTweets) {
       String featureVectorStr = "";
       for (Map.Entry<Integer, Double> feature : cfvg.calculateFeatureVector(
           tweet).entrySet()) {

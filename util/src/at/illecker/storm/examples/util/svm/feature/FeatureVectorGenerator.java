@@ -16,13 +16,15 @@
  */
 package at.illecker.storm.examples.util.svm.feature;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.tweet.FeaturedTweet;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 
 public abstract class FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
@@ -30,20 +32,24 @@ public abstract class FeatureVectorGenerator {
 
   public abstract int getFeatureVectorSize();
 
-  public abstract Map<Integer, Double> calculateFeatureVector(Tweet tweet);
+  public abstract Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet);
 
-  public void generateFeatureVectors(List<Tweet> tweets, boolean logging) {
-    for (Tweet tweet : tweets) {
-      tweet.genFeatureVector(this);
-
+  public List<FeaturedTweet> generateFeatureVectors(List<TaggedTweet> tweets,
+      boolean logging) {
+    List<FeaturedTweet> featuredTweets = new ArrayList<FeaturedTweet>();
+    for (TaggedTweet tweet : tweets) {
+      Map<Integer, Double> featureVector = this.calculateFeatureVector(tweet);
       if (logging) {
         LOG.info("Tweet: " + tweet);
-        LOG.info("FeatureVector: " + tweet.getFeatureVector());
+        LOG.info("FeatureVector: " + featureVector);
       }
+      featuredTweets.add(new FeaturedTweet(tweet.getId(), tweet.getText(),
+          tweet.getScore(), featureVector));
     }
+    return featuredTweets;
   }
 
-  public void generateFeatureVectors(List<Tweet> tweets) {
-    generateFeatureVectors(tweets, false);
+  public List<FeaturedTweet> generateFeatureVectors(List<TaggedTweet> tweets) {
+    return generateFeatureVectors(tweets, false);
   }
 }

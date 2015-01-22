@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.examples.util.svm.feature;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,6 +29,7 @@ import at.illecker.storm.examples.util.dictionaries.SentimentWordLists;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -60,7 +62,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(Tweet tweet) {
+  public Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
@@ -120,26 +122,24 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
     for (Tweet tweet : Tweet.getTestTweets()) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
 
       // Preprocess
       List<String> preprocessedTokens = preprocessor.preprocess(tokens);
-      tweet.addPreprocessedSentence(preprocessedTokens);
 
       // POS Tagging
-      List<TaggedWord> taggedSentence = posTagger
-          .tagSentence(preprocessedTokens);
-      tweet.addTaggedSentence(taggedSentence);
+      List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
+      taggedSentences.add(posTagger.tagSentence(preprocessedTokens));
 
       // Feature Vector Generation
       String featureVectorStr = "";
       for (Map.Entry<Integer, Double> feature : sfvg.calculateFeatureVector(
-          tweet).entrySet()) {
+          new TaggedTweet(tweet.getId(), tweet.getText(), tweet.getScore(),
+              taggedSentences)).entrySet()) {
         featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
 
       LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("TaggedSentence: " + taggedSentence);
+      LOG.info("TaggedSentence: " + taggedSentences);
       LOG.info("FeatureVector: " + featureVectorStr);
     }
 
