@@ -16,13 +16,20 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Dataset;
+import at.illecker.storm.examples.util.io.SerializationUtils;
+import at.illecker.storm.examples.util.svm.feature.CombinedFeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
-import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
+import at.illecker.storm.examples.util.tfidf.TfIdfNormalization;
+import at.illecker.storm.examples.util.tfidf.TfType;
+import at.illecker.storm.examples.util.tfidf.TweetTfIdf;
+import at.illecker.storm.examples.util.tweet.FeaturedTweet;
 import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -39,15 +46,15 @@ public class FeatureGenerationBolt extends BaseRichBolt {
       .getLogger(FeatureGenerationBolt.class);
   private String[] m_inputFields;
   private String[] m_outputFields;
+  private Dataset m_dataset;
   private OutputCollector m_collector;
-  private Class<? extends FeatureVectorGenerator> m_featureVectorGenerationClass;
   private FeatureVectorGenerator m_fvg = null;
 
   public FeatureGenerationBolt(String[] inputFields, String[] outputFields,
-      Class<? extends FeatureVectorGenerator> featureVectorGenerationClass) {
+      Dataset dataset) {
     this.m_inputFields = inputFields;
     this.m_outputFields = outputFields;
-    this.m_featureVectorGenerationClass = featureVectorGenerationClass;
+    this.m_dataset = dataset;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -61,9 +68,18 @@ public class FeatureGenerationBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
-    // TODO load m_featureVectorGenerationClass
-    LOG.info("Load SentimentFeatureVectorGenerator...");
-    m_fvg = new SentimentFeatureVectorGenerator();
+    List<TaggedTweet> taggedTweets = SerializationUtils.deserialize(m_dataset
+        .getTrainTaggedDataSerializationFile());
+
+    if (taggedTweets != null) {
+      TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
+          TfIdfNormalization.COS, true);
+      LOG.info("Load CombinedFeatureVectorGenerator...");
+      m_fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
+    } else {
+      LOG.error("TaggedTweets could not be found! File is missing: "
+          + m_dataset.getTrainTaggedDataSerializationFile());
+    }
   }
 
   public void execute(Tuple tuple) {
@@ -72,10 +88,10 @@ public class FeatureGenerationBolt extends BaseRichBolt {
 
     // Generate Feature Vector for tweet
     Map<Integer, Double> featureVector = m_fvg.calculateFeatureVector(tweet);
+    // LOG.info("FeatureVector: " + featureVector);
 
-    LOG.info("FeatureVector: " + featureVector);
-
-    this.m_collector.emit(tuple, new Values(tweet));
+    this.m_collector.emit(tuple, new Values(new FeaturedTweet(tweet.getId(),
+        tweet.getText(), tweet.getScore(), featureVector)));
     this.m_collector.ack(tuple);
   }
 }

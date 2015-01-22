@@ -19,6 +19,7 @@ package at.illecker.storm.examples.sentimentanalysis.svm;
 import java.util.Arrays;
 
 import at.illecker.storm.examples.util.Configuration;
+import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.bolt.FeatureGenerationBolt;
 import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
 import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
@@ -26,7 +27,6 @@ import at.illecker.storm.examples.util.bolt.SVMBolt;
 import at.illecker.storm.examples.util.bolt.TokenizerBolt;
 import at.illecker.storm.examples.util.spout.DatasetSpout;
 import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
-import at.illecker.storm.examples.util.svm.feature.CombinedFeatureVectorGenerator;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -65,12 +65,14 @@ public class SentimentAnalysisSVMTopology {
       }
     }
 
+    // Dataset SemEval2013
+    Dataset dataset = Configuration.getDataSetSemEval2013();
+
     // Create Spout
     IRichSpout spout;
     String spoutID = "";
     if (consumerKey.isEmpty()) {
-      spout = new DatasetSpout(new String[] { "tweet" },
-          Configuration.getDataSetSemEval2013());
+      spout = new DatasetSpout(new String[] { "tweet" }, dataset);
       spoutID = DatasetSpout.ID;
     } else {
       spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
@@ -87,8 +89,9 @@ public class SentimentAnalysisSVMTopology {
         new String[] { "preprocessedTweet" }, new String[] { "taggedTweet" });
     FeatureGenerationBolt featureGenerationBolt = new FeatureGenerationBolt(
         new String[] { "taggedTweet" }, new String[] { "featuredTweet" },
-        CombinedFeatureVectorGenerator.class);
-    SVMBolt svmBolt = new SVMBolt(new String[] { "featuredTweet" }, null);
+        dataset);
+    SVMBolt svmBolt = new SVMBolt(new String[] { "featuredTweet" }, null,
+        dataset);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();

@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
+import java.io.File;
 import java.util.Map;
 
 import libsvm.svm_model;
@@ -23,8 +24,11 @@ import libsvm.svm_model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.examples.util.Dataset;
+import at.illecker.storm.examples.util.io.SerializationUtils;
 import at.illecker.storm.examples.util.svm.SVM;
-import at.illecker.storm.examples.util.svm.classifier.DynamicScoreClassifier;
+import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
+import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
 import at.illecker.storm.examples.util.tweet.FeaturedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -35,19 +39,20 @@ import backtype.storm.tuple.Tuple;
 
 public class SVMBolt extends BaseRichBolt {
   public static final String ID = "support-vector-maschine-bolt";
-  private static final long serialVersionUID = -18278802726186268L;
+  private static final long serialVersionUID = -3235291265771813064L;
   private static final Logger LOG = LoggerFactory.getLogger(SVMBolt.class);
-  private static final boolean LOGGING = true;
   private String[] m_inputFields;
   private String[] m_outputFields;
+  private Dataset m_dataset;
   private OutputCollector m_collector;
   private int m_totalClasses;
-  private DynamicScoreClassifier m_dsc;
+  private ScoreClassifier m_classifier;
   private svm_model m_model;
 
-  public SVMBolt(String[] inputFields, String[] outputFields) {
+  public SVMBolt(String[] inputFields, String[] outputFields, Dataset dataset) {
     this.m_inputFields = inputFields;
     this.m_outputFields = outputFields;
+    this.m_dataset = dataset;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -61,27 +66,29 @@ public class SVMBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
-    // TODO load model instead of training...
-    LOG.info("Train model...");
-    // m_model = SVM.train(svmProb, svmParam);
+    m_totalClasses = 3;
+    m_classifier = new IdentityScoreClassifier();
+
+    LOG.info("Loading SVM model...");
+    m_model = SerializationUtils.deserialize(m_dataset.getDatasetPath()
+        + File.separator + SVM.SVM_MODEL_FILE_SER);
+
+    if (m_model == null) {
+      LOG.error("Could not load SVM model! File: " + m_dataset.getDatasetPath()
+          + File.separator + SVM.SVM_MODEL_FILE_SER);
+    }
   }
 
   public void execute(Tuple tuple) {
     FeaturedTweet tweet = (FeaturedTweet) tuple
         .getValueByField(m_inputFields[0]);
 
-    double predictedClass = SVM.evaluate(tweet, m_model, m_totalClasses, m_dsc);
+    double predictedClass = SVM.evaluate(tweet, m_model, m_totalClasses,
+        m_classifier);
 
     LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
-        + " expectedClass: " + m_dsc.classfyScore(tweet.getScore())
+        + " expectedClass: " + m_classifier.classfyScore(tweet.getScore())
         + " predictedClass: " + predictedClass);
-
-    String featureVectorStr = "";
-    for (Map.Entry<Integer, Double> feature : tweet.getFeatureVector()
-        .entrySet()) {
-      featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
-    }
-    LOG.info("FeatureVector: " + featureVectorStr);
 
     this.m_collector.ack(tuple);
   }
