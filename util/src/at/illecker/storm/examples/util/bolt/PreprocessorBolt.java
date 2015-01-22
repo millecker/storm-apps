@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
+import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -61,14 +63,18 @@ public class PreprocessorBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
+    TokenizedTweet tweet = (TokenizedTweet) tuple
+        .getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
+    List<List<String>> preprocessedSentences = new ArrayList<List<String>>();
     for (List<String> sentence : tweet.getSentences()) {
-      tweet.addPreprocessedSentence(m_preprocessor.preprocess(sentence));
+      preprocessedSentences.add(m_preprocessor.preprocess(sentence));
     }
 
-    this.m_collector.emit(tuple, new Values(tweet));
+    this.m_collector.emit(tuple, new Values(
+        new PreprocessedTweet(tweet.getId(), tweet.getText(), tweet.getScore(),
+            preprocessedSentences)));
     this.m_collector.ack(tuple);
   }
 }

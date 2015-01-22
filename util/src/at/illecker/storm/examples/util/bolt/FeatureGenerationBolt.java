@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
 import at.illecker.storm.examples.util.svm.feature.SentimentFeatureVectorGenerator;
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -67,12 +67,13 @@ public class FeatureGenerationBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
+    TaggedTweet tweet = (TaggedTweet) tuple.getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
     // Generate Feature Vector for tweet
-    tweet.genFeatureVector(m_fvg);
-    // LOG.info("FeatureVector: " + Arrays.toString(tweet.getFeatureVector()));
+    Map<Integer, Double> featureVector = m_fvg.calculateFeatureVector(tweet);
+
+    LOG.info("FeatureVector: " + featureVector);
 
     this.m_collector.emit(tuple, new Values(tweet));
     this.m_collector.ack(tuple);

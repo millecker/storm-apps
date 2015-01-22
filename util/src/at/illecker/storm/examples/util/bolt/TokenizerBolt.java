@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -64,10 +66,11 @@ public class TokenizerBolt extends BaseRichBolt {
 
     // Split tweet into tokens
     // trim text and split at one ore more blanks
-    List<String> tokens = Tokenizer.tokenize(tweet.getText());
-    tweet.addSentence(tokens);
+    List<List<String>> sentences = new ArrayList<List<String>>();
+    sentences.add(Tokenizer.tokenize(tweet.getText()));
 
-    this.m_collector.emit(tuple, new Values(tweet));
+    this.m_collector.emit(tuple, new Values(new TokenizedTweet(tweet.getId(),
+        tweet.getText(), tweet.getScore(), sentences)));
     this.m_collector.ack(tuple);
   }
 }

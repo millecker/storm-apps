@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.examples.util.bolt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.tagger.POSTagger;
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -62,17 +64,17 @@ public class POSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
+    PreprocessedTweet tweet = (PreprocessedTweet) tuple
+        .getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
-    for (List<String> sentence : tweet.getSentences()) {
-      List<TaggedWord> taggedSentence = m_posTagger.tagSentence(sentence);
-      tweet.addTaggedSentence(taggedSentence);
-      // LOG.info("Tweet: " + sentence.toString() + " TaggedTweet: "
-      // + taggedSentence.toString());
+    List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
+    for (List<String> sentence : tweet.getPreprocessedSentences()) {
+      taggedSentences.add(m_posTagger.tagSentence(sentence));
     }
 
-    this.m_collector.emit(tuple, new Values(tweet));
+    this.m_collector.emit(tuple, new Values(new TaggedTweet(tweet.getId(),
+        tweet.getText(), tweet.getScore(), taggedSentences)));
     this.m_collector.ack(tuple);
   }
 }

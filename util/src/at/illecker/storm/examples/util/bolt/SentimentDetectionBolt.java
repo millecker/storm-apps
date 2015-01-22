@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.dictionaries.SentimentResult;
 import at.illecker.storm.examples.util.dictionaries.SentimentWordLists;
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -64,7 +64,7 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
+    TaggedTweet tweet = (TaggedTweet) tuple.getValueByField(m_inputFields[0]);
     // LOG.info(tweet.toString());
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
