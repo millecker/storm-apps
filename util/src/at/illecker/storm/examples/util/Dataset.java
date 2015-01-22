@@ -102,6 +102,11 @@ public class Dataset implements Serializable {
         + m_trainDataFile + SERIAL_EXTENSION : null;
   }
 
+  public String getTrainTaggedDataSerializationFile() {
+    return (m_trainDataFile != null) ? m_datasetPath + File.separator
+        + m_trainDataFile + "-tagged" + SERIAL_EXTENSION : null;
+  }
+
   public String getDevDataFile() {
     return (m_devDataFile != null) ? m_datasetPath + File.separator
         + m_devDataFile : null;

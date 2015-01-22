@@ -494,6 +494,12 @@ public class SVM {
       LOG.info("POS Tagging of train tweets...");
       List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
 
+      // Serialize training data including POS tags
+      if (useSerialization) {
+        SerializationUtils.serializeList(taggedTweets,
+            dataset.getTrainTaggedDataSerializationFile());
+      }
+
       // Feature Vector Generation
       if (featureVectorGenerator.equals(SentimentFeatureVectorGenerator.class)) {
         LOG.info("Load SentimentFeatureVectorGenerator...");
@@ -522,7 +528,7 @@ public class SVM {
       LOG.info("Generate Feature Vectors for test tweets...");
       trainFeaturedTweets = fvg.generateFeatureVectors(taggedTweets);
 
-      // Serialize training data
+      // Serialize training data including feature vectors
       if (useSerialization) {
         SerializationUtils.serializeList(trainFeaturedTweets,
             dataset.getTrainDataSerializationFile());
@@ -674,16 +680,18 @@ public class SVM {
     int nFoldCrossValidation = 3;
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
+    boolean parameterSearch = false;
+    boolean useSerialization = true;
 
     if (featureVectorLevel == 0) {
       SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,
-          nFoldCrossValidation, false, false);
+          nFoldCrossValidation, parameterSearch, useSerialization);
     } else if (featureVectorLevel == 1) {
       SVM.svm(dataSet, TfIdfFeatureVectorGenerator.class, nFoldCrossValidation,
-          false, false);
+          parameterSearch, useSerialization);
     } else {
       SVM.svm(dataSet, CombinedFeatureVectorGenerator.class,
-          nFoldCrossValidation, false, false);
+          nFoldCrossValidation, parameterSearch, useSerialization);
     }
   }
 }
