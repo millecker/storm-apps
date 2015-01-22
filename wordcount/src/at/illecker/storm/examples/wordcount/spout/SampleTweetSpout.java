@@ -39,9 +39,9 @@ public class SampleTweetSpout extends BaseRichSpout {
   public SampleTweetSpout(String[] outputFields) {
     m_outputFields = outputFields;
     m_tweets = new ArrayList<Tweet>();
-    m_tweets.add(new Tweet(1, "this is the first tweet"));
-    m_tweets.add(new Tweet(2, "followed by a second tweet"));
-    m_tweets.add(new Tweet(3, "and a third tweet"));
+    m_tweets.add(new Tweet(1L, "this is the first tweet"));
+    m_tweets.add(new Tweet(2L, "followed by a second tweet"));
+    m_tweets.add(new Tweet(3L, "and a third tweet"));
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
