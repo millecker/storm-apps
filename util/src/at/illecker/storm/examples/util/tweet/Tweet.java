@@ -18,45 +18,25 @@ package at.illecker.storm.examples.util.tweet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import at.illecker.storm.examples.util.svm.feature.FeatureVectorGenerator;
-import edu.stanford.nlp.ling.TaggedWord;
+public final class Tweet implements Serializable {
+  private static final long serialVersionUID = 5246263296320608188L;
+  private final Long m_id;
+  private final String m_text;
+  private final Double m_score;
 
-public class Tweet implements Serializable {
-  private static final long serialVersionUID = 4547113316137760131L;
-  private long m_id;
-  private String m_text = "";
-  private Double m_score = null;
-
-  private List<List<String>> m_sentences;
-  private List<List<String>> m_preprocessedSentences;
-  private List<List<TaggedWord>> m_taggedSentences;
-  private Map<Integer, Double> m_featureVector; // store only non-zero values
-
-  public Tweet() {
-    this.m_sentences = new ArrayList<List<String>>();
-    this.m_preprocessedSentences = new ArrayList<List<String>>();
-    this.m_taggedSentences = new ArrayList<List<TaggedWord>>();
-    this.m_featureVector = new HashMap<Integer, Double>();
-  }
-
-  public Tweet(long id, String text) {
-    this();
-    this.m_id = id;
-    this.m_text = text;
-  }
-
-  public Tweet(long id, String text, double score) {
-    this();
+  public Tweet(Long id, String text, Double score) {
     this.m_id = id;
     this.m_text = text;
     this.m_score = score;
   }
 
-  public long getId() {
+  public Tweet(Long id, String text) {
+    this(id, text, null);
+  }
+
+  public Long getId() {
     return m_id;
   }
 
@@ -66,38 +46,6 @@ public class Tweet implements Serializable {
 
   public Double getScore() {
     return m_score;
-  }
-
-  public List<List<String>> getSentences() {
-    return m_sentences;
-  }
-
-  public void addSentence(List<String> sentence) {
-    m_sentences.add(sentence);
-  }
-
-  public List<List<String>> getPreprocessedSentences() {
-    return m_preprocessedSentences;
-  }
-
-  public void addPreprocessedSentence(List<String> preprocessedSentence) {
-    m_preprocessedSentences.add(preprocessedSentence);
-  }
-
-  public List<List<TaggedWord>> getTaggedSentences() {
-    return m_taggedSentences;
-  }
-
-  public void addTaggedSentence(List<TaggedWord> sentence) {
-    m_taggedSentences.add(sentence);
-  }
-
-  public void genFeatureVector(FeatureVectorGenerator featureVectorGen) {
-    m_featureVector = featureVectorGen.calculateFeatureVector(this);
-  }
-
-  public Map<Integer, Double> getFeatureVector() {
-    return m_featureVector;
   }
 
   @Override
@@ -128,55 +76,53 @@ public class Tweet implements Serializable {
 
   public static List<Tweet> getTestTweets() {
     List<Tweet> tweets = new ArrayList<Tweet>();
+    tweets.add(new Tweet(1L,
+        "Gas by my house hit $3.39 !!!! I'm goin to Chapel Hill on Sat . :)",
+        1.0));
     tweets
         .add(new Tweet(
-            1,
-            "Gas by my house hit $3.39 !!!! I'm goin to Chapel Hill on Sat . :)",
-            1));
-    tweets
-        .add(new Tweet(
-            2,
+            2L,
             "@oluoch @victor_otti @kunjand I just watched it ! Sridevi's comeback .... U remember her from the 90s ?? Sun mornings on NTA ;)",
-            1));
+            1.0));
     tweets
         .add(new Tweet(
-            3,
+            3L,
             "PBR & @mokbpresents bring you Jim White at the @Do317 Lounge on October 23rd at 7 pm ! http://t.co/7x8OfC56.",
             0.5));
     tweets
         .add(new Tweet(
-            4,
+            4L,
             "Why is it so hard to find the @TVGuideMagazine these days ? Went to 3 stores for the Castle cover issue . NONE . Will search again tomorrow ...",
-            0));
-    tweets.add(new Tweet(0, "called in sick for the third straight day.  ugh.",
-        0));
+            0.0));
+    tweets.add(new Tweet(0L,
+        "called in sick for the third straight day.  ugh.", 0.0));
     tweets
         .add(new Tweet(
-            5,
+            5L,
             "Here we go.  BANK FAAAAIL FRIDAY -- The FDIC says the Bradford Bank in Baltimore, Maryland has become the 82nd bank failure of the year.",
-            0));
-    tweets.add(new Tweet(0,
-        "Oh, I'm afraid your Windows-using friends will not survive.", 0));
+            0.0));
+    tweets.add(new Tweet(0L,
+        "Oh, I'm afraid your Windows-using friends will not survive.", 0.0));
 
     tweets
         .add(new Tweet(
-            6,
+            6L,
             "Excuse the connectivity of this live stream , from Baba Amr , so many activists using only one Sat Modem . LIVE http://t.co/U283IhZ5 #Homs"));
     tweets
         .add(new Tweet(
-            7,
+            7L,
             "Show your LOVE for your local field & it might win an award ! Gallagher Park #Bedlington current 4th in National Award http://t.co/WeiMDtQt"));
     tweets
         .add(new Tweet(
-            8,
+            8L,
             "@firecore Can you tell me when an update for the Apple TV 3rd gen becomes available ? The missing update holds me back from buying #appletv3"));
     tweets
         .add(new Tweet(
-            9,
+            9L,
             "My #cre blog Oklahoma Per Square Foot returns to the @JournalRecord blog hub tomorrow . I will have some interesting local data to share ."));
     tweets
         .add(new Tweet(
-            10,
+            10L,
             "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \""));
     return tweets;
   }

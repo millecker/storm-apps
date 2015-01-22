@@ -16,26 +16,27 @@
  */
 package at.illecker.storm.examples.util.tweet;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SentimentTweet extends Tweet {
-  private static final long serialVersionUID = 1392290892466436212L;
+public final class SentimentTweet implements Serializable {
+  private static final long serialVersionUID = -3755946597513993340L;
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentTweet.class);
-
-  private double m_scoreMislove;
-  private double m_scoreAfinn;
-  private double m_scoreSentiStrength;
-  private double m_scoreSentiStrengthPos;
-  private double m_scoreSentiStrengthNeg;
+  private final Tweet m_tweet;
+  private final Double m_scoreMislove;
+  private final Double m_scoreAfinn;
+  private final Double m_scoreSentiStrength;
+  private final Double m_scoreSentiStrengthPos;
+  private final Double m_scoreSentiStrengthNeg;
 
   public SentimentTweet(long id, String text, double score,
       double scoreMislove, double scoreAfinn, double scoreSentiStrength,
       double scoreSentiStrengthPos, double scoreSentiStrengthNeg) {
-    super(id, text, score);
+    this.m_tweet = new Tweet(id, text, score);
     this.m_scoreMislove = scoreMislove;
     this.m_scoreAfinn = scoreAfinn;
     this.m_scoreSentiStrength = scoreSentiStrength;
@@ -43,33 +44,34 @@ public class SentimentTweet extends Tweet {
     this.m_scoreSentiStrengthNeg = scoreSentiStrengthNeg;
   }
 
-  public double getScoreMislove() {
+  public Double getScoreMislove() {
     return m_scoreMislove;
   }
 
-  public double getScoreAFINN() {
+  public Double getScoreAFINN() {
     return m_scoreAfinn;
   }
 
-  public double getScoreSentiStrength() {
+  public Double getScoreSentiStrength() {
     return m_scoreSentiStrength;
   }
 
-  public double getScoreSentiStrengthPos() {
+  public Double getScoreSentiStrengthPos() {
     return m_scoreSentiStrengthPos;
   }
 
-  public double getScoreSentiStrengthNeg() {
+  public Double getScoreSentiStrengthNeg() {
     return m_scoreSentiStrengthNeg;
   }
 
   @Override
   public String toString() {
-    return "Tweet [id=" + getId() + ", text=" + getText() + ", score="
-        + getScore() + ", scoreMislove=" + m_scoreMislove + ", scoreAfinn="
-        + m_scoreAfinn + ", scoreSentiStrength=" + m_scoreSentiStrength
-        + ", scoreSentiStrengthPositive=" + m_scoreSentiStrengthPos
-        + ", scoreSentiStrengthNegative=" + m_scoreSentiStrengthNeg + "]";
+    return "Tweet [id=" + m_tweet.getId() + ", text=" + m_tweet.getText()
+        + ", score=" + m_tweet.getScore() + ", scoreMislove=" + m_scoreMislove
+        + ", scoreAfinn=" + m_scoreAfinn + ", scoreSentiStrength="
+        + m_scoreSentiStrength + ", scoreSentiStrengthPositive="
+        + m_scoreSentiStrengthPos + ", scoreSentiStrengthNegative="
+        + m_scoreSentiStrengthNeg + "]";
   }
 
   public static SentimentTweet fromJsonElement(Map<String, Object> element) {
