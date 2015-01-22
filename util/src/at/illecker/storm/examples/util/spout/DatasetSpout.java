@@ -62,8 +62,6 @@ public class DatasetSpout extends BaseRichSpout {
     }
     // Emit tweet
     m_collector.emit(new Values(tweet));
-    // TODO minimize sleep time
-    // default sleep 1 ms
-    Utils.sleep(500); // for development
+    Utils.sleep(10);
   }
 }
