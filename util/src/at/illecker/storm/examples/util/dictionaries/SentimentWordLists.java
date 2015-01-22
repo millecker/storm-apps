@@ -31,6 +31,7 @@ import at.illecker.storm.examples.util.io.FileUtils;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tagger.POSTagger;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.TaggedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.POSTag;
 import at.illecker.storm.examples.util.wordnet.WordNet;
@@ -196,7 +197,7 @@ public class SentimentWordLists {
     return (sentimentResults.size() > 0) ? sentimentResults : null;
   }
 
-  public Map<Integer, SentimentResult> getTweetSentiment(Tweet tweet) {
+  public Map<Integer, SentimentResult> getTweetSentiment(TaggedTweet tweet) {
     Map<Integer, SentimentResult> tweetSentiments = new HashMap<Integer, SentimentResult>();
 
     for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
@@ -232,16 +233,13 @@ public class SentimentWordLists {
     for (Tweet tweet : Tweet.getTestTweets()) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
 
       // Preprocess
       List<String> preprocessedTokens = preprocessor.preprocess(tokens);
-      tweet.addPreprocessedSentence(preprocessedTokens);
 
       // POS Tagging
       List<TaggedWord> taggedSentence = posTagger
           .tagSentence(preprocessedTokens);
-      tweet.addTaggedSentence(taggedSentence);
 
       // Calculate Sentiment
       Map<Integer, SentimentResult> sentimentResult = sentimentWordLists
