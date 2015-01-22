@@ -32,6 +32,8 @@ import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.dictionaries.FirstNames;
 import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
+import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
+import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.WordNet;
 
@@ -297,13 +299,17 @@ public class Preprocessor {
     return value;
   }
 
-  public void preprocessTweets(List<Tweet> tweets) {
-    for (Tweet tweet : tweets) {
+  public List<PreprocessedTweet> preprocessTweets(List<TokenizedTweet> tweets) {
+    List<PreprocessedTweet> preprocessedTweets = new ArrayList<PreprocessedTweet>();
+    for (TokenizedTweet tweet : tweets) {
+      List<List<String>> preprocessedSentences = new ArrayList<List<String>>();
       for (List<String> sentence : tweet.getSentences()) {
-        List<String> preprocessedSentence = this.preprocess(sentence);
-        tweet.addPreprocessedSentence(preprocessedSentence);
+        preprocessedSentences.add(this.preprocess(sentence));
       }
+      preprocessedTweets.add(new PreprocessedTweet(tweet.getId(), tweet
+          .getText(), tweet.getScore(), preprocessedSentences));
     }
+    return preprocessedTweets;
   }
 
   public static void main(String[] args) {
@@ -327,31 +333,31 @@ public class Preprocessor {
 
     } else { // test tweets
       tweets = Tweet.getTestTweets();
-      tweets.add(new Tweet(0, "2moro afaik bbq hf lol loool lollll"));
+      tweets.add(new Tweet(0L, "2moro afaik bbq hf lol loool lollll"));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "suuuper suuper professional tell aahh aaahh aahhh aaahhh aaaahhhhh gaaahh gaaahhhaaag haaahaaa hhhaaaahhhaaa"));
-      tweets.add(new Tweet(0, "Martin martin kevin Kevin Justin justin"));
-      tweets.add(new Tweet(0, "10,000 1000 +111 -111,0000.4444"));
-      tweets
-          .add(new Tweet(0, "bankruptcy\ud83d\ude05 happy:-) said:-) ;-)yeah"));
-      tweets.add(new Tweet(0, "I\u2019m shit\u002c fan\\u002c \\u2019t"));
+      tweets.add(new Tweet(0L, "Martin martin kevin Kevin Justin justin"));
+      tweets.add(new Tweet(0L, "10,000 1000 +111 -111,0000.4444"));
+      tweets.add(new Tweet(0L,
+          "bankruptcy\ud83d\ude05 happy:-) said:-) ;-)yeah"));
+      tweets.add(new Tweet(0L, "I\u2019m shit\u002c fan\\u002c \\u2019t"));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "like...and vegas.just hosp.now lies\u002c1st lies,1st candy....wasn\u2019t Nevada\u002cFlorida\u002cOhio\u002cTuesday lol.,.lol lol...lol.."));
-      tweets.add(new Tweet(0, "L.O.V.E D.R.U.G.S K.R.I.T"));
+      tweets.add(new Tweet(0L, "L.O.V.E D.R.U.G.S K.R.I.T"));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "Lamar.....I free..edom free.edom star.Kisses,Star Yes..a Oh,I it!!!Go Jenks/sagna"));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "32.50 $3.25 49.3% 97.1FM 97.1fm 8.30pm 12.45am 12.45AM 12.45PM 6-7pm 5-8p 6pm-9pm @9.15 tonight... 10,000 199,400 149,597,900 20,000+ 10.45,9 8/11/12"));
       tweets
-          .add(new Tweet(0,
+          .add(new Tweet(0L,
               "(6ft.10) 2),Chap 85.3%(6513 (att@m80.com) awayDAWN.com www.asdf.org"));
     }
 
@@ -360,11 +366,9 @@ public class Preprocessor {
     for (Tweet tweet : tweets) {
       // Tokenize
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      tweet.addSentence(tokens);
 
       // Preprocess
       List<String> preprocessedTokens = preprocessor.preprocess(tokens);
-      tweet.addPreprocessedSentence(preprocessedTokens);
 
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("Preprocessed: '" + preprocessedTokens + "'");
