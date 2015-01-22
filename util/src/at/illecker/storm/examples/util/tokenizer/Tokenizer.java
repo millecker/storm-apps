@@ -29,6 +29,7 @@ import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.HtmlUtils;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.UnicodeUtils;
+import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
@@ -74,19 +75,23 @@ public class Tokenizer {
     return resultTokens;
   }
 
+  public static List<TokenizedTweet> tokenizeTweets(List<Tweet> tweets) {
+    List<TokenizedTweet> tokenizedTweets = new ArrayList<TokenizedTweet>();
+    for (Tweet tweet : tweets) {
+      List<List<String>> tokenizedSentences = new ArrayList<List<String>>();
+      tokenizedSentences.add(tokenize(tweet.getText()));
+      tokenizedTweets.add(new TokenizedTweet(tweet.getId(), tweet.getText(),
+          tweet.getScore(), tokenizedSentences));
+    }
+    return tokenizedTweets;
+  }
+
   public static List<List<HasWord>> tokenizeTreebank(String str) {
     TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
         .newTokenizerFactory();
     tokenizer.setOptions("ptb3Escaping=false");
 
     return MaxentTagger.tokenizeText(new StringReader(str), tokenizer);
-  }
-
-  public static void tokenizeTweets(List<Tweet> tweets) {
-    for (Tweet tweet : tweets) {
-      List<String> tokens = tokenize(tweet.getText());
-      tweet.addSentence(tokens);
-    }
   }
 
   public static void main(String[] args) {
@@ -101,25 +106,25 @@ public class Tokenizer {
       tweets = Tweet.getTestTweets();
       tweets
           .add(new Tweet(
-              0,
+              0L,
               ":-))) xDD XDD ;) :) :-) :) :D :o) :] :3 :c) :> =] 8) =) :} :^) :-D 8-D 8D x-D xD X-D XD =-D =D =-3 =3"));
       tweets
-          .add(new Tweet(12,
+          .add(new Tweet(0L,
               ">:[ :-( :(  :-c :c :-< :< :-[ :[ :{ ;( :-|| :@ >:( :'-( :'( :'-) :') \\m/"));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "\"All the money you've spent on my credit card I'm taking it out of your account\".... Hi I'm Sydney and I'm filing bankruptcy\ud83d\ude05\ud83d\ude05\ud83d\ude05\ud83d\ude05 \ud83d\ude05"));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "word:-) Moon:Oct Jobs! Thursday:... http://t.co/TZZzrrKa +1 (000) 123-4567, (000) 123-4567, and 123-4567 "));
       tweets
           .add(new Tweet(
-              0,
+              0L,
               "t/m k/o w/my b/slisten Rt/follow S/o S/O O/U O/A w/ w/Biden w/deals w/you w/the w/her"));
       tweets
-          .add(new Tweet(0, "5pm 5Am 5% $5 5-6am 7am-10pm U.S. U.K. L.O.V.E"));
+          .add(new Tweet(0L, "5pm 5Am 5% $5 5-6am 7am-10pm U.S. U.K. L.O.V.E"));
     }
 
     // Tokenize tweets
