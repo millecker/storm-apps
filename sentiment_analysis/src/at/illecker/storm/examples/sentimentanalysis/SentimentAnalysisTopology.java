@@ -96,11 +96,11 @@ public class SentimentAnalysisTopology {
     builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt, 2).shuffleGrouping(
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
         TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, 6).shuffleGrouping(
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, 4).shuffleGrouping(
         PreprocessorBolt.ID);
 
     // POSTaggerBolt --> SentimentDetectionBolt

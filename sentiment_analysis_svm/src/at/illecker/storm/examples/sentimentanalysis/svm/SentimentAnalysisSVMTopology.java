@@ -107,7 +107,7 @@ public class SentimentAnalysisSVMTopology {
         TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt).shuffleGrouping(
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, 4).shuffleGrouping(
         PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
