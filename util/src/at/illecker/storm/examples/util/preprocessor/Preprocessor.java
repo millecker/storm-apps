@@ -74,7 +74,6 @@ public class Preprocessor {
         new ArrayList<TaggedWord>());
   }
 
-  // TODO create Matcher and use reset() method
   private List<TaggedWord> preprocessAccumulator(LinkedList<String> tokens,
       List<TaggedWord> processedTokens) {
 
@@ -93,8 +92,7 @@ public class Preprocessor {
 
       // Step 1) Unify Emoticons remove repeating chars
       if ((tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsNumeric)) {
-        Matcher m = RegexUtils.TWO_OR_MORE_REPEATING_CHARS_PATTERN
-            .matcher(token);
+        Matcher m = RegexUtils.TWO_OR_MORE_REPEATING_CHARS_MATCHER.reset(token);
         if (m.find()) {
           boolean isSpecialEmoticon = m.group(1).equals("^");
           String reducedToken = m.replaceAll("$1");
@@ -174,7 +172,7 @@ public class Preprocessor {
           && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
           && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
         // remove alternating letter dot pattern e.g., L.O.V.E
-        Matcher m = RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token);
+        Matcher m = RegexUtils.ALTERNATING_LETTER_DOT_MATCHER.reset(token);
         if (m.matches()) {
           String newToken = token.replaceAll("\\.", "");
           if (m_wordnet.contains(newToken)) {
@@ -264,12 +262,11 @@ public class Preprocessor {
     // collect matches for sub-token search
     List<int[]> matches = new ArrayList<int[]>();
 
-    Matcher matcher = RegexUtils.THREE_OR_MORE_REPEATING_CHARS_PATTERN
-        .matcher(value);
-    while (matcher.find()) {
-      int start = matcher.start();
-      int end = matcher.end();
-      // String c = matcher.group(1);
+    Matcher m = RegexUtils.THREE_OR_MORE_REPEATING_CHARS_MATCHER.reset(value);
+    while (m.find()) {
+      int start = m.start();
+      int end = m.end();
+      // String c = m.group(1);
       // LOG.info("token: '" + value + "' match at start: " + start + " end: "
       // + end);
 
@@ -320,7 +317,7 @@ public class Preprocessor {
     // no match have been found
     // reduce all repeating chars
     if (!matches.isEmpty()) {
-      String reducedToken = matcher.replaceAll("$1");
+      String reducedToken = m.replaceAll("$1");
       if (LOGGING) {
         LOG.info("removeRepeatingChars(not found in dict) from '" + value
             + "' to '" + reducedToken + "'");

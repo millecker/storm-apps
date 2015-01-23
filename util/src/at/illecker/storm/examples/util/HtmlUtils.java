@@ -22,7 +22,7 @@ public class HtmlUtils {
     if (str == null) {
       return false;
     }
-    return RegexUtils.CONTAINS_HTML_SYMBOLS_PATTERN.matcher(str).find();
+    return RegexUtils.CONTAINS_HTML_SYMBOLS_MATCHER.reset(str).find();
   }
 
   public static String replaceHtmlSymbols(String str) {

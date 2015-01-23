@@ -26,91 +26,98 @@ public class StringUtils {
     if (str == null) {
       return false;
     }
-    return RegexUtils.URL_PATTERN.matcher(str).matches();
+    return RegexUtils.URL_MATCHER.reset(str).matches();
   }
 
   public static boolean isEmail(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.EMAIL_ADDRESS_PATTERN.matcher(str).matches();
+    return RegexUtils.EMAIL_ADDRESS_MATCHER.reset(str).matches();
   }
 
   public static boolean isPhone(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.PHONE_PATTERN.matcher(str).matches();
+    return RegexUtils.PHONE_MATCHER.reset(str).matches();
   }
 
   public static boolean isEmoticon(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.EMOTICON_PATTERN.matcher(str).matches();
+    return RegexUtils.EMOTICON_MATCHER.reset(str).matches();
   }
 
   public static boolean isHashTag(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.HASH_TAG_PATTERN.matcher(str).matches();
+    return RegexUtils.HASH_TAG_MATCHER.reset(str).matches();
   }
 
   public static boolean isUser(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.USER_NAME_PATTERN.matcher(str).matches();
+    return RegexUtils.USER_NAME_MATCHER.reset(str).matches();
   }
 
   public static boolean isRetweet(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.RETWEET_PATTERN.matcher(str).matches();
+    return RegexUtils.RETWEET_MATCHER.reset(str).matches();
   }
 
   public static boolean consitsOfPunctuations(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.PUNCTUATIONS_PATTERN.matcher(str).matches();
+    return RegexUtils.PUNCTUATIONS_MATCHER.reset(str).matches();
   }
 
   public static boolean consitsOfUnderscores(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.UNDERSCORES_PATTERN.matcher(str).matches();
+    return RegexUtils.UNDERSCORES_MATCHER.reset(str).matches();
   }
 
   public static boolean isNumeric(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.NUMBER_PATTERN.matcher(str).matches();
+    return RegexUtils.NUMBER_MATCHER.reset(str).matches();
   }
 
   public static boolean isSpecialNumeric(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.SPECIAL_NUMBER_PATTERN.matcher(str).matches();
+    return RegexUtils.SPECIAL_NUMBER_MATCHER.reset(str).matches();
   }
 
   public static boolean isSeparatedNumeric(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.SEPARATED_NUMBER_PATTERN.matcher(str).matches();
+    return RegexUtils.SEPARATED_NUMBER_MATCHER.reset(str).matches();
   }
 
   public static boolean isSlang(String str) {
     if (str == null) {
       return false;
     }
-    return RegexUtils.SLANG_PATTERN.matcher(str).matches();
+    return RegexUtils.SLANG_MATCHER.reset(str).matches();
+  }
+
+  public static boolean startsWithAlphabeticChar(String str) {
+    if (str == null) {
+      return false;
+    }
+    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR_MATCHER.reset(str).matches();
   }
 
   public static boolean isPunctuation(char c) {
@@ -122,14 +129,6 @@ public class StringUtils {
         || c == '\\' || c == '"' || c == '\'' || c == '`' || c == '´'
         || c == '<' || c == '>' || c == '~' || c == '*' || c == '+' || c == '('
         || c == ')' || c == '[' || c == ']';
-  }
-
-  public static boolean startsWithAlphabeticChar(String str) {
-    if (str == null) {
-      return false;
-    }
-    return RegexUtils.STARTS_WITH_ALPHABETIC_CHAR_PATTERN.matcher(str)
-        .matches();
   }
 
   public static String trimPunctuation(String str) {
