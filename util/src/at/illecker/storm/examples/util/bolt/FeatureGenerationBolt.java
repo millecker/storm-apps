@@ -40,7 +40,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
 public class FeatureGenerationBolt extends BaseRichBolt {
-  public static final String ID = "json-tweet-extractor-bolt";
+  public static final String ID = "feature-generation-bolt";
   private static final long serialVersionUID = 6342287897604628238L;
   private static final Logger LOG = LoggerFactory
       .getLogger(FeatureGenerationBolt.class);

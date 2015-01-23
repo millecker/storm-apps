@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TfIdf {
   private static final Logger LOG = LoggerFactory.getLogger(TfIdf.class);
+  private static final boolean LOGGING = false;
 
   public static <T> Map<T, Double> tf(Collection<T> document) {
     return tf(new HashMap<T, Double>(), document);
@@ -88,9 +89,11 @@ public class TfIdf {
     for (Map.Entry<T, Long> e : docFreq.entrySet()) {
       T term = e.getKey();
       double documentFreq = e.getValue();
-      LOG.info("term: " + term.toString() + " idf: log(" + totalDocuments + "/"
-          + documentFreq + ") + 1 = "
-          + (Math.log(totalDocuments / documentFreq) + 1));
+      if (LOGGING) {
+        LOG.info("term: " + term.toString() + " idf: log(" + totalDocuments
+            + "/" + documentFreq + ") + 1 = "
+            + (Math.log(totalDocuments / documentFreq) + 1));
+      }
       idf.put(term, Math.log(totalDocuments / documentFreq) + 1);
     }
     return idf;
