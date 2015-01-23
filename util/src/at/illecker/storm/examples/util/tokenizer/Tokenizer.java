@@ -68,7 +68,7 @@ public class Tokenizer {
 
     // Step 4) Tokenize string by multiple regex patterns
     List<String> resultTokens = new ArrayList<String>();
-    Matcher m = RegexUtils.TOKENIZER_MATCHER.reset(str);
+    Matcher m = RegexUtils.TOKENIZER_PATTERN.matcher(str);
     while (m.find()) {
       resultTokens.add(m.group());
     }
