@@ -17,7 +17,6 @@
 package at.illecker.storm.examples.util.tagger;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -25,9 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Dataset;
-import at.illecker.storm.examples.util.StringUtils;
-import at.illecker.storm.examples.util.dictionaries.Interjections;
-import at.illecker.storm.examples.util.dictionaries.NameEntities;
 import at.illecker.storm.examples.util.preprocessor.Preprocessor;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
@@ -42,12 +38,8 @@ import edu.stanford.nlp.tagger.maxent.TaggerConfig;
 
 public class POSTagger {
   private static final Logger LOG = LoggerFactory.getLogger(POSTagger.class);
-  private static final boolean LOGGING = false;
   private static final POSTagger instance = new POSTagger();
-
   private MaxentTagger m_posTagger;
-  private NameEntities m_nameEntities;
-  private Interjections m_interjections;
 
   private POSTagger() {
     // Load POS Tagger
@@ -59,84 +51,21 @@ public class POSTagger {
     } catch (RuntimeIOException e) {
       LOG.error("RuntimeIOException: " + e.getMessage());
     }
-    // Load NameEntities
-    m_nameEntities = NameEntities.getInstance();
-    // Load Interjections
-    m_interjections = Interjections.getInstance();
   }
 
   public static POSTagger getInstance() {
     return instance;
   }
 
-  public List<TaggedWord> tagSentence(List<String> tokens) {
-    // LOG.info("tagSentence: " + tokens.toString());
-    List<TaggedWord> untaggedTokens = new ArrayList<TaggedWord>();
-
-    Iterator<String> iter = tokens.iterator();
-    while (iter.hasNext()) {
-      String token = iter.next();
-      TaggedWord preTaggedToken = new TaggedWord(token);
-
-      // set custom tags
-      // TODO move set custom tags to Preprocessor
-      if (StringUtils.isHashTag(token)) {
-        preTaggedToken.setTag("HT");
-        // if ((token.length() == 1) && (iter.hasNext())) {
-        // String nextToken = iter.next();
-        // preTaggedToken.setWord(preTaggedToken.word() + nextToken);
-        // token = nextToken;
-        // }
-      }
-      if (StringUtils.isURL(token)) {
-        preTaggedToken.setTag("USR");
-        // if ((token.length() == 1) && (iter.hasNext())) {
-        // String nextToken = iter.next();
-        // preTaggedToken.setWord(preTaggedToken.word() + nextToken);
-        // token = nextToken;
-        // if (preTaggedToken.word().indexOf("#") == 0) {
-        // preTaggedToken.setTag("HT");
-        // }
-        // }
-      }
-      if (StringUtils.isURL(token)) {
-        preTaggedToken.setTag("URL");
-      }
-      if (StringUtils.isRetweet(token)) {
-        preTaggedToken.setTag("RT");
-      }
-
-      // Name entities
-      if (m_nameEntities.isNameEntity(token)) {
-        if (LOGGING) {
-          LOG.info("NameEntity labelled for " + token);
-        }
-        preTaggedToken.setTag("NNP");
-      }
-
-      // Interjections
-      if ((m_interjections.isInterjection(token))
-          || (StringUtils.isEmoticon(token))) {
-        if (LOGGING) {
-          LOG.info("Interjection or Emoticon labelled for " + token);
-        }
-        preTaggedToken.setTag("UH");
-      }
-
-      untaggedTokens.add(preTaggedToken);
-    }
-
-    if (LOGGING) {
-      LOG.info("tagSentence: " + untaggedTokens.toString());
-    }
-    return m_posTagger.tagSentence(untaggedTokens, true);
+  public List<TaggedWord> tagSentence(List<TaggedWord> pretaggedTokens) {
+    return m_posTagger.tagSentence(pretaggedTokens, true);
   }
 
   public List<TaggedTweet> tagTweets(List<PreprocessedTweet> tweets) {
     List<TaggedTweet> taggedTweets = new ArrayList<TaggedTweet>();
     for (PreprocessedTweet tweet : tweets) {
       List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
-      for (List<String> sentence : tweet.getPreprocessedSentences()) {
+      for (List<TaggedWord> sentence : tweet.getPreprocessedSentences()) {
         taggedSentences.add(this.tagSentence(sentence));
       }
       taggedTweets.add(new TaggedTweet(tweet.getId(), tweet.getText(), tweet
@@ -259,7 +188,7 @@ public class POSTagger {
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
       // Preprocess
-      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       // POS Tagging
       List<TaggedWord> taggedSentence = posTagger

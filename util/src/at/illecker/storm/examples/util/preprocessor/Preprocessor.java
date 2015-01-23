@@ -30,12 +30,15 @@ import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.RegexUtils;
 import at.illecker.storm.examples.util.StringUtils;
 import at.illecker.storm.examples.util.dictionaries.FirstNames;
+import at.illecker.storm.examples.util.dictionaries.Interjections;
+import at.illecker.storm.examples.util.dictionaries.NameEntities;
 import at.illecker.storm.examples.util.dictionaries.SlangCorrection;
 import at.illecker.storm.examples.util.tokenizer.Tokenizer;
 import at.illecker.storm.examples.util.tweet.PreprocessedTweet;
 import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import at.illecker.storm.examples.util.wordnet.WordNet;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class Preprocessor {
   private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
@@ -45,6 +48,8 @@ public class Preprocessor {
   private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
   private FirstNames m_firstNames;
+  private NameEntities m_nameEntities;
+  private Interjections m_interjections;
 
   private Preprocessor() {
     // Load WordNet
@@ -53,22 +58,25 @@ public class Preprocessor {
     m_slangCorrection = SlangCorrection.getInstance();
     // Load FirstNames
     m_firstNames = FirstNames.getInstance();
+    // Load NameEntities
+    m_nameEntities = NameEntities.getInstance();
+    // Load Interjections
+    m_interjections = Interjections.getInstance();
   }
 
   public static Preprocessor getInstance() {
     return instance;
   }
 
-  public List<String> preprocess(List<String> tokens) {
+  public List<TaggedWord> preprocess(List<String> tokens) {
     // run tail recursion
     return preprocessAccumulator(new LinkedList<String>(tokens),
-        new ArrayList<String>());
+        new ArrayList<TaggedWord>());
   }
 
-  // TODO return List<TaggedWord>
   // TODO create Matcher and use reset() method
-  private List<String> preprocessAccumulator(LinkedList<String> tokens,
-      List<String> processedTokens) {
+  private List<TaggedWord> preprocessAccumulator(LinkedList<String> tokens,
+      List<TaggedWord> processedTokens) {
 
     if (tokens.isEmpty()) {
       return processedTokens;
@@ -102,17 +110,17 @@ public class Preprocessor {
             LOG.info("Unify Emoticon from '" + token + "' to '" + reducedToken
                 + "'");
           }
-          processedTokens.add(reducedToken);
+          processedTokens.add(new TaggedWord(reducedToken, "UH"));
           return preprocessAccumulator(tokens, processedTokens);
         }
       } else if (tokenContainsPunctuation) {
         // If token is no Emoticon then there is no further
         // preprocessing for punctuations
-        processedTokens.add(token);
+        processedTokens.add(new TaggedWord(token));
         return preprocessAccumulator(tokens, processedTokens);
       }
 
-      // identify token further
+      // identify token
       boolean tokenIsUser = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
       boolean tokenIsSlang = StringUtils.isSlang(token);
@@ -136,7 +144,7 @@ public class Preprocessor {
             .toLowerCase());
         if (slangCorrection != null) {
           for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(slangCorrection[i]);
+            processedTokens.add(new TaggedWord(slangCorrection[i]));
           }
           if (LOGGING) {
             LOG.info("Slang Correction from '" + token + "' to "
@@ -145,8 +153,8 @@ public class Preprocessor {
           return preprocessAccumulator(tokens, processedTokens);
         } else if (tokenIsSlang) {
           if (token.startsWith("w/")) {
-            processedTokens.add("with");
-            processedTokens.add(token.substring(2));
+            processedTokens.add(new TaggedWord("with"));
+            processedTokens.add(new TaggedWord(token.substring(2)));
             if (LOGGING) {
               LOG.info("Slang Correction from '" + token + "' to " + "[with, "
                   + token.substring(2) + "]");
@@ -176,7 +184,7 @@ public class Preprocessor {
             }
             token = newToken;
           }
-          processedTokens.add(token);
+          processedTokens.add(new TaggedWord(token));
           return preprocessAccumulator(tokens, processedTokens);
         }
       }
@@ -190,7 +198,7 @@ public class Preprocessor {
           LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
         }
         token = token + "g";
-        processedTokens.add(token);
+        processedTokens.add(new TaggedWord(token));
         return preprocessAccumulator(tokens, processedTokens);
       }
 
@@ -209,7 +217,7 @@ public class Preprocessor {
             .toLowerCase());
         if (slangCorrection != null) {
           for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(slangCorrection[i]);
+            processedTokens.add(new TaggedWord(slangCorrection[i]));
           }
           if (LOGGING) {
             LOG.info("Slang Correction from '" + token + "' to "
@@ -219,8 +227,31 @@ public class Preprocessor {
         }
       }
 
+      // Step 6) PreTagging for POS Tagger
+      TaggedWord preTaggedToken = new TaggedWord(token);
+      if (tokenIsHashTag) {
+        preTaggedToken.setTag("HT");
+      } else if (tokenIsUser) {
+        preTaggedToken.setTag("USR");
+      } else if (tokenIsURL) {
+        preTaggedToken.setTag("URL");
+      } else if (StringUtils.isRetweet(token)) {
+        preTaggedToken.setTag("RT");
+      } else if (m_nameEntities.isNameEntity(token)) {
+        if (LOGGING) {
+          LOG.info("NameEntity labelled for " + token);
+        }
+        preTaggedToken.setTag("NNP");
+      } else if ((m_interjections.isInterjection(token))
+          || (StringUtils.isEmoticon(token))) {
+        if (LOGGING) {
+          LOG.info("Interjection or Emoticon labelled for " + token);
+        }
+        preTaggedToken.setTag("UH");
+      }
+
       // add token to processed list
-      processedTokens.add(token);
+      processedTokens.add(preTaggedToken);
       return preprocessAccumulator(tokens, processedTokens);
     }
   }
@@ -302,7 +333,7 @@ public class Preprocessor {
   public List<PreprocessedTweet> preprocessTweets(List<TokenizedTweet> tweets) {
     List<PreprocessedTweet> preprocessedTweets = new ArrayList<PreprocessedTweet>();
     for (TokenizedTweet tweet : tweets) {
-      List<List<String>> preprocessedSentences = new ArrayList<List<String>>();
+      List<List<TaggedWord>> preprocessedSentences = new ArrayList<List<TaggedWord>>();
       for (List<String> sentence : tweet.getSentences()) {
         preprocessedSentences.add(this.preprocess(sentence));
       }
@@ -368,7 +399,7 @@ public class Preprocessor {
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
       // Preprocess
-      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       LOG.info("Tweet: '" + tweet + "'");
       LOG.info("Preprocessed: '" + preprocessedTokens + "'");
