@@ -127,7 +127,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
       // Preprocess
-      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       // POS Tagging
       List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();

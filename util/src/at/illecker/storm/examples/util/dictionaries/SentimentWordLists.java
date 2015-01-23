@@ -235,7 +235,7 @@ public class SentimentWordLists {
       List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
       // Preprocess
-      List<String> preprocessedTokens = preprocessor.preprocess(tokens);
+      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       // POS Tagging
       List<TaggedWord> taggedSentence = posTagger

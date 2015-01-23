@@ -19,13 +19,15 @@ package at.illecker.storm.examples.util.tweet;
 import java.io.Serializable;
 import java.util.List;
 
+import edu.stanford.nlp.ling.TaggedWord;
+
 public final class PreprocessedTweet implements Serializable {
   private static final long serialVersionUID = 4981779725843228602L;
   private final Tweet m_tweet;
-  private final List<List<String>> m_preprocessedSentences;
+  private final List<List<TaggedWord>> m_preprocessedSentences;
 
   public PreprocessedTweet(Long id, String text, Double score,
-      List<List<String>> preprocessedSentences) {
+      List<List<TaggedWord>> preprocessedSentences) {
     this.m_tweet = new Tweet(id, text, score);
     this.m_preprocessedSentences = preprocessedSentences;
   }
@@ -42,7 +44,7 @@ public final class PreprocessedTweet implements Serializable {
     return m_tweet.getScore();
   }
 
-  public List<List<String>> getPreprocessedSentences() {
+  public List<List<TaggedWord>> getPreprocessedSentences() {
     return m_preprocessedSentences;
   }
 

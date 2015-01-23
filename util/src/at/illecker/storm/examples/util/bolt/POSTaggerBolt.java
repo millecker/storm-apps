@@ -69,7 +69,7 @@ public class POSTaggerBolt extends BaseRichBolt {
     // LOG.info(tweet.toString());
 
     List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
-    for (List<String> sentence : tweet.getPreprocessedSentences()) {
+    for (List<TaggedWord> sentence : tweet.getPreprocessedSentences()) {
       taggedSentences.add(m_posTagger.tagSentence(sentence));
     }
 
