@@ -18,6 +18,9 @@ package at.illecker.storm.examples.util.svm;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import libsvm.svm_model;
 
@@ -46,16 +49,25 @@ public class SVMBenchmark {
   private static final Logger LOG = LoggerFactory.getLogger(SVMBenchmark.class);
 
   public static void main(String[] args) {
+    final int numberOfThreads;
+    if (args.length > 0) {
+      numberOfThreads = Integer.parseInt(args[0]);
+      LOG.info("Using " + numberOfThreads + " threads...");
+    } else {
+      numberOfThreads = 1;
+    }
+
     Dataset dataset = Configuration.getDataSetSemEval2013();
-    int totalClasses = 3;
+    final int totalClasses = 3;
     // classes 0 = negative, 1 = neutral, 2 = positive
-    IdentityScoreClassifier isc = new IdentityScoreClassifier();
+
+    final IdentityScoreClassifier isc = new IdentityScoreClassifier();
 
     // Load Preprocessor
-    Preprocessor preprocessor = Preprocessor.getInstance();
+    final Preprocessor preprocessor = Preprocessor.getInstance();
 
     // Load POS Tagger
-    POSTagger posTagger = POSTagger.getInstance();
+    final POSTagger posTagger = POSTagger.getInstance();
 
     // Load TF-IDF
     List<TaggedTweet> taggedTrainTweets = SerializationUtils
@@ -65,36 +77,68 @@ public class SVMBenchmark {
 
     // Load Feature Vector Generator
     LOG.info("Load CombinedFeatureVectorGenerator...");
-    FeatureVectorGenerator fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
+    final FeatureVectorGenerator fvg = new CombinedFeatureVectorGenerator(
+        tweetTfIdf);
 
     // Load SVM Model
     LOG.info("Loading SVM model...");
-    svm_model svmModel = SerializationUtils.deserialize(dataset
+    final svm_model svmModel = SerializationUtils.deserialize(dataset
         .getDatasetPath() + File.separator + SVM.SVM_MODEL_FILE_SER);
+
+    final CountDownLatch latch = new CountDownLatch(numberOfThreads);
+    ExecutorService executorService = Executors
+        .newFixedThreadPool(numberOfThreads);
 
     // Start Benchmark
     LOG.info("Start Benchmark...");
     long startTime = System.currentTimeMillis();
 
-    // 1) Load test tweets
-    List<Tweet> testTweets = dataset.getTestTweets();
+    // Load test tweets
+    final List<Tweet> testTweets = dataset.getTestTweets();
+    final int totalTweets = testTweets.size();
+    final int tweetsPerThread = totalTweets / numberOfThreads;
 
-    // 2) Tokenize
-    List<TokenizedTweet> tokenizedTweets = Tokenizer.tokenizeTweets(testTweets);
+    // Run threads
+    for (int i = 0; i < numberOfThreads; i++) {
+      int begin = i * tweetsPerThread;
+      int end = (i == numberOfThreads - 1) ? totalTweets - 1
+          : ((i + 1) * tweetsPerThread) - 1;
+      // LOG.info("begin: " + begin + " end: " + end);
 
-    // 3) Preprocess
-    List<PreprocessedTweet> preprocessedTweets = preprocessor
-        .preprocessTweets(tokenizedTweets);
+      final List<Tweet> subtestTweets = testTweets.subList(begin, end);
 
-    // 4) POS Tagging
-    List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
+      executorService.submit(new Runnable() {
+        public void run() {
+          // Tokenize
+          List<TokenizedTweet> tokenizedTweets = Tokenizer
+              .tokenizeTweets(subtestTweets);
 
-    // 5) Feature Vector Generation
-    List<FeaturedTweet> featuredTweets = fvg
-        .generateFeatureVectors(taggedTweets);
+          // Preprocess
+          List<PreprocessedTweet> preprocessedTweets = preprocessor
+              .preprocessTweets(tokenizedTweets);
 
-    for (FeaturedTweet tweet : featuredTweets) {
-      double predictedClass = SVM.evaluate(tweet, svmModel, totalClasses, isc);
+          // POS Tagging
+          List<TaggedTweet> taggedTweets = posTagger
+              .tagTweets(preprocessedTweets);
+
+          // Feature Vector Generation
+          List<FeaturedTweet> featuredTweets = fvg
+              .generateFeatureVectors(taggedTweets);
+
+          for (FeaturedTweet tweet : featuredTweets) {
+            double predictedClass = SVM.evaluate(tweet, svmModel, totalClasses,
+                isc);
+          }
+
+          latch.countDown();
+        }
+      });
+    }
+
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      System.err.println("InterruptedException: " + e.getMessage());
     }
 
     // End Benchmark
