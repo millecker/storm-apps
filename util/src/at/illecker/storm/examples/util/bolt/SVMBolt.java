@@ -30,6 +30,7 @@ import at.illecker.storm.examples.util.svm.SVM;
 import at.illecker.storm.examples.util.svm.classifier.IdentityScoreClassifier;
 import at.illecker.storm.examples.util.svm.classifier.ScoreClassifier;
 import at.illecker.storm.examples.util.tweet.FeaturedTweet;
+import backtype.storm.metric.api.CountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -48,6 +49,9 @@ public class SVMBolt extends BaseRichBolt {
   private int m_totalClasses;
   private ScoreClassifier m_classifier;
   private svm_model m_model;
+  // Metrics
+  // Note: these must be declared as transient since they are not Serializable
+  transient CountMetric m_countMetric;
 
   public SVMBolt(String[] inputFields, String[] outputFields, Dataset dataset) {
     this.m_inputFields = inputFields;
@@ -65,6 +69,9 @@ public class SVMBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+
+    m_countMetric = new CountMetric();
+    context.registerMetric("tuple_count", m_countMetric, 1);
 
     m_totalClasses = 3;
     m_classifier = new IdentityScoreClassifier();
@@ -86,10 +93,11 @@ public class SVMBolt extends BaseRichBolt {
     double predictedClass = SVM.evaluate(tweet, m_model, m_totalClasses,
         m_classifier);
 
-    LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
-        + " expectedClass: " + m_classifier.classfyScore(tweet.getScore())
-        + " predictedClass: " + predictedClass);
+    // LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
+    // + " expectedClass: " + m_classifier.classfyScore(tweet.getScore())
+    // + " predictedClass: " + predictedClass);
 
-    this.m_collector.ack(tuple);
+    m_countMetric.incr();
+    m_collector.ack(tuple);
   }
 }

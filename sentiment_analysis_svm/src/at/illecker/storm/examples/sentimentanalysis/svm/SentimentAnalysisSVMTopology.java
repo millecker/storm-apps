@@ -29,6 +29,7 @@ import at.illecker.storm.examples.util.spout.DatasetSpout;
 import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
+import backtype.storm.metric.LoggingMetricsConsumer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
@@ -95,30 +96,40 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
+    int numberOfThreads = 2;
+    int numberOfWorkers = 2;
 
     // Set Spout
     builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfThreads)
+        .shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
-        TokenizerBolt.ID);
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt, numberOfThreads)
+        .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, 4).shuffleGrouping(
-        PreprocessorBolt.ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfThreads * 5)
+        .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
-    builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt)
-        .shuffleGrouping(POSTaggerBolt.ID);
+    builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
+        numberOfThreads).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt).shuffleGrouping(
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfThreads * 4).shuffleGrouping(
         FeatureGenerationBolt.ID);
 
     Config conf = new Config();
+    conf.setNumWorkers(numberOfWorkers);
+
+    conf.setMaxSpoutPending(5000);
+    // This will simply log all Metrics received into
+    // $STORM_HOME/logs/metrics.log on one or more worker nodes.
+    conf.registerMetricsConsumer(LoggingMetricsConsumer.class);
+
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
 
