@@ -96,39 +96,42 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
-    int numberOfThreads = 2;
-    int numberOfWorkers = 2;
+    int numberOfThreads = 1;
+    int numberOfWorkers = 1;
 
     // Set Spout
     builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfThreads)
-        .shuffleGrouping(spoutID);
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt,
+        numberOfWorkers * numberOfThreads).shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt, numberOfThreads)
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt,
+        numberOfWorkers * numberOfThreads * 2)
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfThreads * 5)
-        .shuffleGrouping(PreprocessorBolt.ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt,
+        numberOfWorkers * numberOfThreads * 10).shuffleGrouping(
+        PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
     builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
-        numberOfThreads).shuffleGrouping(POSTaggerBolt.ID);
+        numberOfWorkers * numberOfThreads).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt, numberOfThreads * 4).shuffleGrouping(
-        FeatureGenerationBolt.ID);
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfThreads * 7)
+        .shuffleGrouping(FeatureGenerationBolt.ID);
 
     Config conf = new Config();
     conf.setNumWorkers(numberOfWorkers);
 
     conf.setMaxSpoutPending(5000);
+
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
-    conf.registerMetricsConsumer(LoggingMetricsConsumer.class);
+    conf.registerMetricsConsumer(LoggingMetricsConsumer.class, numberOfWorkers);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
