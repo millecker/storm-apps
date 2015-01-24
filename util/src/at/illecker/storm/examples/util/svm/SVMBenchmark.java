@@ -22,6 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import libsvm.svm;
 import libsvm.svm_model;
 
 import org.slf4j.Logger;
@@ -147,5 +148,8 @@ public class SVMBenchmark {
     LOG.info("Total test tweets: " + testTweets.size());
     LOG.info("Tweets per second: "
         + (testTweets.size() / ((double) totalTime / 1000)));
+
+    executorService.shutdown();
+    svm.EXEC_SERV.shutdown();
   }
 }
