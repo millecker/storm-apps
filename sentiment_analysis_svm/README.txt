@@ -24,5 +24,11 @@ ant clean && ant run \
   -DconsumerKey=XXXX  -DconsumerSecret=XXXX \
   -DaccessToken=XXXX  -DaccessTokenSecret=XXXX
 
+# Benchmark
+ant bench -DbenchTimeLimit='--time-limit 10000s' \
+  -DbenchInstrument='--instrument macro' \
+  -DbenchMacroMeasurements='-Cinstrument.macro.options.measurements=5' \
+  -DbenchMacroWarmup='-Cinstrument.macro.options.warmup=30s'
+  [-DbenchTrials='--trials 1']
 
 ###############################################################################

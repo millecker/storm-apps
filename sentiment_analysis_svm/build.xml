@@ -7,17 +7,17 @@
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar,${lib}${file.separator}libsvm-3.2-multithreaded.jar" />
 	<property name="libfiles.cpu" value="resources${file.separator}dictionaries,resources${file.separator}models,resources${file.separator}datasets${file.separator}SemEval2013" />
-	<property name="libjars.bench" value="" />
+	<property name="libjars.bench" value="${lib}${file.separator}caliper-1.0-beta-1-all.jar,${lib}${file.separator}slf4j-api-1.7.7.jar,${lib}${file.separator}slf4j-simple-1.7.7.jar,${lib}${file.separator}storm-core-0.9.3.jar" />
 	<property name="rootbeer.package.dir" value="" />
 	<property name="rootbeer.classes" value="" />
 	<property name="kernel.class" value="" />
 	<property name="gpu.class" value="" />
 	<property name="cpu.class" value="at.illecker.storm.examples.sentimentanalysis.svm.SentimentAnalysisSVMTopology" />
-	<property name="bench.class" value="" />
+	<property name="bench.class" value="at.illecker.storm.examples.util.svm.SVMCaliperBenchmark" />
 	<property name="program" value="storm" />
 	<property name="program.args" value="jar" />
 	<property name="application.args.fixed" value="${cpu.class}" />
-	<property name="application.args" value="consumerKey consumerSecret accessToken accessTokenSecret keyWords" />
+	<property name="application.args" value="consumerKey consumerSecret accessToken accessTokenSecret keyWords benchTimeLimit benchInstrument benchMacroMeasurements benchMacroWarmup benchTrials" />
 
 	<import file="${root}${file.separator}commonbuild.xml" />
 </project>
