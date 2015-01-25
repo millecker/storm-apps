@@ -113,7 +113,7 @@ public class SentimentAnalysisSVMTopology {
 
     // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(POSTaggerBolt.ID, posTaggerBolt,
-        numberOfWorkers * numberOfExecutors * 6).localOrShuffleGrouping(
+        numberOfWorkers * numberOfExecutors * 8).localOrShuffleGrouping(
         PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
@@ -123,7 +123,7 @@ public class SentimentAnalysisSVMTopology {
 
     // FeatureGenerationBolt --> SVMBolt
     builder.setBolt(SVMBolt.ID, svmBolt,
-        numberOfWorkers * numberOfExecutors * 4).localOrShuffleGrouping(
+        numberOfWorkers * numberOfExecutors * 5).localOrShuffleGrouping(
         FeatureGenerationBolt.ID);
 
     Config conf = new Config();
