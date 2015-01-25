@@ -123,7 +123,7 @@ public class SentimentAnalysisSVMTopology {
 
     // FeatureGenerationBolt --> SVMBolt
     builder.setBolt(SVMBolt.ID, svmBolt,
-        numberOfWorkers * numberOfExecutors * 5).localOrShuffleGrouping(
+        numberOfWorkers * numberOfExecutors * 4).localOrShuffleGrouping(
         FeatureGenerationBolt.ID);
 
     Config conf = new Config();
@@ -136,8 +136,8 @@ public class SentimentAnalysisSVMTopology {
     // conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
 
-    conf.put(Config.WORKER_CHILDOPTS, "-Xmx32g");
-    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx16g");
+    conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
+    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
 
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
