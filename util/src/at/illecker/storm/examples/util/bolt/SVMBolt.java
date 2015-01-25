@@ -71,7 +71,7 @@ public class SVMBolt extends BaseRichBolt {
     this.m_collector = collector;
 
     m_countMetric = new CountMetric();
-    context.registerMetric("tuple_count", m_countMetric, 1);
+    context.registerMetric("tuple_count", m_countMetric, 10);
 
     m_totalClasses = 3;
     m_classifier = new IdentityScoreClassifier();
