@@ -107,14 +107,18 @@ public class SentimentAnalysisSVMTopology {
         numberOfWorkers * numberOfExecutors).localOrShuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt,
-        numberOfWorkers * numberOfExecutors * 2).localOrShuffleGrouping(
-        TokenizerBolt.ID);
+    builder
+        .setBolt(PreprocessorBolt.ID, preprocessorBolt,
+            numberOfWorkers * numberOfExecutors)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 2)
+        .localOrShuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt,
-        numberOfWorkers * numberOfExecutors * 6).localOrShuffleGrouping(
-        PreprocessorBolt.ID);
+    builder
+        .setBolt(POSTaggerBolt.ID, posTaggerBolt,
+            numberOfWorkers * numberOfExecutors * 3)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 6)
+        .localOrShuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
     builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
@@ -122,9 +126,10 @@ public class SentimentAnalysisSVMTopology {
         POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt,
-        numberOfWorkers * numberOfExecutors * 4).localOrShuffleGrouping(
-        FeatureGenerationBolt.ID);
+    builder
+        .setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfExecutors * 2)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 4)
+        .localOrShuffleGrouping(FeatureGenerationBolt.ID);
 
     Config conf = new Config();
     conf.setNumWorkers(numberOfWorkers);
