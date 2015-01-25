@@ -136,8 +136,8 @@ public class SentimentAnalysisSVMTopology {
     // conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
 
-    conf.put(Config.WORKER_CHILDOPTS, "-Xmx32g -XX:-UseConcMarkSweepGC");
-    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx8g -XX:-UseConcMarkSweepGC");
+    conf.put(Config.WORKER_CHILDOPTS, "-Xmx32g");
+    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx16g");
 
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
