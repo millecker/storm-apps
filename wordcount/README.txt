@@ -8,10 +8,10 @@
 ant clean
 
 # Build jar file
-ant jar-cpu
+ant jar
 
 # Submit Task to Storm
-ant run-cpu [-DconsumerKey=key \
+ant run [-DconsumerKey=key \
  -DconsumerSecret=secret \
  -DaccessToken=token \
  -DaccessTokenSecret=secret]

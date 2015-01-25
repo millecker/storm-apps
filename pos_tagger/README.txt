@@ -8,10 +8,10 @@
 ant clean
 
 # Build jar file
-ant jar-cpu
+ant jar
 
 # Submit Task to Storm
-ant run-cpu [ -DtwitterDir=dir \
+ant run [ -DtwitterDir=dir \
  -DconsumerKey=key \
  -DconsumerSecret=secret \
  -DaccessToken=token \
@@ -19,10 +19,10 @@ ant run-cpu [ -DtwitterDir=dir \
  [-DkeyWords='word1 word2']
 
 # Example
-ant clean && ant run-cpu \
+ant clean && ant run \
  -DtwitterDir=../resources/datasets/uibk_crawler/test/
  
-ant clean && ant run-cpu \
+ant clean && ant run \
   -DconsumerKey=XXXX  -DconsumerSecret=XXXX \
   -DaccessToken=XXXX  -DaccessTokenSecret=XXXX
 
