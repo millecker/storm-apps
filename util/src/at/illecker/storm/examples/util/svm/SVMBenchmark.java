@@ -17,6 +17,7 @@
 package at.illecker.storm.examples.util.svm;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -51,11 +52,19 @@ public class SVMBenchmark {
 
   public static void main(String[] args) {
     final int numberOfThreads;
+    final int inputCount;
     if (args.length > 0) {
       numberOfThreads = Integer.parseInt(args[0]);
       LOG.info("Using " + numberOfThreads + " threads...");
+      if (args.length > 1) {
+        inputCount = Integer.parseInt(args[1]);
+        LOG.info("Using " + inputCount + " times the test dataset...");
+      } else {
+        inputCount = 1;
+      }
     } else {
       numberOfThreads = 1;
+      inputCount = 1;
     }
 
     Dataset dataset = Configuration.getDataSetSemEval2013();
@@ -95,21 +104,25 @@ public class SVMBenchmark {
     long startTime = System.currentTimeMillis();
 
     // Load test tweets
-    final List<Tweet> testTweets = dataset.getTestTweets();
+    final ArrayList<Tweet> testTweets = (ArrayList<Tweet>) dataset
+        .getTestTweets();
+    for (int i = 0; i < inputCount - 1; i++) {
+      testTweets.addAll((ArrayList<Tweet>) testTweets.clone());
+    }
     final int totalTweets = testTweets.size();
     final int tweetsPerThread = totalTweets / numberOfThreads;
 
     // Run threads
     for (int i = 0; i < numberOfThreads; i++) {
-      int begin = i * tweetsPerThread;
-      int end = (i == numberOfThreads - 1) ? totalTweets - 1
+      final int begin = i * tweetsPerThread;
+      final int end = (i == numberOfThreads - 1) ? totalTweets - 1
           : ((i + 1) * tweetsPerThread) - 1;
       // LOG.info("begin: " + begin + " end: " + end);
 
-      final List<Tweet> subtestTweets = testTweets.subList(begin, end);
-
       executorService.submit(new Runnable() {
         public void run() {
+          List<Tweet> subtestTweets = testTweets.subList(begin, end);
+
           // Tokenize
           List<TokenizedTweet> tokenizedTweets = Tokenizer
               .tokenizeTweets(subtestTweets);
