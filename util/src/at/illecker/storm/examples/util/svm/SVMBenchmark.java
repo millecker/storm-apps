@@ -99,19 +99,19 @@ public class SVMBenchmark {
     ExecutorService executorService = Executors
         .newFixedThreadPool(numberOfThreads);
 
-    // Start Benchmark
-    LOG.info("Start Benchmark...");
-    long startTime = System.currentTimeMillis();
-
     // Load test tweets
     final ArrayList<Tweet> testTweets = (ArrayList<Tweet>) dataset
         .getTestTweets();
     for (int i = 0; i < inputCount - 1; i++) {
       testTweets.addAll((ArrayList<Tweet>) testTweets.clone());
     }
+    
     final int totalTweets = testTweets.size();
     final int tweetsPerThread = totalTweets / numberOfThreads;
 
+    // Start Benchmark
+    LOG.info("Start Benchmark...");
+    long startTime = System.currentTimeMillis();
     // Run threads
     for (int i = 0; i < numberOfThreads; i++) {
       final int begin = i * tweetsPerThread;
