@@ -100,10 +100,11 @@ public class SVMBenchmark {
         .newFixedThreadPool(numberOfThreads);
 
     // Load test tweets
-    final ArrayList<Tweet> testTweets = (ArrayList<Tweet>) dataset
+    final ArrayList<Tweet> testInputTweets = (ArrayList<Tweet>) dataset
         .getTestTweets();
+    final ArrayList<Tweet> testTweets = new ArrayList<Tweet>(testInputTweets);
     for (int i = 0; i < inputCount - 1; i++) {
-      testTweets.addAll((ArrayList<Tweet>) testTweets.clone());
+      testTweets.addAll((ArrayList<Tweet>) testInputTweets.clone());
     }
 
     final int totalTweets = testTweets.size();
