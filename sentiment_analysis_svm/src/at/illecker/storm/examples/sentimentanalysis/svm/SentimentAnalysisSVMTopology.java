@@ -116,8 +116,8 @@ public class SentimentAnalysisSVMTopology {
     // PreprocessorBolt --> POSTaggerBolt
     builder
         .setBolt(POSTaggerBolt.ID, posTaggerBolt,
-            numberOfWorkers * numberOfExecutors * 7)
-        .setNumTasks(numberOfWorkers * numberOfExecutors * 14)
+            numberOfWorkers * numberOfExecutors * 6)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 12)
         .localOrShuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
@@ -144,7 +144,7 @@ public class SentimentAnalysisSVMTopology {
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
 
     conf.put(Config.WORKER_CHILDOPTS, "-Xmx32g");
-    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx16g");
+    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
 
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
