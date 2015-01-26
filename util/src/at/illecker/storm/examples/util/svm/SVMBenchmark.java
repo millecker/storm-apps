@@ -48,6 +48,7 @@ public class SVMBenchmark {
   public static void main(String[] args) {
     final int numberOfThreads;
     final int inputCount;
+    System.out.println("\nStarting SVM Benchmark...");
     if (args.length > 0) {
       numberOfThreads = Integer.parseInt(args[0]);
       System.out.println("Using " + numberOfThreads + " threads...");
