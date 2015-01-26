@@ -64,5 +64,11 @@ public class DatasetSpout extends BaseRichSpout {
     // Emit tweet
     m_collector.emit(new Values(tweet));
     // Utils.sleep(1);
+    try {
+      Thread.sleep(0, 500000); // 0.5 ms
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 }
