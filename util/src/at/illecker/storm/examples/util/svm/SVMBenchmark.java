@@ -25,10 +25,6 @@ import java.util.concurrent.Executors;
 
 import libsvm.svm;
 import libsvm.svm_model;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import at.illecker.storm.examples.util.Configuration;
 import at.illecker.storm.examples.util.Dataset;
 import at.illecker.storm.examples.util.io.SerializationUtils;
@@ -48,17 +44,17 @@ import at.illecker.storm.examples.util.tweet.TokenizedTweet;
 import at.illecker.storm.examples.util.tweet.Tweet;
 
 public class SVMBenchmark {
-  private static final Logger LOG = LoggerFactory.getLogger(SVMBenchmark.class);
 
   public static void main(String[] args) {
     final int numberOfThreads;
     final int inputCount;
     if (args.length > 0) {
       numberOfThreads = Integer.parseInt(args[0]);
-      LOG.info("Using " + numberOfThreads + " threads...");
+      System.out.println("Using " + numberOfThreads + " threads...");
       if (args.length > 1) {
         inputCount = Integer.parseInt(args[1]);
-        LOG.info("Using " + inputCount + " times the test dataset...");
+        System.out
+            .println("Using " + inputCount + " times the test dataset...");
       } else {
         inputCount = 1;
       }
@@ -86,12 +82,12 @@ public class SVMBenchmark {
         TfIdfNormalization.COS, true);
 
     // Load Feature Vector Generator
-    LOG.info("Load CombinedFeatureVectorGenerator...");
+    System.out.println("Load CombinedFeatureVectorGenerator...");
     final FeatureVectorGenerator fvg = new CombinedFeatureVectorGenerator(
         tweetTfIdf);
 
     // Load SVM Model
-    LOG.info("Loading SVM model...");
+    System.out.println("Loading SVM model...");
     final svm_model svmModel = SerializationUtils.deserialize(dataset
         .getDatasetPath() + File.separator + SVM.SVM_MODEL_FILE_SER);
 
@@ -111,7 +107,7 @@ public class SVMBenchmark {
     final int tweetsPerThread = totalTweets / numberOfThreads;
 
     // Start Benchmark
-    LOG.info("Start Benchmark...");
+    System.out.println("Start Benchmark...");
     long startTime = System.currentTimeMillis();
     // Run threads
     for (int i = 0; i < numberOfThreads; i++) {
@@ -158,9 +154,9 @@ public class SVMBenchmark {
 
     // End Benchmark
     long totalTime = System.currentTimeMillis() - startTime;
-    LOG.info("Benchmark finished after " + totalTime + " ms");
-    LOG.info("Total test tweets: " + testTweets.size());
-    LOG.info("Tweets per second: "
+    System.out.println("Benchmark finished after " + totalTime + " ms");
+    System.out.println("Total test tweets: " + testTweets.size());
+    System.out.println("Tweets per second: "
         + (testTweets.size() / ((double) totalTime / 1000)));
 
     executorService.shutdown();
