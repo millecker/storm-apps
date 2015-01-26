@@ -124,7 +124,7 @@ public class SentimentAnalysisSVMTopology {
     builder
         .setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
             numberOfWorkers * numberOfExecutors * 2)
-        .setNumTasks(numberOfWorkers * numberOfExecutors * 4)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 2)
         .localOrShuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
@@ -143,7 +143,7 @@ public class SentimentAnalysisSVMTopology {
     // conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
 
-    conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
+    conf.put(Config.WORKER_CHILDOPTS, "-Xmx32g");
     conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
 
     // This will simply log all Metrics received into
