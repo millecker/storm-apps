@@ -103,8 +103,11 @@ public class SentimentAnalysisSVMTopology {
     builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt,
-        numberOfWorkers * numberOfExecutors).localOrShuffleGrouping(spoutID);
+    builder
+        .setBolt(TokenizerBolt.ID, tokenizerBolt,
+            numberOfWorkers * numberOfExecutors)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 2)
+        .localOrShuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
     builder
