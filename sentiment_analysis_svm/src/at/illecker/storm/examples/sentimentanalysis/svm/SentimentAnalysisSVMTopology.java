@@ -117,7 +117,7 @@ public class SentimentAnalysisSVMTopology {
 
     // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(POSTaggerBolt.ID, posTaggerBolt,
-        numberOfWorkers * numberOfExecutors * 12)
+        numberOfWorkers * numberOfExecutors * 11 + 2)
     // .setNumTasks(numberOfWorkers * numberOfExecutors * 16)
         .localOrShuffleGrouping(PreprocessorBolt.ID);
 
