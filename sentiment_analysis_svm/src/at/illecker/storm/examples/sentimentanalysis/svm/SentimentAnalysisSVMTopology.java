@@ -96,7 +96,7 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
-    int numberOfWorkers = 2;
+    int numberOfWorkers = 1;
     int numberOfExecutors = 1;
 
     // Set Spout
