@@ -129,8 +129,8 @@ public class SentimentAnalysisSVMTopology {
 
     // FeatureGenerationBolt --> SVMBolt
     builder
-        .setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfExecutors * 3)
-        .setNumTasks(numberOfWorkers * numberOfExecutors * 6)
+        .setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfExecutors * 2)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 4)
         .localOrShuffleGrouping(FeatureGenerationBolt.ID);
 
     Config conf = new Config();
