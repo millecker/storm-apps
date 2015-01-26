@@ -121,20 +121,22 @@ public class SentimentAnalysisSVMTopology {
         .localOrShuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
-    builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
-        numberOfWorkers * numberOfExecutors).localOrShuffleGrouping(
-        POSTaggerBolt.ID);
+    builder
+        .setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
+            numberOfWorkers * numberOfExecutors)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 2)
+        .localOrShuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
     builder
-        .setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfExecutors * 2)
-        .setNumTasks(numberOfWorkers * numberOfExecutors * 4)
+        .setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfExecutors * 3)
+        .setNumTasks(numberOfWorkers * numberOfExecutors * 6)
         .localOrShuffleGrouping(FeatureGenerationBolt.ID);
 
     Config conf = new Config();
     conf.setNumWorkers(numberOfWorkers);
 
-    // conf.setMaxSpoutPending(5000);
+    conf.setMaxSpoutPending(5000);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);
