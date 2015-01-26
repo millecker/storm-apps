@@ -52,6 +52,7 @@ public class DatasetSpout extends BaseRichSpout {
       SpoutOutputCollector collector) {
     this.m_collector = collector;
     this.m_tweets = m_dataset.getTestTweets();
+    Utils.sleep(10000);
   }
 
   public void nextTuple() {
