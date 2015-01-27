@@ -96,7 +96,7 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
-    int numberOfWorkers = 2;
+    int numberOfWorkers = 5;
     int numberOfExecutors = 1;
 
     // Set Spout
@@ -104,7 +104,7 @@ public class SentimentAnalysisSVMTopology {
 
     // Set Spout --> TokenizerBolt
     builder.setBolt(TokenizerBolt.ID, tokenizerBolt,
-        numberOfWorkers * numberOfExecutors * 2 + 2)
+        numberOfWorkers * numberOfExecutors * 2)
     // .setNumTasks(numberOfWorkers * numberOfExecutors * 2)
         .shuffleGrouping(spoutID);
 
@@ -129,7 +129,7 @@ public class SentimentAnalysisSVMTopology {
 
     // FeatureGenerationBolt --> SVMBolt
     builder.setBolt(SVMBolt.ID, svmBolt,
-        numberOfWorkers * numberOfExecutors * 4 + 2)
+        numberOfWorkers * numberOfExecutors * 4)
     // .setNumTasks(numberOfWorkers * numberOfExecutors * 4)
         .shuffleGrouping(FeatureGenerationBolt.ID);
 
