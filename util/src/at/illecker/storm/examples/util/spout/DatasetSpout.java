@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import at.illecker.storm.examples.util.Dataset;
+import at.illecker.storm.examples.util.Utils;
 import at.illecker.storm.examples.util.tweet.Tweet;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -27,7 +28,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 
 public class DatasetSpout extends BaseRichSpout {
   public static final String ID = "dataset-spout";
@@ -52,7 +52,7 @@ public class DatasetSpout extends BaseRichSpout {
       SpoutOutputCollector collector) {
     this.m_collector = collector;
     this.m_tweets = m_dataset.getTestTweets();
-    Utils.sleep(20000);
+    Utils.sleepMillis(20000);
   }
 
   public void nextTuple() {
@@ -63,12 +63,7 @@ public class DatasetSpout extends BaseRichSpout {
     }
     // Emit tweet
     m_collector.emit(new Values(tweet));
-    // Utils.sleep(1);
-    try {
-      Thread.sleep(0, 5000); // 500000 - 0.5 ms
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    // Utils.sleepMillis(1); // 1 ms
+    Utils.sleepNanos(500000);// 500000 ns - 0.5 ms
   }
 }
