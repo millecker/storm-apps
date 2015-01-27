@@ -97,33 +97,38 @@ public class SentimentAnalysisSVMTopology {
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
     int numberOfWorkers = 5;
-    int numberOfExecutors = 1;
+    // Parallelism assumptions:
+    // One worker per node and 16 cores per node (12 Java threads per node)
+    // 15 Executors per each worker
+    // - Spout 1 thread
+    // - TokenizerBolt 2 threads
+    // - PreprocessorBolt 1 thread
+    // - POSTaggerBolt 5 threads and 2 tasks per thread
+    // - FeatureGenerationBolt 1 thread
+    // - SVMBolt 5 threads
 
     // Set Spout
     builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt,
-        numberOfWorkers * numberOfExecutors * 2).shuffleGrouping(spoutID);
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers * 2)
+        .shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt,
-        numberOfWorkers * numberOfExecutors).shuffleGrouping(TokenizerBolt.ID);
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt, numberOfWorkers)
+        .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder
-        .setBolt(POSTaggerBolt.ID, posTaggerBolt,
-            numberOfWorkers * numberOfExecutors * 8)
-        .setNumTasks(numberOfWorkers * numberOfExecutors * 8 * 2)
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5)
+        .setNumTasks(numberOfWorkers * 5 * 2)
         .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
     builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
-        numberOfWorkers * numberOfExecutors).shuffleGrouping(POSTaggerBolt.ID);
+        numberOfWorkers).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt,
-        numberOfWorkers * numberOfExecutors * 5).shuffleGrouping(
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 5).shuffleGrouping(
         FeatureGenerationBolt.ID);
 
     Config conf = new Config();
