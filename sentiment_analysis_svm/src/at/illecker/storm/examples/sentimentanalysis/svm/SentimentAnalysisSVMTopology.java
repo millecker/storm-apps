@@ -122,10 +122,9 @@ public class SentimentAnalysisSVMTopology {
         numberOfWorkers * numberOfExecutors).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder
-        .setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * numberOfExecutors * 4)
-        .setNumTasks(numberOfWorkers * numberOfExecutors * 4 * 2)
-        .shuffleGrouping(FeatureGenerationBolt.ID);
+    builder.setBolt(SVMBolt.ID, svmBolt,
+        numberOfWorkers * numberOfExecutors * 4).shuffleGrouping(
+        FeatureGenerationBolt.ID);
 
     Config conf = new Config();
     conf.setNumWorkers(numberOfWorkers);
