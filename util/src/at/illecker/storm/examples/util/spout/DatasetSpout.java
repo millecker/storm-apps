@@ -64,6 +64,6 @@ public class DatasetSpout extends BaseRichSpout {
     // Emit tweet
     m_collector.emit(new Values(tweet));
     // Utils.sleepMillis(1); // 1 ms
-    Utils.sleepNanos(500000);// 500000 ns - 0.5 ms
+    Utils.sleepNanos(1000000);// 500000 ns - 0.5 ms
   }
 }
