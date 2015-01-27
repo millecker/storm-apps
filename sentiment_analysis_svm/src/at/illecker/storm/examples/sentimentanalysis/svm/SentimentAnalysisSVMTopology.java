@@ -96,7 +96,7 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
-    int numberOfWorkers = 5;
+    int numberOfWorkers = 2;
     int numberOfExecutors = 1;
 
     // Set Spout
@@ -145,7 +145,7 @@ public class SentimentAnalysisSVMTopology {
     // conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
 
-    conf.put(Config.WORKER_CHILDOPTS, "-Xmx32g");
+    conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
     conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
 
     // This will simply log all Metrics received into
