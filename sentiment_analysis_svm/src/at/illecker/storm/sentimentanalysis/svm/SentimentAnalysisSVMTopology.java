@@ -69,13 +69,21 @@ public class SentimentAnalysisSVMTopology {
     // Dataset SemEval2013
     Dataset dataset = Configuration.getDataSetSemEval2013();
 
+    Config conf = new Config();
+
     // Create Spout
     IRichSpout spout;
     String spoutID = "";
     if (consumerKey.isEmpty()) {
+      // sleep 20 sec before starting emitting tuples
+      conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
+      // sleep between emitting tuples
+      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
       spout = new DatasetSpout(new String[] { "tweet" }, dataset);
       spoutID = DatasetSpout.ID;
     } else {
+      // sleep 20 sec before starting emitting tuples
+      conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
       spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
           consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
       spoutID = TwitterStreamSpout.ID;
@@ -96,7 +104,10 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
-    int numberOfWorkers = 2;
+
+    int numberOfWorkers = 1;
+    conf.setNumWorkers(numberOfWorkers);
+
     // Parallelism assumptions:
     // One worker per node and 16 cores per node (12 Java threads per node)
     // 15 Executors per each worker
@@ -130,9 +141,6 @@ public class SentimentAnalysisSVMTopology {
     // FeatureGenerationBolt --> SVMBolt
     builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 5).shuffleGrouping(
         FeatureGenerationBolt.ID);
-
-    Config conf = new Config();
-    conf.setNumWorkers(numberOfWorkers);
 
     // Set max pending tuples
     conf.setMaxSpoutPending(5000);

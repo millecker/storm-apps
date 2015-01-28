@@ -63,14 +63,22 @@ public class SentimentAnalysisTopology {
       }
     }
 
+    Config conf = new Config();
+
     // Create Spout
     IRichSpout spout;
     String spoutID = "";
     if (consumerKey.isEmpty()) {
+      // sleep 20 sec before starting emitting tuples
+      conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
+      // sleep 100 ms between emitting tuples
+      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_MS, 100);
       spout = new DatasetSpout(new String[] { "tweet" },
           Configuration.getDataSetSemEval2013());
       spoutID = DatasetSpout.ID;
     } else {
+      // sleep 20 sec before starting emitting tuples
+      conf.put(TwitterStreamSpout.CONF_STARTUP_SLEEP_MS, 20000);
       spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
           consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
       spoutID = TwitterStreamSpout.ID;
@@ -107,7 +115,8 @@ public class SentimentAnalysisTopology {
     builder.setBolt(SentimentDetectionBolt.ID, sentimentDetectionBolt)
         .shuffleGrouping(POSTaggerBolt.ID);
 
-    Config conf = new Config();
+    // Enable logging in SentimentDetectionBolt
+    conf.put(SentimentDetectionBolt.CONF_LOGGING, true);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
