@@ -80,6 +80,7 @@ public class SentimentAnalysisSVMTopology {
       // sleep between emitting tuples
       // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
       // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 250000); // 0.25 ms
+      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 50000); // 0.05 ms
       spout = new DatasetSpout(new String[] { "tweet" }, dataset);
       spoutID = DatasetSpout.ID;
     } else {
