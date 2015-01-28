@@ -3,7 +3,7 @@
 	<property name="rootbeer.version" value="" />
 	<property name="rootbeer.args" value="" />
 	<property name="output.file" value="POSTagger" />
-	<property name="util.src.dir" value="../util/src" />
+	<property name="util.src.dir" value="../commons/src" />
 	<property name="libjars.gpu" value="" />
 	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar" />
 	<property name="libfiles.cpu" value="resources${file.separator}dictionaries,resources${file.separator}models" />
@@ -12,7 +12,7 @@
 	<property name="rootbeer.classes" value="" />
 	<property name="kernel.class" value="" />
 	<property name="gpu.class" value="" />
-	<property name="cpu.class" value="at.illecker.storm.examples.postagger.POSTaggerTopology" />
+	<property name="cpu.class" value="at.illecker.storm.postagger.POSTaggerTopology" />
 	<property name="bench.class" value="" />
 	<property name="program" value="storm" />
 	<property name="program.args" value="jar" />

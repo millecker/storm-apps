@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.postagger;
+package at.illecker.storm.postagger;
 
 import java.io.File;
 import java.util.Arrays;
 
-import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
-import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
-import at.illecker.storm.examples.util.bolt.TokenizerBolt;
-import at.illecker.storm.examples.util.spout.TwitterFilesSpout;
-import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
+import at.illecker.storm.commons.bolt.POSTaggerBolt;
+import at.illecker.storm.commons.bolt.PreprocessorBolt;
+import at.illecker.storm.commons.bolt.TokenizerBolt;
+import at.illecker.storm.commons.spout.TwitterFilesSpout;
+import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -113,6 +113,9 @@ public class POSTaggerTopology {
     // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(POSTaggerBolt.ID, posTaggerBolt).shuffleGrouping(
         PreprocessorBolt.ID);
+
+    conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
+    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

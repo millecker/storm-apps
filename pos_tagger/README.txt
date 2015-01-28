@@ -1,5 +1,5 @@
 ###############################################################################
-##### POS Tagger Example                                                  #####
+##### POS Tagger Application                                              #####
 ###############################################################################
 
 # Use Apache Ant to build and run example
@@ -19,10 +19,10 @@ ant run [ -DtwitterDir=dir \
  [-DkeyWords='word1 word2']
 
 # Example
-ant clean && ant run \
+ant run \
  -DtwitterDir=../resources/datasets/uibk_crawler/test/
  
-ant clean && ant run \
+ant run \
   -DconsumerKey=XXXX  -DconsumerSecret=XXXX \
   -DaccessToken=XXXX  -DaccessTokenSecret=XXXX
 
