@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.sentimentanalysis.svm;
+package at.illecker.storm.sentimentanalysis.svm;
 
 import java.util.Arrays;
 
-import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.Dataset;
-import at.illecker.storm.examples.util.bolt.FeatureGenerationBolt;
-import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
-import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
-import at.illecker.storm.examples.util.bolt.SVMBolt;
-import at.illecker.storm.examples.util.bolt.TokenizerBolt;
-import at.illecker.storm.examples.util.spout.DatasetSpout;
-import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
+import at.illecker.storm.commons.Configuration;
+import at.illecker.storm.commons.Dataset;
+import at.illecker.storm.commons.bolt.FeatureGenerationBolt;
+import at.illecker.storm.commons.bolt.POSTaggerBolt;
+import at.illecker.storm.commons.bolt.PreprocessorBolt;
+import at.illecker.storm.commons.bolt.SVMBolt;
+import at.illecker.storm.commons.bolt.TokenizerBolt;
+import at.illecker.storm.commons.spout.DatasetSpout;
+import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.metric.LoggingMetricsConsumer;
@@ -96,7 +96,7 @@ public class SentimentAnalysisSVMTopology {
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
-    int numberOfWorkers = 5;
+    int numberOfWorkers = 2;
     // Parallelism assumptions:
     // One worker per node and 16 cores per node (12 Java threads per node)
     // 15 Executors per each worker
@@ -134,6 +134,7 @@ public class SentimentAnalysisSVMTopology {
     Config conf = new Config();
     conf.setNumWorkers(numberOfWorkers);
 
+    // Set max pending tuples
     conf.setMaxSpoutPending(5000);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
