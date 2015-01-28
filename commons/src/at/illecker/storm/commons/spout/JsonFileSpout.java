@@ -19,6 +19,7 @@ package at.illecker.storm.commons.spout;
 import java.util.List;
 import java.util.Map;
 
+import at.illecker.storm.commons.util.TimeUtils;
 import at.illecker.storm.commons.util.io.JsonUtils;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -26,16 +27,18 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 
 public class JsonFileSpout extends BaseRichSpout {
   public static final String ID = "json-file-spout";
-  public static final String CONF_JSON_FILE = "json.file";
-  private static final long serialVersionUID = -566909258413711921L;
+  public static final String CONF_JSON_FILE = ID + ".json.file";
+  public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
+  public static final String CONF_TUPLE_SLEEP_MS = ID + ".tuple.sleep.ms";
+  private static final long serialVersionUID = -4355637229662565251L;
   private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Map<String, Object>> m_elements;
   private int m_index = 0;
+  private long m_tupleSleepMs = 0;
 
   public JsonFileSpout(String[] outputFields) {
     this.m_outputFields = outputFields;
@@ -56,16 +59,34 @@ public class JsonFileSpout extends BaseRichSpout {
     } else {
       throw new RuntimeException(CONF_JSON_FILE + " property was not set!");
     }
+
+    // Optional sleep between tuples emitting
+    if (config.get(CONF_TUPLE_SLEEP_MS) != null) {
+      m_tupleSleepMs = (Long) config.get(CONF_TUPLE_SLEEP_MS);
+    } else {
+      m_tupleSleepMs = 0;
+    }
+
+    // Optional startup sleep to finish bolt preparation
+    // before spout starts emitting
+    if (config.get(CONF_STARTUP_SLEEP_MS) != null) {
+      long startupSleepMillis = (Long) config.get(CONF_STARTUP_SLEEP_MS);
+      TimeUtils.sleepMillis(startupSleepMillis);
+    }
   }
 
   public void nextTuple() {
     this.m_collector.emit(new Values(m_elements.get(m_index)));
+
+    // index is used to endless loop within the collection
     m_index++;
     if (m_index >= m_elements.size()) {
       m_index = 0;
     }
-    // TODO minimize sleep time
-    // default sleep 1 ms
-    Utils.sleep(500); // for development
+
+    // Optional sleep between emitting tuples
+    if (m_tupleSleepMs != 0) {
+      TimeUtils.sleepMillis(m_tupleSleepMs);
+    }
   }
 }

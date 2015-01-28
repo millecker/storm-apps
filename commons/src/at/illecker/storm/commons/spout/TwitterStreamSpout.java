@@ -29,6 +29,7 @@ import twitter4j.TwitterStreamFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 import at.illecker.storm.commons.tweet.Tweet;
+import at.illecker.storm.commons.util.TimeUtils;
 import backtype.storm.Config;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -36,11 +37,11 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 
 public class TwitterStreamSpout extends BaseRichSpout {
   public static final String ID = "twitter-stream-spout";
-  private static final long serialVersionUID = 1208142390795660693L;
+  public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
+  private static final long serialVersionUID = -4657730220755697034L;
   private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private LinkedBlockingQueue<Status> m_tweetsQueue = null;
@@ -71,10 +72,17 @@ public class TwitterStreamSpout extends BaseRichSpout {
   }
 
   @Override
-  public void open(Map conf, TopologyContext context,
+  public void open(Map config, TopologyContext context,
       SpoutOutputCollector collector) {
     m_collector = collector;
     m_tweetsQueue = new LinkedBlockingQueue<Status>(1000);
+
+    // Optional startup sleep to finish bolt preparation
+    // before spout starts emitting
+    if (config.get(CONF_STARTUP_SLEEP_MS) != null) {
+      long startupSleepMillis = (Long) config.get(CONF_STARTUP_SLEEP_MS);
+      TimeUtils.sleepMillis(startupSleepMillis);
+    }
 
     TwitterStream twitterStream = new TwitterStreamFactory(
         new ConfigurationBuilder().setJSONStoreEnabled(true).build())
@@ -134,7 +142,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
   public void nextTuple() {
     Status tweet = m_tweetsQueue.poll();
     if (tweet == null) {
-      Utils.sleep(50);
+      TimeUtils.sleepMillis(50); // sleep 50 ms
     } else {
       // Emit tweet
       m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
