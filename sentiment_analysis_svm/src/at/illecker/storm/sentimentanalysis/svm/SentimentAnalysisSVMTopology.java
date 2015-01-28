@@ -78,7 +78,8 @@ public class SentimentAnalysisSVMTopology {
       // sleep 20 sec before starting emitting tuples
       conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
       // sleep between emitting tuples
-      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
+      // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
+      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 250000); // 0.25 ms
       spout = new DatasetSpout(new String[] { "tweet" }, dataset);
       spoutID = DatasetSpout.ID;
     } else {
@@ -131,7 +132,7 @@ public class SentimentAnalysisSVMTopology {
 
     // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5)
-        .setNumTasks(numberOfWorkers * 5 * 2)
+        .setNumTasks(numberOfWorkers * 5 * 3)
         .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
