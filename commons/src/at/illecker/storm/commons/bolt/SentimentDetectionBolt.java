@@ -33,9 +33,11 @@ import backtype.storm.tuple.Tuple;
 
 public class SentimentDetectionBolt extends BaseRichBolt {
   public static final String ID = "sentiment-detection-bolt";
-  private static final long serialVersionUID = -3279220626656829348L;
+  public static final String CONF_LOGGING = ID + ".logging";
+  private static final long serialVersionUID = 707679458760007989L;
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentDetectionBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private OutputCollector m_collector;
@@ -56,6 +58,12 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
     this.m_sentimentWordLists = SentimentWordLists.getInstance();
   }
 
@@ -65,7 +73,6 @@ public class SentimentDetectionBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     TaggedTweet tweet = (TaggedTweet) tuple.getValueByField(m_inputFields[0]);
-    // LOG.info(tweet.toString());
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
         .getTweetSentiment(tweet);
@@ -78,20 +85,21 @@ public class SentimentDetectionBolt extends BaseRichBolt {
       totalSentimentScore /= tweetSentiments.size();
     }
 
-    // Debug
-    if (totalSentimentScore != Double.MIN_VALUE) {
-      if (totalSentimentScore > SentimentResult.POSITIVE_THRESHOLD) {
-        LOG.info("Tweet: " + tweet.toString() + " Sentiment: POSITIVE Score: "
-            + totalSentimentScore);
-      } else if (totalSentimentScore < SentimentResult.NEGATIVE_THRESHOLD) {
-        LOG.info("Tweet: " + tweet.toString() + " Sentiment: NEGATIVE Score: "
-            + totalSentimentScore);
+    if (m_logging) {
+      if (totalSentimentScore != Double.MIN_VALUE) {
+        if (totalSentimentScore > SentimentResult.POSITIVE_THRESHOLD) {
+          LOG.info("Tweet: " + tweet.toString()
+              + " Sentiment: POSITIVE Score: " + totalSentimentScore);
+        } else if (totalSentimentScore < SentimentResult.NEGATIVE_THRESHOLD) {
+          LOG.info("Tweet: " + tweet.toString()
+              + " Sentiment: NEGATIVE Score: " + totalSentimentScore);
+        } else {
+          LOG.info("Tweet: " + tweet.toString() + " Sentiment: NEUTAL Score: "
+              + totalSentimentScore);
+        }
       } else {
-        LOG.info("Tweet: " + tweet.toString() + " Sentiment: NEUTAL Score: "
-            + totalSentimentScore);
+        LOG.info("Tweet: " + tweet.toString() + " Sentiment: UNKNOWN");
       }
-    } else {
-      LOG.info("Tweet: " + tweet.toString() + " Sentiment: UNKNOWN");
     }
 
     this.m_collector.ack(tuple);

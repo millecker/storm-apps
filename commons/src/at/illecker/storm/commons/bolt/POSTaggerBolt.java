@@ -37,9 +37,11 @@ import edu.stanford.nlp.ling.TaggedWord;
 
 public class POSTaggerBolt extends BaseRichBolt {
   public static final String ID = "pos-tagger-bolt";
-  private static final long serialVersionUID = -2931810659942708343L;
+  public static final String CONF_LOGGING = ID + ".logging";
+  private static final long serialVersionUID = 8389930087364663504L;
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private OutputCollector m_collector;
@@ -60,19 +62,31 @@ public class POSTaggerBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
     this.m_posTagger = POSTagger.getInstance();
   }
 
   public void execute(Tuple tuple) {
     PreprocessedTweet tweet = (PreprocessedTweet) tuple
         .getValueByField(m_inputFields[0]);
-    // LOG.info(tweet.toString());
 
+    // POS Tagger
     List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
     for (List<TaggedWord> sentence : tweet.getPreprocessedSentences()) {
       taggedSentences.add(m_posTagger.tagSentence(sentence));
     }
 
+    if (m_logging) {
+      LOG.info("Tweet: \"" + tweet.getText() + "\" Tagged: "
+          + taggedSentences.toString());
+    }
+
+    // Emit new immutable TaggedTweet object
     this.m_collector.emit(tuple, new Values(new TaggedTweet(tweet.getId(),
         tweet.getText(), tweet.getScore(), taggedSentences)));
     this.m_collector.ack(tuple);

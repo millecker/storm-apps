@@ -36,9 +36,11 @@ import backtype.storm.tuple.Values;
 
 public class TokenizerBolt extends BaseRichBolt {
   public static final String ID = "tokenizer-bolt";
-  private static final long serialVersionUID = -2932822073019567061L;
+  public static final String CONF_LOGGING = ID + ".logging";
+  private static final long serialVersionUID = 7134328814020366549L;
   private static final Logger LOG = LoggerFactory
       .getLogger(TokenizerBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private OutputCollector m_collector;
@@ -58,17 +60,27 @@ public class TokenizerBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
   }
 
   public void execute(Tuple tuple) {
     Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
-    // LOG.info(tweet.toString());
 
-    // Split tweet into tokens
-    // trim text and split at one ore more blanks
+    // Tokenize tweet text
     List<List<String>> sentences = new ArrayList<List<String>>();
     sentences.add(Tokenizer.tokenize(tweet.getText()));
 
+    if (m_logging) {
+      LOG.info("Tweet: \"" + tweet.getText() + "\" Tokenized: "
+          + sentences.toString());
+    }
+
+    // Emit new immutable TokenizedTweet object
     this.m_collector.emit(tuple, new Values(new TokenizedTweet(tweet.getId(),
         tweet.getText(), tweet.getScore(), sentences)));
     this.m_collector.ack(tuple);

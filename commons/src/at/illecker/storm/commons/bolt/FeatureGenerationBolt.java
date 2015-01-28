@@ -41,9 +41,11 @@ import backtype.storm.tuple.Values;
 
 public class FeatureGenerationBolt extends BaseRichBolt {
   public static final String ID = "feature-generation-bolt";
-  private static final long serialVersionUID = 6342287897604628238L;
+  public static final String CONF_LOGGING = ID + ".logging";
+  private static final long serialVersionUID = 8704674836362723368L;
   private static final Logger LOG = LoggerFactory
       .getLogger(FeatureGenerationBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private Dataset m_dataset;
@@ -68,14 +70,21 @@ public class FeatureGenerationBolt extends BaseRichBolt {
       OutputCollector collector) {
     this.m_collector = collector;
 
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
+
     List<TaggedTweet> taggedTweets = SerializationUtils.deserialize(m_dataset
         .getTrainTaggedDataSerializationFile());
-
     if (taggedTweets != null) {
       TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
           TfIdfNormalization.COS, true);
       LOG.info("Load CombinedFeatureVectorGenerator...");
       m_fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
+      LOG.info("CombinedFeatureVectorGenerator loaded");
     } else {
       LOG.error("TaggedTweets could not be found! File is missing: "
           + m_dataset.getTrainTaggedDataSerializationFile());
@@ -84,12 +93,16 @@ public class FeatureGenerationBolt extends BaseRichBolt {
 
   public void execute(Tuple tuple) {
     TaggedTweet tweet = (TaggedTweet) tuple.getValueByField(m_inputFields[0]);
-    // LOG.info(tweet.toString());
 
     // Generate Feature Vector for tweet
     Map<Integer, Double> featureVector = m_fvg.calculateFeatureVector(tweet);
-    // LOG.info("FeatureVector: " + featureVector);
 
+    if (m_logging) {
+      LOG.info("Tweet: \"" + tweet.getText() + "\" FeatureVector: "
+          + featureVector.toString());
+    }
+
+    // Emit new immutable FeaturedTweet object
     this.m_collector.emit(tuple, new Values(new FeaturedTweet(tweet.getId(),
         tweet.getText(), tweet.getScore(), featureVector)));
     this.m_collector.ack(tuple);

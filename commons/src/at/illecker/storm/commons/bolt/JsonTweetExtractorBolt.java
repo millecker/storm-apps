@@ -32,9 +32,11 @@ import backtype.storm.tuple.Values;
 
 public class JsonTweetExtractorBolt extends BaseRichBolt {
   public static final String ID = "json-tweet-extractor-bolt";
-  private static final long serialVersionUID = -7467317303659214525L;
+  public static final String CONF_LOGGING = ID + ".logging";
+  private static final long serialVersionUID = 1245405660991336534L;
   private static final Logger LOG = LoggerFactory
       .getLogger(JsonTweetExtractorBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private OutputCollector m_collector;
@@ -54,6 +56,12 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
   }
 
   public void execute(Tuple tuple) {
@@ -61,8 +69,12 @@ public class JsonTweetExtractorBolt extends BaseRichBolt {
     Map<String, Object> element = (Map<String, Object>) tuple
         .getValueByField(m_inputFields[0]);
 
+    // Read Tweet from JSON element
     SentimentTweet tweet = SentimentTweet.fromJsonElement(element);
-    // LOG.info(tweet.toString());
+
+    if (m_logging) {
+      LOG.info(tweet.toString());
+    }
 
     this.m_collector.emit(tuple, new Values(tweet));
     this.m_collector.ack(tuple);

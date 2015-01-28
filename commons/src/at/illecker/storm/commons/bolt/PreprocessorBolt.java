@@ -37,9 +37,11 @@ import edu.stanford.nlp.ling.TaggedWord;
 
 public class PreprocessorBolt extends BaseRichBolt {
   public static final String ID = "preprocessor-bolt";
-  private static final long serialVersionUID = 5767153574646034298L;
+  public static final String CONF_LOGGING = ID + ".logging";
+  private static final long serialVersionUID = -1623010654971791418L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PreprocessorBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private OutputCollector m_collector;
@@ -60,19 +62,31 @@ public class PreprocessorBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
     this.m_preprocessor = Preprocessor.getInstance();
   }
 
   public void execute(Tuple tuple) {
     TokenizedTweet tweet = (TokenizedTweet) tuple
         .getValueByField(m_inputFields[0]);
-    // LOG.info(tweet.toString());
 
+    // Preprocess tokens
     List<List<TaggedWord>> preprocessedSentences = new ArrayList<List<TaggedWord>>();
     for (List<String> sentence : tweet.getSentences()) {
       preprocessedSentences.add(m_preprocessor.preprocess(sentence));
     }
 
+    if (m_logging) {
+      LOG.info("Tweet: \"" + tweet.getText() + "\" Preprocessed: "
+          + preprocessedSentences.toString());
+    }
+
+    // Emit new immutable PreprocessedTweet object
     this.m_collector.emit(tuple, new Values(
         new PreprocessedTweet(tweet.getId(), tweet.getText(), tweet.getScore(),
             preprocessedSentences)));

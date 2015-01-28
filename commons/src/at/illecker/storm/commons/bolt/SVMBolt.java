@@ -40,8 +40,10 @@ import backtype.storm.tuple.Tuple;
 
 public class SVMBolt extends BaseRichBolt {
   public static final String ID = "support-vector-maschine-bolt";
+  public static final String CONF_LOGGING = ID + ".logging";
   private static final long serialVersionUID = -3235291265771813064L;
   private static final Logger LOG = LoggerFactory.getLogger(SVMBolt.class);
+  private boolean m_logging = false;
   private String[] m_inputFields;
   private String[] m_outputFields;
   private Dataset m_dataset;
@@ -69,7 +71,14 @@ public class SVMBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    // Optional set logging
+    if (config.get(CONF_LOGGING) != null) {
+      m_logging = (Boolean) config.get(CONF_LOGGING);
+    } else {
+      m_logging = false;
+    }
 
+    // Tuple counter metric
     m_countMetric = new CountMetric();
     context.registerMetric("tuple_count", m_countMetric, 10);
 
@@ -93,9 +102,11 @@ public class SVMBolt extends BaseRichBolt {
     double predictedClass = SVM.evaluate(tweet, m_model, m_totalClasses,
         m_classifier);
 
-    // LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
-    // + " expectedClass: " + m_classifier.classfyScore(tweet.getScore())
-    // + " predictedClass: " + predictedClass);
+    if (m_logging) {
+      LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
+          + " expectedClass: " + m_classifier.classfyScore(tweet.getScore())
+          + " predictedClass: " + predictedClass);
+    }
 
     m_countMetric.incr();
     m_collector.ack(tuple);
