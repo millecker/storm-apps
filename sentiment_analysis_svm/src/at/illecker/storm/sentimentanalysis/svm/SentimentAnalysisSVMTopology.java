@@ -106,7 +106,7 @@ public class SentimentAnalysisSVMTopology {
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
 
-    int numberOfWorkers = 10;
+    int numberOfWorkers = 5;
     conf.setNumWorkers(numberOfWorkers);
 
     // Parallelism assumptions:
