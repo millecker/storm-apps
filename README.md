@@ -16,10 +16,10 @@ Further details are explained in the *README* file of each application.
 `ant clean`
 
 ##### Build a jar file
-`ant jar-cpu`
+`ant jar`
 
 ##### Submit and run an application on Apache Storm
-`ant run-cpu`
+`ant run`
 
 ## Resources
 The following resources are required for POS tagging and the sentiment analysis:
