@@ -80,6 +80,8 @@ public class POSTaggerTopology {
     String spoutID = "";
     if (twitterDir.isDirectory()) {
       conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
+      // sleep 500 ms between emitting tuples
+      conf.put(TwitterFilesSpout.CONF_TUPLE_SLEEP_MS, 500);
       spout = new TwitterFilesSpout(new String[] { "tweet" }, FILTER_LANG);
       spoutID = TwitterFilesSpout.ID;
     } else {
@@ -116,6 +118,9 @@ public class POSTaggerTopology {
 
     conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
     conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
+
+    // Enable logging in POSTaggerBolt
+    conf.put(POSTaggerBolt.CONF_LOGGING, true);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
