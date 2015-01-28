@@ -79,7 +79,7 @@ public class SentimentAnalysisSVMTopology {
       conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
       // sleep between emitting tuples
       // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
-      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 250000); // 0.25 ms
+      // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 250000); // 0.25 ms
       spout = new DatasetSpout(new String[] { "tweet" }, dataset);
       spoutID = DatasetSpout.ID;
     } else {
@@ -106,7 +106,7 @@ public class SentimentAnalysisSVMTopology {
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
 
-    int numberOfWorkers = 5;
+    int numberOfWorkers = 10;
     conf.setNumWorkers(numberOfWorkers);
 
     // Parallelism assumptions:
