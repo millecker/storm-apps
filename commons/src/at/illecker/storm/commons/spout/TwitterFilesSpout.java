@@ -21,6 +21,7 @@ import java.util.Map;
 
 import twitter4j.Status;
 import at.illecker.storm.commons.tweet.Tweet;
+import at.illecker.storm.commons.util.TimeUtils;
 import at.illecker.storm.commons.util.io.JsonUtils;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -28,17 +29,19 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 
 public class TwitterFilesSpout extends BaseRichSpout {
   public static final String ID = "twitter-files-spout";
-  public static final String CONF_TWITTER_DIR = "twitter.dir";
-  private static final long serialVersionUID = -4277696098291748609L;
+  public static final String CONF_TWITTER_DIR = ID + ".twitter.dir";
+  public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
+  public static final String CONF_TUPLE_SLEEP_MS = ID + ".tuple.sleep.ms";
+  private static final long serialVersionUID = 1584431147989513848L;
   private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Status> m_tweets;
   private int m_index = 0;
   private String m_filterLanguage;
+  private long m_tupleSleepMs = 0;
 
   public TwitterFilesSpout(String[] outputFields, String filterLanguage) {
     this.m_outputFields = outputFields;
@@ -61,18 +64,37 @@ public class TwitterFilesSpout extends BaseRichSpout {
     } else {
       throw new RuntimeException(CONF_TWITTER_DIR + " property was not set!");
     }
+
+    // Optional sleep between tuples emitting
+    if (config.get(CONF_TUPLE_SLEEP_MS) != null) {
+      m_tupleSleepMs = (Long) config.get(CONF_TUPLE_SLEEP_MS);
+    } else {
+      m_tupleSleepMs = 0;
+    }
+
+    // Optional startup sleep to finish bolt preparation
+    // before spout starts emitting
+    if (config.get(CONF_STARTUP_SLEEP_MS) != null) {
+      long startupSleepMillis = (Long) config.get(CONF_STARTUP_SLEEP_MS);
+      TimeUtils.sleepMillis(startupSleepMillis);
+    }
   }
 
   public void nextTuple() {
     Status tweet = m_tweets.get(m_index);
+
+    // index is used to endless loop within the collection
     m_index++;
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
+
     // Emit tweet
     m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
-    // TODO minimize sleep time
-    // default sleep 1 ms
-    Utils.sleep(500); // for development
+
+    // Optional sleep between emitting tuples
+    if (m_tupleSleepMs != 0) {
+      TimeUtils.sleepMillis(m_tupleSleepMs);
+    }
   }
 }
