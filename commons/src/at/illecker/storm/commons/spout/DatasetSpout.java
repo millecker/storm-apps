@@ -31,12 +31,17 @@ import backtype.storm.tuple.Values;
 
 public class DatasetSpout extends BaseRichSpout {
   public static final String ID = "dataset-spout";
-  private static final long serialVersionUID = -7033277532867702166L;
+  public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
+  public static final String CONF_TUPLE_SLEEP_MS = ID + ".tuple.sleep.ms";
+  public static final String CONF_TUPLE_SLEEP_NS = ID + ".spout.tuple.sleep.ns";
+  private static final long serialVersionUID = 3028853846518561027L;
   private String[] m_outputFields;
   private Dataset m_dataset;
   private SpoutOutputCollector m_collector;
   private List<Tweet> m_tweets;
   private int m_index = 0;
+  private long m_tupleSleepMs = 0;
+  private long m_tupleSleepNs = 0;
 
   public DatasetSpout(String[] outputFields, Dataset dataset) {
     this.m_outputFields = outputFields;
@@ -52,18 +57,45 @@ public class DatasetSpout extends BaseRichSpout {
       SpoutOutputCollector collector) {
     this.m_collector = collector;
     this.m_tweets = m_dataset.getTestTweets();
-    TimeUtils.sleepMillis(20000);
+
+    // Optional sleep between tuples emitting
+    if (config.get(CONF_TUPLE_SLEEP_MS) != null) {
+      m_tupleSleepMs = (Long) config.get(CONF_TUPLE_SLEEP_MS);
+    } else {
+      m_tupleSleepMs = 0;
+    }
+    if (config.get(CONF_TUPLE_SLEEP_NS) != null) {
+      m_tupleSleepNs = (Long) config.get(CONF_TUPLE_SLEEP_NS);
+    } else {
+      m_tupleSleepNs = 0;
+    }
+
+    // Optional startup sleep to finish bolt preparation
+    // before spout starts emitting
+    if (config.get(CONF_STARTUP_SLEEP_MS) != null) {
+      long startupSleepMillis = (Long) config.get(CONF_STARTUP_SLEEP_MS);
+      TimeUtils.sleepMillis(startupSleepMillis);
+    }
   }
 
   public void nextTuple() {
     Tweet tweet = m_tweets.get(m_index);
+
+    // index is used to endless loop within the collection
     m_index++;
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
+
     // Emit tweet
     m_collector.emit(new Values(tweet));
-    // Utils.sleepMillis(1); // 1 ms
-    // Utils.sleepNanos(500000);// 500000 ns - 0.5 ms
+
+    // Optional sleep between emitting tuples
+    if (m_tupleSleepMs != 0) {
+      TimeUtils.sleepMillis(m_tupleSleepMs);
+    }
+    if (m_tupleSleepNs != 0) {
+      TimeUtils.sleepNanos(m_tupleSleepNs);
+    }
   }
 }
