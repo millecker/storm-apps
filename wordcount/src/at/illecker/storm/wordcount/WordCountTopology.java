@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount;
+package at.illecker.storm.wordcount;
 
 import java.util.Arrays;
 
-import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
-import at.illecker.storm.examples.wordcount.bolt.ReportWordCountBolt;
-import at.illecker.storm.examples.wordcount.bolt.SplitTweetBolt;
-import at.illecker.storm.examples.wordcount.bolt.WordCountBolt;
-import at.illecker.storm.examples.wordcount.spout.SampleTweetSpout;
+import at.illecker.storm.commons.spout.TwitterStreamSpout;
+import at.illecker.storm.wordcount.bolt.ReportWordCountBolt;
+import at.illecker.storm.wordcount.bolt.SplitTweetBolt;
+import at.illecker.storm.wordcount.bolt.WordCountBolt;
+import at.illecker.storm.wordcount.spout.SampleTweetSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;

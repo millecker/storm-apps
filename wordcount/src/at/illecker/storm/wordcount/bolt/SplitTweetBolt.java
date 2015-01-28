@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount.bolt;
+package at.illecker.storm.wordcount.bolt;
 
 import java.util.Map;
 
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.commons.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;

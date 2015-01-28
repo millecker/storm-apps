@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.wordcount.spout;
+package at.illecker.storm.wordcount.spout;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import at.illecker.storm.examples.util.tweet.Tweet;
+import at.illecker.storm.commons.tweet.Tweet;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
