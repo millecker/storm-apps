@@ -110,9 +110,10 @@ public class SentimentAnalysisSVMTopology {
     int numberOfWorkers = 5;
     conf.setNumWorkers(numberOfWorkers);
 
-    // Parallelism assumptions:
-    // One worker per node and 16 cores per node (12 Java threads per node)
-    // 15 Executors per each worker
+    // Maximum Parallelism options:
+
+    // 1) One worker per node and 16 cores per node (12 Java threads per node)
+    // 14 Executors per each worker
     // - Spout 1 thread
     // - TokenizerBolt 1 threads
     // - PreprocessorBolt 1 thread
@@ -120,11 +121,20 @@ public class SentimentAnalysisSVMTopology {
     // - FeatureGenerationBolt 1 thread
     // - SVMBolt 5 threads
 
+    // 2) One worker per node and 32 cores per node (22 Java threads per node)
+    // 21 Executors per each worker
+    // - Spout 1 thread
+    // - TokenizerBolt 2 threads
+    // - PreprocessorBolt 1 thread
+    // - POSTaggerBolt 8 threads
+    // - FeatureGenerationBolt 1 thread
+    // - SVMBolt 8 threads
+
     // Set Spout
     builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers)
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers * 2)
         .shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
@@ -132,15 +142,15 @@ public class SentimentAnalysisSVMTopology {
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5)
-        .setNumTasks(numberOfWorkers * 5).shuffleGrouping(PreprocessorBolt.ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 8)
+        .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
     builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
         numberOfWorkers).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 5).shuffleGrouping(
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 8).shuffleGrouping(
         FeatureGenerationBolt.ID);
 
     // Set max pending tuples
