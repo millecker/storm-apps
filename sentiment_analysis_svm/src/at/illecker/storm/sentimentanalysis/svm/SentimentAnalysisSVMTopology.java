@@ -124,7 +124,7 @@ public class SentimentAnalysisSVMTopology {
     builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers)
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers + 2)
         .shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
@@ -132,7 +132,7 @@ public class SentimentAnalysisSVMTopology {
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5)
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5 + 2)
         .setNumTasks(numberOfWorkers * 5).shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
