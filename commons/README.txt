@@ -3,10 +3,12 @@
 ###############################################################################
 
 # Bolts (at.illecker.storm.commons.bolt)
- - FeatureExtractorBolt
+ - FeatureGenerationBolt
  - JsonTweetExtractorBolt
  - POSTaggerBolt
  - PreprocessorBolt
+ - SVMBolt
+ - SentimentDetectionBolt
  - TokenizerBolt
 
 # Spouts (at.illecker.storm.commons.spout)
@@ -16,6 +18,8 @@
  - TwitterStreamSpout
 
 # Utils / IO Utils (at.illecker.storm.commons.util)
+
+# POS Tagger (at.illecker.storm.commons.postagger)
 
 # Support Vector Machine (at.illecker.storm.commons.svm)
 
