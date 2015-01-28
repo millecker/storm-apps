@@ -1,5 +1,5 @@
 ###############################################################################
-##### Sentiment Analysis                                                  #####
+##### Sentiment Analysis Application                                      #####
 ###############################################################################
 
 # Use Apache Ant to build and run example
@@ -18,9 +18,9 @@ ant run [ -DconsumerKey=key \
  [-DkeyWords='word1 word2']
 
 # Example
-ant clean && ant run 
+ant run 
 
-ant clean && ant run \
+ant run \
   -DconsumerKey=XXXX  -DconsumerSecret=XXXX \
   -DaccessToken=XXXX  -DaccessTokenSecret=XXXX
 

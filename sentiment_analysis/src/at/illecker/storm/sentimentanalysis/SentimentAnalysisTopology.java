@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.examples.sentimentanalysis;
+package at.illecker.storm.sentimentanalysis;
 
 import java.util.Arrays;
 
-import at.illecker.storm.examples.util.Configuration;
-import at.illecker.storm.examples.util.bolt.POSTaggerBolt;
-import at.illecker.storm.examples.util.bolt.PreprocessorBolt;
-import at.illecker.storm.examples.util.bolt.SentimentDetectionBolt;
-import at.illecker.storm.examples.util.bolt.TokenizerBolt;
-import at.illecker.storm.examples.util.spout.DatasetSpout;
-import at.illecker.storm.examples.util.spout.TwitterStreamSpout;
+import at.illecker.storm.commons.Configuration;
+import at.illecker.storm.commons.bolt.POSTaggerBolt;
+import at.illecker.storm.commons.bolt.PreprocessorBolt;
+import at.illecker.storm.commons.bolt.SentimentDetectionBolt;
+import at.illecker.storm.commons.bolt.TokenizerBolt;
+import at.illecker.storm.commons.spout.DatasetSpout;
+import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
@@ -108,7 +108,6 @@ public class SentimentAnalysisTopology {
         .shuffleGrouping(POSTaggerBolt.ID);
 
     Config conf = new Config();
-    // conf.setNumWorkers(2); // use two worker processes
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
