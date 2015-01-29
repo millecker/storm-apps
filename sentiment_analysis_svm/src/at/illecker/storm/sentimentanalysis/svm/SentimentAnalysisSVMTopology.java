@@ -124,14 +124,14 @@ public class SentimentAnalysisSVMTopology {
 
     // c3.8xlarge
     // One worker per node and 32 cores per node (22 Java threads per node)
-    // 22 Executors per each worker
+    // 21 Executors per each worker
     // - 1 x Acker
     // - 1 x Spout
     // - 2 x TokenizerBolt
     // - 1 x PreprocessorBolt
     // - 8 x POSTaggerBolt
     // - 1 x FeatureGenerationBolt
-    // - 8 x SVMBolt
+    // - 7 x SVMBolt
 
     // Set Spout
     builder.setSpout(spoutID, spout, numberOfWorkers);
@@ -153,7 +153,7 @@ public class SentimentAnalysisSVMTopology {
         numberOfWorkers).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 8).shuffleGrouping(
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 7).shuffleGrouping(
         FeatureGenerationBolt.ID);
 
     // Set max pending tuples
