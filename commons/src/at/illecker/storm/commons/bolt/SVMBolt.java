@@ -51,9 +51,10 @@ public class SVMBolt extends BaseRichBolt {
   private int m_totalClasses;
   private ScoreClassifier m_classifier;
   private svm_model m_model;
+
   // Metrics
   // Note: these must be declared as transient since they are not Serializable
-  transient CountMetric m_countMetric;
+  // transient CountMetric m_countMetric;
 
   public SVMBolt(String[] inputFields, String[] outputFields, Dataset dataset) {
     this.m_inputFields = inputFields;
@@ -79,8 +80,8 @@ public class SVMBolt extends BaseRichBolt {
     }
 
     // Tuple counter metric
-    m_countMetric = new CountMetric();
-    context.registerMetric("tuple_count", m_countMetric, 10);
+    // m_countMetric = new CountMetric();
+    // context.registerMetric("tuple_count", m_countMetric, 10);
 
     m_totalClasses = 3;
     m_classifier = new IdentityScoreClassifier();
@@ -108,7 +109,7 @@ public class SVMBolt extends BaseRichBolt {
           + " predictedClass: " + predictedClass);
     }
 
-    m_countMetric.incr();
+    // m_countMetric.incr();
     m_collector.ack(tuple);
   }
 }

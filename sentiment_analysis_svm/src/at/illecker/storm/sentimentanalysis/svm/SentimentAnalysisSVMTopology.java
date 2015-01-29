@@ -169,7 +169,7 @@ public class SentimentAnalysisSVMTopology {
 
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
-    conf.registerMetricsConsumer(LoggingMetricsConsumer.class, numberOfWorkers);
+    // conf.registerMetricsConsumer(LoggingMetricsConsumer.class, numberOfWorkers);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
