@@ -134,7 +134,7 @@ public class SentimentAnalysisSVMTopology {
     // - 7 x SVMBolt
 
     // Set Spout
-    builder.setSpout(spoutID, spout, numberOfWorkers);
+    builder.setSpout(spoutID, spout);
 
     // Set Spout --> TokenizerBolt
     builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers * 2)
