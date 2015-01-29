@@ -145,7 +145,7 @@ public class SentimentAnalysisSVMTopology {
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 8)
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 7)
         .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
@@ -153,11 +153,11 @@ public class SentimentAnalysisSVMTopology {
         numberOfWorkers).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 7).shuffleGrouping(
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 6).shuffleGrouping(
         FeatureGenerationBolt.ID);
 
     // Set max pending tuples
-    conf.setMaxSpoutPending(1000);
+    conf.setMaxSpoutPending(5000);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);
