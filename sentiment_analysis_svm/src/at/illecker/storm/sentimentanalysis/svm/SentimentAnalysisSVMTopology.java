@@ -107,28 +107,31 @@ public class SentimentAnalysisSVMTopology {
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
 
+    // Parallelism options
     int numberOfWorkers = 5;
     conf.setNumWorkers(numberOfWorkers);
 
-    // Maximum Parallelism options:
+    // c3.4xlarge
+    // One worker per node and 16 cores per node (12 Java threads per node)
+    // 15 Executors per each worker
+    // - 1 x Acker
+    // - 1 x Spout
+    // - 1 x TokenizerBolt
+    // - 1 x PreprocessorBolt
+    // - 5 x POSTaggerBolt
+    // - 1 x FeatureGenerationBolt
+    // - 5 x SVMBolt
 
-    // 1) One worker per node and 16 cores per node (12 Java threads per node)
-    // 14 Executors per each worker
-    // - Spout 1 thread
-    // - TokenizerBolt 1 threads
-    // - PreprocessorBolt 1 thread
-    // - POSTaggerBolt 5 threads
-    // - FeatureGenerationBolt 1 thread
-    // - SVMBolt 5 threads
-
-    // 2) One worker per node and 32 cores per node (22 Java threads per node)
-    // 21 Executors per each worker
-    // - Spout 1 thread
-    // - TokenizerBolt 2 threads
-    // - PreprocessorBolt 1 thread
-    // - POSTaggerBolt 8 threads
-    // - FeatureGenerationBolt 1 thread
-    // - SVMBolt 8 threads
+    // c3.8xlarge
+    // One worker per node and 32 cores per node (22 Java threads per node)
+    // 22 Executors per each worker
+    // - 1 x Acker
+    // - 1 x Spout
+    // - 2 x TokenizerBolt
+    // - 1 x PreprocessorBolt
+    // - 8 x POSTaggerBolt
+    // - 1 x FeatureGenerationBolt
+    // - 8 x SVMBolt
 
     // Set Spout
     builder.setSpout(spoutID, spout);
@@ -154,7 +157,7 @@ public class SentimentAnalysisSVMTopology {
         FeatureGenerationBolt.ID);
 
     // Set max pending tuples
-    conf.setMaxSpoutPending(5000);
+    conf.setMaxSpoutPending(1000);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);
