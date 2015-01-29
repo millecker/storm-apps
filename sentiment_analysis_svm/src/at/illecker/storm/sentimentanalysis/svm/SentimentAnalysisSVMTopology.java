@@ -29,7 +29,6 @@ import at.illecker.storm.commons.spout.DatasetSpout;
 import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
-import backtype.storm.metric.LoggingMetricsConsumer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
@@ -80,7 +79,7 @@ public class SentimentAnalysisSVMTopology {
       // sleep between emitting tuples
       // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
       // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 250000); // 0.25 ms
-      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 50000); // 0.05 ms
+      // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 50000); // 0.05 ms
       spout = new DatasetSpout(new String[] { "tweet" }, dataset);
       spoutID = DatasetSpout.ID;
     } else {
@@ -108,30 +107,18 @@ public class SentimentAnalysisSVMTopology {
     TopologyBuilder builder = new TopologyBuilder();
 
     // Parallelism options
-    int numberOfWorkers = 10;
+    int numberOfWorkers = 5;
     conf.setNumWorkers(numberOfWorkers);
 
     // c3.4xlarge
     // One worker per node and 16 cores per node (12 Java threads per node)
-    // 15 Executors per each worker
+    // 12 Executors per each worker
     // - 1 x Acker
-    // - 1 x Spout
     // - 1 x TokenizerBolt
     // - 1 x PreprocessorBolt
     // - 5 x POSTaggerBolt
     // - 1 x FeatureGenerationBolt
-    // - 5 x SVMBolt
-
-    // c3.8xlarge
-    // One worker per node and 32 cores per node (22 Java threads per node)
-    // 21 Executors per each worker
-    // - 1 x Acker
-    // - 1 x Spout
-    // - 2 x TokenizerBolt
-    // - 1 x PreprocessorBolt
-    // - 8 x POSTaggerBolt
-    // - 1 x FeatureGenerationBolt
-    // - 7 x SVMBolt
+    // - 3 x SVMBolt
 
     // Set Spout
     builder.setSpout(spoutID, spout);
@@ -145,7 +132,7 @@ public class SentimentAnalysisSVMTopology {
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 7)
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5)
         .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
@@ -153,7 +140,7 @@ public class SentimentAnalysisSVMTopology {
         numberOfWorkers).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 5).shuffleGrouping(
+    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 3).shuffleGrouping(
         FeatureGenerationBolt.ID);
 
     // Set max pending tuples
@@ -169,7 +156,8 @@ public class SentimentAnalysisSVMTopology {
 
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
-    // conf.registerMetricsConsumer(LoggingMetricsConsumer.class, numberOfWorkers);
+    // conf.registerMetricsConsumer(LoggingMetricsConsumer.class,
+    // numberOfWorkers);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

@@ -30,7 +30,6 @@ import at.illecker.storm.commons.svm.scoreclassifier.IdentityScoreClassifier;
 import at.illecker.storm.commons.svm.scoreclassifier.ScoreClassifier;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
-import backtype.storm.metric.api.CountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
