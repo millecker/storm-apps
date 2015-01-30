@@ -35,7 +35,6 @@ public class DatasetSpout extends BaseRichSpout {
   public static final String CONF_TUPLE_SLEEP_MS = ID + ".tuple.sleep.ms";
   public static final String CONF_TUPLE_SLEEP_NS = ID + ".spout.tuple.sleep.ns";
   private static final long serialVersionUID = 3028853846518561027L;
-  private String[] m_outputFields;
   private Dataset m_dataset;
   private SpoutOutputCollector m_collector;
   private List<Tweet> m_tweets;
@@ -43,14 +42,9 @@ public class DatasetSpout extends BaseRichSpout {
   private long m_tupleSleepMs = 0;
   private long m_tupleSleepNs = 0;
 
-  public DatasetSpout(String[] outputFields, Dataset dataset) {
-    this.m_outputFields = outputFields;
-    this.m_dataset = dataset;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputFields));
+    declarer.declare(new Fields("id", "score", "text"));
   }
 
   public void open(Map config, TopologyContext context,
@@ -81,16 +75,17 @@ public class DatasetSpout extends BaseRichSpout {
   public void nextTuple() {
     Tweet tweet = m_tweets.get(m_index);
 
-    // index is used to endless loop within the collection
+    // infinite loop
     m_index++;
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
 
     // Emit tweet
-    m_collector.emit(new Values(tweet));
+    m_collector.emit(new Values(tweet.getId(), tweet.getScore(), tweet
+        .getText()));
 
-    // Optional sleep between emitting tuples
+    // Optional sleep
     if (m_tupleSleepMs != 0) {
       TimeUtils.sleepMillis(m_tupleSleepMs);
     }

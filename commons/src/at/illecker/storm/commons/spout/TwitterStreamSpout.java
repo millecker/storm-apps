@@ -28,7 +28,6 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
-import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.TimeUtils;
 import backtype.storm.Config;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -42,7 +41,6 @@ public class TwitterStreamSpout extends BaseRichSpout {
   public static final String ID = "twitter-stream-spout";
   public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
   private static final long serialVersionUID = -4657730220755697034L;
-  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private LinkedBlockingQueue<Status> m_tweetsQueue = null;
   private TwitterStream m_twitterStream;
@@ -53,10 +51,9 @@ public class TwitterStreamSpout extends BaseRichSpout {
   private String[] m_keyWords;
   private String m_filterLanguage;
 
-  public TwitterStreamSpout(String[] outputFields, String consumerKey,
-      String consumerSecret, String accessToken, String accessTokenSecret,
-      String[] keyWords, String filterLanguage) {
-    this.m_outputFields = outputFields;
+  public TwitterStreamSpout(String consumerKey, String consumerSecret,
+      String accessToken, String accessTokenSecret, String[] keyWords,
+      String filterLanguage) {
     this.m_consumerKey = consumerKey;
     this.m_consumerSecret = consumerSecret;
     this.m_accessToken = accessToken;
@@ -68,7 +65,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputFields));
+    declarer.declare(new Fields("id", "text"));
   }
 
   @Override
@@ -145,7 +142,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
       TimeUtils.sleepMillis(50); // sleep 50 ms
     } else {
       // Emit tweet
-      m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
+      m_collector.emit(new Values(tweet.getId(), tweet.getText()));
     }
   }
 

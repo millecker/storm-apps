@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import twitter4j.Status;
-import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.TimeUtils;
 import at.illecker.storm.commons.util.io.JsonUtils;
 import backtype.storm.spout.SpoutOutputCollector;
@@ -33,34 +32,32 @@ import backtype.storm.tuple.Values;
 public class TwitterFilesSpout extends BaseRichSpout {
   public static final String ID = "twitter-files-spout";
   public static final String CONF_TWITTER_DIR = ID + ".twitter.dir";
+  public static final String CONF_FILTER_LANGUAGE = ID + ".filter.language";
   public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
   public static final String CONF_TUPLE_SLEEP_MS = ID + ".tuple.sleep.ms";
   private static final long serialVersionUID = 1584431147989513848L;
-  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Status> m_tweets;
   private int m_index = 0;
-  private String m_filterLanguage;
   private long m_tupleSleepMs = 0;
-
-  public TwitterFilesSpout(String[] outputFields, String filterLanguage) {
-    this.m_outputFields = outputFields;
-    this.m_filterLanguage = filterLanguage; // "en"
-  }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputFields));
+    declarer.declare(new Fields("id", "text"));
   }
 
   public void open(Map config, TopologyContext context,
       SpoutOutputCollector collector) {
     this.m_collector = collector;
 
+    String filterLanguage = null;
+    if (config.get(CONF_FILTER_LANGUAGE) != null) {
+      filterLanguage = (String) config.get(CONF_FILTER_LANGUAGE);
+    }
+
     if (config.get(CONF_TWITTER_DIR) != null) {
       String twitterDirPath = config.get(CONF_TWITTER_DIR).toString();
-      m_tweets = JsonUtils
-          .readTweetsDirectory(twitterDirPath, m_filterLanguage);
+      m_tweets = JsonUtils.readTweetsDirectory(twitterDirPath, filterLanguage);
     } else {
       throw new RuntimeException(CONF_TWITTER_DIR + " property was not set!");
     }
@@ -83,14 +80,14 @@ public class TwitterFilesSpout extends BaseRichSpout {
   public void nextTuple() {
     Status tweet = m_tweets.get(m_index);
 
-    // index is used to endless loop within the collection
+    // infinite loop
     m_index++;
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
 
     // Emit tweet
-    m_collector.emit(new Values(new Tweet(tweet.getId(), tweet.getText())));
+    m_collector.emit(new Values(tweet.getId(), tweet.getText()));
 
     // Optional sleep between emitting tuples
     if (m_tupleSleepMs != 0) {

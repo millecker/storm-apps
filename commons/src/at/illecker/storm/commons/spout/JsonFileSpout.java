@@ -26,7 +26,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
 
 public class JsonFileSpout extends BaseRichSpout {
   public static final String ID = "json-file-spout";
@@ -34,19 +33,14 @@ public class JsonFileSpout extends BaseRichSpout {
   public static final String CONF_STARTUP_SLEEP_MS = ID + ".startup.sleep.ms";
   public static final String CONF_TUPLE_SLEEP_MS = ID + ".tuple.sleep.ms";
   private static final long serialVersionUID = -4355637229662565251L;
-  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
   private List<Map<String, Object>> m_elements;
   private int m_index = 0;
   private long m_tupleSleepMs = 0;
 
-  public JsonFileSpout(String[] outputFields) {
-    this.m_outputFields = outputFields;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields(m_outputFields));
+    declarer.declare(new Fields("id", "text"));
   }
 
   public void open(Map config, TopologyContext context,
@@ -54,7 +48,7 @@ public class JsonFileSpout extends BaseRichSpout {
     this.m_collector = collector;
 
     if (config.get(CONF_JSON_FILE) != null) {
-      String jsonFilePath = config.get(CONF_JSON_FILE).toString();
+      String jsonFilePath = (String) config.get(CONF_JSON_FILE);
       m_elements = JsonUtils.readJsonFile(jsonFilePath);
     } else {
       throw new RuntimeException(CONF_JSON_FILE + " property was not set!");
@@ -76,15 +70,20 @@ public class JsonFileSpout extends BaseRichSpout {
   }
 
   public void nextTuple() {
-    this.m_collector.emit(new Values(m_elements.get(m_index)));
+    Map<String, Object> element = m_elements.get(m_index);
 
-    // index is used to endless loop within the collection
+    // Read Tweet from JSON element
+    // TODO
+    // SentimentTweet tweet = SentimentTweet.fromJsonElement(element);
+    // this.m_collector.emit(new Values(tweet.getId()));
+
+    // infinite loop
     m_index++;
     if (m_index >= m_elements.size()) {
       m_index = 0;
     }
 
-    // Optional sleep between emitting tuples
+    // Optional sleep
     if (m_tupleSleepMs != 0) {
       TimeUtils.sleepMillis(m_tupleSleepMs);
     }
