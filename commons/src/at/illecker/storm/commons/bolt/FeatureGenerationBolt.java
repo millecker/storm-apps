@@ -28,7 +28,6 @@ import at.illecker.storm.commons.svm.featurevector.FeatureVectorGenerator;
 import at.illecker.storm.commons.tfidf.TfIdfNormalization;
 import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
-import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.tweet.TaggedTweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
 import backtype.storm.task.OutputCollector;
@@ -38,6 +37,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class FeatureGenerationBolt extends BaseRichBolt {
   public static final String ID = "feature-generation-bolt";
@@ -46,24 +46,17 @@ public class FeatureGenerationBolt extends BaseRichBolt {
   private static final Logger LOG = LoggerFactory
       .getLogger(FeatureGenerationBolt.class);
   private boolean m_logging = false;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private Dataset m_dataset;
   private OutputCollector m_collector;
   private FeatureVectorGenerator m_fvg = null;
 
-  public FeatureGenerationBolt(String[] inputFields, String[] outputFields,
-      Dataset dataset) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
+  public FeatureGenerationBolt(Dataset dataset) {
     this.m_dataset = dataset;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputFields != null) {
-      declarer.declare(new Fields(m_outputFields));
-    }
+    declarer.declare(new Fields("id", "score", "text", "featureVector"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -76,6 +69,8 @@ public class FeatureGenerationBolt extends BaseRichBolt {
     } else {
       m_logging = false;
     }
+
+    // TODO LOAD FULL CombinedFeatureVectorGenerator
 
     List<TaggedTweet> taggedTweets = SerializationUtils.deserialize(m_dataset
         .getTrainTaggedDataSerializationFile());
@@ -92,19 +87,25 @@ public class FeatureGenerationBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    TaggedTweet tweet = (TaggedTweet) tuple.getValueByField(m_inputFields[0]);
+    Long tweetId = tuple.getLongByField("id");
+    Double score = tuple.getDoubleByField("score");
+    String text = tuple.getStringByField("text");
+    List<TaggedWord> taggedTokens = (List<TaggedWord>) tuple
+        .getValueByField("taggedTokens");
 
-    // Generate Feature Vector for tweet
-    Map<Integer, Double> featureVector = m_fvg.calculateFeatureVector(tweet);
+    // Generate Feature Vector
+    Map<Integer, Double> featureVector = m_fvg
+        .calculateFeatureVector(taggedTokens);
 
     if (m_logging) {
-      LOG.info("Tweet: \"" + tweet.getText() + "\" FeatureVector: "
-          + featureVector.toString());
+      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" FeatureVector: "
+          + featureVector);
     }
 
-    // Emit new immutable FeaturedTweet object
-    this.m_collector.emit(tuple, new Values(new FeaturedTweet(tweet.getId(),
-        tweet.getText(), tweet.getScore(), featureVector)));
+    // Emit new tuples
+    this.m_collector.emit(tuple,
+        new Values(tweetId, score, text, featureVector));
     this.m_collector.ack(tuple);
   }
+
 }

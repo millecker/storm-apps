@@ -16,16 +16,12 @@
  */
 package at.illecker.storm.commons.bolt;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.commons.postagger.POSTagger;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -34,29 +30,23 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+import edu.stanford.nlp.tagger.maxent.TaggerConfig;
 
 public class POSTaggerBolt extends BaseRichBolt {
   public static final String ID = "pos-tagger-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
+  public static final String CONF_MODEL = ID + ".model";
   private static final long serialVersionUID = 8389930087364663504L;
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
   private boolean m_logging = false;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private OutputCollector m_collector;
-  private POSTagger m_posTagger;
-
-  public POSTaggerBolt(String inputFields[], String outputFields[]) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
-  }
+  private MaxentTagger m_posTagger;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputFields != null) {
-      declarer.declare(new Fields(m_outputFields));
-    }
+    declarer.declare(new Fields("id", "score", "text", "taggedTokens"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -68,27 +58,36 @@ public class POSTaggerBolt extends BaseRichBolt {
     } else {
       m_logging = false;
     }
-    this.m_posTagger = POSTagger.getInstance();
+
+    if (config.get(CONF_MODEL) != null) {
+      String taggingModel = (String) config.get(CONF_MODEL);
+      LOG.info("Load POSTagger with model: " + taggingModel);
+      TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
+      m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
+    } else {
+      throw new RuntimeException(CONF_MODEL + " property was not set!");
+    }
   }
 
   public void execute(Tuple tuple) {
-    PreprocessedTweet tweet = (PreprocessedTweet) tuple
-        .getValueByField(m_inputFields[0]);
+    Long tweetId = tuple.getLongByField("id");
+    Double score = tuple.getDoubleByField("score");
+    String text = tuple.getStringByField("text");
+    List<TaggedWord> preprocessedTokens = (List<TaggedWord>) tuple
+        .getValueByField("preprocessedTokens");
 
-    // POS Tagger
-    List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
-    for (List<TaggedWord> sentence : tweet.getPreprocessedSentences()) {
-      taggedSentences.add(m_posTagger.tagSentence(sentence));
-    }
+    // POS Tagging
+    List<TaggedWord> taggedTokens = m_posTagger.tagSentence(preprocessedTokens);
 
     if (m_logging) {
-      LOG.info("Tweet: \"" + tweet.getText() + "\" Tagged: "
-          + taggedSentences.toString());
+      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" Tagged: "
+          + taggedTokens);
     }
 
-    // Emit new immutable TaggedTweet object
-    this.m_collector.emit(tuple, new Values(new TaggedTweet(tweet.getId(),
-        tweet.getText(), tweet.getScore(), taggedSentences)));
+    // Emit new tuples
+    this.m_collector
+        .emit(tuple, new Values(tweetId, score, text, taggedTokens));
     this.m_collector.ack(tuple);
   }
+
 }

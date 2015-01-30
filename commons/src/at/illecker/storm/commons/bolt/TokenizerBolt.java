@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.commons.bolt;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
-import at.illecker.storm.commons.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -41,20 +38,11 @@ public class TokenizerBolt extends BaseRichBolt {
   private static final Logger LOG = LoggerFactory
       .getLogger(TokenizerBolt.class);
   private boolean m_logging = false;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private OutputCollector m_collector;
-
-  public TokenizerBolt(String[] inputFields, String[] outputFields) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
-  }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    if (m_outputFields != null) {
-      declarer.declare(new Fields(m_outputFields));
-    }
+    declarer.declare(new Fields("id", "score", "text", "tokens"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -69,20 +57,20 @@ public class TokenizerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
+    Long tweetId = tuple.getLongByField("id");
+    Double score = tuple.getDoubleByField("score");
+    String text = tuple.getStringByField("text");
 
-    // Tokenize tweet text
-    List<List<String>> sentences = new ArrayList<List<String>>();
-    sentences.add(Tokenizer.tokenize(tweet.getText()));
+    // Tokenize
+    List<String> tokens = Tokenizer.tokenize(text);
 
     if (m_logging) {
-      LOG.info("Tweet: \"" + tweet.getText() + "\" Tokenized: "
-          + sentences.toString());
+      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" Tokenized: " + tokens);
     }
 
-    // Emit new immutable TokenizedTweet object
-    this.m_collector.emit(tuple, new Values(new TokenizedTweet(tweet.getId(),
-        tweet.getText(), tweet.getScore(), sentences)));
+    // Emit new tuples
+    this.m_collector.emit(tuple, new Values(tweetId, score, text, tokens));
     this.m_collector.ack(tuple);
   }
+
 }

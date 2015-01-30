@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.commons.bolt;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -23,13 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.dict.SentimentResult;
 import at.illecker.storm.commons.dict.SentimentWordLists;
-import at.illecker.storm.commons.tweet.TaggedTweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class SentimentDetectionBolt extends BaseRichBolt {
   public static final String ID = "sentiment-detection-bolt";
@@ -38,21 +38,11 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentDetectionBolt.class);
   private boolean m_logging = false;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private OutputCollector m_collector;
   private SentimentWordLists m_sentimentWordLists;
 
-  public SentimentDetectionBolt(String[] inputFields, String[] outputFields) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    // key of output tuples
-    if (m_outputFields != null) {
-      declarer.declare(new Fields(m_outputFields));
-    }
+    // no output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -72,10 +62,15 @@ public class SentimentDetectionBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    TaggedTweet tweet = (TaggedTweet) tuple.getValueByField(m_inputFields[0]);
+    Long tweetId = tuple.getLongByField("id");
+    Double score = tuple.getDoubleByField("score");
+    String text = tuple.getStringByField("text");
+    List<TaggedWord> taggedTokens = (List<TaggedWord>) tuple
+        .getValueByField("taggedTokens");
 
+    // Calculate sentiment
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
-        .getTweetSentiment(tweet);
+        .getSentiment(taggedTokens);
 
     double totalSentimentScore = Double.MIN_VALUE;
     if (tweetSentiments != null) {
@@ -88,20 +83,21 @@ public class SentimentDetectionBolt extends BaseRichBolt {
     if (m_logging) {
       if (totalSentimentScore != Double.MIN_VALUE) {
         if (totalSentimentScore > SentimentResult.POSITIVE_THRESHOLD) {
-          LOG.info("Tweet: " + tweet.toString()
+          LOG.info("Tweet[" + tweetId + "]: " + text
               + " Sentiment: POSITIVE Score: " + totalSentimentScore);
         } else if (totalSentimentScore < SentimentResult.NEGATIVE_THRESHOLD) {
-          LOG.info("Tweet: " + tweet.toString()
+          LOG.info("Tweet[" + tweetId + "]: " + text
               + " Sentiment: NEGATIVE Score: " + totalSentimentScore);
         } else {
-          LOG.info("Tweet: " + tweet.toString() + " Sentiment: NEUTAL Score: "
-              + totalSentimentScore);
+          LOG.info("Tweet[" + tweetId + "]: " + text
+              + " Sentiment: NEUTAL Score: " + totalSentimentScore);
         }
       } else {
-        LOG.info("Tweet: " + tweet.toString() + " Sentiment: UNKNOWN");
+        LOG.info("Tweet[" + tweetId + "]: " + text + " Sentiment: UNKNOWN");
       }
     }
 
     this.m_collector.ack(tuple);
   }
+
 }

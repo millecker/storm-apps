@@ -19,22 +19,20 @@ package at.illecker.storm.commons.bolt;
 import java.io.File;
 import java.util.Map;
 
+import libsvm.svm;
 import libsvm.svm_model;
+import libsvm.svm_node;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.svm.SVM;
-import at.illecker.storm.commons.svm.scoreclassifier.IdentityScoreClassifier;
-import at.illecker.storm.commons.svm.scoreclassifier.ScoreClassifier;
-import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
 public class SVMBolt extends BaseRichBolt {
@@ -43,29 +41,20 @@ public class SVMBolt extends BaseRichBolt {
   private static final long serialVersionUID = -3235291265771813064L;
   private static final Logger LOG = LoggerFactory.getLogger(SVMBolt.class);
   private boolean m_logging = false;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private Dataset m_dataset;
   private OutputCollector m_collector;
-  private int m_totalClasses;
-  private ScoreClassifier m_classifier;
   private svm_model m_model;
 
   // Metrics
   // Note: these must be declared as transient since they are not Serializable
   // transient CountMetric m_countMetric;
 
-  public SVMBolt(String[] inputFields, String[] outputFields, Dataset dataset) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
+  public SVMBolt(Dataset dataset) {
     this.m_dataset = dataset;
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    // key of output tuples
-    if (m_outputFields != null) {
-      declarer.declare(new Fields(m_outputFields));
-    }
+    // no output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -82,9 +71,6 @@ public class SVMBolt extends BaseRichBolt {
     // m_countMetric = new CountMetric();
     // context.registerMetric("tuple_count", m_countMetric, 10);
 
-    m_totalClasses = 3;
-    m_classifier = new IdentityScoreClassifier();
-
     LOG.info("Loading SVM model...");
     m_model = SerializationUtils.deserialize(m_dataset.getDatasetPath()
         + File.separator + SVM.SVM_MODEL_FILE_SER);
@@ -92,23 +78,37 @@ public class SVMBolt extends BaseRichBolt {
     if (m_model == null) {
       LOG.error("Could not load SVM model! File: " + m_dataset.getDatasetPath()
           + File.separator + SVM.SVM_MODEL_FILE_SER);
+      throw new RuntimeException();
     }
   }
 
   public void execute(Tuple tuple) {
-    FeaturedTweet tweet = (FeaturedTweet) tuple
-        .getValueByField(m_inputFields[0]);
+    Long tweetId = tuple.getLongByField("id");
+    Double score = tuple.getDoubleByField("score");
+    String text = tuple.getStringByField("text");
+    Map<Integer, Double> featureVector = (Map<Integer, Double>) tuple
+        .getValueByField("featureVector");
 
-    double predictedClass = SVM.evaluate(tweet, m_model, m_totalClasses,
-        m_classifier);
+    // create feature nodes
+    svm_node[] testNodes = new svm_node[featureVector.size()];
+    int i = 0;
+    for (Map.Entry<Integer, Double> feature : featureVector.entrySet()) {
+      svm_node node = new svm_node();
+      node.index = feature.getKey();
+      node.value = feature.getValue();
+      testNodes[i] = node;
+      i++;
+    }
+
+    double predictedClass = svm.svm_predict(m_model, testNodes);
 
     if (m_logging) {
-      LOG.info("Tweet: \"" + tweet.getText() + "\" score: " + tweet.getScore()
-          + " expectedClass: " + m_classifier.classfyScore(tweet.getScore())
+      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" score: " + score
           + " predictedClass: " + predictedClass);
     }
 
     // m_countMetric.incr();
     m_collector.ack(tuple);
   }
+
 }
