@@ -46,7 +46,9 @@ public class POSTagger {
     String taggingModel = Configuration.getPOSTaggingModelFast();
     try {
       LOG.info("Load POSTagger with model: " + taggingModel);
-      TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
+      TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel,
+          "-nthreads", "4");
+      LOG.info("POSTagger uses " + posTaggerConf.getNThreads() + " threads...");
       m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
     } catch (RuntimeIOException e) {
       LOG.error("RuntimeIOException: " + e.getMessage());
@@ -74,80 +76,25 @@ public class POSTagger {
     return taggedTweets;
   }
 
-  public static void testPOSTagger() {
-    String text = "ikr smh he asked fir yo last name so he can add u on fb lololol";
-    final int testRounds = 1;
-
-    // Measurements
-    List<Long> tagger1TextTimes = new ArrayList<Long>();
-    List<Long> tagger2TextTimes = new ArrayList<Long>();
-    List<Long> tagger1SentenceTimes = new ArrayList<Long>();
-    List<Long> tagger2SentenceTimes = new ArrayList<Long>();
-
-    // Load tagger and models
-    MaxentTagger tagger1 = new MaxentTagger(Configuration.getPOSTaggingModel());
-    MaxentTagger tagger2 = new MaxentTagger(
-        Configuration.getPOSTaggingModelFast());
-
-    // Test tagger1 via strings
-    String taggedText1 = "";
+  private static List<Long> measurePOSTagger(MaxentTagger tagger,
+      List<Tweet> tweets, int testRounds, boolean manualTokenizing) {
+    List<Long> times = new ArrayList<Long>();
     for (int i = 0; i < testRounds; i++) {
-      long startTime = System.currentTimeMillis();
-      taggedText1 = tagger1.tagString(text);
-      tagger1TextTimes.add(System.currentTimeMillis() - startTime);
+      for (Tweet t : tweets) {
+        String text = t.getText();
+        if (manualTokenizing) {
+          List<HasWord> sentence = Sentence.toWordList(text.split(" "));
+          long startTime = System.currentTimeMillis();
+          tagger.tagSentence(sentence, true); // reuseTags = true
+          times.add(System.currentTimeMillis() - startTime);
+        } else {
+          long startTime = System.currentTimeMillis();
+          tagger.tagString(text);
+          times.add(System.currentTimeMillis() - startTime);
+        }
+      }
     }
-
-    // Test tagger2 via strings
-    String taggedText2 = "";
-    for (int i = 0; i < testRounds; i++) {
-      long startTime = System.currentTimeMillis();
-      taggedText2 = tagger2.tagString(text);
-      tagger2TextTimes.add(System.currentTimeMillis() - startTime);
-    }
-
-    // Manually tokenize
-    List<HasWord> sentence = Sentence.toWordList(text.split(" "));
-
-    // Test tagger1 via sentence
-    List<TaggedWord> taggedSentence1 = null;
-    for (int i = 0; i < testRounds; i++) {
-      long startTime = System.currentTimeMillis();
-      taggedSentence1 = tagger1.tagSentence(sentence);
-      tagger1SentenceTimes.add(System.currentTimeMillis() - startTime);
-    }
-    // Test tagger2 via sentence
-    List<TaggedWord> taggedSentence2 = null;
-    for (int i = 0; i < testRounds; i++) {
-      long startTime = System.currentTimeMillis();
-      taggedSentence2 = tagger2.tagSentence(sentence);
-      tagger2SentenceTimes.add(System.currentTimeMillis() - startTime);
-    }
-
-    // Output results
-    System.out.println("Input: " + text);
-    System.out.println("Tagger1 Text output: " + taggedText1);
-    System.out.println("Tagger2 Text output: " + taggedText2);
-    System.out.println("Tagger1 Sentence output: ");
-    for (TaggedWord tw : taggedSentence1) {
-      System.out.println("word: " + tw.word() + " ::  tag: " + tw.tag());
-      // tw.tag().startsWith("JJ")
-    }
-    System.out.println("Tagger2 Sentence output: ");
-    for (TaggedWord tw : taggedSentence2) {
-      System.out.println("word: " + tw.word() + " ::  tag: " + tw.tag());
-    }
-
-    System.out.println("Time Measurements: ");
-    System.out
-        .println("Tagger1 (gate-EN-twitter.model): TextTagging (incl tokenize): "
-            + getAvg(tagger1TextTimes)
-            + " ms SentenceTagging: "
-            + getAvg(tagger2TextTimes) + " ms");
-    System.out
-        .println("Tagger2 (gate-EN-twitter-fast.model): TextTagging (incl tokenize): "
-            + getAvg(tagger1SentenceTimes)
-            + " ms SentenceTagging: "
-            + getAvg(tagger2SentenceTimes) + " ms");
+    return times;
   }
 
   private static long getAvg(List<Long> list) {
@@ -158,13 +105,52 @@ public class POSTagger {
     return (sum / list.size());
   }
 
+  public static void testPOSTagger(List<Tweet> tweets, int testRounds) {
+    // Load tagger and models
+    String taggingModel1 = Configuration.getPOSTaggingModelFast();
+    TaggerConfig gateTagger1Conf = new TaggerConfig("-model", taggingModel1);
+    MaxentTagger gateTagger1 = new MaxentTagger(taggingModel1, gateTagger1Conf,
+        true);
+
+    String taggingModel2 = Configuration.getPOSTaggingModelFast();
+    TaggerConfig gateTagger2Conf = new TaggerConfig("-model", taggingModel2);
+    MaxentTagger gateTagger2 = new MaxentTagger(taggingModel2, gateTagger2Conf,
+        true);
+
+    // Test gateTagger1 with model1 via strings
+    List<Long> tagger1TextTimes = measurePOSTagger(gateTagger1, tweets,
+        testRounds, false);
+    // Test gateTagger2 with model2 via strings
+    List<Long> tagger2TextTimes = measurePOSTagger(gateTagger2, tweets,
+        testRounds, false);
+
+    // Test gateTagger1 with model1 via sentence, manually tokenize
+    List<Long> tagger1SentenceTimes = measurePOSTagger(gateTagger1, tweets,
+        testRounds, true);
+    // Test gateTagger2 with model2 via sentence, manually tokenize
+    List<Long> tagger2SentenceTimes = measurePOSTagger(gateTagger2, tweets,
+        testRounds, true);
+
+    // Output results
+    System.out.println("Time Measurements: ");
+    System.out
+        .println("GateTagger1 (gate-EN-twitter.model): TextTagging (incl tokenize): "
+            + getAvg(tagger1TextTimes)
+            + " ms SentenceTagging: "
+            + getAvg(tagger2TextTimes) + " ms");
+    System.out
+        .println("GateTagger2 (gate-EN-twitter-fast.model): TextTagging (incl tokenize): "
+            + getAvg(tagger1SentenceTimes)
+            + " ms SentenceTagging: "
+            + getAvg(tagger2SentenceTimes) + " ms");
+  }
+
   public static void main(String[] args) {
-    POSTagger posTagger = POSTagger.getInstance();
-    Preprocessor preprocessor = Preprocessor.getInstance();
-    List<Tweet> tweets = null;
+    boolean testPOSTagger = false;
     boolean extendedTest = true;
 
     // load tweets
+    List<Tweet> tweets = null;
     if (extendedTest) {
       // Twitter crawler
       // List<Status> extendedTweets = Configuration
@@ -181,23 +167,33 @@ public class POSTagger {
       tweets = Tweet.getTestTweets();
     }
 
-    // process tweets
-    long startTime = System.currentTimeMillis();
-    for (Tweet tweet : tweets) {
-      // Tokenize
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+    if (testPOSTagger) {
+      testPOSTagger(tweets, 1);
 
-      // Preprocess
-      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
+    } else {
+      POSTagger posTagger = POSTagger.getInstance();
+      Preprocessor preprocessor = Preprocessor.getInstance();
 
-      // POS Tagging
-      List<TaggedWord> taggedSentence = posTagger
-          .tagSentence(preprocessedTokens);
+      // process tweets
+      long startTime = System.currentTimeMillis();
+      for (Tweet tweet : tweets) {
+        // Tokenize
+        List<String> tokens = Tokenizer.tokenize(tweet.getText());
 
-      LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("TaggedSentence: " + taggedSentence);
+        // Preprocess
+        List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
+
+        // POS Tagging
+        List<TaggedWord> taggedSentence = posTagger
+            .tagSentence(preprocessedTokens);
+
+        LOG.info("Tweet: '" + tweet + "'");
+        LOG.info("TaggedSentence: " + taggedSentence);
+      }
+      long elapsedTime = System.currentTimeMillis() - startTime;
+      LOG.info("POSTagger finished after " + elapsedTime + " ms");
+      LOG.info("Total tweets: " + tweets.size());
+      LOG.info((elapsedTime / (double) tweets.size()) + " ms per Tweet");
     }
-    LOG.info("POSTagger finished after "
-        + (System.currentTimeMillis() - startTime) + " ms");
   }
 }
