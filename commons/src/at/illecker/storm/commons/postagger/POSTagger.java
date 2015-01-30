@@ -29,7 +29,6 @@ import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.PreprocessedTweet;
 import at.illecker.storm.commons.tweet.TaggedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
-import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -44,15 +43,9 @@ public class POSTagger {
   private POSTagger() {
     // Load POS Tagger
     String taggingModel = Configuration.getPOSTaggingModelFast();
-    try {
-      LOG.info("Load POSTagger with model: " + taggingModel);
-      TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel,
-          "-nthreads", "4");
-      LOG.info("POSTagger uses " + posTaggerConf.getNThreads() + " threads...");
-      m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
-    } catch (RuntimeIOException e) {
-      LOG.error("RuntimeIOException: " + e.getMessage());
-    }
+    LOG.info("Load POSTagger with model: " + taggingModel);
+    TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
+    m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
   }
 
   public static POSTagger getInstance() {
