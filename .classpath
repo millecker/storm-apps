@@ -17,6 +17,7 @@
 	<classpathentry kind="lib" path="lib/libsvm-3.2-multithreaded.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.7.jar"/>
+	<classpathentry kind="lib" path="lib/snakeyaml-1.14.jar"/>
 	<classpathentry kind="lib" path="lib/stanford-classifier-3.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/stanford-corenlp-3.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/storm-core-0.9.3.jar"/>
