@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,13 +39,10 @@ public class Interjections {
   private List<Pattern> m_interjectionPatterns = null;
 
   private Interjections() {
-    Map<String, Properties> interjectionFiles = Configuration
-        .getInterjections();
-    for (Map.Entry<String, Properties> interjectionEntry : interjectionFiles
-        .entrySet()) {
-      String file = interjectionEntry.getKey();
-      Boolean containsRegex = (Boolean) interjectionEntry.getValue().get(
-          "containsRegex");
+    List<Map> interjectionFiles = Configuration.getInterjections();
+    for (Map interjectionEntry : interjectionFiles) {
+      String file = (String) interjectionEntry.get("path");
+      Boolean containsRegex = (Boolean) interjectionEntry.get("containsRegex");
 
       Set<String> interjections = FileUtils.readFile(file);
 

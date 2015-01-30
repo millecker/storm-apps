@@ -18,8 +18,8 @@ package at.illecker.storm.commons.dict;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,17 +35,18 @@ public class SlangCorrection {
   private Map<String, String[]> m_slangWordList = new HashMap<String, String[]>();
 
   private SlangCorrection() {
-    Map<String, Properties> slangWordLists = Configuration.getSlangWordlists();
-    for (Map.Entry<String, Properties> slangWordListEntry : slangWordLists
-        .entrySet()) {
-      String file = slangWordListEntry.getKey();
-      String separator = slangWordListEntry.getValue().getProperty("separator");
-
-      LOG.info("Load SlangLookupTable from: " + file);
-      Map<String, String> slangWordList = FileUtils.readFile(file, separator);
-      for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
-        if (!m_slangWordList.containsKey(entry.getKey())) {
-          m_slangWordList.put(entry.getKey(), entry.getValue().split(" "));
+    List<Map> slangWordLists = Configuration.getSlangWordlists();
+    for (Map slangWordListEntry : slangWordLists) {
+      String file = (String) slangWordListEntry.get("path");
+      String separator = (String) slangWordListEntry.get("delimiter");
+      boolean isEnabled = (Boolean) slangWordListEntry.get("enabled");
+      if (isEnabled) {
+        LOG.info("Load SlangLookupTable from: " + file);
+        Map<String, String> slangWordList = FileUtils.readFile(file, separator);
+        for (Map.Entry<String, String> entry : slangWordList.entrySet()) {
+          if (!m_slangWordList.containsKey(entry.getKey())) {
+            m_slangWordList.put(entry.getKey(), entry.getValue().split(" "));
+          }
         }
       }
     }

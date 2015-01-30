@@ -1,5 +1,6 @@
 package at.illecker.storm.commons.dict;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.storm.guava.collect.Sets;
@@ -51,9 +52,9 @@ public class StopWords {
   private StopWords() {
     m_stopwords = Sets.newHashSet(STOP_WORDS);
 
-    Set<String> files = Configuration.getStopWords();
+    List<String> files = Configuration.getStopWords();
     if (files != null) {
-      for (String file : Configuration.getStopWords()) {
+      for (String file : files) {
         LOG.info("Load StopWords from: " + file);
         m_stopwords.addAll(FileUtils.readFile(file));
       }

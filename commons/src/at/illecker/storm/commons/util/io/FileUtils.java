@@ -43,9 +43,9 @@ public class FileUtils {
   }
 
   public static List<Tweet> readTweets(InputStream is, Dataset dataset) {
-    List<String> negativeLabels = Arrays.asList(dataset.getNegativeLabels());
-    List<String> neutralLabels = Arrays.asList(dataset.getNeutralLabels());
-    List<String> positiveLabels = Arrays.asList(dataset.getPositiveLabels());
+    List<String> negativeLabels = dataset.getNegativeLabels();
+    List<String> neutralLabels = dataset.getNeutralLabels();
+    List<String> positiveLabels = dataset.getPositiveLabels();
     List<Tweet> tweets = new ArrayList<Tweet>();
     InputStreamReader isr = null;
     BufferedReader br = null;

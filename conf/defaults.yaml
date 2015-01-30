@@ -1,0 +1,221 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+### Storm Apps default configuration values
+### Specific configuration values can be overridden by config.yaml
+
+##############################################################################
+### global.* configs are general configurations
+##############################################################################
+
+
+
+##############################################################################
+### global.resources.* configs are resources configurations
+##############################################################################
+global.resources.datasets.semeval:
+    "2013":
+        path: "resources/datasets/SemEval2013"
+        train.file: "twitter-train-full-B.tsv"
+        dev.file: "twitter-dev-gold-B.tsv"
+        test.file: "twitter-test-gold-B.tsv"
+        delimiter: "\\t"
+        tweetId.index: 0
+        label.index: 2
+        text.index: 3
+        positive.labels: [positive]
+        negative.labels: [negative, \"negative\"]
+        neutral.labels: [neutral, objective-OR-neutral, objective]
+        positive.class.value: 0
+        negative.class.value: 1
+        neutral.class.value: 2
+        svm.kernel: 0 # Linear
+        svm.c: 0.5
+        svm.gamma: null
+        svm.class.weights:
+            0: 1.26
+            1: 2.95
+            2: 1.0
+    "2013Mixed":
+        path: "resources/datasets/SemEval2013_mixed"
+        train.file: "trainingInput.txt"
+        dev.file: null
+        test.file: "testingInput.txt"
+        delimiter: "\\t"
+        tweetId.index: 0
+        label.index: 3
+        text.index: 1
+        positive.labels: [positive]
+        negative.labels: [negative]
+        neutral.labels: [neutral]
+        positive.class.value: 0
+        negative.class.value: 1
+        neutral.class.value: 2
+        svm.kernel: 0 # Linear
+        svm.c: 0.5
+    "2014":
+        path: "resources/datasets/SemEval2014"
+        train.file: "twitter-train-gold-B-2014.tsv"
+        dev.file: null
+        test.file: "SemEval2014-task9-test-B-input.txt"
+        delimiter: "\\t"
+        tweetId.index: 0
+        label.index: 2
+        text.index: 3
+        positive.labels: [positive, \"positive\"]
+        negative.labels: [negative, \"negative\"]
+        neutral.labels: [neutral, \"neutral\", objective-OR-neutral, objective]
+        positive.class.value: 0
+        negative.class.value: 1
+        neutral.class.value: 2
+        svm.kernel: 0 # Linear
+        svm.c: 0.5
+
+global.resources.datasets.crawler:
+    Crawler:
+        type: json
+        path: "resources/datasets/uibk_crawler"
+        language.filter: en
+    CrawlerTest:
+        type: json
+        path: "resources/datasets/uibk_crawler/test"
+        language.filter: en
+
+global.resources.dict:
+    NameEntities: # https://gate.ac.uk/wiki/twitter-postagger.html
+        - "resources/dictionaries/GATE_cities.txt"
+        - "resources/dictionaries/GATE_corps.txt"
+        - "resources/dictionaries/GATE_names.txt"
+    FirstNames: # http://www.oxfordreference.com/view/10.1093/acref/9780198610601.001.0001/acref-9780198610601?hide=true&pageSize=100&sort=titlesort
+        - "resources/dictionaries/FirstNames.txt"
+    Emoticons: # http://de.wiktionary.org/wiki/Verzeichnis:International/Smileys
+        - path: "resources/dictionaries/Emoticons.regex"
+          containsRegex: true
+    Interjections: # https://gate.ac.uk/wiki/twitter-postagger.html
+        - path: "resources/dictionaries/GATE_interjections.regex"
+          containsRegex: true
+    StopWords:
+        - "resources/dictionaries/Stopwords.txt"
+
+global.resources.dict.sentiment:
+    # AFINN http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010
+    - path: "resources/dictionaries/sentiment/AFINN-111.txt"
+      delimiter: "\\t"
+      containsPOSTags: false
+      containsRegex: false
+      featureScaling: true
+      minValue: -5.0
+      maxValue: 5.0
+      enabled: true
+    # SentiStrengthEmotion http://sentistrength.wlv.ac.uk/#Download
+    - path: "resources/dictionaries/sentiment/SentiStrength_Data_Sept2011_EmotionLookupTable.txt"
+      delimiter: "\\t"
+      containsPOSTags: false
+      containsRegex: true
+      featureScaling: true
+      minValue: -5.0
+      maxValue: 5.0
+      enabled: true
+    # SentiStrengthEmoticon http://sentistrength.wlv.ac.uk/#Download
+    - path: "resources/dictionaries/sentiment/SentiStrength_Data_Sept2011_EmoticonLookupTable.txt"
+      delimiter: "\\t"
+      containsPOSTags: false
+      containsRegex: false
+      featureScaling: true
+      minValue: -1.0
+      maxValue: 1.0
+      enabled: true
+    # SentiWords https://hlt.fbk.eu/technologies/sentiwords # words might contain an underscore (bi-gram)
+    - path: "resources/dictionaries/sentiment/SentiWords_1.0.txt"
+      delimiter: "\\t"
+      containsPOSTags: true
+      containsRegex: false
+      featureScaling: true
+      minValue: -0.935
+      maxValue: 0.88257
+      enabled: true
+    # Sentiment140 http://www.saifmohammad.com/WebPages/lexicons.html
+    - path: "resources/dictionaries/sentiment/Sentiment140_unigrams_pmilexicon.txt"
+      delimiter: "\\t"
+      containsPOSTags: false
+      containsRegex: false
+      featureScaling: true
+      minValue: -4.999
+      maxValue: 5.0
+      enabled: true
+    # BingLiu http://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon
+    - path: "resources/dictionaries/sentiment/Bing_Liu.txt"
+      delimiter: "\\t"
+      containsPOSTags: false
+      containsRegex: false
+      featureScaling: true
+      minValue: -1.0
+      maxValue: 1.0
+      enabled: true
+    # MPQASubjectivity http://mpqa.cs.pitt.edu/lexicons/subj_lexicon/
+    - path: "resources/dictionaries/sentiment/MPQA_subjclueslen1-HLTEMNLP05.txt"
+      delimiter: "\\t"
+      containsPOSTags: false
+      containsRegex: false
+      featureScaling: true
+      minValue: -1.0
+      maxValue: 1.0
+      enabled: true
+
+global.resources.dict.sentiment.sentiwordnet.path: "resources/dictionaries/sentiment/SentiWordNet_3.0.0_20130122.txt"
+
+global.resources.dict.slang:
+    # InternetSlang http://www.internetslang.com/
+    - path: "resources/dictionaries/slang/InternetSlang.txt"
+      delimiter: "\\t"
+      enabled: true
+    # NoSlang http://www.noslang.com/dictionary/
+    - path: "resources/dictionaries/slang/NoSlang.txt"
+      delimiter: "\\t"
+      enabled: true
+    # GATE https://gate.ac.uk/wiki/twitter-postagger.html (orth.en)
+    - path: "resources/dictionaries/slang/GATE_slang.en.csv"
+      delimiter: ","
+      enabled: true
+    # SentiStrength http://sentistrength.wlv.ac.uk/#Download
+    - path: "resources/dictionaries/slang/SentiStrength_Data_Sept2011_SlangLookupTable.txt"
+      delimiter: "\\t"
+      enabled: true
+
+global.resources.dict.wordnet.path: "resources/dictionaries/wordnet/wn3.1.dict.tar.gz"
+
+global.resources.postagger.gate.model.path: "resources/models/pos/gate-EN-twitter.model"
+
+global.resources.postagger.gate.model.fast.path: "resources/models/pos/gate-EN-twitter-fast.model"
+
+# global.resources.svm.model.path: "resources/models/svm"
+
+##############################################################################
+### apps.postagger.* configs are for the POS Tagger application
+##############################################################################
+
+
+##############################################################################
+### apps.sentiment.analysis.* configs are for the Sentiment Analysis application
+##############################################################################
+
+
+##############################################################################
+### apps.sentiment.analysis.svm.* configs are for the Sentiment Analysis SVM application
+##############################################################################
+
+
+

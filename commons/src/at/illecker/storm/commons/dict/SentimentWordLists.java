@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,25 +52,26 @@ public class SentimentWordLists {
     m_wordLists = new ArrayList<Map<String, Double>>();
     m_wordListMaps = new ArrayList<WordListMap<Double>>();
 
-    Map<String, Properties> wordLists = Configuration.getSentimentWordlists();
-    for (Map.Entry<String, Properties> wordListEntry : wordLists.entrySet()) {
-      String file = wordListEntry.getKey();
-      Properties props = wordListEntry.getValue();
-      String separator = props.getProperty("separator");
-      boolean containsPOSTags = (Boolean) props.get("containsPOSTags");
-      boolean containsRegex = (Boolean) props.get("containsRegex");
-      boolean featureScaling = (Boolean) props.get("featureScaling");
-      double minValue = (Double) props.get("minValue");
-      double maxValue = (Double) props.get("maxValue");
-
-      if (containsRegex) {
-        LOG.info("Load WordListMap including Regex from: " + file);
-        m_wordListMaps.add(FileUtils.readWordListMap(file, separator,
-            containsPOSTags, featureScaling, minValue, maxValue));
-      } else {
-        LOG.info("Load WordList from: " + file);
-        m_wordLists.add(FileUtils.readFile(file, separator, containsPOSTags,
-            featureScaling, minValue, maxValue));
+    List<Map> wordLists = Configuration.getSentimentWordlists();
+    for (Map wordListEntry : wordLists) {
+      String file = (String) wordListEntry.get("path");
+      String separator = (String) wordListEntry.get("delimiter");
+      boolean containsPOSTags = (Boolean) wordListEntry.get("containsPOSTags");
+      boolean containsRegex = (Boolean) wordListEntry.get("containsRegex");
+      boolean featureScaling = (Boolean) wordListEntry.get("featureScaling");
+      double minValue = (Double) wordListEntry.get("minValue");
+      double maxValue = (Double) wordListEntry.get("maxValue");
+      boolean isEnabled = (Boolean) wordListEntry.get("enabled");
+      if (isEnabled) {
+        if (containsRegex) {
+          LOG.info("Load WordListMap including Regex from: " + file);
+          m_wordListMaps.add(FileUtils.readWordListMap(file, separator,
+              containsPOSTags, featureScaling, minValue, maxValue));
+        } else {
+          LOG.info("Load WordList from: " + file);
+          m_wordLists.add(FileUtils.readFile(file, separator, containsPOSTags,
+              featureScaling, minValue, maxValue));
+        }
       }
     }
   }

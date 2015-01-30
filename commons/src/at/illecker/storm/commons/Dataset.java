@@ -19,7 +19,6 @@ package at.illecker.storm.commons;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,6 +28,7 @@ import libsvm.svm_parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.svm.SVM;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.FileUtils;
 
@@ -47,9 +47,9 @@ public class Dataset implements Serializable {
   private int m_labelIndex;
   private int m_textIndex;
 
-  private String[] m_positiveLabels;
-  private String[] m_negativeLabels;
-  private String[] m_neutralLabels;
+  private List<String> m_positiveLabels;
+  private List<String> m_negativeLabels;
+  private List<String> m_neutralLabels;
 
   private int m_positiveValue;
   private int m_negativeValue;
@@ -63,8 +63,8 @@ public class Dataset implements Serializable {
 
   public Dataset(String datasetPath, String trainDataFile, String devDataFile,
       String testDataFile, String delimiter, int idIndex, int labelIndex,
-      int textIndex, String[] positiveLabels, String[] negativeLabels,
-      String[] neutralLabels, int positiveValue, int negativeValue,
+      int textIndex, List<String> positiveLabels, List<String> negativeLabels,
+      List<String> neutralLabels, int positiveValue, int negativeValue,
       int neutralValue, svm_parameter svmParam) {
     this.m_datasetPath = datasetPath;
     this.m_trainDataFile = trainDataFile;
@@ -143,15 +143,15 @@ public class Dataset implements Serializable {
     return m_textIndex;
   }
 
-  public String[] getNegativeLabels() {
+  public List<String> getNegativeLabels() {
     return m_negativeLabels;
   }
 
-  public String[] getNeutralLabels() {
+  public List<String> getNeutralLabels() {
     return m_neutralLabels;
   }
 
-  public String[] getPositiveLabels() {
+  public List<String> getPositiveLabels() {
     return m_positiveLabels;
   }
 
@@ -248,11 +248,54 @@ public class Dataset implements Serializable {
         + ", testDataFile=" + m_testDataFile + ", delimiter=" + m_delimiter
         + ", idIndex=" + m_idIndex + ", textIndex=" + m_textIndex
         + ", labelIndex=" + m_labelIndex + ", positiveLabels="
-        + Arrays.toString(m_positiveLabels) + ", negativeLabel="
-        + Arrays.toString(m_negativeLabels) + ", neutralLabel="
-        + Arrays.toString(m_neutralLabels) + ", positiveValue="
+        + m_positiveLabels + ", negativeLabel=" + m_negativeLabels
+        + ", neutralLabel=" + m_neutralLabels + ", positiveValue="
         + m_positiveValue + ", negativeValue=" + m_negativeValue
         + ", neutralValue=" + m_neutralValue + "]";
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public static Dataset readFromYaml(Map dataset) {
+    svm_parameter svmParam = SVM.getDefaultParameter();
+
+    if (dataset.get("svm.kernel") != null) {
+      svmParam.kernel_type = (Integer) dataset.get("svm.kernel");
+    }
+
+    if (dataset.get("svm.c") != null) {
+      svmParam.C = (Double) dataset.get("svm.c");
+    }
+
+    if (dataset.get("svm.gamma") != null) {
+      svmParam.gamma = (Double) dataset.get("svm.gamma");
+    }
+
+    if (dataset.get("svm.class.weights") != null) {
+      Map<Integer, Double> classWeights = (Map<Integer, Double>) dataset
+          .get("svm.class.weights");
+
+      svmParam.nr_weight = classWeights.size();
+      svmParam.weight_label = new int[svmParam.nr_weight];
+      svmParam.weight = new double[svmParam.nr_weight];
+
+      for (Map.Entry<Integer, Double> entry : classWeights.entrySet()) {
+        svmParam.weight_label[entry.getKey()] = entry.getKey();
+        svmParam.weight[entry.getKey()] = entry.getValue();
+      }
+    }
+
+    return new Dataset((String) dataset.get("path"),
+        (String) dataset.get("train.file"), (String) dataset.get("dev.file"),
+        (String) dataset.get("test.file"), (String) dataset.get("delimiter"),
+        (Integer) dataset.get("tweetId.index"),
+        (Integer) dataset.get("label.index"),
+        (Integer) dataset.get("text.index"),
+        (List<String>) dataset.get("positive.labels"),
+        (List<String>) dataset.get("negative.labels"),
+        (List<String>) dataset.get("neutral.labels"),
+        (Integer) dataset.get("positive.class.value"),
+        (Integer) dataset.get("negative.class.value"),
+        (Integer) dataset.get("neutral.class.value"), svmParam);
   }
 
   public static void main(String[] args) {
@@ -269,4 +312,5 @@ public class Dataset implements Serializable {
     // LOG.info("Dataset: SemEval2014");
     // dataSet2014.printDatasetStats();
   }
+
 }

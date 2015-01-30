@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,11 +38,10 @@ public class Emoticons {
   private List<Pattern> m_emoticonPatterns = null;
 
   private Emoticons() {
-    Map<String, Properties> emoticonFiles = Configuration.getEmoticons();
-    for (Map.Entry<String, Properties> emoticonEntry : emoticonFiles.entrySet()) {
-      String file = emoticonEntry.getKey();
-      Boolean containsRegex = (Boolean) emoticonEntry.getValue().get(
-          "containsRegex");
+    List<Map> emoticonFiles = Configuration.getEmoticons();
+    for (Map emoticonEntry : emoticonFiles) {
+      String file = (String) emoticonEntry.get("path");
+      Boolean containsRegex = (Boolean) emoticonEntry.get("containsRegex");
 
       Set<String> emoticons = FileUtils.readFile(file);
 
