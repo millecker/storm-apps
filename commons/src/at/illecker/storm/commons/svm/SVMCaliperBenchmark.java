@@ -19,6 +19,7 @@ package at.illecker.storm.commons.svm;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,9 +43,6 @@ import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
 
@@ -53,31 +51,40 @@ import com.google.caliper.Param;
 import com.google.caliper.api.Macrobenchmark;
 import com.google.caliper.runner.CaliperMain;
 
+import edu.stanford.nlp.ling.TaggedWord;
+
 public class SVMCaliperBenchmark extends Benchmark {
-  private static final Logger LOG = LoggerFactory.getLogger(SVMCaliperBenchmark.class);
+  private static final Logger LOG = LoggerFactory
+      .getLogger(SVMCaliperBenchmark.class);
 
   @Param({ "1", "2" })
   private int n; // number of threads
 
   private int inputCount = 1;
 
-  private final Dataset m_dataset = Configuration.getDataSetSemEval2013();
-  // classes 0 = negative, 1 = neutral, 2 = positive
-  private final int m_totalClasses = 3;
-  private final ScoreClassifier m_sc = new IdentityScoreClassifier();
   private final Preprocessor m_preprocessor = Preprocessor.getInstance();
   private final POSTagger m_posTagger = POSTagger.getInstance();
-  private List<TaggedTweet> m_taggedTrainTweets = SerializationUtils
-      .deserialize(m_dataset.getTrainTaggedDataSerializationFile());
-  private TweetTfIdf m_tweetTfIdf = new TweetTfIdf(m_taggedTrainTweets,
-      TfType.RAW, TfIdfNormalization.COS, true);
-  private final FeatureVectorGenerator m_fvg = new CombinedFeatureVectorGenerator(
-      m_tweetTfIdf);
+
+  private final Dataset m_dataset = Configuration.getDataSetSemEval2013();
+  // classes 0 = positive, 1 = negative, 2 = neutral
+  private final int m_totalClasses = 3;
+  private final ScoreClassifier m_sc = new IdentityScoreClassifier();
+
   private final svm_model m_svmModel = SerializationUtils.deserialize(m_dataset
       .getDatasetPath() + File.separator + SVM.SVM_MODEL_FILE_SER);
+
+  private final List<FeaturedTweet> m_featuredTrainTweets = SerializationUtils
+      .deserialize(m_dataset.getTrainDataSerializationFile());
+  private final TweetTfIdf m_tweetTfIdf = new TweetTfIdf(
+      FeaturedTweet.getTaggedTweets(m_featuredTrainTweets), TfType.RAW,
+      TfIdfNormalization.COS, true);
+  private final FeatureVectorGenerator m_fvg = new CombinedFeatureVectorGenerator(
+      m_tweetTfIdf);
+
   private ArrayList<Tweet> m_testTweets = null;
   private int m_totalTweets;
   private int m_tweetsPerThread;
+
   private ExecutorService m_executorService;
   private CountDownLatch m_latch;
 
@@ -122,23 +129,23 @@ public class SVMCaliperBenchmark extends Benchmark {
             List<Tweet> subtestTweets = m_testTweets.subList(begin, end);
 
             // Tokenize
-            List<TokenizedTweet> tokenizedTweets = Tokenizer
+            List<List<String>> tokenizedTweets = Tokenizer
                 .tokenizeTweets(subtestTweets);
 
             // Preprocess
-            List<PreprocessedTweet> preprocessedTweets = m_preprocessor
+            List<List<TaggedWord>> preprocessedTweets = m_preprocessor
                 .preprocessTweets(tokenizedTweets);
 
             // POS Tagging
-            List<TaggedTweet> taggedTweets = m_posTagger
+            List<List<TaggedWord>> taggedTweets = m_posTagger
                 .tagTweets(preprocessedTweets);
 
             // Feature Vector Generation
-            List<FeaturedTweet> featuredTweets = m_fvg
+            List<Map<Integer, Double>> featureVectors = m_fvg
                 .generateFeatureVectors(taggedTweets);
 
-            for (FeaturedTweet tweet : featuredTweets) {
-              double predictedClass = SVM.evaluate(tweet, m_svmModel,
+            for (Map<Integer, Double> featureVector : featureVectors) {
+              double predictedClass = SVM.evaluate(featureVector, m_svmModel,
                   m_totalClasses, m_sc);
             }
 

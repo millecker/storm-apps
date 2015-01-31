@@ -17,6 +17,7 @@
 package at.illecker.storm.commons.tweet;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +84,15 @@ public final class FeaturedTweet implements Serializable {
   @Override
   public String toString() {
     return m_tweet.toString();
+  }
+
+  public static final List<List<TaggedWord>> getTaggedTweets(
+      List<FeaturedTweet> featuredTweets) {
+    List<List<TaggedWord>> taggedTweets = new ArrayList<List<TaggedWord>>();
+    for (FeaturedTweet tweet : featuredTweets) {
+      taggedTweets.add(tweet.getTaggedTokens());
+    }
+    return taggedTweets;
   }
 
 }

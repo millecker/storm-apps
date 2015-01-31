@@ -19,6 +19,7 @@ package at.illecker.storm.commons.svm;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,11 +38,9 @@ import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class SVMBenchmark {
 
@@ -77,9 +76,10 @@ public class SVMBenchmark {
     final POSTagger posTagger = POSTagger.getInstance();
 
     // Load TF-IDF
-    List<TaggedTweet> taggedTrainTweets = SerializationUtils
-        .deserialize(dataset.getTrainTaggedDataSerializationFile());
-    TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTrainTweets, TfType.RAW,
+    List<FeaturedTweet> featuredTrainTweets = SerializationUtils
+        .deserialize(dataset.getTrainDataSerializationFile());
+    TweetTfIdf tweetTfIdf = new TweetTfIdf(
+        FeaturedTweet.getTaggedTweets(featuredTrainTweets), TfType.RAW,
         TfIdfNormalization.COS, true);
 
     // Load Feature Vector Generator
@@ -122,24 +122,24 @@ public class SVMBenchmark {
           List<Tweet> subtestTweets = testTweets.subList(begin, end);
 
           // Tokenize
-          List<TokenizedTweet> tokenizedTweets = Tokenizer
+          List<List<String>> tokenizedTweets = Tokenizer
               .tokenizeTweets(subtestTweets);
 
           // Preprocess
-          List<PreprocessedTweet> preprocessedTweets = preprocessor
+          List<List<TaggedWord>> preprocessedTweets = preprocessor
               .preprocessTweets(tokenizedTweets);
 
           // POS Tagging
-          List<TaggedTweet> taggedTweets = posTagger
+          List<List<TaggedWord>> taggedTweets = posTagger
               .tagTweets(preprocessedTweets);
 
           // Feature Vector Generation
-          List<FeaturedTweet> featuredTweets = fvg
+          List<Map<Integer, Double>> featureVectors = fvg
               .generateFeatureVectors(taggedTweets);
 
-          for (FeaturedTweet tweet : featuredTweets) {
-            double predictedClass = SVM.evaluate(tweet, svmModel, totalClasses,
-                isc);
+          for (Map<Integer, Double> featureVector : featureVectors) {
+            double predictedClass = SVM.evaluate(featureVector, svmModel,
+                totalClasses, isc);
           }
 
           latch.countDown();
