@@ -61,7 +61,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(
+  public Map<Integer, Double> generateFeatureVector(
       List<TaggedWord> taggedTokens) {
     Map<Integer, Double> featureVector = new TreeMap<Integer, Double>();
 
@@ -131,7 +131,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
 
       // Sentiment Feature Vector Generation
       Map<Integer, Double> sentimentFeatureVector = sfvg
-          .calculateFeatureVector(taggedTokens);
+          .generateFeatureVector(taggedTokens);
 
       // Build feature vector string
       String featureVectorStr = "";

@@ -55,7 +55,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(
+  public Map<Integer, Double> generateFeatureVector(
       List<TaggedWord> taggedTokens) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
@@ -131,7 +131,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
 
       // POS Feature Vector Generation
       Map<Integer, Double> posFeatureVector = fvg
-          .calculateFeatureVector(taggedTokens);
+          .generateFeatureVector(taggedTokens);
 
       // Build feature vector string
       String featureVectorStr = "";

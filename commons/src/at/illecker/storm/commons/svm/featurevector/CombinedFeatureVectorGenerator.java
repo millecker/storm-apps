@@ -63,16 +63,16 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(List<TaggedWord> tweet) {
+  public Map<Integer, Double> generateFeatureVector(List<TaggedWord> tweet) {
 
     Map<Integer, Double> featureVector = m_sentimentFeatureVectorGenerator
-        .calculateFeatureVector(tweet);
+        .generateFeatureVector(tweet);
 
     featureVector.putAll(m_POSFeatureVectorGenerator
-        .calculateFeatureVector(tweet));
+        .generateFeatureVector(tweet));
 
     featureVector.putAll(m_tfidfFeatureVectorGenerator
-        .calculateFeatureVector(tweet));
+        .generateFeatureVector(tweet));
 
     return featureVector;
   }
@@ -131,7 +131,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
     // Combined Feature Vector Generation
     for (List<TaggedWord> taggedTweet : taggedTweets) {
       Map<Integer, Double> combinedFeatureVector = cfvg
-          .calculateFeatureVector(taggedTweet);
+          .generateFeatureVector(taggedTweet);
 
       // Build feature vector string
       String featureVectorStr = "";

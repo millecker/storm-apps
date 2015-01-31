@@ -63,7 +63,7 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(
+  public Map<Integer, Double> generateFeatureVector(
       List<TaggedWord> taggedTokens) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
@@ -125,7 +125,7 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
     // TF-IDF Feature Vector Generation
     for (List<TaggedWord> taggedTweet : taggedTweets) {
       Map<Integer, Double> tfIdfFeatureVector = efvg
-          .calculateFeatureVector(taggedTweet);
+          .generateFeatureVector(taggedTweet);
 
       // Build feature vector string
       String featureVectorStr = "";

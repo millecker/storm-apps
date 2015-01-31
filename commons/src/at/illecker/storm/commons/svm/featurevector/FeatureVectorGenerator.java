@@ -31,7 +31,7 @@ public abstract class FeatureVectorGenerator {
 
   public abstract int getFeatureVectorSize();
 
-  public abstract Map<Integer, Double> calculateFeatureVector(
+  public abstract Map<Integer, Double> generateFeatureVector(
       List<TaggedWord> tweet);
 
   public List<Map<Integer, Double>> generateFeatureVectors(
@@ -43,7 +43,7 @@ public abstract class FeatureVectorGenerator {
       List<List<TaggedWord>> taggedTweets, boolean logging) {
     List<Map<Integer, Double>> featuredVectors = new ArrayList<Map<Integer, Double>>();
     for (List<TaggedWord> tweet : taggedTweets) {
-      Map<Integer, Double> featureVector = this.calculateFeatureVector(tweet);
+      Map<Integer, Double> featureVector = generateFeatureVector(tweet);
       if (logging) {
         LOG.info("Tweet: " + tweet);
         LOG.info("FeatureVector: " + featureVector);
