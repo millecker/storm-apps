@@ -28,7 +28,7 @@ import at.illecker.storm.commons.svm.featurevector.FeatureVectorGenerator;
 import at.illecker.storm.commons.tfidf.TfIdfNormalization;
 import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
-import at.illecker.storm.commons.tweet.TaggedTweet;
+import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -70,19 +70,20 @@ public class FeatureGenerationBolt extends BaseRichBolt {
       m_logging = false;
     }
 
-    // TODO LOAD FULL CombinedFeatureVectorGenerator
-
-    List<TaggedTweet> taggedTweets = SerializationUtils.deserialize(m_dataset
-        .getTrainTaggedDataSerializationFile());
-    if (taggedTweets != null) {
-      TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
+    // TODO load CombinedFeatureVectorGenerator
+    List<FeaturedTweet> featuredTrainTweets = SerializationUtils
+        .deserialize(m_dataset.getTrainDataSerializationFile());
+    if (featuredTrainTweets != null) {
+      TweetTfIdf tweetTfIdf = new TweetTfIdf(
+          FeaturedTweet.getTaggedTweets(featuredTrainTweets), TfType.RAW,
           TfIdfNormalization.COS, true);
+
       LOG.info("Load CombinedFeatureVectorGenerator...");
       m_fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
       LOG.info("CombinedFeatureVectorGenerator loaded");
     } else {
       LOG.error("TaggedTweets could not be found! File is missing: "
-          + m_dataset.getTrainTaggedDataSerializationFile());
+          + m_dataset.getTrainDataSerializationFile());
     }
   }
 
@@ -95,7 +96,7 @@ public class FeatureGenerationBolt extends BaseRichBolt {
 
     // Generate Feature Vector
     Map<Integer, Double> featureVector = m_fvg
-        .calculateFeatureVector(taggedTokens);
+        .generateFeatureVector(taggedTokens);
 
     if (m_logging) {
       LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" FeatureVector: "

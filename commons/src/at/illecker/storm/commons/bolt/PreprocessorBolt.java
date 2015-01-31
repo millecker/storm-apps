@@ -56,8 +56,7 @@ public class PreprocessorBolt extends BaseRichBolt {
     } else {
       m_logging = false;
     }
-    // TODO DO NOT USE SINGELTON
-    this.m_preprocessor = Preprocessor.getInstance();
+    m_preprocessor = Preprocessor.getInstance();
   }
 
   public void execute(Tuple tuple) {

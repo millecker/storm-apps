@@ -22,8 +22,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.commons.dict.SentimentResult;
 import at.illecker.storm.commons.dict.SentimentDictionary;
+import at.illecker.storm.commons.dict.SentimentResult;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -39,7 +39,7 @@ public class SentimentDetectionBolt extends BaseRichBolt {
       .getLogger(SentimentDetectionBolt.class);
   private boolean m_logging = false;
   private OutputCollector m_collector;
-  private SentimentDictionary m_sentimentWordLists;
+  private SentimentDictionary m_sentimentDict;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // no output tuples
@@ -54,11 +54,11 @@ public class SentimentDetectionBolt extends BaseRichBolt {
     } else {
       m_logging = false;
     }
-    this.m_sentimentWordLists = SentimentDictionary.getInstance();
+    m_sentimentDict = SentimentDictionary.getInstance();
   }
 
   public void cleanup() {
-    m_sentimentWordLists.close();
+    m_sentimentDict.close();
   }
 
   public void execute(Tuple tuple) {
@@ -69,8 +69,8 @@ public class SentimentDetectionBolt extends BaseRichBolt {
         .getValueByField("taggedTokens");
 
     // Calculate sentiment
-    Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
-        .getSentiment(taggedTokens);
+    Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
+        .getSentenceSentiment(taggedTokens);
 
     double totalSentimentScore = Double.MIN_VALUE;
     if (tweetSentiments != null) {
