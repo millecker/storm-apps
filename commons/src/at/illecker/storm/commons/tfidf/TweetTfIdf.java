@@ -18,6 +18,7 @@ package at.illecker.storm.commons.tfidf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +104,7 @@ public class TweetTfIdf {
 
   public static Map<String, Double> tf(List<TaggedWord> tweet, TfType type,
       boolean usePOSTags) {
-    Map<String, Double> termFreq = new HashMap<String, Double>();
+    Map<String, Double> termFreq = new LinkedHashMap<String, Double>();
     WordNet wordNet = WordNet.getInstance();
     StopWords stopWords = StopWords.getInstance();
 

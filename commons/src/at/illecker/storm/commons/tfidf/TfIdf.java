@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TfIdf {
   private static final Logger LOG = LoggerFactory.getLogger(TfIdf.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = true;
 
   public static <T> Map<T, Double> tf(Collection<T> document) {
     return tf(new HashMap<T, Double>(), document);
@@ -73,7 +74,7 @@ public class TfIdf {
   public static <T> Map<T, Double> idf(List<Map<T, Double>> termFreq) {
     // compute document frequency
     // number of documents containing the term
-    Map<T, Long> docFreq = new HashMap<T, Long>();
+    Map<T, Long> docFreq = new LinkedHashMap<T, Long>();
     for (Map<T, Double> document : termFreq) {
       for (T term : document.keySet()) {
         Long v = docFreq.get(term);
@@ -83,7 +84,7 @@ public class TfIdf {
 
     // compute inverse document frequency
     int totalDocuments = termFreq.size();
-    Map<T, Double> idf = new HashMap<T, Double>();
+    Map<T, Double> idf = new LinkedHashMap<T, Double>();
     for (Map.Entry<T, Long> e : docFreq.entrySet()) {
       T term = e.getKey();
       double documentFreq = e.getValue();
