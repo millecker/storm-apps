@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,23 +32,14 @@ public class SerializationUtils {
   private static final Logger LOG = LoggerFactory
       .getLogger(SerializationUtils.class);
 
-  public static void serializeList(List<?> objects, String fileName) {
+  public static <T extends Serializable> void serializeList(List<T> objects,
+      String fileName) {
     // Assume List is Serializable
     // e.g., LinkedList or ArrayList
     if (objects instanceof java.io.Serializable) {
       SerializationUtils.serialize((Serializable) objects, fileName);
     } else {
       LOG.error("List is not serializable!");
-    }
-  }
-
-  public static void serializeMap(Map<?, ?> objects, String fileName) {
-    // Assume Map is Serializable
-    // e.g., HashMap
-    if (objects instanceof java.io.Serializable) {
-      SerializationUtils.serialize((Serializable) objects, fileName);
-    } else {
-      LOG.error("Map is not serializable!");
     }
   }
 
