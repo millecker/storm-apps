@@ -704,7 +704,7 @@ public class SVM {
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
     boolean parameterSearch = false;
-    boolean useSerialization = true;
+    boolean useSerialization = false;
 
     if (featureVectorLevel == 0) {
       SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,
