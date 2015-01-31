@@ -83,12 +83,12 @@ public class POSTagger {
     return times;
   }
 
-  private static long getAvg(List<Long> list) {
+  private static double getAvg(List<Long> list) {
     long sum = 0;
     for (Long l : list) {
       sum += l.longValue();
     }
-    return (sum / list.size());
+    return (sum / (double) list.size());
   }
 
   public static void testPOSTagger(List<Tweet> tweets, int testRounds) {
