@@ -26,7 +26,7 @@ import at.illecker.storm.commons.util.io.FileUtils;
 
 public class NameEntities {
   private static final Logger LOG = LoggerFactory.getLogger(NameEntities.class);
-  private static final NameEntities instance = new NameEntities();
+  private static final NameEntities INSTANCE = new NameEntities();
 
   private Set<String> m_nameEntities = null;
 
@@ -42,7 +42,7 @@ public class NameEntities {
   }
 
   public static NameEntities getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public boolean isNameEntity(String value) {

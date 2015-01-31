@@ -30,7 +30,7 @@ import at.illecker.storm.commons.util.io.FileUtils;
 public class SlangCorrection {
   private static final Logger LOG = LoggerFactory
       .getLogger(SlangCorrection.class);
-  private static final SlangCorrection instance = new SlangCorrection();
+  private static final SlangCorrection INSTANCE = new SlangCorrection();
 
   private Map<String, String[]> m_slangWordList = new HashMap<String, String[]>();
 
@@ -53,7 +53,7 @@ public class SlangCorrection {
   }
 
   public static SlangCorrection getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public String[] getCorrection(String token) {

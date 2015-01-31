@@ -34,7 +34,7 @@ import edu.mit.jwi.item.POS;
 
 public class SentiWordNet {
   private static final Logger LOG = LoggerFactory.getLogger(SentiWordNet.class);
-  private static final SentiWordNet instance = new SentiWordNet();
+  private static final SentiWordNet INSTANCE = new SentiWordNet();
 
   private WordNet m_wordnet;
   private Map<String, HashMap<Integer, SentiValue>> m_dict;
@@ -48,7 +48,7 @@ public class SentiWordNet {
   }
 
   public static SentiWordNet getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   private Map<String, HashMap<Integer, SentiValue>> loadSentiWordNetDict() {

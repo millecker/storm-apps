@@ -45,7 +45,7 @@ public class StopWords {
       "too", "very", "s", "t", "can", "will", "just", "don", "should", "now" };
 
   private static final Logger LOG = LoggerFactory.getLogger(NameEntities.class);
-  private static final StopWords instance = new StopWords();
+  private static final StopWords INSTANCE = new StopWords();
 
   private Set<String> m_stopwords = null;
 
@@ -62,7 +62,7 @@ public class StopWords {
   }
 
   public static StopWords getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public boolean isStopWord(String value) {

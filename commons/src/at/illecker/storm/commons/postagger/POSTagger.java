@@ -37,7 +37,7 @@ import edu.stanford.nlp.tagger.maxent.TaggerConfig;
 
 public class POSTagger {
   private static final Logger LOG = LoggerFactory.getLogger(POSTagger.class);
-  private static final POSTagger instance = new POSTagger();
+  private static final POSTagger INSTANCE = new POSTagger();
   private MaxentTagger m_posTagger;
 
   private POSTagger() {
@@ -49,7 +49,7 @@ public class POSTagger {
   }
 
   public static POSTagger getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public List<TaggedWord> tagSentence(List<TaggedWord> pretaggedTokens) {

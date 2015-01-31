@@ -32,7 +32,7 @@ import at.illecker.storm.commons.util.io.FileUtils;
 
 public class Emoticons {
   private static final Logger LOG = LoggerFactory.getLogger(Emoticons.class);
-  private static final Emoticons instance = new Emoticons();
+  private static final Emoticons INSTANCE = new Emoticons();
 
   private Set<String> m_emoticons = null;
   private List<Pattern> m_emoticonPatterns = null;
@@ -64,7 +64,7 @@ public class Emoticons {
   }
 
   public static Emoticons getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public boolean isEmoticon(String str) {

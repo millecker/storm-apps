@@ -26,7 +26,7 @@ import at.illecker.storm.commons.util.io.FileUtils;
 
 public class FirstNames {
   private static final Logger LOG = LoggerFactory.getLogger(FirstNames.class);
-  private static final FirstNames instance = new FirstNames();
+  private static final FirstNames INSTANCE = new FirstNames();
 
   private Set<String> m_firstNames = null;
 
@@ -42,7 +42,7 @@ public class FirstNames {
   }
 
   public static FirstNames getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public boolean isFirstName(String value) {

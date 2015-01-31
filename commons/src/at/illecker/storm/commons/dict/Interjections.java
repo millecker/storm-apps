@@ -33,7 +33,7 @@ import at.illecker.storm.commons.util.io.FileUtils;
 public class Interjections {
   private static final Logger LOG = LoggerFactory
       .getLogger(Interjections.class);
-  private static final Interjections instance = new Interjections();
+  private static final Interjections INSTANCE = new Interjections();
 
   private Set<String> m_interjections = null;
   private List<Pattern> m_interjectionPatterns = null;
@@ -65,7 +65,7 @@ public class Interjections {
   }
 
   public static Interjections getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public boolean isInterjection(String value) {

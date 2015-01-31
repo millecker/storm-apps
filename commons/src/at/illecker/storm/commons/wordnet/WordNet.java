@@ -46,7 +46,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class WordNet {
   public static final int MAX_DEPTH_OF_HIERARCHY = 16;
   private static final Logger LOG = LoggerFactory.getLogger(WordNet.class);
-  private static final WordNet instance = new WordNet();
+  private static final WordNet INSTANCE = new WordNet();
 
   private IRAMDictionary m_dict;
   private File m_wordNetDir;
@@ -87,7 +87,7 @@ public class WordNet {
   }
 
   public static WordNet getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public void close() {
