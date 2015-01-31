@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.HtmlUtils;
 import at.illecker.storm.commons.util.RegexUtils;
@@ -50,7 +49,7 @@ public class Tokenizer {
       // LOG.info("Replaced Unicode symbols from '" + str + "' to '"
       // + replacedText + "'");
       if (replacedText.equals(str)) {
-        LOG.error("Unicode symbols could not be replaced: '" + str + "'");
+        LOG.warn("Unicode symbols could not be replaced: '" + str + "'");
       }
       str = replacedText;
     }
@@ -61,7 +60,7 @@ public class Tokenizer {
       // LOG.info("Replaced HTML symbols from '" + text + "' to '"
       // + replacedText + "'");
       if (replacedText.equals(str)) {
-        LOG.error("HTML symbols could not be replaced: '" + str + "'");
+        LOG.warn("HTML symbols could not be replaced: '" + str + "'");
       }
       str = replacedText;
     }
@@ -75,13 +74,10 @@ public class Tokenizer {
     return resultTokens;
   }
 
-  public static List<TokenizedTweet> tokenizeTweets(List<Tweet> tweets) {
-    List<TokenizedTweet> tokenizedTweets = new ArrayList<TokenizedTweet>();
+  public static List<List<String>> tokenizeTweets(List<Tweet> tweets) {
+    List<List<String>> tokenizedTweets = new ArrayList<List<String>>();
     for (Tweet tweet : tweets) {
-      List<List<String>> tokenizedSentences = new ArrayList<List<String>>();
-      tokenizedSentences.add(tokenize(tweet.getText()));
-      tokenizedTweets.add(new TokenizedTweet(tweet.getId(), tweet.getText(),
-          tweet.getScore(), tokenizedSentences));
+      tokenizedTweets.add(tokenize(tweet.getText()));
     }
     return tokenizedTweets;
   }
@@ -137,4 +133,5 @@ public class Tokenizer {
     LOG.info("Tokenize finished after "
         + (System.currentTimeMillis() - startTime) + " ms");
   }
+
 }
