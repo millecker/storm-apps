@@ -46,8 +46,8 @@ global.resources.datasets.semeval:
         svm.c: 0.5
         svm.gamma: null
         svm.class.weights:
-            0: 1.26
-            1: 2.95
+            0: 1.2612
+            1: 2.9574
             2: 1.0
     "2013Mixed":
         path: "resources/datasets/SemEval2013_mixed"

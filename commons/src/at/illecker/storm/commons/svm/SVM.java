@@ -21,9 +21,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -54,12 +56,9 @@ import at.illecker.storm.commons.tfidf.TfIdfNormalization;
 import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.FeaturedTweet;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class SVM {
   public static final String SVM_PROBLEM_FILE = "svm_problem.txt";
@@ -117,18 +116,21 @@ public class SVM {
     return param;
   }
 
-  public static svm_problem generateProblem(List<FeaturedTweet> trainTweets,
+  public static svm_problem generateProblem(
+      Map<Map<Integer, Double>, Double> scoredFeatureVectors,
       ScoreClassifier scoreClassifier) {
-    int dataCount = trainTweets.size();
+    int dataCount = scoredFeatureVectors.size();
 
     svm_problem svmProb = new svm_problem();
     svmProb.y = new double[dataCount];
     svmProb.l = dataCount;
     svmProb.x = new svm_node[dataCount][];
 
-    for (int i = 0; i < dataCount; i++) {
-      FeaturedTweet tweet = trainTweets.get(i);
-      Map<Integer, Double> featureVector = tweet.getFeatureVector();
+    int i = 0;
+    for (Entry<Map<Integer, Double>, Double> scoredFeatureVector : scoredFeatureVectors
+        .entrySet()) {
+
+      Map<Integer, Double> featureVector = scoredFeatureVector.getKey();
       // set feature nodes
       svmProb.x[i] = new svm_node[featureVector.size()];
       int j = 0;
@@ -141,7 +143,9 @@ public class SVM {
       }
 
       // set class / label
-      svmProb.y[i] = scoreClassifier.classfyScore(tweet.getScore());
+      svmProb.y[i] = scoreClassifier.classfyScore(scoredFeatureVector
+          .getValue());
+      i++;
     }
 
     return svmProb;
@@ -308,15 +312,16 @@ public class SVM {
     executorService.shutdown();
   }
 
-  public static double evaluate(FeaturedTweet tweet, svm_model svmModel,
-      int totalClasses, ScoreClassifier scoreClassifier) {
-    return evaluate(tweet, svmModel, totalClasses, scoreClassifier, false);
+  public static double evaluate(Map<Integer, Double> featureVector,
+      svm_model svmModel, int totalClasses, ScoreClassifier scoreClassifier) {
+    return evaluate(featureVector, svmModel, totalClasses, scoreClassifier,
+        false);
   }
 
-  public static double evaluate(FeaturedTweet tweet, svm_model svmModel,
-      int totalClasses, ScoreClassifier scoreClassifier, boolean logging) {
+  public static double evaluate(Map<Integer, Double> featureVector,
+      svm_model svmModel, int totalClasses, ScoreClassifier scoreClassifier,
+      boolean logging) {
 
-    Map<Integer, Double> featureVector = tweet.getFeatureVector();
     // set feature nodes
     svm_node[] testNodes = new svm_node[featureVector.size()];
     int i = 0;
@@ -342,8 +347,7 @@ public class SVM {
         LOG.info("Label[" + i + "]: " + labels[i] + " Probability: "
             + probEstimates[i]);
       }
-      LOG.info("TweetClass: " + scoreClassifier.classfyScore(tweet.getScore())
-          + " Prediction: " + predictedClassProb);
+      LOG.info("PredictedClass: " + predictedClassProb);
     }
 
     return predictedClass;
@@ -466,13 +470,13 @@ public class SVM {
 
     // Prepare Train tweets
     LOG.info("Prepare Train data...");
-    List<FeaturedTweet> trainFeaturedTweets = null;
+    Map<Map<Integer, Double>, Double> trainScoredFeatureVectors = null;
     if (useSerialization) {
-      trainFeaturedTweets = SerializationUtils.deserialize(dataset
+      trainScoredFeatureVectors = SerializationUtils.deserialize(dataset
           .getTrainDataSerializationFile());
     }
 
-    if (trainFeaturedTweets == null) {
+    if (trainScoredFeatureVectors == null) {
       // Read train tweets
       List<Tweet> trainTweets = dataset.getTrainTweets(true);
       LOG.info("Read train tweets from " + dataset.getTrainDataFile());
@@ -480,19 +484,20 @@ public class SVM {
 
       // Tokenize
       LOG.info("Tokenize train tweets...");
-      List<TokenizedTweet> tokenizedTweets = Tokenizer
+      List<List<String>> tokenizedTweets = Tokenizer
           .tokenizeTweets(trainTweets);
 
       // Preprocess
       preprocessor = Preprocessor.getInstance();
       LOG.info("Preprocess train tweets...");
-      List<PreprocessedTweet> preprocessedTweets = preprocessor
+      List<List<TaggedWord>> preprocessedTweets = preprocessor
           .preprocessTweets(tokenizedTweets);
 
       // POS Tagging
       posTagger = POSTagger.getInstance();
       LOG.info("POS Tagging of train tweets...");
-      List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
+      List<List<TaggedWord>> taggedTweets = posTagger
+          .tagTweets(preprocessedTweets);
 
       // Serialize training data including POS tags
       if (useSerialization) {
@@ -500,7 +505,7 @@ public class SVM {
             dataset.getTrainTaggedDataSerializationFile());
       }
 
-      // Feature Vector Generation
+      // Create Feature Vector Generator
       if (featureVectorGenerator.equals(SentimentFeatureVectorGenerator.class)) {
         LOG.info("Load SentimentFeatureVectorGenerator...");
         fvg = new SentimentFeatureVectorGenerator();
@@ -525,25 +530,30 @@ public class SVM {
       }
 
       // Feature Vector Generation
-      LOG.info("Generate Feature Vectors for test tweets...");
-      trainFeaturedTweets = fvg.generateFeatureVectors(taggedTweets);
+      LOG.info("Generate Feature Vectors for train tweets...");
+      trainScoredFeatureVectors = new HashMap<Map<Integer, Double>, Double>();
+      for (int i = 0; i < taggedTweets.size(); i++) {
+        List<TaggedWord> taggedTweet = taggedTweets.get(i);
+        trainScoredFeatureVectors.put(fvg.generateFeatureVector(taggedTweet),
+            trainTweets.get(i).getScore());
+      }
 
       // Serialize training data including feature vectors
       if (useSerialization) {
-        SerializationUtils.serializeList(trainFeaturedTweets,
+        SerializationUtils.serializeMap(trainScoredFeatureVectors,
             dataset.getTrainDataSerializationFile());
       }
     }
 
     // Prepare Test tweets
     LOG.info("Prepare Test data...");
-    List<FeaturedTweet> testFeaturedTweets = null;
+    Map<Map<Integer, Double>, Double> testScoredFeatureVectors = null;
     if (useSerialization) {
-      testFeaturedTweets = SerializationUtils.deserialize(dataset
+      testScoredFeatureVectors = SerializationUtils.deserialize(dataset
           .getTestDataSerializationFile());
     }
 
-    if (testFeaturedTweets == null) {
+    if (testScoredFeatureVectors == null) {
       if (fvg == null) {
         LOG.error("Train and test data must use the same FeatureVectorGenerator!");
         System.exit(1);
@@ -554,23 +564,32 @@ public class SVM {
       LOG.info("Read test tweets from " + dataset.getTestDataFile());
 
       // Tokenize
-      List<TokenizedTweet> tokenizedTweets = Tokenizer
-          .tokenizeTweets(testTweets);
+      LOG.info("Tokenize train tweets...");
+      List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(testTweets);
 
       // Preprocess
-      List<PreprocessedTweet> preprocessedTweets = preprocessor
+      preprocessor = Preprocessor.getInstance();
+      LOG.info("Preprocess train tweets...");
+      List<List<TaggedWord>> preprocessedTweets = preprocessor
           .preprocessTweets(tokenizedTweets);
 
       // POS Tagging
-      List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
+      posTagger = POSTagger.getInstance();
+      LOG.info("POS Tagging of train tweets...");
+      List<List<TaggedWord>> taggedTweets = posTagger
+          .tagTweets(preprocessedTweets);
 
       // Feature Vector Generation
-      LOG.info("Generate Feature Vectors for test tweets...");
-      testFeaturedTweets = fvg.generateFeatureVectors(taggedTweets);
+      testScoredFeatureVectors = new HashMap<Map<Integer, Double>, Double>();
+      for (int i = 0; i < taggedTweets.size(); i++) {
+        List<TaggedWord> taggedTweet = taggedTweets.get(i);
+        testScoredFeatureVectors.put(fvg.generateFeatureVector(taggedTweet),
+            testTweets.get(i).getScore());
+      }
 
       // Serialize test data
       if (useSerialization) {
-        SerializationUtils.serializeList(testFeaturedTweets,
+        SerializationUtils.serializeMap(testScoredFeatureVectors,
             dataset.getTestDataSerializationFile());
       }
     }
@@ -579,7 +598,7 @@ public class SVM {
     if (parameterSearch) {
       svm_parameter svmParam = getDefaultParameter();
       LOG.info("Generate SVM problem...");
-      svm_problem svmProb = generateProblem(trainFeaturedTweets,
+      svm_problem svmProb = generateProblem(trainScoredFeatureVectors,
           new IdentityScoreClassifier());
 
       // 1) coarse grained paramter search
@@ -616,7 +635,7 @@ public class SVM {
 
       if (svmModel == null) {
         LOG.info("Generate SVM problem...");
-        svm_problem svmProb = generateProblem(trainFeaturedTweets, isc);
+        svm_problem svmProb = generateProblem(trainScoredFeatureVectors, isc);
 
         // save svm problem in libSVM format
         saveProblem(svmProb, dataset.getDatasetPath() + File.separator
@@ -653,9 +672,13 @@ public class SVM {
       LOG.info("Evaluate test tweets...");
 
       long startTime = System.currentTimeMillis();
-      for (FeaturedTweet tweet : testFeaturedTweets) {
-        double predictedClass = evaluate(tweet, svmModel, totalClasses, isc);
-        int actualClass = isc.classfyScore(tweet.getScore());
+      for (Entry<Map<Integer, Double>, Double> tweet : testScoredFeatureVectors
+          .entrySet()) {
+
+        double predictedClass = evaluate(tweet.getKey(), svmModel,
+            totalClasses, isc);
+
+        int actualClass = isc.classfyScore(tweet.getValue());
         if (predictedClass == actualClass) {
           countMatches++;
         }
@@ -664,10 +687,10 @@ public class SVM {
 
       LOG.info("Evaluate finished after "
           + (System.currentTimeMillis() - startTime) + " ms");
-      LOG.info("Total test tweets: " + testFeaturedTweets.size());
+      LOG.info("Total test tweets: " + testScoredFeatureVectors.size());
       LOG.info("Matches: " + countMatches);
       double accuracy = (double) countMatches
-          / (double) testFeaturedTweets.size();
+          / (double) testScoredFeatureVectors.size();
       LOG.info("Accuracy: " + accuracy);
 
       printStats(confusionMatrix);
@@ -694,4 +717,5 @@ public class SVM {
           nFoldCrossValidation, parameterSearch, useSerialization);
     }
   }
+
 }
