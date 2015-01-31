@@ -64,6 +64,7 @@ public class Configuration {
   public static Map readConfig() {
     Map conf = readConfigFile(WORKING_DIR_PATH + "conf/defaults.yaml", true);
     // read custom config
+    LOG.info("Try to load user-specific config...");
     Map customConfig = readConfigFile(WORKING_DIR_PATH
         + "conf/configuration.yaml", false);
     if (customConfig != null) {

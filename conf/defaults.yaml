@@ -45,7 +45,7 @@ global.resources.datasets.semeval:
         svm.kernel: 0 # Linear
         svm.c: 0.5
         svm.gamma: null
-        svm.class.weights:
+        svm.class.weights: # http://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#f804
             0: 1.26
             1: 2.95
             2: 1.0
@@ -88,11 +88,11 @@ global.resources.datasets.crawler:
     Crawler:
         type: json
         path: "resources/datasets/uibk_crawler"
-        language.filter: en
+        language.filter: "en"
     CrawlerTest:
         type: json
         path: "resources/datasets/uibk_crawler/test"
-        language.filter: en
+        language.filter: "en"
 
 global.resources.dict:
     NameEntities: # https://gate.ac.uk/wiki/twitter-postagger.html
@@ -207,6 +207,27 @@ global.resources.postagger.gate.model.fast.path: "resources/models/pos/gate-EN-t
 ### apps.postagger.* configs are for the POS Tagger application
 ##############################################################################
 
+apps.postagger.workers.num: 1
+apps.postagger.workers.childopts: "-Xmx16g"
+
+apps.postagger.supervisor.childopts: "-Xmx2g"
+
+apps.postagger.spout.parallelism: 1
+apps.postagger.spout.max.pending: 2000
+apps.postagger.spout.startup.sleep.ms: null
+apps.postagger.spout.tuple.sleep.ms: null
+apps.postagger.spout.tuple.sleep.ns: null
+apps.postagger.spout.filter.language: "en"
+
+apps.postagger.bolt.tokenizer.parallelism: 1
+apps.postagger.bolt.tokenizer.logging: false
+
+apps.postagger.bolt.preprocessor.parallelism: 1
+apps.postagger.bolt.preprocessor.logging: false
+
+apps.postagger.bolt.postagger.parallelism: 1
+apps.postagger.bolt.postagger.logging: true
+apps.postagger.bolt.postagger.model: "resources/models/pos/gate-EN-twitter-fast.model"
 
 ##############################################################################
 ### apps.sentiment.analysis.* configs are for the Sentiment Analysis application

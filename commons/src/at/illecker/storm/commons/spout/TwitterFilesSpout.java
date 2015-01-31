@@ -43,7 +43,7 @@ public class TwitterFilesSpout extends BaseRichSpout {
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields("id", "text"));
+    declarer.declare(new Fields("id", "text", "score"));
   }
 
   public void open(Map config, TopologyContext context,
@@ -87,7 +87,7 @@ public class TwitterFilesSpout extends BaseRichSpout {
     }
 
     // Emit tweet
-    m_collector.emit(new Values(tweet.getId(), tweet.getText()));
+    m_collector.emit(new Values(tweet.getId(), tweet.getText(), null));
 
     // Optional sleep between emitting tuples
     if (m_tupleSleepMs != 0) {

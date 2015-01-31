@@ -65,7 +65,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
   @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields("id", "text"));
+    declarer.declare(new Fields("id", "text", "score"));
   }
 
   @Override
@@ -142,7 +142,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
       TimeUtils.sleepMillis(50); // sleep 50 ms
     } else {
       // Emit tweet
-      m_collector.emit(new Values(tweet.getId(), tweet.getText()));
+      m_collector.emit(new Values(tweet.getId(), tweet.getText(), null));
     }
   }
 

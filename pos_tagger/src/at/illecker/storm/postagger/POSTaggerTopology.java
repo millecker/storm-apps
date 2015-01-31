@@ -19,6 +19,7 @@ package at.illecker.storm.postagger;
 import java.io.File;
 import java.util.Arrays;
 
+import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.bolt.POSTaggerBolt;
 import at.illecker.storm.commons.bolt.PreprocessorBolt;
 import at.illecker.storm.commons.bolt.TokenizerBolt;
@@ -31,7 +32,6 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class POSTaggerTopology {
   public static final String TOPOLOGY_NAME = "pos-tagger-topology";
-  public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
     String twitterDirOrConsumerKey = "";
@@ -80,47 +80,86 @@ public class POSTaggerTopology {
     String spoutID = "";
     if (twitterDir.isDirectory()) {
       conf.put(TwitterFilesSpout.CONF_TWITTER_DIR, twitterDir.getAbsolutePath());
-      // sleep 500 ms between emitting tuples
-      conf.put(TwitterFilesSpout.CONF_TUPLE_SLEEP_MS, 500);
-      spout = new TwitterFilesSpout(new String[] { "tweet" }, FILTER_LANG);
+      conf.put(TwitterFilesSpout.CONF_FILTER_LANGUAGE,
+          Configuration.get("apps.postagger.spout.filter.language"));
+      if (Configuration.get("apps.postagger.spout.startup.sleep.ms") != null) {
+        conf.put(TwitterFilesSpout.CONF_STARTUP_SLEEP_MS,
+            (Integer) Configuration
+                .get("apps.postagger.spout.startup.sleep.ms"));
+      }
+      if (Configuration.get("apps.postagger.spout.tuple.sleep.ms") != null) {
+        conf.put(TwitterFilesSpout.CONF_TUPLE_SLEEP_MS, (Integer) Configuration
+            .get("apps.postagger.spout.startup.sleep.ms"));
+      }
+      spout = new TwitterFilesSpout();
       spoutID = TwitterFilesSpout.ID;
+
     } else {
-      spout = new TwitterStreamSpout(new String[] { "tweet" },
-          twitterDirOrConsumerKey, consumerSecret, accessToken,
-          accessTokenSecret, keyWords, FILTER_LANG);
+      if (Configuration.get("apps.postagger.spout.startup.sleep.ms") != null) {
+        conf.put(TwitterStreamSpout.CONF_STARTUP_SLEEP_MS,
+            (Integer) Configuration
+                .get("apps.postagger.spout.startup.sleep.ms"));
+      }
+      spout = new TwitterStreamSpout(twitterDirOrConsumerKey, consumerSecret,
+          accessToken, accessTokenSecret, keyWords,
+          (String) Configuration.get("apps.postagger.spout.filter.language"));
       spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts
-    TokenizerBolt tokenizerBolt = new TokenizerBolt(new String[] { "tweet" },
-        new String[] { "splittedTweet" });
-    PreprocessorBolt preprocessorBolt = new PreprocessorBolt(
-        new String[] { "splittedTweet" }, new String[] { "preprocessedTweet" });
-    POSTaggerBolt posTaggerBolt = new POSTaggerBolt(
-        new String[] { "preprocessedTweet" }, new String[] { "taggedTweet" });
+    TokenizerBolt tokenizerBolt = new TokenizerBolt();
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
 
     // Set Spout
-    builder.setSpout(spoutID, spout);
+    builder.setSpout(spoutID, spout,
+        Configuration.get("apps.postagger.spout.parallelism", 1));
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
+    builder.setBolt(TokenizerBolt.ID, tokenizerBolt,
+        Configuration.get("apps.postagger.bolt.tokenizer.parallelism", 1))
+        .shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
-        TokenizerBolt.ID);
+    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt,
+        Configuration.get("apps.postagger.bolt.preprocessor.parallelism", 1))
+        .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt).shuffleGrouping(
-        PreprocessorBolt.ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt,
+        Configuration.get("apps.postagger.bolt.postagger.parallelism", 1))
+        .shuffleGrouping(PreprocessorBolt.ID);
 
-    conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
-    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
+    // Set topology config
+    conf.setNumWorkers(Configuration.get("apps.postagger.workers.num", 1));
 
-    // Enable logging in POSTaggerBolt
-    conf.put(POSTaggerBolt.CONF_LOGGING, true);
+    if (Configuration.get("apps.postagger.spout.max.pending") != null) {
+      conf.setMaxSpoutPending((Integer) Configuration
+          .get("apps.postagger.spout.max.pending"));
+    }
+
+    if (Configuration.get("apps.postagger.workers.childopts") != null) {
+      conf.put(Config.WORKER_CHILDOPTS,
+          Configuration.get("apps.postagger.workers.childopts"));
+    }
+    if (Configuration.get("apps.postagger.supervisor.childopts") != null) {
+      conf.put(Config.SUPERVISOR_CHILDOPTS,
+          Configuration.get("apps.postagger.supervisor.childopts"));
+    }
+
+    conf.put(TokenizerBolt.CONF_LOGGING,
+        Configuration.get("apps.postagger.bolt.tokenizer.logging", false));
+    conf.put(PreprocessorBolt.CONF_LOGGING,
+        Configuration.get("apps.postagger.bolt.preprocessor.logging", false));
+    conf.put(POSTaggerBolt.CONF_LOGGING,
+        Configuration.get("apps.postagger.bolt.postagger.logging", false));
+    conf.put(POSTaggerBolt.CONF_MODEL,
+        Configuration.get("apps.postagger.bolt.postagger.model"));
+
+    conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
