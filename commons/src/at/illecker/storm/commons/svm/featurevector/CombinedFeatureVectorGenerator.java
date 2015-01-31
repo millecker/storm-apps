@@ -30,10 +30,8 @@ import at.illecker.storm.commons.tfidf.TfIdfNormalization;
 import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
@@ -65,7 +63,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet) {
+  public Map<Integer, Double> calculateFeatureVector(List<TaggedWord> tweet) {
 
     Map<Integer, Double> featureVector = m_sentimentFeatureVectorGenerator
         .calculateFeatureVector(tweet);
@@ -83,7 +81,7 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
     List<Tweet> tweets = null;
-    boolean extendedTest = true;
+    boolean extendedTest = false;
 
     // load tweets
     if (extendedTest) {
@@ -96,19 +94,20 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
 
     // prepare Tweets
     long startTime = System.currentTimeMillis();
-    // Tokenize tweets
-    List<TokenizedTweet> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
+    // Tokenize
+    List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
     // Preprocess
-    List<PreprocessedTweet> preprocessedTweets = preprocessor
+    List<List<TaggedWord>> preprocessedTweets = preprocessor
         .preprocessTweets(tokenizedTweets);
 
     // POS Tagging
-    List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
+    List<List<TaggedWord>> taggedTweets = posTagger
+        .tagTweets(preprocessedTweets);
     LOG.info("Preparation of Tweets finished after "
         + (System.currentTimeMillis() - startTime) + " ms");
 
-    // Calculate Tf-Idf
+    // Generate CombinedFeatureVectorGenerator
     boolean usePOSTags = true; // use POS tags in terms
     TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
         TfIdfNormalization.COS, usePOSTags);
@@ -121,17 +120,29 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
           tweetTfIdf.getInverseDocFreq());
       TweetTfIdf.print("Inverse Document Frequency",
           tweetTfIdf.getInverseDocFreq());
+      TweetTfIdf.print(
+          "Tf-Idf",
+          TweetTfIdf.tfIdf(tweetTfIdf.getTermFreqs(),
+              tweetTfIdf.getInverseDocFreq(),
+              tweetTfIdf.getTfIdfNormalization()),
+          tweetTfIdf.getInverseDocFreq());
     }
 
-    // Feature Vector Generation
-    for (TaggedTweet tweet : taggedTweets) {
+    // Combined Feature Vector Generation
+    for (List<TaggedWord> taggedTweet : taggedTweets) {
+      Map<Integer, Double> combinedFeatureVector = cfvg
+          .calculateFeatureVector(taggedTweet);
+
+      // Build feature vector string
       String featureVectorStr = "";
-      for (Map.Entry<Integer, Double> feature : cfvg.calculateFeatureVector(
-          tweet).entrySet()) {
+      for (Map.Entry<Integer, Double> feature : combinedFeatureVector
+          .entrySet()) {
         featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
-      LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("FeatureVector: " + featureVectorStr);
+
+      LOG.info("Tweet: '" + taggedTweet + "'");
+      LOG.info("CombinedFeatureVector: " + featureVectorStr);
     }
   }
+
 }

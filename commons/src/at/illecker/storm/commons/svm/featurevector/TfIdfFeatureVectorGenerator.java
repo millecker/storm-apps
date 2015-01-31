@@ -102,14 +102,14 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
     List<List<TaggedWord>> taggedTweets = posTagger
         .tagTweets(preprocessedTweets);
 
+    // Generate TfIdfFeatureVectorGenerator
     boolean usePOSTags = true; // use POS tags in terms
-    // calculate Tf-Idf
     TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
         TfIdfNormalization.COS, usePOSTags);
     TfIdfFeatureVectorGenerator efvg = new TfIdfFeatureVectorGenerator(
         tweetTfIdf);
 
-    // DEBUG
+    // Debug
     TweetTfIdf.print("Term Frequency", tweetTfIdf.getTermFreqs(),
         tweetTfIdf.getInverseDocFreq());
     TweetTfIdf.print("Inverse Document Frequency",
@@ -122,8 +122,8 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
                 tweetTfIdf.getTfIdfNormalization()),
             tweetTfIdf.getInverseDocFreq());
 
+    // TF-IDF Feature Vector Generation
     for (List<TaggedWord> taggedTweet : taggedTweets) {
-      // TF-IDF Feature Vector Generation
       Map<Integer, Double> tfIdfFeatureVector = efvg
           .calculateFeatureVector(taggedTweet);
 
