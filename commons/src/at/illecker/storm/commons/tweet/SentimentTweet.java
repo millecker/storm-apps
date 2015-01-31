@@ -99,4 +99,5 @@ public final class SentimentTweet implements Serializable {
         score_mislove, score_afinn, score_sentistrength,
         score_sentistrength_pos, score_sentistrength_neg);
   }
+
 }

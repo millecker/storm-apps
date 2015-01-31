@@ -126,4 +126,5 @@ public final class Tweet implements Serializable {
             "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \""));
     return tweets;
   }
+
 }
