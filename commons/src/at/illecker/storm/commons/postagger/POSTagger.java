@@ -26,8 +26,6 @@ import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Sentence;
@@ -56,15 +54,10 @@ public class POSTagger {
     return m_posTagger.tagSentence(pretaggedTokens, true);
   }
 
-  public List<TaggedTweet> tagTweets(List<PreprocessedTweet> tweets) {
-    List<TaggedTweet> taggedTweets = new ArrayList<TaggedTweet>();
-    for (PreprocessedTweet tweet : tweets) {
-      List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
-      for (List<TaggedWord> sentence : tweet.getPreprocessedSentences()) {
-        taggedSentences.add(this.tagSentence(sentence));
-      }
-      taggedTweets.add(new TaggedTweet(tweet.getId(), tweet.getText(), tweet
-          .getScore(), taggedSentences));
+  public List<List<TaggedWord>> tagTweets(List<List<TaggedWord>> tweets) {
+    List<List<TaggedWord>> taggedTweets = new ArrayList<List<TaggedWord>>();
+    for (List<TaggedWord> tweet : tweets) {
+      taggedTweets.add(tagSentence(tweet));
     }
     return taggedTweets;
   }
@@ -164,8 +157,8 @@ public class POSTagger {
       testPOSTagger(tweets, 1);
 
     } else {
-      POSTagger posTagger = POSTagger.getInstance();
       Preprocessor preprocessor = Preprocessor.getInstance();
+      POSTagger posTagger = POSTagger.getInstance();
 
       // process tweets
       long startTime = System.currentTimeMillis();
@@ -177,11 +170,11 @@ public class POSTagger {
         List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
         // POS Tagging
-        List<TaggedWord> taggedSentence = posTagger
+        List<TaggedWord> taggedTokens = posTagger
             .tagSentence(preprocessedTokens);
 
         LOG.info("Tweet: '" + tweet + "'");
-        LOG.info("TaggedSentence: " + taggedSentence);
+        LOG.info("TaggedTweet: " + taggedTokens);
       }
       long elapsedTime = System.currentTimeMillis() - startTime;
       LOG.info("POSTagger finished after " + elapsedTime + " ms");
@@ -189,4 +182,5 @@ public class POSTagger {
       LOG.info((elapsedTime / (double) tweets.size()) + " ms per Tweet");
     }
   }
+
 }
