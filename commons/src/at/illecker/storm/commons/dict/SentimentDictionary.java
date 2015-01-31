@@ -28,7 +28,6 @@ import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.TaggedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.StringUtils;
 import at.illecker.storm.commons.util.io.FileUtils;
@@ -37,17 +36,17 @@ import at.illecker.storm.commons.wordnet.WordNet;
 import edu.mit.jwi.item.POS;
 import edu.stanford.nlp.ling.TaggedWord;
 
-public class SentimentWordLists {
+public class SentimentDictionary {
   private static final Logger LOG = LoggerFactory
-      .getLogger(SentimentWordLists.class);
+      .getLogger(SentimentDictionary.class);
   private static final boolean LOGGING = false;
-  private static final SentimentWordLists instance = new SentimentWordLists();
+  private static final SentimentDictionary INSTANCE = new SentimentDictionary();
 
   private WordNet m_wordnet;
   private List<Map<String, Double>> m_wordLists = null;
   private List<WordListMap<Double>> m_wordListMaps = null;
 
-  private SentimentWordLists() {
+  private SentimentDictionary() {
     m_wordnet = WordNet.getInstance();
     m_wordLists = new ArrayList<Map<String, Double>>();
     m_wordListMaps = new ArrayList<WordListMap<Double>>();
@@ -76,8 +75,8 @@ public class SentimentWordLists {
     }
   }
 
-  public static SentimentWordLists getInstance() {
-    return instance;
+  public static SentimentDictionary getInstance() {
+    return INSTANCE;
   }
 
   public void close() {
@@ -161,14 +160,15 @@ public class SentimentWordLists {
       LOG.info("getWordSentimentWithStemming('" + word + "'\'" + posTag
           + "'): " + sentimentScores);
     }
-
     return sentimentScores;
   }
 
   public Map<Integer, SentimentResult> getSentenceSentiment(
       List<TaggedWord> sentence) {
-    Map<Integer, SentimentResult> sentimentResults = new HashMap<Integer, SentimentResult>();
-
+    Map<Integer, SentimentResult> sentenceSentiments = new HashMap<Integer, SentimentResult>();
+    if (LOGGING) {
+      LOG.info("TaggedSentence: " + sentence.toString());
+    }
     for (TaggedWord w : sentence) {
       Map<Integer, Double> wordSentiments = getWordSentimentWithStemming(
           w.word(), w.tag());
@@ -180,7 +180,7 @@ public class SentimentWordLists {
           int key = wordSentiment.getKey();
           double sentimentScore = wordSentiment.getValue();
 
-          SentimentResult sentimentResult = sentimentResults.get(key);
+          SentimentResult sentimentResult = sentenceSentiments.get(key);
           if (sentimentResult == null) {
             sentimentResult = new SentimentResult();
           }
@@ -189,46 +189,20 @@ public class SentimentWordLists {
           sentimentResult.addScore(sentimentScore);
 
           // update sentimentResult
-          sentimentResults.put(key, sentimentResult);
-        }
-      }
-    }
-
-    return (sentimentResults.size() > 0) ? sentimentResults : null;
-  }
-
-  public Map<Integer, SentimentResult> getTweetSentiment(TaggedTweet tweet) {
-    Map<Integer, SentimentResult> tweetSentiments = new HashMap<Integer, SentimentResult>();
-
-    for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
-      if (LOGGING) {
-        LOG.info("TaggedSentence: " + sentence.toString());
-      }
-      Map<Integer, SentimentResult> sentenceSentiments = getSentenceSentiment(sentence);
-      if (sentenceSentiments != null) {
-        for (Map.Entry<Integer, SentimentResult> sentenceSentiment : sentenceSentiments
-            .entrySet()) {
-          int key = sentenceSentiment.getKey();
-          SentimentResult tweetSentiment = tweetSentiments.get(key);
-          if (tweetSentiment != null) {
-            tweetSentiment.add(sentenceSentiment.getValue());
-          } else {
-            tweetSentiment = sentenceSentiment.getValue();
-          }
-          tweetSentiments.put(key, tweetSentiment);
+          sentenceSentiments.put(key, sentimentResult);
         }
       }
     }
     if (LOGGING) {
-      LOG.info("Sentiment: " + tweetSentiments);
+      LOG.info("Sentiment: " + sentenceSentiments);
     }
-    return (tweetSentiments.size() > 0) ? tweetSentiments : null;
+    return (sentenceSentiments.size() > 0) ? sentenceSentiments : null;
   }
 
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
-    SentimentWordLists sentimentWordLists = SentimentWordLists.getInstance();
+    SentimentDictionary sentimentWordLists = SentimentDictionary.getInstance();
 
     for (Tweet tweet : Tweet.getTestTweets()) {
       // Tokenize
@@ -238,18 +212,17 @@ public class SentimentWordLists {
       List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       // POS Tagging
-      List<TaggedWord> taggedSentence = posTagger
-          .tagSentence(preprocessedTokens);
+      List<TaggedWord> taggedTokens = posTagger.tagSentence(preprocessedTokens);
 
       // Calculate Sentiment
       Map<Integer, SentimentResult> sentimentResult = sentimentWordLists
-          .getSentenceSentiment(taggedSentence);
+          .getSentenceSentiment(taggedTokens);
 
       LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("Preprocessed: " + preprocessedTokens);
       LOG.info("Sentiment: " + sentimentResult);
     }
 
     sentimentWordLists.close();
   }
+
 }

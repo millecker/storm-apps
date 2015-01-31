@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.dict.SentimentResult;
-import at.illecker.storm.commons.dict.SentimentWordLists;
+import at.illecker.storm.commons.dict.SentimentDictionary;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -39,7 +39,7 @@ public class SentimentDetectionBolt extends BaseRichBolt {
       .getLogger(SentimentDetectionBolt.class);
   private boolean m_logging = false;
   private OutputCollector m_collector;
-  private SentimentWordLists m_sentimentWordLists;
+  private SentimentDictionary m_sentimentWordLists;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // no output tuples
@@ -54,7 +54,7 @@ public class SentimentDetectionBolt extends BaseRichBolt {
     } else {
       m_logging = false;
     }
-    this.m_sentimentWordLists = SentimentWordLists.getInstance();
+    this.m_sentimentWordLists = SentimentDictionary.getInstance();
   }
 
   public void cleanup() {
