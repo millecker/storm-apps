@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.wordcount.spout;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,21 +30,12 @@ import backtype.storm.tuple.Values;
 public class SampleTweetSpout extends BaseRichSpout {
   public static final String ID = "sample-tweet-spout";
   private static final long serialVersionUID = 3621927972989123163L;
-  private String[] m_outputFields;
   private SpoutOutputCollector m_collector;
-  private List<Tweet> m_tweets;
+  private List<Tweet> m_tweets = Tweet.getTestTweets();
   private int m_index = 0;
 
-  public SampleTweetSpout(String[] outputFields) {
-    m_outputFields = outputFields;
-    m_tweets = new ArrayList<Tweet>();
-    m_tweets.add(new Tweet(1L, "this is the first tweet"));
-    m_tweets.add(new Tweet(2L, "followed by a second tweet"));
-    m_tweets.add(new Tweet(3L, "and a third tweet"));
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(m_outputFields)); // key of output tuples
+    declarer.declare(new Fields("id", "text", "score")); // key of output tuples
   }
 
   public void open(Map config, TopologyContext context,
@@ -54,14 +44,20 @@ public class SampleTweetSpout extends BaseRichSpout {
   }
 
   public void nextTuple() {
-    this.m_collector.emit(new Values(m_tweets.get(m_index)));
+    Tweet tweet = m_tweets.get(m_index);
+    this.m_collector.emit(new Values(tweet.getId(), tweet.getText(), tweet
+        .getScore()));
+    // infinite loop
     m_index++;
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
+    // sleep between emitting tuples
     try {
       Thread.sleep(1); // sleep 1 ms
     } catch (InterruptedException e) {
+      e.printStackTrace();
     }
   }
+
 }

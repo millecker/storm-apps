@@ -18,7 +18,6 @@ package at.illecker.storm.wordcount.bolt;
 
 import java.util.Map;
 
-import at.illecker.storm.commons.tweet.Tweet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -30,20 +29,10 @@ import backtype.storm.tuple.Values;
 public class SplitTweetBolt extends BaseRichBolt {
   public static final String ID = "split-tweet-bolt";
   private static final long serialVersionUID = 883934440113385476L;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private OutputCollector m_collector;
 
-  public SplitTweetBolt(String[] inputFields, String[] outputFields) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    // key of output tuples
-    if (m_outputFields != null) {
-      declarer.declare(new Fields(m_outputFields));
-    }
+    declarer.declare(new Fields("word")); // keys of output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -52,11 +41,12 @@ public class SplitTweetBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Tweet tweet = (Tweet) tuple.getValueByField(m_inputFields[0]);
-    String[] words = tweet.getText().split(" ");
-    for (String word : words) {
-      this.m_collector.emit(tuple, new Values(word));
+    String text = tuple.getStringByField("text");
+    String[] tokens = text.split(" ");
+    for (String token : tokens) {
+      this.m_collector.emit(tuple, new Values(token));
     }
     this.m_collector.ack(tuple);
   }
+
 }

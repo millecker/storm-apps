@@ -67,21 +67,19 @@ public class WordCountTopology {
     IRichSpout spout;
     String spoutID;
     if (consumerKey.isEmpty()) {
-      spout = new SampleTweetSpout(new String[] { "tweet" });
+      spout = new SampleTweetSpout();
       spoutID = SampleTweetSpout.ID;
     } else {
-      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
-          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      spout = new TwitterStreamSpout(consumerKey, consumerSecret, accessToken,
+          accessTokenSecret, keyWords, FILTER_LANG);
       spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts
-    SplitTweetBolt splitTweetBolt = new SplitTweetBolt(
-        new String[] { "tweet" }, new String[] { "word" });
-    WordCountBolt wordCountBolt = new WordCountBolt(new String[] { "word" },
-        new String[] { "word", "count" });
+    SplitTweetBolt splitTweetBolt = new SplitTweetBolt();
+    WordCountBolt wordCountBolt = new WordCountBolt();
     ReportWordCountBolt reportWordCountBolt = new ReportWordCountBolt(
-        new String[] { "word", "count" }, null, REPORT_PERIOD);
+        REPORT_PERIOD);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -107,4 +105,5 @@ public class WordCountTopology {
     System.out.println("To kill the topology run:");
     System.out.println("storm kill " + TOPOLOGY_NAME);
   }
+
 }

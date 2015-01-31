@@ -30,18 +30,11 @@ import backtype.storm.tuple.Values;
 public class WordCountBolt extends BaseRichBolt {
   public static final String ID = "word-count-bolt";
   private static final long serialVersionUID = -1587421475240637474L;
-  private String[] m_inputFields;
-  private String[] m_outputFields;
   private OutputCollector m_collector;
   private HashMap<String, Long> m_counts = null;
 
-  public WordCountBolt(String[] inputFields, String[] outputFields) {
-    this.m_inputFields = inputFields;
-    this.m_outputFields = outputFields;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(m_outputFields)); // keys of output tuples
+    declarer.declare(new Fields("word", "count")); // keys of output tuples
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -51,7 +44,7 @@ public class WordCountBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    String word = tuple.getStringByField(m_inputFields[0]);
+    String word = tuple.getStringByField("word");
     Long count = this.m_counts.get(word);
     if (count == null) {
       count = 0L;
@@ -61,4 +54,5 @@ public class WordCountBolt extends BaseRichBolt {
     this.m_collector.ack(tuple);
     this.m_collector.emit(tuple, new Values(word, count));
   }
+
 }
