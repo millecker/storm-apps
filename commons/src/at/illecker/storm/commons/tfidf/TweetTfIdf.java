@@ -42,8 +42,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class TweetTfIdf {
   private static final Logger LOG = LoggerFactory.getLogger(TweetTfIdf.class);
 
-  private TfType m_type;
-  private TfIdfNormalization m_normalization;
+  private TfType m_tfType;
+  private TfIdfNormalization m_tfIdfNormalization;
   private List<Map<String, Double>> m_termFreqs;
   private Map<String, Double> m_inverseDocFreq;
   private Map<String, Integer> m_termIds;
@@ -56,8 +56,8 @@ public class TweetTfIdf {
 
   public TweetTfIdf(List<List<TaggedWord>> tweets, TfType type,
       TfIdfNormalization normalization, boolean usePOSTags) {
-    this.m_type = type;
-    this.m_normalization = normalization;
+    this.m_tfType = type;
+    this.m_tfIdfNormalization = normalization;
     this.m_usePOSTags = usePOSTags;
 
     this.m_termFreqs = tfTweets(tweets, type, m_usePOSTags);
@@ -76,6 +76,14 @@ public class TweetTfIdf {
     // print("Inverse Document Frequency", m_inverseDocFreq);
   }
 
+  public TfType getTfType() {
+    return m_tfType;
+  }
+
+  public TfIdfNormalization getTfIdfNormalization() {
+    return m_tfIdfNormalization;
+  }
+
   public List<Map<String, Double>> getTermFreqs() {
     return m_termFreqs;
   }
@@ -89,8 +97,8 @@ public class TweetTfIdf {
   }
 
   public Map<String, Double> tfIdf(List<TaggedWord> tweet) {
-    return TfIdf.tfIdf(tf(tweet, m_type, m_usePOSTags), m_inverseDocFreq,
-        m_normalization);
+    return TfIdf.tfIdf(tf(tweet, m_tfType, m_usePOSTags), m_inverseDocFreq,
+        m_tfIdfNormalization);
   }
 
   public static Map<String, Double> tf(List<TaggedWord> tweet, TfType type,

@@ -23,17 +23,15 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.commons.dict.SentimentWordLists;
+import at.illecker.storm.commons.dict.SentimentDictionary;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tfidf.TfIdfNormalization;
 import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
+import edu.stanford.nlp.ling.TaggedWord;
 
 public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
@@ -41,12 +39,12 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   // private static final boolean LOGGING = false;
 
   private TweetTfIdf m_tweetTfIdf = null;
-  private SentimentWordLists m_sentimentWordLists;
+  private SentimentDictionary m_sentimentDict;
   private int m_vectorStartId = 1;
 
   public TfIdfFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
     this.m_tweetTfIdf = tweetTfIdf;
-    this.m_sentimentWordLists = SentimentWordLists.getInstance();
+    this.m_sentimentDict = SentimentDictionary.getInstance();
     LOG.info("VectorSize: " + getFeatureVectorSize());
   }
 
@@ -55,8 +53,8 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
     this.m_vectorStartId = vectorStartId;
   }
 
-  public SentimentWordLists getSentimentWordLists() {
-    return m_sentimentWordLists;
+  public SentimentDictionary getSentimentDictionary() {
+    return m_sentimentDict;
   }
 
   @Override
@@ -65,13 +63,14 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet) {
+  public Map<Integer, Double> calculateFeatureVector(
+      List<TaggedWord> taggedTokens) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
     if (m_tweetTfIdf != null) {
       // Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
       Map<String, Integer> termIds = m_tweetTfIdf.getTermIds();
-      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdf(tweet);
+      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdf(taggedTokens);
 
       for (Map.Entry<String, Double> element : tfIdf.entrySet()) {
         String key = element.getKey();
@@ -92,15 +91,16 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
 
-    // Tokenize tweets
-    List<TokenizedTweet> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
+    // Tokenize
+    List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
     // Preprocess
-    List<PreprocessedTweet> preprocessedTweets = preprocessor
+    List<List<TaggedWord>> preprocessedTweets = preprocessor
         .preprocessTweets(tokenizedTweets);
 
     // POS Tagging
-    List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
+    List<List<TaggedWord>> taggedTweets = posTagger
+        .tagTweets(preprocessedTweets);
 
     boolean usePOSTags = true; // use POS tags in terms
     // calculate Tf-Idf
@@ -109,24 +109,35 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
     TfIdfFeatureVectorGenerator efvg = new TfIdfFeatureVectorGenerator(
         tweetTfIdf);
 
-    // debug
+    // DEBUG
     TweetTfIdf.print("Term Frequency", tweetTfIdf.getTermFreqs(),
         tweetTfIdf.getInverseDocFreq());
     TweetTfIdf.print("Inverse Document Frequency",
         tweetTfIdf.getInverseDocFreq());
+    TweetTfIdf
+        .print(
+            "Tf-Idf",
+            TweetTfIdf.tfIdf(tweetTfIdf.getTermFreqs(),
+                tweetTfIdf.getInverseDocFreq(),
+                tweetTfIdf.getTfIdfNormalization()),
+            tweetTfIdf.getInverseDocFreq());
 
-    // Feature Vector Generation
-    for (TaggedTweet tweet : taggedTweets) {
+    for (List<TaggedWord> taggedTweet : taggedTweets) {
+      // TF-IDF Feature Vector Generation
+      Map<Integer, Double> tfIdfFeatureVector = efvg
+          .calculateFeatureVector(taggedTweet);
+
+      // Build feature vector string
       String featureVectorStr = "";
-      for (Map.Entry<Integer, Double> feature : efvg.calculateFeatureVector(
-          tweet).entrySet()) {
+      for (Map.Entry<Integer, Double> feature : tfIdfFeatureVector.entrySet()) {
         featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
 
-      LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("FeatureVector: " + featureVectorStr);
+      LOG.info("Tweet: '" + taggedTweet + "'");
+      LOG.info("TF-IDF FeatureVector: " + featureVectorStr);
     }
 
-    efvg.getSentimentWordLists().close();
+    efvg.getSentimentDictionary().close();
   }
+
 }
