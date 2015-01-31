@@ -21,8 +21,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -531,7 +531,7 @@ public class SVM {
 
       // Feature Vector Generation
       LOG.info("Generate Feature Vectors for train tweets...");
-      trainScoredFeatureVectors = new HashMap<Map<Integer, Double>, Double>();
+      trainScoredFeatureVectors = new LinkedHashMap<Map<Integer, Double>, Double>();
       for (int i = 0; i < taggedTweets.size(); i++) {
         List<TaggedWord> taggedTweet = taggedTweets.get(i);
         trainScoredFeatureVectors.put(fvg.generateFeatureVector(taggedTweet),
@@ -564,23 +564,23 @@ public class SVM {
       LOG.info("Read test tweets from " + dataset.getTestDataFile());
 
       // Tokenize
-      LOG.info("Tokenize train tweets...");
+      LOG.info("Tokenize test tweets...");
       List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(testTweets);
 
       // Preprocess
       preprocessor = Preprocessor.getInstance();
-      LOG.info("Preprocess train tweets...");
+      LOG.info("Preprocess test tweets...");
       List<List<TaggedWord>> preprocessedTweets = preprocessor
           .preprocessTweets(tokenizedTweets);
 
       // POS Tagging
       posTagger = POSTagger.getInstance();
-      LOG.info("POS Tagging of train tweets...");
+      LOG.info("POS Tagging of test tweets...");
       List<List<TaggedWord>> taggedTweets = posTagger
           .tagTweets(preprocessedTweets);
 
       // Feature Vector Generation
-      testScoredFeatureVectors = new HashMap<Map<Integer, Double>, Double>();
+      testScoredFeatureVectors = new LinkedHashMap<Map<Integer, Double>, Double>();
       for (int i = 0; i < taggedTweets.size(); i++) {
         List<TaggedWord> taggedTweet = taggedTweets.get(i);
         testScoredFeatureVectors.put(fvg.generateFeatureVector(taggedTweet),
@@ -704,7 +704,7 @@ public class SVM {
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
     boolean parameterSearch = false;
-    boolean useSerialization = true;
+    boolean useSerialization = false;
 
     if (featureVectorLevel == 0) {
       SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,
