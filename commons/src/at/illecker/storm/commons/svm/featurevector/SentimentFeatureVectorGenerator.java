@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.commons.svm.featurevector;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,12 +23,11 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.dict.SentimentDictionary;
 import at.illecker.storm.commons.dict.SentimentResult;
-import at.illecker.storm.commons.dict.SentimentWordLists;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.TaggedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -38,11 +36,11 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
       .getLogger(SentimentFeatureVectorGenerator.class);
   private static final boolean LOGGING = false;
   private static final int VECTOR_SIZE = 7;
-  private SentimentWordLists m_sentimentWordLists;
+  private SentimentDictionary m_sentimentDict;
   private int m_vectorStartId = 1;
 
   public SentimentFeatureVectorGenerator() {
-    this.m_sentimentWordLists = SentimentWordLists.getInstance();
+    this.m_sentimentDict = SentimentDictionary.getInstance();
     LOG.info("VectorSize: " + getFeatureVectorSize());
   }
 
@@ -51,22 +49,23 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
     this.m_vectorStartId = vectorStartId;
   }
 
-  public SentimentWordLists getSentimentWordLists() {
-    return m_sentimentWordLists;
+  public SentimentDictionary getSentimentDictionary() {
+    return m_sentimentDict;
   }
 
   @Override
   public int getFeatureVectorSize() {
-    // PosCount, NeutralCount, NegCount, Sum, Count, MaxPos, MaxNeg
-    return VECTOR_SIZE * m_sentimentWordLists.getSentimentWordListCount();
+    // VECTOR_SIZE = 7 = {PosCount, NeutralCount, NegCount, Sum, Count, MaxPos,
+    // MaxNeg}
+    return VECTOR_SIZE * m_sentimentDict.getSentimentWordListCount();
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet) {
-    Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
+  public Map<Integer, Double> calculateFeatureVector(List<TaggedWord> tweet) {
+    Map<Integer, Double> featureVector = new TreeMap<Integer, Double>();
 
-    Map<Integer, SentimentResult> tweetSentiments = m_sentimentWordLists
-        .getTweetSentiment(tweet);
+    Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
+        .getSentenceSentiment(tweet);
 
     if (tweetSentiments != null) {
       for (Map.Entry<Integer, SentimentResult> tweetSentiment : tweetSentiments
@@ -77,31 +76,31 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
         // LOG.info("TweetSentiment: " + sentimentResult);
 
         if (sentimentResult.getPosCount() != 0) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE),
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE),
               (double) sentimentResult.getPosCount());
         }
         if (sentimentResult.getNeutralCount() != 0) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 1,
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 1,
               (double) sentimentResult.getNeutralCount());
         }
         if (sentimentResult.getNegCount() != 0) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 2,
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 2,
               (double) sentimentResult.getNegCount());
         }
         if (sentimentResult.getSum() != 0) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 3,
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 3,
               sentimentResult.getSum());
         }
         if (sentimentResult.getCount() != 0) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 4,
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 4,
               (double) sentimentResult.getCount());
         }
         if (sentimentResult.getMaxPos() != null) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 5,
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 5,
               sentimentResult.getMaxPos());
         }
         if (sentimentResult.getMaxNeg() != null) {
-          resultFeatureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 6,
+          featureVector.put(m_vectorStartId + (key * VECTOR_SIZE) + 6,
               sentimentResult.getMaxNeg());
         }
 
@@ -111,7 +110,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
       }
     }
 
-    return resultFeatureVector;
+    return featureVector;
   }
 
   public static void main(String[] args) {
@@ -127,22 +126,25 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
       List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       // POS Tagging
-      List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
-      taggedSentences.add(posTagger.tagSentence(preprocessedTokens));
+      List<TaggedWord> taggedTokens = posTagger.tagSentence(preprocessedTokens);
 
-      // Feature Vector Generation
+      // Sentiment Feature Vector Generation
+      Map<Integer, Double> sentimentFeatureVector = sfvg
+          .calculateFeatureVector(taggedTokens);
+
+      // Build feature vector string
       String featureVectorStr = "";
-      for (Map.Entry<Integer, Double> feature : sfvg.calculateFeatureVector(
-          new TaggedTweet(tweet.getId(), tweet.getText(), tweet.getScore(),
-              taggedSentences)).entrySet()) {
+      for (Map.Entry<Integer, Double> feature : sentimentFeatureVector
+          .entrySet()) {
         featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
 
       LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("TaggedSentence: " + taggedSentences);
-      LOG.info("FeatureVector: " + featureVectorStr);
+      LOG.info("TaggedSentence: " + taggedTokens);
+      LOG.info("SentimentFeatureVector: " + featureVectorStr);
     }
 
-    sfvg.getSentimentWordLists().close();
+    sfvg.getSentimentDictionary().close();
   }
+
 }

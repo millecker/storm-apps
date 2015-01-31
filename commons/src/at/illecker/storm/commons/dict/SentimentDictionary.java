@@ -83,6 +83,10 @@ public class SentimentDictionary {
     m_wordnet.close();
   }
 
+  /**
+   * 
+   * @return Returns the number of word lists used by the sentiment dictionary
+   */
   public int getSentimentWordListCount() {
     return m_wordLists.size() + m_wordListMaps.size();
   }
