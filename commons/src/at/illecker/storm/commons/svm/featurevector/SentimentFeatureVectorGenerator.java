@@ -55,17 +55,18 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
 
   @Override
   public int getFeatureVectorSize() {
-    // VECTOR_SIZE = 7 = {PosCount, NeutralCount, NegCount, Sum, Count, MaxPos,
+    // VECTOR_SIZE = {PosCount, NeutralCount, NegCount, Sum, Count, MaxPos,
     // MaxNeg}
     return VECTOR_SIZE * m_sentimentDict.getSentimentWordListCount();
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(List<TaggedWord> tweet) {
+  public Map<Integer, Double> calculateFeatureVector(
+      List<TaggedWord> taggedTokens) {
     Map<Integer, Double> featureVector = new TreeMap<Integer, Double>();
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
-        .getSentenceSentiment(tweet);
+        .getSentenceSentiment(taggedTokens);
 
     if (tweetSentiments != null) {
       for (Map.Entry<Integer, SentimentResult> tweetSentiment : tweetSentiments

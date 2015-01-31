@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.commons.svm.featurevector;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.TaggedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -51,16 +49,17 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
 
   @Override
   public int getFeatureVectorSize() {
-    // Nouns/wc, Verbs/wc, Adjectives/wc, Adverbs/wc, Interjections/wc,
-    // Punctuations/wc, Hashtags/wc
+    // VECTOR_SIZE = {Nouns/wc, Verbs/wc, Adjectives/wc, Adverbs/wc,
+    // Interjections/wc, Punctuations/wc, Hashtags/wc}
     return VECTOR_SIZE;
   }
 
   @Override
-  public Map<Integer, Double> calculateFeatureVector(TaggedTweet tweet) {
+  public Map<Integer, Double> calculateFeatureVector(
+      List<TaggedWord> taggedTokens) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
-    double[] posTags = countPOSTags(tweet);
+    double[] posTags = countPOSTags(taggedTokens);
     if (posTags != null) {
       if (posTags[0] != 0) // nouns / wordCount
         resultFeatureVector.put(m_vectorStartId, posTags[0]);
@@ -85,29 +84,27 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
     return resultFeatureVector;
   }
 
-  private double[] countPOSTags(TaggedTweet tweet) {
+  private double[] countPOSTags(List<TaggedWord> taggedTokens) {
     // [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAG]
     double[] posTags = new double[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d };
     int wordCount = 0;
-    for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
-      for (TaggedWord word : sentence) {
-        wordCount++;
-        String pennTag = word.tag();
-        if (pennTag.startsWith("NN")) {
-          posTags[0]++;
-        } else if (pennTag.startsWith("VB")) {
-          posTags[1]++;
-        } else if (pennTag.startsWith("JJ")) {
-          posTags[2]++;
-        } else if (pennTag.startsWith("RB")) {
-          posTags[3]++;
-        } else if (pennTag.startsWith("UH")) {
-          posTags[4]++;
-        } else if ((pennTag.equals(".")) || (pennTag.equals(":"))) {
-          posTags[5]++;
-        } else if (pennTag.startsWith("HT")) {
-          posTags[6]++;
-        }
+    for (TaggedWord word : taggedTokens) {
+      wordCount++;
+      String pennTag = word.tag();
+      if (pennTag.startsWith("NN")) {
+        posTags[0]++;
+      } else if (pennTag.startsWith("VB")) {
+        posTags[1]++;
+      } else if (pennTag.startsWith("JJ")) {
+        posTags[2]++;
+      } else if (pennTag.startsWith("RB")) {
+        posTags[3]++;
+      } else if (pennTag.startsWith("UH")) {
+        posTags[4]++;
+      } else if ((pennTag.equals(".")) || (pennTag.equals(":"))) {
+        posTags[5]++;
+      } else if (pennTag.startsWith("HT")) {
+        posTags[6]++;
       }
     }
     // normalize
@@ -120,7 +117,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
   public static void main(String[] args) {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
-    POSFeatureVectorGenerator sfvg = new POSFeatureVectorGenerator();
+    FeatureVectorGenerator fvg = new POSFeatureVectorGenerator();
 
     for (Tweet tweet : Tweet.getTestTweets()) {
       // Tokenize
@@ -130,20 +127,22 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
       List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
 
       // POS Tagging
-      List<List<TaggedWord>> taggedSentences = new ArrayList<List<TaggedWord>>();
-      taggedSentences.add(posTagger.tagSentence(preprocessedTokens));
+      List<TaggedWord> taggedTokens = posTagger.tagSentence(preprocessedTokens);
 
-      // Feature Vector Generation
+      // POS Feature Vector Generation
+      Map<Integer, Double> posFeatureVector = fvg
+          .calculateFeatureVector(taggedTokens);
+
+      // Build feature vector string
       String featureVectorStr = "";
-      for (Map.Entry<Integer, Double> feature : sfvg.calculateFeatureVector(
-          new TaggedTweet(tweet.getId(), tweet.getText(), tweet.getScore(),
-              taggedSentences)).entrySet()) {
+      for (Map.Entry<Integer, Double> feature : posFeatureVector.entrySet()) {
         featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
       }
 
       LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("TaggedSentence: " + taggedSentences);
-      LOG.info("FeatureVector: " + featureVectorStr);
+      LOG.info("TaggedSentence: " + taggedTokens);
+      LOG.info("POSFeatureVector: " + featureVectorStr);
     }
   }
+
 }
