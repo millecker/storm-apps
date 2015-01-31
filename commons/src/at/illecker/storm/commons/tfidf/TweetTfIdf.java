@@ -28,9 +28,6 @@ import at.illecker.storm.commons.dict.StopWords;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TaggedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.StringUtils;
 import at.illecker.storm.commons.wordnet.POSTag;
@@ -47,23 +44,23 @@ public class TweetTfIdf {
 
   private TfType m_type;
   private TfIdfNormalization m_normalization;
-  private Map<TaggedTweet, Map<String, Double>> m_termFreqs;
+  private List<Map<String, Double>> m_termFreqs;
   private Map<String, Double> m_inverseDocFreq;
   private Map<String, Integer> m_termIds;
 
   private boolean m_usePOSTags;
 
-  public TweetTfIdf(List<TaggedTweet> tweets, boolean usePOSTags) {
+  public TweetTfIdf(List<List<TaggedWord>> tweets, boolean usePOSTags) {
     this(tweets, TfType.RAW, TfIdfNormalization.NONE, usePOSTags);
   }
 
-  public TweetTfIdf(List<TaggedTweet> tweets, TfType type,
+  public TweetTfIdf(List<List<TaggedWord>> tweets, TfType type,
       TfIdfNormalization normalization, boolean usePOSTags) {
     this.m_type = type;
     this.m_normalization = normalization;
     this.m_usePOSTags = usePOSTags;
 
-    this.m_termFreqs = tf(tweets, type, m_usePOSTags);
+    this.m_termFreqs = tfTweets(tweets, type, m_usePOSTags);
     this.m_inverseDocFreq = idf(m_termFreqs);
 
     this.m_termIds = new HashMap<String, Integer>();
@@ -79,7 +76,7 @@ public class TweetTfIdf {
     // print("Inverse Document Frequency", m_inverseDocFreq);
   }
 
-  public Map<TaggedTweet, Map<String, Double>> getTermFreqs() {
+  public List<Map<String, Double>> getTermFreqs() {
     return m_termFreqs;
   }
 
@@ -91,98 +88,91 @@ public class TweetTfIdf {
     return m_termIds;
   }
 
-  public Map<String, Double> tfIdf(TaggedTweet tweet) {
+  public Map<String, Double> tfIdf(List<TaggedWord> tweet) {
     return TfIdf.tfIdf(tf(tweet, m_type, m_usePOSTags), m_inverseDocFreq,
         m_normalization);
   }
 
-  public static Map<String, Double> tf(TaggedTweet tweet, TfType type,
+  public static Map<String, Double> tf(List<TaggedWord> tweet, TfType type,
       boolean usePOSTags) {
     Map<String, Double> termFreq = new HashMap<String, Double>();
     WordNet wordNet = WordNet.getInstance();
     StopWords stopWords = StopWords.getInstance();
 
-    for (List<TaggedWord> sentence : tweet.getTaggedSentences()) {
-      List<String> words = new ArrayList<String>();
+    List<String> words = new ArrayList<String>();
+    for (TaggedWord taggedWord : tweet) {
+      String word = taggedWord.word().toLowerCase();
+      String pennTag = taggedWord.tag();
 
-      for (TaggedWord taggedWord : sentence) {
-        String word = taggedWord.word().toLowerCase();
-        String pennTag = taggedWord.tag();
+      if ((!pennTag.equals(".")) && (!pennTag.equals(","))
+          && (!pennTag.equals(":")) && (!pennTag.equals("''"))
+          && (!pennTag.equals("(")) && (!pennTag.equals(")"))
+          && (!pennTag.equals("URL")) && (!pennTag.equals("USR"))
+          && (!pennTag.equals("CC")) && (!pennTag.equals("CD"))
+          && (!pennTag.equals("SYM")) && (!pennTag.equals("POS"))
+          && (!stopWords.isStopWord(word))) {
 
-        if ((!pennTag.equals(".")) && (!pennTag.equals(","))
-            && (!pennTag.equals(":")) && (!pennTag.equals("''"))
-            && (!pennTag.equals("(")) && (!pennTag.equals(")"))
-            && (!pennTag.equals("URL")) && (!pennTag.equals("USR"))
-            && (!pennTag.equals("CC")) && (!pennTag.equals("CD"))
-            && (!pennTag.equals("SYM")) && (!pennTag.equals("POS"))
-            && (!stopWords.isStopWord(word))) {
+        // Remove hashtag
+        if (pennTag.equals("HT")) {
+          word = word.substring(1);
+        }
 
-          // Remove hashtag
-          if (pennTag.equals("HT")) {
-            word = word.substring(1);
-          }
+        // Check if word consists of punctuations
+        // if (StringUtils.consitsOfPunctuations(word)
+        // && (!pennTag.equals("POS"))) {
+        // continue;
+        // }
 
-          // Check if word consists of punctuations
-          // if (StringUtils.consitsOfPunctuations(word)
-          // && (!pennTag.equals("POS"))) {
-          // continue;
-          // }
+        // Check if word starts with an alphabet
+        if (!StringUtils.startsWithAlphabeticChar(word)) {
+          continue;
+        }
 
-          // Check if word starts with an alphabet
-          if (!StringUtils.startsWithAlphabeticChar(word)) {
-            continue;
-          }
+        POS posTag = POSTag.convertString(pennTag);
+        // LOG.info("word: '" + word + "' pennTag: '" + pennTag + "' tag: '"
+        // + posTag + "'");
 
-          POS posTag = POSTag.convertString(pennTag);
-          // LOG.info("word: '" + word + "' pennTag: '" + pennTag + "' tag: '"
-          // + posTag + "'");
+        // word stemming
+        List<String> stems = wordNet.findStems(word, posTag);
+        if (!stems.isEmpty()) {
+          word = stems.get(0);
+        }
 
-          // word stemming
-          List<String> stems = wordNet.findStems(word, posTag);
-          if (!stems.isEmpty()) {
-            word = stems.get(0);
-          }
-
-          // add word to term frequency
-          if (usePOSTags) {
-            words.add(word
-                + ((posTag != null) ? "#" + POSTag.toString(posTag) : ""));
-          } else {
-            words.add(word);
-          }
-
+        // add word to term frequency
+        if (usePOSTags) {
+          words.add(word
+              + ((posTag != null) ? "#" + POSTag.toString(posTag) : ""));
+        } else {
+          words.add(word);
         }
       }
-      termFreq = TfIdf.tf(termFreq, words);
     }
-
+    termFreq = TfIdf.tf(termFreq, words);
     termFreq = TfIdf.normalizeTf(termFreq, type);
     return termFreq;
   }
 
-  public static Map<TaggedTweet, Map<String, Double>> tf(
-      List<TaggedTweet> tweets, TfType type, boolean usePOSTags) {
-    Map<TaggedTweet, Map<String, Double>> termFreqs = new HashMap<TaggedTweet, Map<String, Double>>();
-    for (TaggedTweet tweet : tweets) {
-      termFreqs.put(tweet, tf(tweet, type, usePOSTags));
+  public static List<Map<String, Double>> tfTweets(
+      List<List<TaggedWord>> tweets, TfType type, boolean usePOSTags) {
+    List<Map<String, Double>> termFreqs = new ArrayList<Map<String, Double>>();
+    for (List<TaggedWord> tweet : tweets) {
+      termFreqs.add(tf(tweet, type, usePOSTags));
     }
     return termFreqs;
   }
 
-  public static Map<String, Double> idf(
-      Map<TaggedTweet, Map<String, Double>> termFreq) {
+  public static Map<String, Double> idf(List<Map<String, Double>> termFreq) {
     return TfIdf.idf(termFreq);
   }
 
-  public static Map<TaggedTweet, Map<String, Double>> tfIdf(
-      Map<TaggedTweet, Map<String, Double>> termFreqs,
-      Map<String, Double> inverseDocFreq, TfIdfNormalization normalization) {
+  public static List<Map<String, Double>> tfIdf(
+      List<Map<String, Double>> termFreqs, Map<String, Double> inverseDocFreq,
+      TfIdfNormalization normalization) {
 
-    Map<TaggedTweet, Map<String, Double>> tfIdf = new HashMap<TaggedTweet, Map<String, Double>>();
+    List<Map<String, Double>> tfIdf = new ArrayList<Map<String, Double>>();
     // compute tfIdf for each document
-    for (Map.Entry<TaggedTweet, Map<String, Double>> doc : termFreqs.entrySet()) {
-      tfIdf.put(doc.getKey(),
-          TfIdf.tfIdf(doc.getValue(), inverseDocFreq, normalization));
+    for (Map<String, Double> doc : termFreqs) {
+      tfIdf.add(TfIdf.tfIdf(doc, inverseDocFreq, normalization));
     }
 
     return tfIdf;
@@ -199,26 +189,23 @@ public class TweetTfIdf {
     }
   }
 
-  public static void print(String title,
-      Map<TaggedTweet, Map<String, Double>> tweetData,
+  public static void print(String title, List<Map<String, Double>> termFreqs,
       Map<String, Double> inverseDocFreq) {
     // print title
     LOG.info(String.format("=== %s ===", title));
 
     // print header
     String line = String.format("%15s", " ");
-    for (Map.Entry<TaggedTweet, Map<String, Double>> tweet : tweetData
-        .entrySet()) {
-      line += String.format("%8s", "Tweet " + tweet.getKey().getId());
+    for (int i = 0; i < termFreqs.size(); i++) {
+      line += String.format("%8s", " " + i);
     }
     LOG.info(line);
 
     // print values
     for (Map.Entry<String, Double> term : inverseDocFreq.entrySet()) {
       line = String.format("%15s", term.getKey());
-      for (Map.Entry<TaggedTweet, Map<String, Double>> tweet : tweetData
-          .entrySet()) {
-        line += String.format("%8.4f", tweet.getValue().get(term.getKey()));
+      for (Map<String, Double> termFreq : termFreqs) {
+        line += String.format("%8.4f", termFreq.get(term.getKey()));
       }
       LOG.info(line);
     }
@@ -229,22 +216,23 @@ public class TweetTfIdf {
     Preprocessor preprocessor = Preprocessor.getInstance();
     POSTagger posTagger = POSTagger.getInstance();
 
-    // Tokenize tweets
-    List<TokenizedTweet> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
+    // Tokenize
+    List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
     // Preprocess
-    List<PreprocessedTweet> preprocessedTweets = preprocessor
+    List<List<TaggedWord>> preprocessedTweets = preprocessor
         .preprocessTweets(tokenizedTweets);
 
     // POS Tagging
-    List<TaggedTweet> taggedTweets = posTagger.tagTweets(preprocessedTweets);
+    List<List<TaggedWord>> taggedTweets = posTagger
+        .tagTweets(preprocessedTweets);
 
     boolean usePOSTags = true; // use POS tags in terms
-    Map<TaggedTweet, Map<String, Double>> termFreqs = TweetTfIdf.tf(
-        taggedTweets, TfType.RAW, usePOSTags);
+    List<Map<String, Double>> termFreqs = TweetTfIdf.tfTweets(taggedTweets,
+        TfType.RAW, usePOSTags);
     Map<String, Double> inverseDocFreq = TweetTfIdf.idf(termFreqs);
 
-    Map<TaggedTweet, Map<String, Double>> tfIdf = TweetTfIdf.tfIdf(termFreqs,
+    List<Map<String, Double>> tfIdf = TweetTfIdf.tfIdf(termFreqs,
         inverseDocFreq, TfIdfNormalization.NONE);
 
     LOG.info("Found " + inverseDocFreq.size() + " terms");
@@ -252,4 +240,5 @@ public class TweetTfIdf {
     print("Inverse Document Frequency", inverseDocFreq);
     print("Tf-Idf", tfIdf, inverseDocFreq);
   }
+
 }

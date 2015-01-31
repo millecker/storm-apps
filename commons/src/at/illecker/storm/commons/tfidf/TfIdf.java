@@ -23,9 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.storm.guava.collect.ImmutableSet;
 import org.apache.storm.guava.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,11 +70,11 @@ public class TfIdf {
     return termFreq;
   }
 
-  public static <T> Map<T, Double> idf(Map<?, Map<T, Double>> termFreq) {
+  public static <T> Map<T, Double> idf(List<Map<T, Double>> termFreq) {
     // compute document frequency
     // number of documents containing the term
     Map<T, Long> docFreq = new HashMap<T, Long>();
-    for (Map<T, Double> document : termFreq.values()) {
+    for (Map<T, Double> document : termFreq) {
       for (T term : document.keySet()) {
         Long v = docFreq.get(term);
         docFreq.put(term, (v == null) ? 1l : v + 1);
@@ -127,16 +125,10 @@ public class TfIdf {
 
   public static void main(String[] args) {
     List<String> documents = Arrays.asList("to be or not to be", "or to jump");
-    Set<String> document1Terms = ImmutableSet.of("to", "be", "or", "not", "to",
-        "be", "to be or", "be or not", "or not to", "not to be");
-    Set<String> document2Terms = ImmutableSet.of("or", "to", "jump",
-        "or to jump");
-
     Map<String, Double> tf;
 
     LOG.info("document1: " + Arrays.toString(documents.get(0).split("\\s+")));
     tf = TfIdf.tf(Lists.newArrayList(documents.get(0).split("\\s+")));
-    // assertEquals(document1Terms, tf.keySet());
     assertEquals((Double) 2.0, tf.get("to"));
     assertEquals((Double) 2.0, tf.get("be"));
     assertEquals((Double) 1.0, tf.get("or"));
@@ -144,9 +136,9 @@ public class TfIdf {
 
     LOG.info("document2: " + Arrays.toString(documents.get(1).split("\\s+")));
     tf = TfIdf.tf(Lists.newArrayList(documents.get(1).split("\\s+")));
-    // assertEquals(document2Terms, tf.keySet());
     assertEquals((Double) 1.0, tf.get("or"));
     assertEquals((Double) 1.0, tf.get("to"));
     assertEquals((Double) 1.0, tf.get("jump"));
   }
+
 }
