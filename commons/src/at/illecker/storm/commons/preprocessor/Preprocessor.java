@@ -32,8 +32,6 @@ import at.illecker.storm.commons.dict.Interjections;
 import at.illecker.storm.commons.dict.NameEntities;
 import at.illecker.storm.commons.dict.SlangCorrection;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
-import at.illecker.storm.commons.tweet.PreprocessedTweet;
-import at.illecker.storm.commons.tweet.TokenizedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.RegexUtils;
 import at.illecker.storm.commons.util.StringUtils;
@@ -43,7 +41,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class Preprocessor {
   private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
   private static final boolean LOGGING = false;
-  private static final Preprocessor instance = new Preprocessor();
+  private static final Preprocessor INSTANCE = new Preprocessor();
 
   private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
@@ -54,7 +52,7 @@ public class Preprocessor {
   private Preprocessor() {
     // Load WordNet
     m_wordnet = WordNet.getInstance();
-    // Load Slang correction vocabulary
+    // Load Slang correction
     m_slangCorrection = SlangCorrection.getInstance();
     // Load FirstNames
     m_firstNames = FirstNames.getInstance();
@@ -65,11 +63,11 @@ public class Preprocessor {
   }
 
   public static Preprocessor getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   public List<TaggedWord> preprocess(List<String> tokens) {
-    // run tail recursion
+    // tail recursion
     return preprocessAccumulator(new LinkedList<String>(tokens),
         new ArrayList<TaggedWord>());
   }
@@ -292,6 +290,7 @@ public class Preprocessor {
 
           // if the token is not in the vocabulary check all combinations
           // of prior matches
+          // TODO really necessary?
           for (int j = 0; j < matches.size(); j++) {
             int startSub = matches.get(j)[0];
             int endSub = matches.get(j)[1];
@@ -328,15 +327,10 @@ public class Preprocessor {
     return value;
   }
 
-  public List<PreprocessedTweet> preprocessTweets(List<TokenizedTweet> tweets) {
-    List<PreprocessedTweet> preprocessedTweets = new ArrayList<PreprocessedTweet>();
-    for (TokenizedTweet tweet : tweets) {
-      List<List<TaggedWord>> preprocessedSentences = new ArrayList<List<TaggedWord>>();
-      for (List<String> sentence : tweet.getSentences()) {
-        preprocessedSentences.add(this.preprocess(sentence));
-      }
-      preprocessedTweets.add(new PreprocessedTweet(tweet.getId(), tweet
-          .getText(), tweet.getScore(), preprocessedSentences));
+  public List<List<TaggedWord>> preprocessTweets(List<List<String>> tweets) {
+    List<List<TaggedWord>> preprocessedTweets = new ArrayList<List<TaggedWord>>();
+    for (List<String> tweet : tweets) {
+      preprocessedTweets.add(preprocess(tweet));
     }
     return preprocessedTweets;
   }
