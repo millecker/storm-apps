@@ -30,6 +30,7 @@ import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.HtmlUtils;
 import at.illecker.storm.commons.util.RegexUtils;
 import at.illecker.storm.commons.util.UnicodeUtils;
+import cmu.arktweetnlp.Twokenize;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.PTBTokenizer.PTBTokenizerFactory;
@@ -41,7 +42,27 @@ public class Tokenizer {
   private static final boolean LOGGING = Configuration.get(
       "commons.tokenizer.logging", false);
 
+  public static enum Type {
+    REGEX_TOKENIZER, ARK_TOKENIZER, STANFORD_TOKENIZER
+  }
+
+  public static List<List<String>> tokenizeTweets(List<Tweet> tweets) {
+    return tokenizeTweets(tweets, Type.REGEX_TOKENIZER);
+  }
+
+  public static List<List<String>> tokenizeTweets(List<Tweet> tweets, Type type) {
+    List<List<String>> tokenizedTweets = new ArrayList<List<String>>();
+    for (Tweet tweet : tweets) {
+      tokenizedTweets.add(tokenize(tweet.getText(), type));
+    }
+    return tokenizedTweets;
+  }
+
   public static List<String> tokenize(String str) {
+    return tokenize(str, Type.REGEX_TOKENIZER);
+  }
+
+  public static List<String> tokenize(String str, Type type) {
     // Step 1) Trim text
     str = str.trim();
 
@@ -67,34 +88,48 @@ public class Tokenizer {
       str = replacedText;
     }
 
-    // Step 4) Tokenize string by multiple regex patterns
-    List<String> resultTokens = new ArrayList<String>();
-    Matcher m = RegexUtils.TOKENIZER_PATTERN.matcher(str);
-    while (m.find()) {
-      resultTokens.add(m.group());
+    // Step 4) Tokenize
+    List<String> tokenizedTokens = null;
+
+    switch (type) {
+      case REGEX_TOKENIZER:
+        tokenizedTokens = new ArrayList<String>();
+        Matcher m = RegexUtils.TOKENIZER_PATTERN.matcher(str);
+        while (m.find()) {
+          tokenizedTokens.add(m.group());
+        }
+        break;
+
+      case ARK_TOKENIZER:
+        tokenizedTokens = Twokenize.tokenize(str);
+        break;
+
+      case STANFORD_TOKENIZER:
+        TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
+            .newTokenizerFactory();
+        tokenizer.setOptions("ptb3Escaping=false");
+        List<List<HasWord>> sentences = MaxentTagger.tokenizeText(
+            new StringReader(str), tokenizer);
+        // Convert sentences to List<String>
+        tokenizedTokens = new ArrayList<String>();
+        for (List<HasWord> sentence : sentences) {
+          for (HasWord word : sentence) {
+            tokenizedTokens.add(word.word());
+          }
+        }
+        break;
+
+      default:
+        break;
     }
-    return resultTokens;
-  }
 
-  public static List<List<String>> tokenizeTweets(List<Tweet> tweets) {
-    List<List<String>> tokenizedTweets = new ArrayList<List<String>>();
-    for (Tweet tweet : tweets) {
-      tokenizedTweets.add(tokenize(tweet.getText()));
-    }
-    return tokenizedTweets;
-  }
-
-  public static List<List<HasWord>> tokenizeTreebank(String str) {
-    TokenizerFactory<Word> tokenizer = PTBTokenizerFactory
-        .newTokenizerFactory();
-    tokenizer.setOptions("ptb3Escaping=false");
-
-    return MaxentTagger.tokenizeText(new StringReader(str), tokenizer);
+    return tokenizedTokens;
   }
 
   public static void main(String[] args) {
     boolean extendedTest = true;
     List<Tweet> tweets = null;
+    Type type = Type.REGEX_TOKENIZER;
 
     // load tweets
     if (extendedTest) {
@@ -128,8 +163,8 @@ public class Tokenizer {
     // Tokenize tweets
     long startTime = System.currentTimeMillis();
     for (Tweet tweet : tweets) {
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
-      LOG.info("Tweet: '" + tweet + "'");
+      List<String> tokens = Tokenizer.tokenize(tweet.getText(), type);
+      LOG.info("Tweet: '" + tweet.getText() + "'");
       LOG.info("Tokens: " + tokens);
     }
     LOG.info("Tokenize finished after "
