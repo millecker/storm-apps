@@ -1,45 +1,45 @@
 All Features - 3-fold Cross Validation
 
-Train SVM model finished after 272674 ms
+Train SVM model finished after 275906 ms
 
 Run n-fold cross validation...
 
 Confusion Matrix:
 		0	1	2	total
-Class:	0	2939	210	1086	4235
-Class:	1	242	902	662	1806
-Class:	2	852	338	4151	5341
-total		4033	1450	5899
+Class:	0	2908	213	1114	4235
+Class:	1	240	905	661	1806
+Class:	2	833	326	4182	5341
+total		3981	1444	5957
 
 Total: 11382
-Correct: 7992
-Accuracy: 0.702161307327359
+Correct: 7995
+Accuracy: 0.702424881391671
 Scores per class:
-Class: 0 Precision: 0.7287379122241507 Recall: 0.693978748524203 F-Score: 0.7109337203676827
-Class: 1 Precision: 0.6220689655172413 Recall: 0.4994462901439646 F-Score: 0.554054054054054
-Class: 2 Precision: 0.7036785895914561 Recall: 0.7771952817824378 F-Score: 0.7386120996441282
-F-Score weighted: 0.7052931689001893
-F-Score average(pos,neg): 0.6324938872108683
-Cross Validation finished after 386494 ms
-Cross Validation Accurancy: 0.702161307327359
+Class: 0 Precision: 0.7304697312233107 Recall: 0.6866587957497048 F-Score: 0.7078870496592016
+Class: 1 Precision: 0.6267313019390581 Recall: 0.5011074197120708 F-Score: 0.5569230769230769
+Class: 2 Precision: 0.7020312237703542 Recall: 0.782999438307433 F-Score: 0.740308019118428
+F-Score weighted: 0.7057028762659181
+F-Score average(pos,neg): 0.6324050632911392
+Cross Validation finished after 385798 ms
+Cross Validation Accurancy: 0.702424881391671
 
 
 Evaluate test tweets...
-Evaluate finished after 2457 ms
+Evaluate finished after 2307 ms
 
 Confusion Matrix:
 		0	1	2	total
-Class:	0	1040	155	377	1572
-Class:	1	64	393	144	601
+Class:	0	1041	155	376	1572
+Class:	1	63	395	143	601
 Class:	2	261	129	1250	1640
-total		1365	677	1771
+total		1365	679	1769
 
 Total: 3813
-Correct: 2683
-Accuracy: 0.7036454235510097
+Correct: 2686
+Accuracy: 0.7044322056123787
 Scores per class:
-Class: 0 Precision: 0.7619047619047619 Recall: 0.6615776081424937 F-Score: 0.7082056520258768
-Class: 1 Precision: 0.5805022156573116 Recall: 0.653910149750416 F-Score: 0.6150234741784038
-Class: 2 Precision: 0.7058159232072275 Recall: 0.7621951219512195 F-Score: 0.7329228965112871
-F-Score weighted: 0.7031413733951194
-F-Score average(pos,neg): 0.6616145631021403
+Class: 0 Precision: 0.7626373626373626 Recall: 0.6622137404580153 F-Score: 0.7088866189989785
+Class: 1 Precision: 0.5817378497790869 Recall: 0.6572379367720466 F-Score: 0.6171875
+Class: 2 Precision: 0.7066139061616733 Recall: 0.7621951219512195 F-Score: 0.7333528894103843
+F-Score weighted: 0.7039081586154144
+F-Score average(pos,neg): 0.6630370594994892
