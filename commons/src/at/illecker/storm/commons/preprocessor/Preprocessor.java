@@ -40,7 +40,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 
 public class Preprocessor {
   private static final Logger LOG = LoggerFactory.getLogger(Preprocessor.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = Configuration.get(
+      "commons.preprocessor.logging", false);
   private static final Preprocessor INSTANCE = new Preprocessor();
 
   private WordNet m_wordnet;
@@ -99,6 +100,7 @@ public class Preprocessor {
             reducedToken += "^";
           }
           // else {
+          // TODO
           // Preprocess token again if there are recursive patterns in it
           // e.g., :):):) -> :):) -> :) Not possible because of Tokenizer
           // tokens.add(0, reducedToken);
@@ -134,14 +136,17 @@ public class Preprocessor {
       // S.O.L - SOL - [s**t, outta, luck]
       // 'AC/DC' to 'AC' and 'DC' - 'DC' to [don't, care]
       // TODO update dictionary O/U O/A
-      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
-          && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
+      if ((!tokenIsEmoticon) && (!tokenIsUser) && (!tokenIsHashTag)
+          && (!tokenIsURL) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
           && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
         String[] slangCorrection = m_slangCorrection.getCorrection(token
             .toLowerCase());
         if (slangCorrection != null) {
           for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(new TaggedWord(slangCorrection[i]));
+            // PreTagging for POS Tagger
+            TaggedWord preTaggedToken = pretagToken(slangCorrection[i],
+                tokenIsHashTag, tokenIsUser, tokenIsURL);
+            processedTokens.add(preTaggedToken);
           }
           if (LOGGING) {
             LOG.info("Slang Correction from '" + token + "' to "
@@ -151,7 +156,10 @@ public class Preprocessor {
         } else if (tokenIsSlang) {
           if (token.startsWith("w/")) {
             processedTokens.add(new TaggedWord("with"));
-            processedTokens.add(new TaggedWord(token.substring(2)));
+            // PreTagging for POS Tagger
+            TaggedWord preTaggedToken = pretagToken(token.substring(2),
+                tokenIsHashTag, tokenIsUser, tokenIsURL);
+            processedTokens.add(preTaggedToken);
             if (LOGGING) {
               LOG.info("Slang Correction from '" + token + "' to " + "[with, "
                   + token.substring(2) + "]");
@@ -167,8 +175,8 @@ public class Preprocessor {
 
       // Step 3) Check if there are punctuations between words
       // e.g., L.O.V.E
-      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
-          && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
+      if ((!tokenIsEmoticon) && (!tokenIsUser) && (!tokenIsHashTag)
+          && (!tokenIsURL) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
           && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
         // remove alternating letter dot pattern e.g., L.O.V.E
         Matcher m = RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token);
@@ -180,30 +188,36 @@ public class Preprocessor {
                   + newToken + "'");
             }
             token = newToken;
+            // PreTagging for POS Tagger
+            TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
+                tokenIsUser, tokenIsURL);
+            processedTokens.add(preTaggedToken);
+            return preprocessAccumulator(tokens, processedTokens);
           }
-          processedTokens.add(new TaggedWord(token));
-          return preprocessAccumulator(tokens, processedTokens);
         }
       }
 
       // Step 4) Add missing g in gerund forms e.g., goin
-      if ((!tokenIsUser) && (!tokenIsHashTag) && (token.endsWith("in"))
-          && (!m_firstNames.isFirstName(token))
+      if ((!tokenIsUser) && (!tokenIsHashTag) && (!tokenIsURL)
+          && (token.endsWith("in")) && (!m_firstNames.isFirstName(token))
           && (!m_wordnet.contains(token.toLowerCase()))) {
         // append "g" if a word ends with "in" and is not in the vocabulary
         if (LOGGING) {
           LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
         }
         token = token + "g";
-        processedTokens.add(new TaggedWord(token));
+        // PreTagging for POS Tagger, because it could be a interjection
+        TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
+            tokenIsUser, tokenIsURL);
+        processedTokens.add(preTaggedToken);
         return preprocessAccumulator(tokens, processedTokens);
       }
 
       // Step 5) Remove elongations of characters (suuuper)
       // 'lollll' to 'loll' because 'loll' is found in dict
       // TODO 'AHHHHH' to 'AH'
-      if ((!tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsUser)
-          && (!tokenIsHashTag) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
+      if ((!tokenIsEmoticon) && (!tokenIsUser) && (!tokenIsHashTag)
+          && (!tokenIsURL) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
           && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
 
         // remove repeating chars
@@ -214,7 +228,10 @@ public class Preprocessor {
             .toLowerCase());
         if (slangCorrection != null) {
           for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(new TaggedWord(slangCorrection[i]));
+            // PreTagging for POS Tagger
+            TaggedWord preTaggedToken = pretagToken(slangCorrection[i],
+                tokenIsHashTag, tokenIsUser, tokenIsURL);
+            processedTokens.add(preTaggedToken);
           }
           if (LOGGING) {
             LOG.info("Slang Correction from '" + token + "' to "
@@ -225,32 +242,39 @@ public class Preprocessor {
       }
 
       // Step 6) PreTagging for POS Tagger
-      TaggedWord preTaggedToken = new TaggedWord(token);
-      if (tokenIsHashTag) {
-        preTaggedToken.setTag("HT");
-      } else if (tokenIsUser) {
-        preTaggedToken.setTag("USR");
-      } else if (tokenIsURL) {
-        preTaggedToken.setTag("URL");
-      } else if (StringUtils.isRetweet(token)) {
-        preTaggedToken.setTag("RT");
-      } else if (m_nameEntities.isNameEntity(token)) {
-        if (LOGGING) {
-          LOG.info("NameEntity labelled for " + token);
-        }
-        preTaggedToken.setTag("NNP");
-      } else if ((m_interjections.isInterjection(token))
-          || (StringUtils.isEmoticon(token))) {
-        if (LOGGING) {
-          LOG.info("Interjection or Emoticon labelled for " + token);
-        }
-        preTaggedToken.setTag("UH");
-      }
+      TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
+          tokenIsUser, tokenIsURL);
 
       // add token to processed list
       processedTokens.add(preTaggedToken);
       return preprocessAccumulator(tokens, processedTokens);
     }
+  }
+
+  private TaggedWord pretagToken(String token, boolean tokenIsHashTag,
+      boolean tokenIsUser, boolean tokenIsURL) {
+    TaggedWord preTaggedToken = new TaggedWord(token);
+    if (tokenIsHashTag) {
+      preTaggedToken.setTag("HT");
+    } else if (tokenIsUser) {
+      preTaggedToken.setTag("USR");
+    } else if (tokenIsURL) {
+      preTaggedToken.setTag("URL");
+    } else if (StringUtils.isRetweet(token)) {
+      preTaggedToken.setTag("RT");
+    } else if (m_nameEntities.isNameEntity(token)) {
+      if (LOGGING) {
+        LOG.info("NameEntity labelled for " + token);
+      }
+      preTaggedToken.setTag("NNP");
+    } else if ((m_interjections.isInterjection(token))
+        || (StringUtils.isEmoticon(token))) {
+      if (LOGGING) {
+        LOG.info("Interjection or Emoticon labelled for " + token);
+      }
+      preTaggedToken.setTag("UH");
+    }
+    return preTaggedToken;
   }
 
   private String removeRepeatingChars(String value) {
