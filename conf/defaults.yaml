@@ -204,6 +204,18 @@ global.resources.postagger.gate.model.fast.path: "resources/models/pos/gate-EN-t
 # global.resources.svm.model.path: "resources/models/svm"
 
 ##############################################################################
+### commons.* configs are for the commons package
+##############################################################################
+
+commons.tokenizer.logging: false
+commons.preprocessor.logging: false
+commons.postagger.logging: false
+commons.sentimentdictionary.logging: false
+commons.tfidf.logging: false
+commons.featurevectorgenerator.pos.logging: false
+commons.featurevectorgenerator.sentiment.logging: false
+
+##############################################################################
 ### apps.postagger.* configs are for the POS Tagger application
 ##############################################################################
 

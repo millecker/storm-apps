@@ -39,7 +39,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class SentimentDictionary {
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentDictionary.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = Configuration.get(
+      "commons.sentimentdictionary.logging", false);
   private static final SentimentDictionary INSTANCE = new SentimentDictionary();
 
   private WordNet m_wordnet;

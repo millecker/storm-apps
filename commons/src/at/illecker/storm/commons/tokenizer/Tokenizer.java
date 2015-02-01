@@ -38,6 +38,8 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 public class Tokenizer {
   private static final Logger LOG = LoggerFactory.getLogger(Tokenizer.class);
+  private static final boolean LOGGING = Configuration.get(
+      "commons.tokenizer.logging", false);
 
   public static List<String> tokenize(String str) {
     // Step 1) Trim text
@@ -48,7 +50,7 @@ public class Tokenizer {
       String replacedText = UnicodeUtils.replaceUnicodeSymbols(str);
       // LOG.info("Replaced Unicode symbols from '" + str + "' to '"
       // + replacedText + "'");
-      if (replacedText.equals(str)) {
+      if ((LOGGING) && (replacedText.equals(str))) {
         LOG.warn("Unicode symbols could not be replaced: '" + str + "'");
       }
       str = replacedText;
@@ -59,7 +61,7 @@ public class Tokenizer {
       String replacedText = HtmlUtils.replaceHtmlSymbols(str);
       // LOG.info("Replaced HTML symbols from '" + text + "' to '"
       // + replacedText + "'");
-      if (replacedText.equals(str)) {
+      if ((LOGGING) && (replacedText.equals(str))) {
         LOG.warn("HTML symbols could not be replaced: '" + str + "'");
       }
       str = replacedText;

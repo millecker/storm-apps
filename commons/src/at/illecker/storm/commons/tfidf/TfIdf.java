@@ -29,13 +29,16 @@ import org.apache.storm.guava.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.Configuration;
+
 /**
  * Term Frequency - Inverse Document Frequency
  *
  */
 public class TfIdf {
   private static final Logger LOG = LoggerFactory.getLogger(TfIdf.class);
-  private static final boolean LOGGING = true;
+  private static final boolean LOGGING = Configuration.get(
+      "commons.tfidf.logging", false);
 
   public static <T> Map<T, Double> tf(Collection<T> document) {
     return tf(new HashMap<T, Double>(), document);

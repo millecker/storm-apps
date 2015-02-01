@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
@@ -33,7 +34,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(POSFeatureVectorGenerator.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = Configuration.get(
+      "commons.featurevectorgenerator.pos.logging", false);
   private static final int VECTOR_SIZE = 7;
   private int m_vectorStartId = 1;
 

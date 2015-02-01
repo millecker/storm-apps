@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.dict.SentimentDictionary;
 import at.illecker.storm.commons.dict.SentimentResult;
 import at.illecker.storm.commons.postagger.POSTagger;
@@ -34,7 +35,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(SentimentFeatureVectorGenerator.class);
-  private static final boolean LOGGING = false;
+  private static final boolean LOGGING = Configuration.get(
+      "commons.featurevectorgenerator.sentiment.logging", false);
   private static final int VECTOR_SIZE = 7;
   private SentimentDictionary m_sentimentDict;
   private int m_vectorStartId = 1;
