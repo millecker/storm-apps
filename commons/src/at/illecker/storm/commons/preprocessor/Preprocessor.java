@@ -69,18 +69,19 @@ public class Preprocessor {
 
   public List<String> preprocess(List<String> tokens) {
     // tail recursion
-    return preprocessAccumulator(new LinkedList<String>(tokens),
+    return preprocessAccumulator(new LinkedList<String>(tokens), false,
         new ArrayList<String>());
   }
 
   public List<TaggedWord> preprocessAndTag(List<String> tokens) {
     // tail recursion
-    return preprocessAndTagAccumulator(new LinkedList<String>(tokens),
+    return preprocessAccumulator(new LinkedList<String>(tokens), true,
         new ArrayList<TaggedWord>());
   }
 
-  private List<String> preprocessAccumulator(LinkedList<String> tokens,
-      List<String> processedTokens) {
+  @SuppressWarnings("unchecked")
+  private <T> List<T> preprocessAccumulator(LinkedList<String> tokens,
+      boolean pretag, List<T> processedTokens) {
 
     if (tokens.isEmpty()) {
       return processedTokens;
@@ -116,14 +117,22 @@ public class Preprocessor {
                 + "'");
           }
 
-          processedTokens.add(reducedToken);
-          return preprocessAccumulator(tokens, processedTokens);
+          if (pretag) {
+            processedTokens.add((T) new TaggedWord(reducedToken, "UH"));
+          } else {
+            processedTokens.add((T) reducedToken);
+          }
+          return preprocessAccumulator(tokens, pretag, processedTokens);
         }
       } else if (tokenContainsPunctuation) {
         // If token is no Emoticon then there is no further
         // preprocessing for punctuations
-        processedTokens.add(token);
-        return preprocessAccumulator(tokens, processedTokens);
+        if (pretag) {
+          processedTokens.add((T) new TaggedWord(token));
+        } else {
+          processedTokens.add((T) token);
+        }
+        return preprocessAccumulator(tokens, pretag, processedTokens);
       }
 
       // identify token
@@ -150,22 +159,37 @@ public class Preprocessor {
             .toLowerCase());
         if (slangCorrection != null) {
           for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(slangCorrection[i]);
+            if (pretag) {
+              // PreTagging for POS Tagger
+              TaggedWord preTaggedToken = pretagToken(slangCorrection[i],
+                  tokenIsHashTag, tokenIsUser, tokenIsURL);
+              processedTokens.add((T) preTaggedToken);
+            } else {
+              processedTokens.add((T) slangCorrection[i]);
+            }
           }
           if (LOGGING) {
             LOG.info("Slang Correction from '" + token + "' to "
                 + Arrays.toString(slangCorrection));
           }
-          return preprocessAccumulator(tokens, processedTokens);
+          return preprocessAccumulator(tokens, pretag, processedTokens);
         } else if (tokenIsSlang) {
           if (token.startsWith("w/")) {
-            processedTokens.add("with");
-            processedTokens.add(token.substring(2));
+            if (pretag) {
+              processedTokens.add((T) new TaggedWord("with"));
+              // PreTagging for POS Tagger
+              TaggedWord preTaggedToken = pretagToken(token.substring(2),
+                  tokenIsHashTag, tokenIsUser, tokenIsURL);
+              processedTokens.add((T) preTaggedToken);
+            } else {
+              processedTokens.add((T) "with");
+              processedTokens.add((T) token.substring(2));
+            }
             if (LOGGING) {
               LOG.info("Slang Correction from '" + token + "' to " + "[with, "
                   + token.substring(2) + "]");
             }
-            return preprocessAccumulator(tokens, processedTokens);
+            return preprocessAccumulator(tokens, pretag, processedTokens);
           } else {
             if (LOGGING) {
               LOG.info("Slang Correction might be missing for '" + token + "'");
@@ -189,8 +213,15 @@ public class Preprocessor {
                   + newToken + "'");
             }
             token = newToken;
-            processedTokens.add(token);
-            return preprocessAccumulator(tokens, processedTokens);
+            if (pretag) {
+              // PreTagging for POS Tagger
+              TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
+                  tokenIsUser, tokenIsURL);
+              processedTokens.add((T) preTaggedToken);
+            } else {
+              processedTokens.add((T) token);
+            }
+            return preprocessAccumulator(tokens, pretag, processedTokens);
           }
         }
       }
@@ -204,9 +235,15 @@ public class Preprocessor {
           LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
         }
         token = token + "g";
-        // PreTagging for POS Tagger, because it could be a interjection
-        processedTokens.add(token);
-        return preprocessAccumulator(tokens, processedTokens);
+        if (pretag) {
+          // PreTagging for POS Tagger, because it could be a interjection
+          TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
+              tokenIsUser, tokenIsURL);
+          processedTokens.add((T) preTaggedToken);
+        } else {
+          processedTokens.add((T) token);
+        }
+        return preprocessAccumulator(tokens, pretag, processedTokens);
       }
 
       // Step 5) Remove elongations of characters (suuuper)
@@ -224,196 +261,33 @@ public class Preprocessor {
             .toLowerCase());
         if (slangCorrection != null) {
           for (int i = 0; i < slangCorrection.length; i++) {
-            processedTokens.add(slangCorrection[i]);
+            if (pretag) {
+              // PreTagging for POS Tagger
+              TaggedWord preTaggedToken = pretagToken(slangCorrection[i],
+                  tokenIsHashTag, tokenIsUser, tokenIsURL);
+              processedTokens.add((T) preTaggedToken);
+            } else {
+              processedTokens.add((T) slangCorrection[i]);
+            }
           }
           if (LOGGING) {
             LOG.info("Slang Correction from '" + token + "' to "
                 + Arrays.toString(slangCorrection));
           }
-          return preprocessAccumulator(tokens, processedTokens);
+          return preprocessAccumulator(tokens, pretag, processedTokens);
         }
       }
 
       // add token to processed list
-      processedTokens.add(token);
-      return preprocessAccumulator(tokens, processedTokens);
-    }
-  }
-
-  private List<TaggedWord> preprocessAndTagAccumulator(
-      LinkedList<String> tokens, List<TaggedWord> processedTokens) {
-    if (tokens.isEmpty()) {
-      return processedTokens;
-    } else {
-      // remove token from queue
-      String token = tokens.removeFirst();
-
-      // identify token
-      boolean tokenContainsPunctuation = StringUtils
-          .consitsOfPunctuations(token);
-      boolean tokenIsEmoticon = StringUtils.isEmoticon(token);
-      boolean tokenIsURL = StringUtils.isURL(token);
-      boolean tokenIsNumeric = StringUtils.isNumeric(token);
-
-      // Step 1) Unify Emoticons remove repeating chars
-      if ((tokenIsEmoticon) && (!tokenIsURL) && (!tokenIsNumeric)) {
-        Matcher m = RegexUtils.TWO_OR_MORE_REPEATING_CHARS_PATTERN
-            .matcher(token);
-        if (m.find()) {
-          boolean isSpecialEmoticon = m.group(1).equals("^");
-          String reducedToken = m.replaceAll("$1");
-          if (isSpecialEmoticon) { // keep ^^
-            reducedToken += "^";
-          }
-          // else {
-          // TODO
-          // Preprocess token again if there are recursive patterns in it
-          // e.g., :):):) -> :):) -> :) Not possible because of Tokenizer
-          // tokens.add(0, reducedToken);
-          // }
-          if (LOGGING) {
-            LOG.info("Unify Emoticon from '" + token + "' to '" + reducedToken
-                + "'");
-          }
-          processedTokens.add(new TaggedWord(reducedToken, "UH"));
-          return preprocessAndTagAccumulator(tokens, processedTokens);
-        }
-      } else if (tokenContainsPunctuation) {
-        // If token is no Emoticon then there is no further
-        // preprocessing for punctuations
-        processedTokens.add(new TaggedWord(token));
-        return preprocessAndTagAccumulator(tokens, processedTokens);
-      }
-
-      // identify token
-      boolean tokenIsUser = StringUtils.isUser(token);
-      boolean tokenIsHashTag = StringUtils.isHashTag(token);
-      boolean tokenIsSlang = StringUtils.isSlang(token);
-      boolean tokenIsEmail = StringUtils.isEmail(token);
-      boolean tokenIsPhone = StringUtils.isPhone(token);
-      boolean tokenIsSpecialNumeric = StringUtils.isSpecialNumeric(token);
-      boolean tokenIsSeparatedNumeric = StringUtils.isSeparatedNumeric(token);
-
-      // Step 2) Slang Correction
-      // TODO prevent slang correction if all UPPERCASE
-      // 'FC' to [fruit, cake]
-      // 'Ajax' to [Asynchronous, Javascript, and, XML]
-      // 'TL' to [dr too, long, didn't, read]
-      // S.O.L - SOL - [s**t, outta, luck]
-      // 'AC/DC' to 'AC' and 'DC' - 'DC' to [don't, care]
-      // TODO update dictionary O/U O/A
-      if ((!tokenIsEmoticon) && (!tokenIsUser) && (!tokenIsHashTag)
-          && (!tokenIsURL) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
-          && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
-        String[] slangCorrection = m_slangCorrection.getCorrection(token
-            .toLowerCase());
-        if (slangCorrection != null) {
-          for (int i = 0; i < slangCorrection.length; i++) {
-            // PreTagging for POS Tagger
-            TaggedWord preTaggedToken = pretagToken(slangCorrection[i],
-                tokenIsHashTag, tokenIsUser, tokenIsURL);
-            processedTokens.add(preTaggedToken);
-          }
-          if (LOGGING) {
-            LOG.info("Slang Correction from '" + token + "' to "
-                + Arrays.toString(slangCorrection));
-          }
-          return preprocessAndTagAccumulator(tokens, processedTokens);
-        } else if (tokenIsSlang) {
-          if (token.startsWith("w/")) {
-            processedTokens.add(new TaggedWord("with"));
-            // PreTagging for POS Tagger
-            TaggedWord preTaggedToken = pretagToken(token.substring(2),
-                tokenIsHashTag, tokenIsUser, tokenIsURL);
-            processedTokens.add(preTaggedToken);
-            if (LOGGING) {
-              LOG.info("Slang Correction from '" + token + "' to " + "[with, "
-                  + token.substring(2) + "]");
-            }
-            return preprocessAndTagAccumulator(tokens, processedTokens);
-          } else {
-            if (LOGGING) {
-              LOG.info("Slang Correction might be missing for '" + token + "'");
-            }
-          }
-        }
-      }
-
-      // Step 3) Check if there are punctuations between words
-      // e.g., L.O.V.E
-      if ((!tokenIsEmoticon) && (!tokenIsUser) && (!tokenIsHashTag)
-          && (!tokenIsURL) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
-          && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
-        // remove alternating letter dot pattern e.g., L.O.V.E
-        Matcher m = RegexUtils.ALTERNATING_LETTER_DOT_PATTERN.matcher(token);
-        if (m.matches()) {
-          String newToken = token.replaceAll("\\.", "");
-          if (m_wordnet.contains(newToken)) {
-            if (LOGGING) {
-              LOG.info("Remove punctuations in word from '" + token + "' to '"
-                  + newToken + "'");
-            }
-            token = newToken;
-            // PreTagging for POS Tagger
-            TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
-                tokenIsUser, tokenIsURL);
-            processedTokens.add(preTaggedToken);
-            return preprocessAndTagAccumulator(tokens, processedTokens);
-          }
-        }
-      }
-
-      // Step 4) Add missing g in gerund forms e.g., goin
-      if ((!tokenIsUser) && (!tokenIsHashTag) && (!tokenIsURL)
-          && (token.endsWith("in")) && (!m_firstNames.isFirstName(token))
-          && (!m_wordnet.contains(token.toLowerCase()))) {
-        // append "g" if a word ends with "in" and is not in the vocabulary
-        if (LOGGING) {
-          LOG.info("Add missing \"g\" from '" + token + "' to '" + token + "g'");
-        }
-        token = token + "g";
-        // PreTagging for POS Tagger, because it could be a interjection
+      if (pretag) {
+        // PreTagging for POS Tagger
         TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
             tokenIsUser, tokenIsURL);
-        processedTokens.add(preTaggedToken);
-        return preprocessAndTagAccumulator(tokens, processedTokens);
+        processedTokens.add((T) preTaggedToken);
+      } else {
+        processedTokens.add((T) token);
       }
-
-      // Step 5) Remove elongations of characters (suuuper)
-      // 'lollll' to 'loll' because 'loll' is found in dict
-      // TODO 'AHHHHH' to 'AH'
-      if ((!tokenIsEmoticon) && (!tokenIsUser) && (!tokenIsHashTag)
-          && (!tokenIsURL) && (!tokenIsNumeric) && (!tokenIsSpecialNumeric)
-          && (!tokenIsSeparatedNumeric) && (!tokenIsEmail) && (!tokenIsPhone)) {
-
-        // remove repeating chars
-        token = removeRepeatingChars(token);
-
-        // Step 5b) Try Slang Correction again
-        String[] slangCorrection = m_slangCorrection.getCorrection(token
-            .toLowerCase());
-        if (slangCorrection != null) {
-          for (int i = 0; i < slangCorrection.length; i++) {
-            // PreTagging for POS Tagger
-            TaggedWord preTaggedToken = pretagToken(slangCorrection[i],
-                tokenIsHashTag, tokenIsUser, tokenIsURL);
-            processedTokens.add(preTaggedToken);
-          }
-          if (LOGGING) {
-            LOG.info("Slang Correction from '" + token + "' to "
-                + Arrays.toString(slangCorrection));
-          }
-          return preprocessAndTagAccumulator(tokens, processedTokens);
-        }
-      }
-
-      // Step 6) PreTagging for POS Tagger
-      TaggedWord preTaggedToken = pretagToken(token, tokenIsHashTag,
-          tokenIsUser, tokenIsURL);
-
-      // add token to processed list
-      processedTokens.add(preTaggedToken);
-      return preprocessAndTagAccumulator(tokens, processedTokens);
+      return preprocessAccumulator(tokens, pretag, processedTokens);
     }
   }
 
@@ -537,7 +411,7 @@ public class Preprocessor {
     Preprocessor preprocessor = Preprocessor.getInstance();
     List<Tweet> tweets = null;
     boolean extendedTest = true;
-    boolean debugOutput = true;
+    boolean debugOutput = false;
 
     // load tweets
     if (extendedTest) {
