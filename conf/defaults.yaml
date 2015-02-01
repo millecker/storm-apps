@@ -197,9 +197,13 @@ global.resources.dict.slang:
 
 global.resources.dict.wordnet.path: "resources/dictionaries/wordnet/wn3.1.dict.tar.gz"
 
-global.resources.postagger.gate.model.path: "resources/models/pos/gate-EN-twitter.model"
+# GATE POS Tagger Model https://gate.ac.uk/wiki/twitter-postagger.html
+global.resources.postagger.gate.model.path: "resources/models/pos/gate-EN-twitter-fast.model"
+# other model: gate-EN-twitter.model
 
-global.resources.postagger.gate.model.fast.path: "resources/models/pos/gate-EN-twitter-fast.model"
+# ARK POS Tagger Model http://www.ark.cs.cmu.edu/TweetNLP/
+global.resources.postagger.ark.model.path: "resources/models/pos/ark.model.20120919.txt"
+# other model: ark.model.ritter_ptb_alldata_fixed.20130723.txt
 
 # global.resources.svm.model.path: "resources/models/svm"
 

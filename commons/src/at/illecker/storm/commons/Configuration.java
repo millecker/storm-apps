@@ -55,9 +55,6 @@ public class Configuration {
   public static final String GLOBAL_RESOURCES_DICT_SLANG = "global.resources.dict.slang";
   public static final String GLOBAL_RESOURCES_DICT_WORDNET_PATH = "global.resources.dict.wordnet.path";
 
-  public static final String GLOBAL_RESOURCES_POSTAGGER_GATE_MODEL_PATH = "global.resources.postagger.gate.model.path";
-  public static final String GLOBAL_RESOURCES_POSTAGGER_GATE_MODEL_FAST_PATH = "global.resources.postagger.gate.model.fast.path";
-
   public static final Map CONFIG = readConfig();
 
   @SuppressWarnings("rawtypes")
@@ -194,14 +191,6 @@ public class Configuration {
 
   public static String getWordNetDict() {
     return (String) CONFIG.get(GLOBAL_RESOURCES_DICT_WORDNET_PATH);
-  }
-
-  public static String getPOSTaggingModel() {
-    return (String) CONFIG.get(GLOBAL_RESOURCES_POSTAGGER_GATE_MODEL_PATH);
-  }
-
-  public static String getPOSTaggingModelFast() {
-    return (String) CONFIG.get(GLOBAL_RESOURCES_POSTAGGER_GATE_MODEL_FAST_PATH);
   }
 
 }
