@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.dict.SentimentDictionary;
 import at.illecker.storm.commons.postagger.POSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
@@ -36,7 +37,8 @@ import edu.stanford.nlp.ling.TaggedWord;
 public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(TfIdfFeatureVectorGenerator.class);
-  // private static final boolean LOGGING = false;
+  private static final boolean LOGGING = Configuration.get(
+      "commons.featurevectorgenerator.tfidf.logging", false);
 
   private TweetTfIdf m_tweetTfIdf = null;
   private SentimentDictionary m_sentimentDict;
@@ -79,10 +81,11 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
           resultFeatureVector.put(vectorId, element.getValue());
         }
       }
-
     }
-    // LOG.info("TfIdsVector: " + resultFeatureVector);
 
+    if (LOGGING) {
+      LOG.info("TfIdsFeatureVector: " + resultFeatureVector);
+    }
     return resultFeatureVector;
   }
 

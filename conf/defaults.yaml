@@ -214,6 +214,7 @@ commons.sentimentdictionary.logging: false
 commons.tfidf.logging: false
 commons.featurevectorgenerator.pos.logging: false
 commons.featurevectorgenerator.sentiment.logging: false
+commons.featurevectorgenerator.tfidf.logging: false
 
 ##############################################################################
 ### apps.postagger.* configs are for the POS Tagger application
