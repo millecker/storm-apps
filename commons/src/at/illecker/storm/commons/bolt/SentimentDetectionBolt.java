@@ -29,7 +29,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import edu.stanford.nlp.ling.TaggedWord;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 
 public class SentimentDetectionBolt extends BaseRichBolt {
   public static final String ID = "sentiment-detection-bolt";
@@ -65,12 +65,12 @@ public class SentimentDetectionBolt extends BaseRichBolt {
     Long tweetId = tuple.getLongByField("id");
     Double score = tuple.getDoubleByField("score");
     String text = tuple.getStringByField("text");
-    List<TaggedWord> taggedTokens = (List<TaggedWord>) tuple
+    List<TaggedToken> taggedTokens = (List<TaggedToken>) tuple
         .getValueByField("taggedTokens");
 
     // Calculate sentiment
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
-        .getSentenceSentiment(taggedTokens);
+        .getSentenceSentimentFromTaggedToken(taggedTokens);
 
     double totalSentimentScore = Double.MIN_VALUE;
     if (tweetSentiments != null) {

@@ -30,7 +30,6 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import edu.stanford.nlp.ling.TaggedWord;
 
 public class PreprocessorBolt extends BaseRichBolt {
   public static final String ID = "preprocessor-bolt";
@@ -66,7 +65,7 @@ public class PreprocessorBolt extends BaseRichBolt {
     List<String> tokens = (List<String>) tuple.getValueByField("tokens");
 
     // Preprocess
-    List<TaggedWord> preprocessedTokens = m_preprocessor.preprocess(tokens);
+    List<String> preprocessedTokens = m_preprocessor.preprocess(tokens);
 
     if (m_logging) {
       LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" Preprocessed: "

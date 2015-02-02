@@ -37,7 +37,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import edu.stanford.nlp.ling.TaggedWord;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 
 public class FeatureGenerationBolt extends BaseRichBolt {
   public static final String ID = "feature-generation-bolt";
@@ -74,13 +74,13 @@ public class FeatureGenerationBolt extends BaseRichBolt {
     List<FeaturedTweet> featuredTrainTweets = SerializationUtils
         .deserialize(m_dataset.getTrainDataSerializationFile());
     if (featuredTrainTweets != null) {
-      TweetTfIdf tweetTfIdf = new TweetTfIdf(
-          FeaturedTweet.getTaggedTweets(featuredTrainTweets), TfType.RAW,
-          TfIdfNormalization.COS, true);
+      TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
+          FeaturedTweet.getTaggedTokensFromTweets(featuredTrainTweets),
+          TfType.RAW, TfIdfNormalization.COS, true);
 
       LOG.info("Load CombinedFeatureVectorGenerator...");
-      m_fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
-      LOG.info("CombinedFeatureVectorGenerator loaded");
+      m_fvg = new CombinedFeatureVectorGenerator(false, true, tweetTfIdf);
+
     } else {
       LOG.error("TaggedTweets could not be found! File is missing: "
           + m_dataset.getTrainDataSerializationFile());
@@ -91,12 +91,12 @@ public class FeatureGenerationBolt extends BaseRichBolt {
     Long tweetId = tuple.getLongByField("id");
     Double score = tuple.getDoubleByField("score");
     String text = tuple.getStringByField("text");
-    List<TaggedWord> taggedTokens = (List<TaggedWord>) tuple
+    List<TaggedToken> taggedTokens = (List<TaggedToken>) tuple
         .getValueByField("taggedTokens");
 
     // Generate Feature Vector
     Map<Integer, Double> featureVector = m_fvg
-        .generateFeatureVector(taggedTokens);
+        .generateFeatureVectorFromTaggedTokens(taggedTokens);
 
     if (m_logging) {
       LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" FeatureVector: "

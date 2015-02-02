@@ -22,6 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -29,9 +30,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-import edu.stanford.nlp.tagger.maxent.TaggerConfig;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 
 public class POSTaggerBolt extends BaseRichBolt {
   public static final String ID = "pos-tagger-bolt";
@@ -42,7 +41,7 @@ public class POSTaggerBolt extends BaseRichBolt {
       .getLogger(POSTaggerBolt.class);
   private boolean m_logging = false;
   private OutputCollector m_collector;
-  private MaxentTagger m_posTagger;
+  private ArkPOSTagger m_arkPOSTagger;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
@@ -59,25 +58,26 @@ public class POSTaggerBolt extends BaseRichBolt {
       m_logging = false;
     }
 
-    if (config.get(CONF_MODEL) != null) {
-      String taggingModel = (String) config.get(CONF_MODEL);
-      LOG.info("Load POSTagger with model: " + taggingModel);
-      TaggerConfig posTaggerConf = new TaggerConfig("-model", taggingModel);
-      m_posTagger = new MaxentTagger(taggingModel, posTaggerConf, false);
-    } else {
-      throw new RuntimeException(CONF_MODEL + " property was not set!");
-    }
+    m_arkPOSTagger = ArkPOSTagger.getInstance();
+
+    // TODO use model from config
+    // if (config.get(CONF_MODEL) != null) {
+    // String taggingModel = (String) config.get(CONF_MODEL);
+
+    // } else {
+    // throw new RuntimeException(CONF_MODEL + " property was not set!");
+    // }
   }
 
   public void execute(Tuple tuple) {
     Long tweetId = tuple.getLongByField("id");
     Double score = tuple.getDoubleByField("score");
     String text = tuple.getStringByField("text");
-    List<TaggedWord> preprocessedTokens = (List<TaggedWord>) tuple
+    List<String> preprocessedTokens = (List<String>) tuple
         .getValueByField("preprocessedTokens");
 
     // POS Tagging
-    List<TaggedWord> taggedTokens = m_posTagger.tagSentence(preprocessedTokens);
+    List<TaggedToken> taggedTokens = m_arkPOSTagger.tag(preprocessedTokens);
 
     if (m_logging) {
       LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" Tagged: "
