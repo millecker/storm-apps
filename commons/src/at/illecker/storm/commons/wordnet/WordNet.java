@@ -529,7 +529,7 @@ public class WordNet {
       for (TaggedWord taggedWord : sentence) {
         double score = 0;
         IIndexWord indexWordLocal = getIndexWord(taggedWord.word(),
-            POSTag.convertString(taggedWord.tag()));
+            POSTag.convertPTB(taggedWord.tag()));
         Set<ISynset> synsetsLocal = getSynsets(indexWordLocal);
         for (ISynset synsetLocal : synsetsLocal) {
           double sim = shortestPathDistance(synsetLocal, synset);
