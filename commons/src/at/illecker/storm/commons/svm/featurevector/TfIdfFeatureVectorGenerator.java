@@ -67,38 +67,23 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> generateFeatureVectorFromTaggedWord(
+  public Map<Integer, Double> generateFeatureVectorFromTaggedWords(
       List<TaggedWord> tweet) {
-    Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
-
-    if (m_tweetTfIdf != null) {
-      // Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
-      Map<String, Integer> termIds = m_tweetTfIdf.getTermIds();
-      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdfTaggedWord(tweet);
-
-      for (Map.Entry<String, Double> element : tfIdf.entrySet()) {
-        String key = element.getKey();
-        if (termIds.containsKey(key)) {
-          int vectorId = m_vectorStartId + termIds.get(key);
-          resultFeatureVector.put(vectorId, element.getValue());
-        }
-      }
-    }
-    if (LOGGING) {
-      LOG.info("TfIdsFeatureVector: " + resultFeatureVector);
-    }
-    return resultFeatureVector;
+    return generateFeatureVector(m_tweetTfIdf.tfIdfTaggedWord(tweet));
   }
 
   @Override
-  public Map<Integer, Double> generateFeatureVectorFromTaggedToken(
+  public Map<Integer, Double> generateFeatureVectorFromTaggedTokens(
       List<TaggedToken> tweet) {
+    return generateFeatureVector(m_tweetTfIdf.tfIdfTaggedToken(tweet));
+  }
+
+  public Map<Integer, Double> generateFeatureVector(Map<String, Double> tfIdf) {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
 
     if (m_tweetTfIdf != null) {
       // Map<String, Double> idf = m_tweetTfIdf.getInverseDocFreq();
       Map<String, Integer> termIds = m_tweetTfIdf.getTermIds();
-      Map<String, Double> tfIdf = m_tweetTfIdf.tfIdfTaggedToken(tweet);
 
       for (Map.Entry<String, Double> element : tfIdf.entrySet()) {
         String key = element.getKey();
@@ -117,16 +102,7 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   public static void main(String[] args) {
     boolean useArkPOSTagger = true;
     boolean usePOSTags = true; // use POS tags in terms
-
     Preprocessor preprocessor = Preprocessor.getInstance();
-    GatePOSTagger gatePOSTagger = null;
-    ArkPOSTagger arkPOSTagger = null;
-
-    if (useArkPOSTagger) {
-      arkPOSTagger = ArkPOSTagger.getInstance();
-    } else {
-      gatePOSTagger = GatePOSTagger.getInstance();
-    }
 
     List<Tweet> tweets = Tweet.getTestTweets();
 
@@ -134,6 +110,8 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
     List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
     if (useArkPOSTagger) {
+      ArkPOSTagger arkPOSTagger = ArkPOSTagger.getInstance();
+
       // Preprocess only
       long startTime = System.currentTimeMillis();
       List<List<String>> preprocessedTweets = preprocessor
@@ -169,9 +147,9 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
       }
 
       // TF-IDF Feature Vector Generation
-      for (List<TaggedToken> taggedToken : taggedTweets) {
+      for (List<TaggedToken> taggedTokens : taggedTweets) {
         Map<Integer, Double> tfIdfFeatureVector = efvg
-            .generateFeatureVectorFromTaggedToken(taggedToken);
+            .generateFeatureVectorFromTaggedTokens(taggedTokens);
 
         // Build feature vector string
         String featureVectorStr = "";
@@ -179,13 +157,15 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
           featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
         }
 
-        LOG.info("Tweet: '" + taggedToken + "'");
+        LOG.info("Tweet: '" + taggedTokens + "'");
         LOG.info("TF-IDF FeatureVector: " + featureVectorStr);
       }
 
       efvg.getSentimentDictionary().close();
 
     } else {
+      GatePOSTagger gatePOSTagger = GatePOSTagger.getInstance();
+
       // Preprocess and tag
       long startTime = System.currentTimeMillis();
       List<List<TaggedWord>> preprocessedTweets = preprocessor
@@ -221,9 +201,9 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
       }
 
       // TF-IDF Feature Vector Generation
-      for (List<TaggedWord> taggedToken : taggedTweets) {
+      for (List<TaggedWord> taggedWords : taggedTweets) {
         Map<Integer, Double> tfIdfFeatureVector = efvg
-            .generateFeatureVectorFromTaggedWord(taggedToken);
+            .generateFeatureVectorFromTaggedWords(taggedWords);
 
         // Build feature vector string
         String featureVectorStr = "";
@@ -231,7 +211,7 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
           featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
         }
 
-        LOG.info("Tweet: '" + taggedToken + "'");
+        LOG.info("Tweet: '" + taggedWords + "'");
         LOG.info("TF-IDF FeatureVector: " + featureVectorStr);
       }
 

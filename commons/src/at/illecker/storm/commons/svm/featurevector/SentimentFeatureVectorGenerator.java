@@ -65,7 +65,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> generateFeatureVectorFromTaggedWord(
+  public Map<Integer, Double> generateFeatureVectorFromTaggedWords(
       List<TaggedWord> taggedWords) {
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
@@ -75,7 +75,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> generateFeatureVectorFromTaggedToken(
+  public Map<Integer, Double> generateFeatureVectorFromTaggedTokens(
       List<TaggedToken> taggedTokens) {
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
@@ -164,7 +164,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
       // Sentiment Feature Vector Generation
       for (List<TaggedToken> taggedTokens : taggedTweets) {
         Map<Integer, Double> sentimentFeatureVector = sfvg
-            .generateFeatureVectorFromTaggedToken(taggedTokens);
+            .generateFeatureVectorFromTaggedTokens(taggedTokens);
 
         // Build feature vector string
         String featureVectorStr = "";
@@ -197,7 +197,7 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
       // Sentiment Feature Vector Generation
       for (List<TaggedWord> taggedWords : taggedTweets) {
         Map<Integer, Double> sentimentFeatureVector = sfvg
-            .generateFeatureVectorFromTaggedWord(taggedWords);
+            .generateFeatureVectorFromTaggedWords(taggedWords);
 
         // Build feature vector string
         String featureVectorStr = "";
