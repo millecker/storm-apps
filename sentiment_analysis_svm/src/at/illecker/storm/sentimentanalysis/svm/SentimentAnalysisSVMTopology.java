@@ -34,7 +34,6 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class SentimentAnalysisSVMTopology {
   public static final String TOPOLOGY_NAME = "sentiment-analysis-svm-topology";
-  private static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
     String consumerKey = "";
@@ -74,85 +73,129 @@ public class SentimentAnalysisSVMTopology {
     IRichSpout spout;
     String spoutID = "";
     if (consumerKey.isEmpty()) {
-      // sleep 20 sec before starting emitting tuples
-      conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
-      // sleep between emitting tuples
-      // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 500000); // 0.5 ms
-      // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 250000); // 0.25 ms
-      // conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, 50000); // 0.05 ms
-      spout = new DatasetSpout(new String[] { "tweet" }, dataset);
+      if (Configuration
+          .get("apps.sentiment.analysis.svm.spout.startup.sleep.ms") != null) {
+        conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, (Integer) Configuration
+            .get("apps.sentiment.analysis.svm.spout.startup.sleep.ms"));
+      }
+      if (Configuration.get("apps.sentiment.analysis.svm.spout.tuple.sleep.ms") != null) {
+        conf.put(DatasetSpout.CONF_TUPLE_SLEEP_MS, (Integer) Configuration
+            .get("apps.sentiment.analysis.svm.spout.tuple.sleep.ms"));
+      }
+      if (Configuration.get("apps.sentiment.analysis.svm.spout.tuple.sleep.ns") != null) {
+        conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, (Integer) Configuration
+            .get("apps.sentiment.analysis.svm.spout.tuple.sleep.ns"));
+      }
+      spout = new DatasetSpout(dataset);
       spoutID = DatasetSpout.ID;
     } else {
-      // sleep 20 sec before starting emitting tuples
-      conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
-      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
-          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      if (Configuration
+          .get("apps.sentiment.analysis.svm.spout.startup.sleep.ms") != null) {
+        conf.put(TwitterStreamSpout.CONF_STARTUP_SLEEP_MS,
+            (Integer) Configuration
+                .get("apps.sentiment.analysis.svm.spout.startup.sleep.ms"));
+      }
+      spout = new TwitterStreamSpout(consumerKey, consumerSecret, accessToken,
+          accessTokenSecret, keyWords,
+          (String) Configuration
+              .get("apps.sentiment.analysis.svm.spout.filter.language"));
       spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts
-    TokenizerBolt tokenizerBolt = new TokenizerBolt(new String[] { "tweet" },
-        new String[] { "splittedTweet" });
-    PreprocessorBolt preprocessorBolt = new PreprocessorBolt(
-        new String[] { "splittedTweet" }, new String[] { "preprocessedTweet" });
-    POSTaggerBolt posTaggerBolt = new POSTaggerBolt(
-        new String[] { "preprocessedTweet" }, new String[] { "taggedTweet" });
+    TokenizerBolt tokenizerBolt = new TokenizerBolt();
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
     FeatureGenerationBolt featureGenerationBolt = new FeatureGenerationBolt(
-        new String[] { "taggedTweet" }, new String[] { "featuredTweet" },
         dataset);
-    SVMBolt svmBolt = new SVMBolt(new String[] { "featuredTweet" }, null,
-        dataset);
+    SVMBolt svmBolt = new SVMBolt(dataset);
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
 
-    // Parallelism options
-    int numberOfWorkers = 5;
-    conf.setNumWorkers(numberOfWorkers);
-
-    // c3.4xlarge
-    // One worker per node and 16 cores per node (12 Java threads per node)
-    // 12 Executors per each worker
-    // - 1 x Acker
-    // - 1 x TokenizerBolt
-    // - 1 x PreprocessorBolt
-    // - 5 x POSTaggerBolt
-    // - 1 x FeatureGenerationBolt
-    // - 3 x SVMBolt
-
     // Set Spout
-    builder.setSpout(spoutID, spout);
+    builder.setSpout(spoutID, spout,
+        Configuration.get("apps.sentiment.analysis.svm.spout.parallelism", 1));
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt, numberOfWorkers)
+    builder.setBolt(
+        TokenizerBolt.ID,
+        tokenizerBolt,
+        Configuration.get(
+            "apps.sentiment.analysis.svm.bolt.tokenizer.parallelism", 1))
         .shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt, numberOfWorkers)
+    builder.setBolt(
+        PreprocessorBolt.ID,
+        preprocessorBolt,
+        Configuration.get(
+            "apps.sentiment.analysis.svm.bolt.preprocessor.parallelism", 1))
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, numberOfWorkers * 5)
+    builder.setBolt(
+        POSTaggerBolt.ID,
+        posTaggerBolt,
+        Configuration.get(
+            "apps.sentiment.analysis.svm.bolt.postagger.parallelism", 1))
         .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> FeatureGenerationBolt
-    builder.setBolt(FeatureGenerationBolt.ID, featureGenerationBolt,
-        numberOfWorkers).shuffleGrouping(POSTaggerBolt.ID);
+    builder
+        .setBolt(
+            FeatureGenerationBolt.ID,
+            featureGenerationBolt,
+            Configuration
+                .get(
+                    "apps.sentiment.analysis.svm.bolt.featuregeneration.parallelism",
+                    1)).shuffleGrouping(POSTaggerBolt.ID);
 
     // FeatureGenerationBolt --> SVMBolt
-    builder.setBolt(SVMBolt.ID, svmBolt, numberOfWorkers * 3).shuffleGrouping(
-        FeatureGenerationBolt.ID);
+    builder.setBolt(
+        SVMBolt.ID,
+        svmBolt,
+        Configuration
+            .get("apps.sentiment.analysis.svm.bolt.svm.parallelism", 1))
+        .shuffleGrouping(FeatureGenerationBolt.ID);
 
-    // Set max pending tuples
-    conf.setMaxSpoutPending(5000);
+    // Set topology config
+    conf.setNumWorkers(Configuration.get(
+        "apps.sentiment.analysis.svm.workers.num", 1));
+
+    if (Configuration.get("apps.sentiment.analysis.svm.spout.max.pending") != null) {
+      conf.setMaxSpoutPending((Integer) Configuration
+          .get("apps.sentiment.analysis.svm.spout.max.pending"));
+    }
+
+    if (Configuration.get("apps.sentiment.analysis.svm.workers.childopts") != null) {
+      conf.put(Config.WORKER_CHILDOPTS,
+          Configuration.get("apps.sentiment.analysis.svm.workers.childopts"));
+    }
+    if (Configuration.get("apps.sentiment.analysis.svm.supervisor.childopts") != null) {
+      conf.put(Config.SUPERVISOR_CHILDOPTS,
+          Configuration.get("apps.sentiment.analysis.svm.supervisor.childopts"));
+    }
+
+    conf.put(TokenizerBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.svm.bolt.tokenizer.logging", false));
+    conf.put(PreprocessorBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.svm.bolt.preprocessor.logging", false));
+    conf.put(POSTaggerBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.svm.bolt.postagger.logging", false));
+    conf.put(POSTaggerBolt.CONF_MODEL,
+        Configuration.get("apps.sentiment.analysis.svm.bolt.postagger.model"));
+    conf.put(FeatureGenerationBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.svm.bolt.featuregeneration.logging", false));
+    conf.put(SVMBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.svm.bolt.svm.logging", false));
+
+    conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);
     // conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
-
-    conf.put(Config.WORKER_CHILDOPTS, "-Xmx16g");
-    conf.put(Config.SUPERVISOR_CHILDOPTS, "-Xmx2g");
 
     // This will simply log all Metrics received into
     // $STORM_HOME/logs/metrics.log on one or more worker nodes.
@@ -165,4 +208,5 @@ public class SentimentAnalysisSVMTopology {
     System.out.println("To kill the topology run:");
     System.out.println("storm kill " + TOPOLOGY_NAME);
   }
+
 }
