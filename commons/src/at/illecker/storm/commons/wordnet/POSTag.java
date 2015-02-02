@@ -54,7 +54,7 @@ public class POSTag {
   }
 
   public static POS convertPTB(String pennTag) {
-    if (pennTag.startsWith("NN")) { // TODO includes proper nouns
+    if (pennTag.startsWith("NN")) { // includes proper nouns
       return POS.NOUN;
     }
     if (pennTag.startsWith("VB")) {
@@ -71,7 +71,8 @@ public class POSTag {
 
   // http://www.ark.cs.cmu.edu/TweetNLP/annot_guidelines.pdf
   public static POS convertArk(String arkTag) {
-    if (arkTag.equals("N")) {
+    if (arkTag.equals("N") || arkTag.equals("O") || arkTag.equals("^")
+        || arkTag.equals("S") || arkTag.equals("Z")) {
       return POS.NOUN;
     }
     if (arkTag.equals("V")) {
@@ -85,4 +86,5 @@ public class POSTag {
     }
     return null;
   }
+
 }
