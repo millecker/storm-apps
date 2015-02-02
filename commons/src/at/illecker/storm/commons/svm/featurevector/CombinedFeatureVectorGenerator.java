@@ -24,32 +24,38 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
-import at.illecker.storm.commons.postagger.POSTagger;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
+import at.illecker.storm.commons.postagger.GatePOSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tfidf.TfIdfNormalization;
 import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.Tweet;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(CombinedFeatureVectorGenerator.class);
 
+  private final boolean m_useTaggedWords;
   private SentimentFeatureVectorGenerator m_sentimentFeatureVectorGenerator = null;
   private TfIdfFeatureVectorGenerator m_tfidfFeatureVectorGenerator = null;
   private POSFeatureVectorGenerator m_POSFeatureVectorGenerator = null;
 
-  public CombinedFeatureVectorGenerator(TweetTfIdf tweetTfIdf) {
-    this.m_sentimentFeatureVectorGenerator = new SentimentFeatureVectorGenerator(
-        1);
+  public CombinedFeatureVectorGenerator(boolean useTaggedWords,
+      boolean normalizePOSCounts, TweetTfIdf tweetTfIdf) {
+    m_useTaggedWords = useTaggedWords;
 
-    this.m_POSFeatureVectorGenerator = new POSFeatureVectorGenerator(
+    m_sentimentFeatureVectorGenerator = new SentimentFeatureVectorGenerator(1);
+
+    m_POSFeatureVectorGenerator = new POSFeatureVectorGenerator(useTaggedWords,
+        normalizePOSCounts,
         m_sentimentFeatureVectorGenerator.getFeatureVectorSize() + 1);
 
-    this.m_tfidfFeatureVectorGenerator = new TfIdfFeatureVectorGenerator(
-        tweetTfIdf, m_sentimentFeatureVectorGenerator.getFeatureVectorSize()
+    m_tfidfFeatureVectorGenerator = new TfIdfFeatureVectorGenerator(tweetTfIdf,
+        m_sentimentFeatureVectorGenerator.getFeatureVectorSize()
             + m_POSFeatureVectorGenerator.getFeatureVectorSize() + 1);
 
     LOG.info("VectorSize: " + getFeatureVectorSize());
@@ -63,27 +69,53 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> generateFeatureVector(List<TaggedWord> tweet) {
+  public Map<Integer, Double> generateFeatureVectorFromTaggedWords(
+      List<TaggedWord> tweet) {
+    if (!m_useTaggedWords) {
+      throw new RuntimeException(
+          "Use TaggedWords was set to false! generateFeatureVectorFromTaggedWords is not applicable!");
+    }
 
     Map<Integer, Double> featureVector = m_sentimentFeatureVectorGenerator
-        .generateFeatureVector(tweet);
+        .generateFeatureVectorFromTaggedWords(tweet);
 
     featureVector.putAll(m_POSFeatureVectorGenerator
-        .generateFeatureVector(tweet));
+        .generateFeatureVectorFromTaggedWords(tweet));
 
     featureVector.putAll(m_tfidfFeatureVectorGenerator
-        .generateFeatureVector(tweet));
+        .generateFeatureVectorFromTaggedWords(tweet));
+
+    return featureVector;
+  }
+
+  @Override
+  public Map<Integer, Double> generateFeatureVectorFromTaggedTokens(
+      List<TaggedToken> tweet) {
+    if (m_useTaggedWords) {
+      throw new RuntimeException(
+          "Use TaggedWords was set to true! generateFeatureVectorFromTaggedTokens is not applicable!");
+    }
+
+    Map<Integer, Double> featureVector = m_sentimentFeatureVectorGenerator
+        .generateFeatureVectorFromTaggedTokens(tweet);
+
+    featureVector.putAll(m_POSFeatureVectorGenerator
+        .generateFeatureVectorFromTaggedTokens(tweet));
+
+    featureVector.putAll(m_tfidfFeatureVectorGenerator
+        .generateFeatureVectorFromTaggedTokens(tweet));
 
     return featureVector;
   }
 
   public static void main(String[] args) {
-    Preprocessor preprocessor = Preprocessor.getInstance();
-    POSTagger posTagger = POSTagger.getInstance();
-    List<Tweet> tweets = null;
     boolean extendedTest = false;
+    boolean useArkPOSTagger = true;
+    boolean usePOSTags = true; // use POS tags in terms
+    Preprocessor preprocessor = Preprocessor.getInstance();
 
     // load tweets
+    List<Tweet> tweets = null;
     if (extendedTest) {
       // SemEval2013
       Dataset dataset = Configuration.getDataSetSemEval2013();
@@ -92,56 +124,84 @@ public class CombinedFeatureVectorGenerator extends FeatureVectorGenerator {
       tweets = Tweet.getTestTweets();
     }
 
-    // prepare Tweets
-    long startTime = System.currentTimeMillis();
     // Tokenize
     List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
-    // Preprocess
-    List<List<TaggedWord>> preprocessedTweets = preprocessor
-        .preprocessTweets(tokenizedTweets);
+    if (useArkPOSTagger) {
+      ArkPOSTagger arkPOSTagger = ArkPOSTagger.getInstance();
 
-    // POS Tagging
-    List<List<TaggedWord>> taggedTweets = posTagger
-        .tagTweets(preprocessedTweets);
-    LOG.info("Preparation of Tweets finished after "
-        + (System.currentTimeMillis() - startTime) + " ms");
+      // Preprocess only
+      long startTime = System.currentTimeMillis();
+      List<List<String>> preprocessedTweets = preprocessor
+          .preprocessTweets(tokenizedTweets);
+      LOG.info("Preprocess finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
 
-    // Generate CombinedFeatureVectorGenerator
-    boolean usePOSTags = true; // use POS tags in terms
-    TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
-        TfIdfNormalization.COS, usePOSTags);
-    CombinedFeatureVectorGenerator cfvg = new CombinedFeatureVectorGenerator(
-        tweetTfIdf);
+      // Ark POS Tagging
+      startTime = System.currentTimeMillis();
+      List<List<TaggedToken>> taggedTweets = arkPOSTagger
+          .tagTweets(preprocessedTweets);
+      LOG.info("Ark POS Tagger finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
 
-    // Debug
-    if (!extendedTest) {
-      TweetTfIdf.print("Term Frequency", tweetTfIdf.getTermFreqs(),
-          tweetTfIdf.getInverseDocFreq());
-      TweetTfIdf.print("Inverse Document Frequency",
-          tweetTfIdf.getInverseDocFreq());
-      TweetTfIdf.print(
-          "Tf-Idf",
-          TweetTfIdf.tfIdf(tweetTfIdf.getTermFreqs(),
-              tweetTfIdf.getInverseDocFreq(),
-              tweetTfIdf.getTfIdfNormalization()),
-          tweetTfIdf.getInverseDocFreq());
-    }
+      // Generate CombinedFeatureVectorGenerator
+      TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(taggedTweets,
+          TfType.RAW, TfIdfNormalization.COS, usePOSTags);
+      CombinedFeatureVectorGenerator cfvg = new CombinedFeatureVectorGenerator(
+          false, true, tweetTfIdf);
 
-    // Combined Feature Vector Generation
-    for (List<TaggedWord> taggedTweet : taggedTweets) {
-      Map<Integer, Double> combinedFeatureVector = cfvg
-          .generateFeatureVector(taggedTweet);
+      // Combined Feature Vector Generation
+      for (List<TaggedToken> taggedTokens : taggedTweets) {
+        Map<Integer, Double> combinedFeatureVector = cfvg
+            .generateFeatureVectorFromTaggedTokens(taggedTokens);
 
-      // Build feature vector string
-      String featureVectorStr = "";
-      for (Map.Entry<Integer, Double> feature : combinedFeatureVector
-          .entrySet()) {
-        featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+        // Build feature vector string
+        String featureVectorStr = "";
+        for (Map.Entry<Integer, Double> feature : combinedFeatureVector
+            .entrySet()) {
+          featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+        }
+        LOG.info("Tweet: '" + taggedTokens + "'");
+        LOG.info("CombinedFeatureVector: " + featureVectorStr);
       }
 
-      LOG.info("Tweet: '" + taggedTweet + "'");
-      LOG.info("CombinedFeatureVector: " + featureVectorStr);
+    } else {
+      GatePOSTagger gatePOSTagger = GatePOSTagger.getInstance();
+
+      // Preprocess and tag
+      long startTime = System.currentTimeMillis();
+      List<List<TaggedWord>> preprocessedTweets = preprocessor
+          .preprocessAndTagTweets(tokenizedTweets);
+      LOG.info("PreprocessAndTag finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
+
+      // Gate POS Tagging
+      startTime = System.currentTimeMillis();
+      List<List<TaggedWord>> taggedTweets = gatePOSTagger
+          .tagTweets(preprocessedTweets);
+      LOG.info("Gate POS Tagger finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
+
+      // Generate CombinedFeatureVectorGenerator
+      TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(taggedTweets,
+          TfType.RAW, TfIdfNormalization.COS, usePOSTags);
+      CombinedFeatureVectorGenerator cfvg = new CombinedFeatureVectorGenerator(
+          true, true, tweetTfIdf);
+
+      // Combined Feature Vector Generation
+      for (List<TaggedWord> taggedWords : taggedTweets) {
+        Map<Integer, Double> combinedFeatureVector = cfvg
+            .generateFeatureVectorFromTaggedWords(taggedWords);
+
+        // Build feature vector string
+        String featureVectorStr = "";
+        for (Map.Entry<Integer, Double> feature : combinedFeatureVector
+            .entrySet()) {
+          featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+        }
+        LOG.info("Tweet: '" + taggedWords + "'");
+        LOG.info("CombinedFeatureVector: " + featureVectorStr);
+      }
     }
   }
 
