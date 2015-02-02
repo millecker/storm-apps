@@ -23,6 +23,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public abstract class FeatureVectorGenerator {
@@ -31,19 +32,41 @@ public abstract class FeatureVectorGenerator {
 
   public abstract int getFeatureVectorSize();
 
-  public abstract Map<Integer, Double> generateFeatureVector(
+  public abstract Map<Integer, Double> generateTaggedWordFeatureVector(
       List<TaggedWord> tweet);
 
-  public List<Map<Integer, Double>> generateFeatureVectors(
+  public abstract Map<Integer, Double> generateTaggedTokenFeatureVector(
+      List<TaggedToken> tweet);
+
+  public List<Map<Integer, Double>> generateTaggedWordFeatureVectors(
       List<List<TaggedWord>> tweets) {
-    return generateFeatureVectors(tweets, false);
+    return generateTaggedWordFeatureVectors(tweets, false);
   }
 
-  public List<Map<Integer, Double>> generateFeatureVectors(
+  public List<Map<Integer, Double>> generateTaggedWordFeatureVectors(
       List<List<TaggedWord>> taggedTweets, boolean logging) {
     List<Map<Integer, Double>> featuredVectors = new ArrayList<Map<Integer, Double>>();
     for (List<TaggedWord> tweet : taggedTweets) {
-      Map<Integer, Double> featureVector = generateFeatureVector(tweet);
+      Map<Integer, Double> featureVector = generateTaggedWordFeatureVector(tweet);
+      if (logging) {
+        LOG.info("Tweet: " + tweet);
+        LOG.info("FeatureVector: " + featureVector);
+      }
+      featuredVectors.add(featureVector);
+    }
+    return featuredVectors;
+  }
+
+  public List<Map<Integer, Double>> generateTaggedTokenFeatureVectors(
+      List<List<TaggedToken>> tweets) {
+    return generateTaggedTokenFeatureVectors(tweets, false);
+  }
+
+  public List<Map<Integer, Double>> generateTaggedTokenFeatureVectors(
+      List<List<TaggedToken>> taggedTweets, boolean logging) {
+    List<Map<Integer, Double>> featuredVectors = new ArrayList<Map<Integer, Double>>();
+    for (List<TaggedToken> tweet : taggedTweets) {
+      Map<Integer, Double> featureVector = generateTaggedTokenFeatureVector(tweet);
       if (logging) {
         LOG.info("Tweet: " + tweet);
         LOG.info("FeatureVector: " + featureVector);
