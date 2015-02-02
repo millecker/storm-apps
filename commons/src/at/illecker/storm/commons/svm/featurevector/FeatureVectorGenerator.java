@@ -32,22 +32,22 @@ public abstract class FeatureVectorGenerator {
 
   public abstract int getFeatureVectorSize();
 
-  public abstract Map<Integer, Double> generateTaggedWordFeatureVector(
+  public abstract Map<Integer, Double> generateFeatureVectorFromTaggedWord(
       List<TaggedWord> tweet);
 
-  public abstract Map<Integer, Double> generateTaggedTokenFeatureVector(
+  public abstract Map<Integer, Double> generateFeatureVectorFromTaggedToken(
       List<TaggedToken> tweet);
 
-  public List<Map<Integer, Double>> generateTaggedWordFeatureVectors(
+  public List<Map<Integer, Double>> generateFeatureVectorsFromTaggedWord(
       List<List<TaggedWord>> tweets) {
-    return generateTaggedWordFeatureVectors(tweets, false);
+    return generateFeatureVectorsFromTaggedWord(tweets, false);
   }
 
-  public List<Map<Integer, Double>> generateTaggedWordFeatureVectors(
+  public List<Map<Integer, Double>> generateFeatureVectorsFromTaggedWord(
       List<List<TaggedWord>> taggedTweets, boolean logging) {
     List<Map<Integer, Double>> featuredVectors = new ArrayList<Map<Integer, Double>>();
     for (List<TaggedWord> tweet : taggedTweets) {
-      Map<Integer, Double> featureVector = generateTaggedWordFeatureVector(tweet);
+      Map<Integer, Double> featureVector = generateFeatureVectorFromTaggedWord(tweet);
       if (logging) {
         LOG.info("Tweet: " + tweet);
         LOG.info("FeatureVector: " + featureVector);
@@ -57,16 +57,16 @@ public abstract class FeatureVectorGenerator {
     return featuredVectors;
   }
 
-  public List<Map<Integer, Double>> generateTaggedTokenFeatureVectors(
+  public List<Map<Integer, Double>> generateFeatureVectorsFromTaggedToken(
       List<List<TaggedToken>> tweets) {
-    return generateTaggedTokenFeatureVectors(tweets, false);
+    return generateFeatureVectorsFromTaggedToken(tweets, false);
   }
 
-  public List<Map<Integer, Double>> generateTaggedTokenFeatureVectors(
+  public List<Map<Integer, Double>> generateFeatureVectorsFromTaggedToken(
       List<List<TaggedToken>> taggedTweets, boolean logging) {
     List<Map<Integer, Double>> featuredVectors = new ArrayList<Map<Integer, Double>>();
     for (List<TaggedToken> tweet : taggedTweets) {
-      Map<Integer, Double> featureVector = generateTaggedTokenFeatureVector(tweet);
+      Map<Integer, Double> featureVector = generateFeatureVectorFromTaggedToken(tweet);
       if (logging) {
         LOG.info("Tweet: " + tweet);
         LOG.info("FeatureVector: " + featureVector);
