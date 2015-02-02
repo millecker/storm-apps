@@ -26,10 +26,12 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.dict.SentimentDictionary;
 import at.illecker.storm.commons.dict.SentimentResult;
-import at.illecker.storm.commons.postagger.POSTagger;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
+import at.illecker.storm.commons.postagger.GatePOSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.Tweet;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
@@ -63,12 +65,28 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   @Override
-  public Map<Integer, Double> generateFeatureVector(
-      List<TaggedWord> taggedTokens) {
-    Map<Integer, Double> featureVector = new TreeMap<Integer, Double>();
+  public Map<Integer, Double> generateFeatureVectorFromTaggedWord(
+      List<TaggedWord> taggedWords) {
 
     Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
-        .getSentenceSentiment(taggedTokens);
+        .getSentenceSentimentFromTaggedWord(taggedWords);
+
+    return generateFeatureVector(tweetSentiments);
+  }
+
+  @Override
+  public Map<Integer, Double> generateFeatureVectorFromTaggedToken(
+      List<TaggedToken> taggedTokens) {
+
+    Map<Integer, SentimentResult> tweetSentiments = m_sentimentDict
+        .getSentenceSentimentFromTaggedToken(taggedTokens);
+
+    return generateFeatureVector(tweetSentiments);
+  }
+
+  private Map<Integer, Double> generateFeatureVector(
+      Map<Integer, SentimentResult> tweetSentiments) {
+    Map<Integer, Double> featureVector = new TreeMap<Integer, Double>();
 
     if (tweetSentiments != null) {
       for (Map.Entry<Integer, SentimentResult> tweetSentiment : tweetSentiments
@@ -117,37 +135,82 @@ public class SentimentFeatureVectorGenerator extends FeatureVectorGenerator {
   }
 
   public static void main(String[] args) {
+    boolean useArkPOSTagger = true;
     Preprocessor preprocessor = Preprocessor.getInstance();
-    POSTagger posTagger = POSTagger.getInstance();
     SentimentFeatureVectorGenerator sfvg = new SentimentFeatureVectorGenerator();
 
-    for (Tweet tweet : Tweet.getTestTweets()) {
-      // Tokenize
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+    List<Tweet> tweets = Tweet.getTestTweets();
 
-      // Preprocess
-      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
+    // Tokenize
+    List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
-      // POS Tagging
-      List<TaggedWord> taggedTokens = posTagger.tagSentence(preprocessedTokens);
+    if (useArkPOSTagger) {
+      ArkPOSTagger arkPOSTagger = ArkPOSTagger.getInstance();
+
+      // Preprocess only
+      long startTime = System.currentTimeMillis();
+      List<List<String>> preprocessedTweets = preprocessor
+          .preprocessTweets(tokenizedTweets);
+      LOG.info("Preprocess finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
+
+      // Ark POS Tagging
+      startTime = System.currentTimeMillis();
+      List<List<TaggedToken>> taggedTweets = arkPOSTagger
+          .tagTweets(preprocessedTweets);
+      LOG.info("Ark POS Tagger finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
 
       // Sentiment Feature Vector Generation
-      Map<Integer, Double> sentimentFeatureVector = sfvg
-          .generateFeatureVector(taggedTokens);
+      for (List<TaggedToken> taggedTokens : taggedTweets) {
+        Map<Integer, Double> sentimentFeatureVector = sfvg
+            .generateFeatureVectorFromTaggedToken(taggedTokens);
 
-      // Build feature vector string
-      String featureVectorStr = "";
-      for (Map.Entry<Integer, Double> feature : sentimentFeatureVector
-          .entrySet()) {
-        featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+        // Build feature vector string
+        String featureVectorStr = "";
+        for (Map.Entry<Integer, Double> feature : sentimentFeatureVector
+            .entrySet()) {
+          featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+        }
+
+        LOG.info("TaggedSentence: " + taggedTokens);
+        LOG.info("SentimentFeatureVector: " + featureVectorStr);
       }
 
-      LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("TaggedSentence: " + taggedTokens);
-      LOG.info("SentimentFeatureVector: " + featureVectorStr);
+    } else {
+      GatePOSTagger gatePOSTagger = GatePOSTagger.getInstance();
+
+      // Preprocess and tag
+      long startTime = System.currentTimeMillis();
+      List<List<TaggedWord>> preprocessedTweets = preprocessor
+          .preprocessAndTagTweets(tokenizedTweets);
+      LOG.info("PreprocessAndTag finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
+
+      // Gate POS Tagging
+      startTime = System.currentTimeMillis();
+      List<List<TaggedWord>> taggedTweets = gatePOSTagger
+          .tagTweets(preprocessedTweets);
+      LOG.info("Gate POS Tagger finished after "
+          + (System.currentTimeMillis() - startTime) + " ms");
+
+      // Sentiment Feature Vector Generation
+      for (List<TaggedWord> taggedWords : taggedTweets) {
+        Map<Integer, Double> sentimentFeatureVector = sfvg
+            .generateFeatureVectorFromTaggedWord(taggedWords);
+
+        // Build feature vector string
+        String featureVectorStr = "";
+        for (Map.Entry<Integer, Double> feature : sentimentFeatureVector
+            .entrySet()) {
+          featureVectorStr += " " + feature.getKey() + ":" + feature.getValue();
+        }
+
+        LOG.info("TaggedSentence: " + taggedWords);
+        LOG.info("SentimentFeatureVector: " + featureVectorStr);
+      }
     }
 
     sfvg.getSentimentDictionary().close();
   }
-
 }

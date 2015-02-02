@@ -179,7 +179,7 @@ public class SentimentDictionary {
     return sentimentScores;
   }
 
-  public Map<Integer, SentimentResult> getSentenceSentimentPTB(
+  public Map<Integer, SentimentResult> getSentenceSentimentFromTaggedWord(
       List<TaggedWord> sentence) {
     Map<Integer, SentimentResult> sentenceSentiments = new HashMap<Integer, SentimentResult>();
     if (LOGGING) {
@@ -212,7 +212,7 @@ public class SentimentDictionary {
     return (sentenceSentiments.size() > 0) ? sentenceSentiments : null;
   }
 
-  public Map<Integer, SentimentResult> getSentenceSentimentArk(
+  public Map<Integer, SentimentResult> getSentenceSentimentFromTaggedToken(
       List<TaggedToken> sentence) {
     Map<Integer, SentimentResult> sentenceSentiments = new HashMap<Integer, SentimentResult>();
     if (LOGGING) {
@@ -245,20 +245,20 @@ public class SentimentDictionary {
     return (sentenceSentiments.size() > 0) ? sentenceSentiments : null;
   }
 
-  public List<Map<Integer, SentimentResult>> getTweetsSentimentPTB(
+  public List<Map<Integer, SentimentResult>> getSentimentFromTaggedWords(
       List<List<TaggedWord>> tweets) {
     List<Map<Integer, SentimentResult>> tweetSentiments = new ArrayList<Map<Integer, SentimentResult>>();
     for (List<TaggedWord> tweet : tweets) {
-      tweetSentiments.add(getSentenceSentimentPTB(tweet));
+      tweetSentiments.add(getSentenceSentimentFromTaggedWord(tweet));
     }
     return tweetSentiments;
   }
 
-  public List<Map<Integer, SentimentResult>> getTweetsSentimentArk(
+  public List<Map<Integer, SentimentResult>> getSentimentFromTaggedTokens(
       List<List<TaggedToken>> tweets) {
     List<Map<Integer, SentimentResult>> tweetSentiments = new ArrayList<Map<Integer, SentimentResult>>();
     for (List<TaggedToken> tweet : tweets) {
-      tweetSentiments.add(getSentenceSentimentArk(tweet));
+      tweetSentiments.add(getSentenceSentimentFromTaggedToken(tweet));
     }
     return tweetSentiments;
   }
@@ -313,11 +313,11 @@ public class SentimentDictionary {
 
     // Calculate Ark Sentiment
     List<Map<Integer, SentimentResult>> arkSentimentResult = sentimentWordLists
-        .getTweetsSentimentArk(arkTaggedTweets);
+        .getSentimentFromTaggedTokens(arkTaggedTweets);
 
     // Calculate Gate Sentiment
     List<Map<Integer, SentimentResult>> gateSentimentResult = sentimentWordLists
-        .getTweetsSentimentPTB(gateTaggedTweets);
+        .getSentimentFromTaggedWords(gateTaggedTweets);
 
     if (debugOutput) {
       for (int i = 0; i < tweets.size(); i++) {
