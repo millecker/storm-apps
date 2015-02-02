@@ -32,7 +32,6 @@ import backtype.storm.topology.TopologyBuilder;
 
 public class SentimentAnalysisTopology {
   public static final String TOPOLOGY_NAME = "sentiment-analysis-topology";
-  public static final String FILTER_LANG = "en";
 
   public static void main(String[] args) throws Exception {
     String consumerKey = "";
@@ -69,54 +68,104 @@ public class SentimentAnalysisTopology {
     IRichSpout spout;
     String spoutID = "";
     if (consumerKey.isEmpty()) {
-      // sleep 20 sec before starting emitting tuples
-      conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, 20000);
-      // sleep 100 ms between emitting tuples
-      conf.put(DatasetSpout.CONF_TUPLE_SLEEP_MS, 100);
-      spout = new DatasetSpout(new String[] { "tweet" },
-          Configuration.getDataSetSemEval2013());
+      if (Configuration.get("apps.sentiment.analysis.spout.startup.sleep.ms") != null) {
+        conf.put(DatasetSpout.CONF_STARTUP_SLEEP_MS, (Integer) Configuration
+            .get("apps.sentiment.analysis.spout.startup.sleep.ms"));
+      }
+      if (Configuration.get("apps.sentiment.analysis.spout.tuple.sleep.ms") != null) {
+        conf.put(DatasetSpout.CONF_TUPLE_SLEEP_MS, (Integer) Configuration
+            .get("apps.sentiment.analysis.spout.tuple.sleep.ms"));
+      }
+      if (Configuration.get("apps.sentiment.analysis.spout.tuple.sleep.ns") != null) {
+        conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, (Integer) Configuration
+            .get("apps.sentiment.analysis.spout.tuple.sleep.ns"));
+      }
+      spout = new DatasetSpout(Configuration.getDataSetSemEval2013());
       spoutID = DatasetSpout.ID;
     } else {
-      // sleep 20 sec before starting emitting tuples
-      conf.put(TwitterStreamSpout.CONF_STARTUP_SLEEP_MS, 20000);
-      spout = new TwitterStreamSpout(new String[] { "tweet" }, consumerKey,
-          consumerSecret, accessToken, accessTokenSecret, keyWords, FILTER_LANG);
+      if (Configuration.get("apps.sentiment.analysis.spout.startup.sleep.ms") != null) {
+        conf.put(TwitterStreamSpout.CONF_STARTUP_SLEEP_MS,
+            (Integer) Configuration
+                .get("apps.sentiment.analysis.spout.startup.sleep.ms"));
+      }
+      spout = new TwitterStreamSpout(consumerKey, consumerSecret, accessToken,
+          accessTokenSecret, keyWords,
+          (String) Configuration
+              .get("apps.sentiment.analysis.spout.filter.language"));
       spoutID = TwitterStreamSpout.ID;
     }
 
     // Create Bolts
-    TokenizerBolt tokenizerBolt = new TokenizerBolt(new String[] { "tweet" },
-        new String[] { "splittedTweet" });
-    PreprocessorBolt preprocessorBolt = new PreprocessorBolt(
-        new String[] { "splittedTweet" }, new String[] { "preprocessedTweet" });
-    POSTaggerBolt posTaggerBolt = new POSTaggerBolt(
-        new String[] { "preprocessedTweet" }, new String[] { "taggedTweet" });
-    SentimentDetectionBolt sentimentDetectionBolt = new SentimentDetectionBolt(
-        new String[] { "taggedTweet" }, null);
+    TokenizerBolt tokenizerBolt = new TokenizerBolt();
+    PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
+    SentimentDetectionBolt sentimentDetectionBolt = new SentimentDetectionBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
 
     // Set Spout
-    builder.setSpout(spoutID, spout);
+    builder.setSpout(spoutID, spout,
+        Configuration.get("apps.sentiment.analysis.spout.parallelism", 1));
 
     // Set Spout --> TokenizerBolt
-    builder.setBolt(TokenizerBolt.ID, tokenizerBolt).shuffleGrouping(spoutID);
+    builder.setBolt(
+        TokenizerBolt.ID,
+        tokenizerBolt,
+        Configuration.get("apps.sentiment.analysis.bolt.tokenizer.parallelism",
+            1)).shuffleGrouping(spoutID);
 
     // TokenizerBolt --> PreprocessorBolt
-    builder.setBolt(PreprocessorBolt.ID, preprocessorBolt).shuffleGrouping(
-        TokenizerBolt.ID);
+    builder.setBolt(
+        PreprocessorBolt.ID,
+        preprocessorBolt,
+        Configuration.get(
+            "apps.sentiment.analysis.bolt.preprocessor.parallelism", 1))
+        .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt, 4).shuffleGrouping(
-        PreprocessorBolt.ID);
+    builder.setBolt(POSTaggerBolt.ID, posTaggerBolt,
+        Configuration.get("apps.sentiment.analysis.spout.parallelism", 1))
+        .shuffleGrouping(PreprocessorBolt.ID);
 
     // POSTaggerBolt --> SentimentDetectionBolt
-    builder.setBolt(SentimentDetectionBolt.ID, sentimentDetectionBolt)
+    builder.setBolt(
+        SentimentDetectionBolt.ID,
+        sentimentDetectionBolt,
+        Configuration.get(
+            "apps.sentiment.analysis.bolt.sentimentdetection.parallelism", 1))
         .shuffleGrouping(POSTaggerBolt.ID);
 
-    // Enable logging in SentimentDetectionBolt
-    conf.put(SentimentDetectionBolt.CONF_LOGGING, true);
+    // Set topology config
+    conf.setNumWorkers(Configuration.get("apps.sentiment.analysis.workers.num",
+        1));
+
+    if (Configuration.get("apps.sentiment.analysis.spout.max.pending") != null) {
+      conf.setMaxSpoutPending((Integer) Configuration
+          .get("apps.sentiment.analysis.spout.max.pending"));
+    }
+
+    if (Configuration.get("apps.sentiment.analysis.workers.childopts") != null) {
+      conf.put(Config.WORKER_CHILDOPTS,
+          Configuration.get("apps.sentiment.analysis.workers.childopts"));
+    }
+    if (Configuration.get("apps.sentiment.analysis.supervisor.childopts") != null) {
+      conf.put(Config.SUPERVISOR_CHILDOPTS,
+          Configuration.get("apps.sentiment.analysis.supervisor.childopts"));
+    }
+
+    conf.put(TokenizerBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.bolt.tokenizer.logging", false));
+    conf.put(PreprocessorBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.bolt.preprocessor.logging", false));
+    conf.put(POSTaggerBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.bolt.postagger.logging", false));
+    conf.put(POSTaggerBolt.CONF_MODEL,
+        Configuration.get("apps.sentiment.analysis.bolt.postagger.model"));
+    conf.put(SentimentDetectionBolt.CONF_LOGGING, Configuration.get(
+        "apps.sentiment.analysis.bolt.sentimentdetection.logging", false));
+
+    conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
@@ -124,4 +173,5 @@ public class SentimentAnalysisTopology {
     System.out.println("To kill the topology run:");
     System.out.println("storm kill " + TOPOLOGY_NAME);
   }
+
 }

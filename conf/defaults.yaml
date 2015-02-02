@@ -230,7 +230,7 @@ apps.postagger.workers.childopts: "-Xmx16g"
 apps.postagger.supervisor.childopts: "-Xmx2g"
 
 apps.postagger.spout.parallelism: 1
-apps.postagger.spout.max.pending: 2000
+apps.postagger.spout.max.pending: 1000
 apps.postagger.spout.startup.sleep.ms: null
 apps.postagger.spout.tuple.sleep.ms: null
 apps.postagger.spout.tuple.sleep.ns: null
@@ -250,6 +250,30 @@ apps.postagger.bolt.postagger.model: "resources/models/pos/gate-EN-twitter-fast.
 ### apps.sentiment.analysis.* configs are for the Sentiment Analysis application
 ##############################################################################
 
+apps.sentiment.analysis.workers.num: 1
+apps.sentiment.analysis.workers.childopts: "-Xmx16g"
+
+apps.sentiment.analysis.supervisor.childopts: "-Xmx2g"
+
+apps.sentiment.analysis.spout.parallelism: 1
+apps.sentiment.analysis.spout.max.pending: 1000
+apps.sentiment.analysis.spout.startup.sleep.ms: 20000 # 20 sec
+apps.sentiment.analysis.spout.tuple.sleep.ms: null
+apps.sentiment.analysis.spout.tuple.sleep.ns: null
+apps.sentiment.analysis.spout.filter.language: "en"
+
+apps.sentiment.analysis.bolt.tokenizer.parallelism: 1
+apps.sentiment.analysis.bolt.tokenizer.logging: false
+
+apps.sentiment.analysis.bolt.preprocessor.parallelism: 1
+apps.sentiment.analysis.bolt.preprocessor.logging: false
+
+apps.sentiment.analysis.bolt.postagger.parallelism: 1
+apps.sentiment.analysis.bolt.postagger.logging: false
+apps.sentiment.analysis.bolt.postagger.model: "resources/models/pos/gate-EN-twitter-fast.model"
+
+apps.sentiment.analysis.bolt.sentimentdetection.parallelism: 1
+apps.sentiment.analysis.bolt.sentimentdetection.logging: true
 
 ##############################################################################
 ### apps.sentiment.analysis.svm.* configs are for the Sentiment Analysis SVM application

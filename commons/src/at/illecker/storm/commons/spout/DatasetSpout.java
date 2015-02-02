@@ -42,6 +42,10 @@ public class DatasetSpout extends BaseRichSpout {
   private long m_tupleSleepMs = 0;
   private long m_tupleSleepNs = 0;
 
+  public DatasetSpout(Dataset dataset) {
+    m_dataset = dataset;
+  }
+
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("id", "score", "text"));
