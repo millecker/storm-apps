@@ -133,7 +133,7 @@ public class SentimentDictionary {
     }
 
     boolean wordIsHashtag = tag.equals("#") || tag.equals("HT");
-    boolean wordIsInterjection = tag.equals("!") || tag.equals("UH");
+    boolean wordIsEmoticon = tag.equals("E") || tag.equals("UH");
 
     // check for Hashtags
     if (wordIsHashtag && (word.length() > 1)) {
@@ -142,7 +142,7 @@ public class SentimentDictionary {
       } else {
         word = word.substring(1);
       }
-    } else if ((!wordIsInterjection) && StringUtils.consitsOfPunctuations(word)) {
+    } else if ((!wordIsEmoticon) && StringUtils.consitsOfPunctuations(word)) {
       // ignore all punctuations except emoticons
       return null;
     } else if (StringUtils.consitsOfUnderscores(word)) {
@@ -150,8 +150,8 @@ public class SentimentDictionary {
       return null;
     }
 
-    // if not an interjection then toLowerCase
-    if (!wordIsInterjection) {
+    // if word is not an emoticon then toLowerCase
+    if (!wordIsEmoticon) {
       word = word.toLowerCase();
     }
 
