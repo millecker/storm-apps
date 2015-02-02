@@ -25,7 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Configuration;
-import at.illecker.storm.commons.postagger.POSTagger;
+import at.illecker.storm.commons.Dataset;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
+import at.illecker.storm.commons.postagger.GatePOSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.Tweet;
@@ -33,6 +35,7 @@ import at.illecker.storm.commons.util.StringUtils;
 import at.illecker.storm.commons.util.io.FileUtils;
 import at.illecker.storm.commons.wordnet.POSTag;
 import at.illecker.storm.commons.wordnet.WordNet;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.mit.jwi.item.POS;
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -119,20 +122,27 @@ public class SentimentDictionary {
     return (sentimentScores.size() > 0) ? sentimentScores : null;
   }
 
-  public Map<Integer, Double> getWordSentimentWithStemming(String word,
-      String pennTag) {
-    // convert pennTag to POS (NOUN, VERB, ADJECTIVE, ADVERB)
-    POS posTag = POSTag.convertString(pennTag);
+  private Map<Integer, Double> getWordSentiment(String word, String tag,
+      boolean usePTB) {
+    // convert tag to POS (NOUN, VERB, ADJECTIVE, ADVERB)
+    POS posTag;
+    if (usePTB) {
+      posTag = POSTag.convertPTB(tag);
+    } else {
+      posTag = POSTag.convertArk(tag);
+    }
+
+    boolean wordIsHashtag = tag.equals("#") || tag.equals("HT");
+    boolean wordIsInterjection = tag.equals("!") || tag.equals("UH");
 
     // check for Hashtags
-    if (pennTag.equals("HT") && (word.length() > 1)) {
+    if (wordIsHashtag && (word.length() > 1)) {
       if (word.indexOf('@') == 1) {
         word = word.substring(2); // check for #@ HASHTAG_USER
       } else {
         word = word.substring(1);
       }
-    } else if ((!pennTag.equals("UH"))
-        && StringUtils.consitsOfPunctuations(word)) {
+    } else if ((!wordIsInterjection) && StringUtils.consitsOfPunctuations(word)) {
       // ignore all punctuations except emoticons
       return null;
     } else if (StringUtils.consitsOfUnderscores(word)) {
@@ -140,7 +150,8 @@ public class SentimentDictionary {
       return null;
     }
 
-    if (!pennTag.equals("UH")) {
+    // if not an interjection then toLowerCase
+    if (!wordIsInterjection) {
       word = word.toLowerCase();
     }
 
@@ -168,16 +179,15 @@ public class SentimentDictionary {
     return sentimentScores;
   }
 
-  public Map<Integer, SentimentResult> getSentenceSentiment(
+  public Map<Integer, SentimentResult> getSentenceSentimentPTB(
       List<TaggedWord> sentence) {
     Map<Integer, SentimentResult> sentenceSentiments = new HashMap<Integer, SentimentResult>();
     if (LOGGING) {
       LOG.info("TaggedSentence: " + sentence.toString());
     }
-    for (TaggedWord w : sentence) {
-      Map<Integer, Double> wordSentiments = getWordSentimentWithStemming(
-          w.word(), w.tag());
-
+    for (TaggedWord word : sentence) {
+      Map<Integer, Double> wordSentiments = getWordSentiment(word.word(),
+          word.tag(), true);
       if (wordSentiments != null) {
         for (Map.Entry<Integer, Double> wordSentiment : wordSentiments
             .entrySet()) {
@@ -189,10 +199,8 @@ public class SentimentDictionary {
           if (sentimentResult == null) {
             sentimentResult = new SentimentResult();
           }
-
           // add score value
           sentimentResult.addScore(sentimentScore);
-
           // update sentimentResult
           sentenceSentiments.put(key, sentimentResult);
         }
@@ -204,27 +212,119 @@ public class SentimentDictionary {
     return (sentenceSentiments.size() > 0) ? sentenceSentiments : null;
   }
 
+  public Map<Integer, SentimentResult> getSentenceSentimentArk(
+      List<TaggedToken> sentence) {
+    Map<Integer, SentimentResult> sentenceSentiments = new HashMap<Integer, SentimentResult>();
+    if (LOGGING) {
+      LOG.info("TaggedSentence: " + sentence.toString());
+    }
+    for (TaggedToken word : sentence) {
+      Map<Integer, Double> wordSentiments = getWordSentiment(word.token,
+          word.tag, false);
+      if (wordSentiments != null) {
+        for (Map.Entry<Integer, Double> wordSentiment : wordSentiments
+            .entrySet()) {
+
+          int key = wordSentiment.getKey();
+          double sentimentScore = wordSentiment.getValue();
+
+          SentimentResult sentimentResult = sentenceSentiments.get(key);
+          if (sentimentResult == null) {
+            sentimentResult = new SentimentResult();
+          }
+          // add score value
+          sentimentResult.addScore(sentimentScore);
+          // update sentimentResult
+          sentenceSentiments.put(key, sentimentResult);
+        }
+      }
+    }
+    if (LOGGING) {
+      LOG.info("Sentiment: " + sentenceSentiments);
+    }
+    return (sentenceSentiments.size() > 0) ? sentenceSentiments : null;
+  }
+
+  public List<Map<Integer, SentimentResult>> getTweetsSentimentPTB(
+      List<List<TaggedWord>> tweets) {
+    List<Map<Integer, SentimentResult>> tweetSentiments = new ArrayList<Map<Integer, SentimentResult>>();
+    for (List<TaggedWord> tweet : tweets) {
+      tweetSentiments.add(getSentenceSentimentPTB(tweet));
+    }
+    return tweetSentiments;
+  }
+
+  public List<Map<Integer, SentimentResult>> getTweetsSentimentArk(
+      List<List<TaggedToken>> tweets) {
+    List<Map<Integer, SentimentResult>> tweetSentiments = new ArrayList<Map<Integer, SentimentResult>>();
+    for (List<TaggedToken> tweet : tweets) {
+      tweetSentiments.add(getSentenceSentimentArk(tweet));
+    }
+    return tweetSentiments;
+  }
+
   public static void main(String[] args) {
+    boolean debugOutput = true;
+    boolean extendedTest = true;
     Preprocessor preprocessor = Preprocessor.getInstance();
-    POSTagger posTagger = POSTagger.getInstance();
+    GatePOSTagger gatePOSTagger = GatePOSTagger.getInstance();
+    ArkPOSTagger arkPOSTagger = ArkPOSTagger.getInstance();
     SentimentDictionary sentimentWordLists = SentimentDictionary.getInstance();
 
-    for (Tweet tweet : Tweet.getTestTweets()) {
-      // Tokenize
-      List<String> tokens = Tokenizer.tokenize(tweet.getText());
+    List<Tweet> tweets;
+    if (extendedTest) {
+      // SemEval2013
+      Dataset dataset = Configuration.getDataSetSemEval2013();
+      tweets = dataset.getTrainTweets(true);
+    } else {
+      tweets = Tweet.getTestTweets();
+    }
 
-      // Preprocess
-      List<TaggedWord> preprocessedTokens = preprocessor.preprocess(tokens);
+    // Tokenize
+    List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(tweets);
 
-      // POS Tagging
-      List<TaggedWord> taggedTokens = posTagger.tagSentence(preprocessedTokens);
+    // Preprocess only
+    long startTime = System.currentTimeMillis();
+    List<List<String>> preprocessedTweets = preprocessor
+        .preprocessTweets(tokenizedTweets);
+    LOG.info("Preprocess finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
 
-      // Calculate Sentiment
-      Map<Integer, SentimentResult> sentimentResult = sentimentWordLists
-          .getSentenceSentiment(taggedTokens);
+    // Preprocess and tag
+    startTime = System.currentTimeMillis();
+    List<List<TaggedWord>> preprocessedTaggedTweets = preprocessor
+        .preprocessAndTagTweets(tokenizedTweets);
+    LOG.info("PreprocessAndTag finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
 
-      LOG.info("Tweet: '" + tweet + "'");
-      LOG.info("Sentiment: " + sentimentResult);
+    // Ark POS Tagging
+    startTime = System.currentTimeMillis();
+    List<List<TaggedToken>> arkTaggedTweets = arkPOSTagger
+        .tagTweets(preprocessedTweets);
+    LOG.info("Ark POS Tagger finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
+
+    // Gate POS Tagging
+    startTime = System.currentTimeMillis();
+    List<List<TaggedWord>> gateTaggedTweets = gatePOSTagger
+        .tagTweets(preprocessedTaggedTweets);
+    LOG.info("Gate POS Tagger finished after "
+        + (System.currentTimeMillis() - startTime) + " ms");
+
+    // Calculate Ark Sentiment
+    List<Map<Integer, SentimentResult>> arkSentimentResult = sentimentWordLists
+        .getTweetsSentimentArk(arkTaggedTweets);
+
+    // Calculate Gate Sentiment
+    List<Map<Integer, SentimentResult>> gateSentimentResult = sentimentWordLists
+        .getTweetsSentimentPTB(gateTaggedTweets);
+
+    if (debugOutput) {
+      for (int i = 0; i < tweets.size(); i++) {
+        LOG.info("Tweet: '" + tweets.get(i).getText() + "'");
+        LOG.info("ArkSentiment: " + arkSentimentResult.get(i));
+        LOG.info("GateSentiment: " + gateSentimentResult.get(i));
+      }
     }
 
     sentimentWordLists.close();
