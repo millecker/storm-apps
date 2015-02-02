@@ -50,7 +50,7 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
     if (useTaggedWords) {
       m_vectorSize = 7;
     } else {
-      m_vectorSize = 10;
+      m_vectorSize = 8;
     }
     LOG.info("VectorSize: " + m_vectorSize);
   }
@@ -107,20 +107,22 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
     Map<Integer, Double> resultFeatureVector = new TreeMap<Integer, Double>();
     double[] posTags = countPOSTagsFromTaggedTokens(taggedTokens, m_normalize);
     if (posTags != null) {
-      if (posTags[0] != 0) // nouns / wordCount
+      if (posTags[0] != 0) // nouns
         resultFeatureVector.put(m_vectorStartId, posTags[0]);
-      if (posTags[1] != 0) // verbs / wordCount
+      if (posTags[1] != 0) // verb
         resultFeatureVector.put(m_vectorStartId + 1, posTags[1]);
-      if (posTags[2] != 0) // adjectives / wordCount
+      if (posTags[2] != 0) // adjective
         resultFeatureVector.put(m_vectorStartId + 2, posTags[2]);
-      if (posTags[3] != 0) // adverbs / wordCount
+      if (posTags[3] != 0) // adverb
         resultFeatureVector.put(m_vectorStartId + 3, posTags[3]);
-      if (posTags[4] != 0) // interjections / wordCount
+      if (posTags[4] != 0) // interjection
         resultFeatureVector.put(m_vectorStartId + 4, posTags[4]);
-      if (posTags[5] != 0) // punctuations / wordCount
+      if (posTags[5] != 0) // punctuation
         resultFeatureVector.put(m_vectorStartId + 5, posTags[5]);
-      if (posTags[6] != 0) // hashtags / wordCount
+      if (posTags[6] != 0) // hashtag
         resultFeatureVector.put(m_vectorStartId + 6, posTags[6]);
+      if (posTags[7] != 0) // emoticon
+        resultFeatureVector.put(m_vectorStartId + 7, posTags[7]);
     }
     if (LOGGING) {
       LOG.info("POStags: " + Arrays.toString(posTags));
@@ -164,32 +166,29 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
       boolean normalize) {
     // 10 = [NOUN, PRONOUN, PROPER_NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION,
     // PUNCTUATION, HASHTAG, EMOTICON]
-    double[] posTags = new double[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d };
+    double[] posTags = new double[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d };
     int wordCount = 0;
     for (TaggedToken word : taggedTokens) {
       wordCount++;
       String arkTag = word.tag;
       // http://www.ark.cs.cmu.edu/TweetNLP/annot_guidelines.pdf
-      if (arkTag.equals("N")) {
+      if (arkTag.equals("N") || arkTag.equals("O") || arkTag.equals("ˆ")
+          || arkTag.equals("Z")) {
         posTags[0]++;
-      } else if (arkTag.equals("O")) {
+      } else if (arkTag.equals("V") || arkTag.equals("T")) {
         posTags[1]++;
-      } else if (arkTag.equals("ˆ") || arkTag.equals("Z")) {
-        posTags[2]++;
-      } else if (arkTag.equals("V")) {
-        posTags[3]++;
       } else if (arkTag.equals("A")) {
-        posTags[4]++;
+        posTags[2]++;
       } else if (arkTag.equals("R")) {
-        posTags[5]++;
+        posTags[3]++;
       } else if (arkTag.equals("!")) {
-        posTags[6]++;
+        posTags[4]++;
       } else if (arkTag.equals(",")) {
-        posTags[7]++;
+        posTags[5]++;
       } else if (arkTag.equals("#")) {
-        posTags[8]++;
+        posTags[6]++;
       } else if (arkTag.equals("E")) {
-        posTags[9]++;
+        posTags[7]++;
       }
     }
     if (normalize) {
