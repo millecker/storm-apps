@@ -28,7 +28,8 @@ import libsvm.svm;
 import libsvm.svm_model;
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
-import at.illecker.storm.commons.postagger.POSTagger;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
+import at.illecker.storm.commons.postagger.GatePOSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.svm.featurevector.CombinedFeatureVectorGenerator;
 import at.illecker.storm.commons.svm.featurevector.FeatureVectorGenerator;
@@ -40,11 +41,13 @@ import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SVMBenchmark {
 
   public static void main(String[] args) {
+    final boolean useArkPOSTagger;
     final int numberOfThreads;
     final int inputCount;
     System.out.println("\nStarting SVM Benchmark...");
@@ -55,10 +58,22 @@ public class SVMBenchmark {
         inputCount = Integer.parseInt(args[1]);
         System.out
             .println("Using " + inputCount + " times the test dataset...");
+        if (args.length > 2) {
+          useArkPOSTagger = Boolean.parseBoolean(args[2]);
+          if (useArkPOSTagger) {
+            System.out.println("Using Ark POS Tagger...");
+          } else {
+            System.out.println("Using Gate POS Tagger...");
+          }
+        } else {
+          useArkPOSTagger = true;
+        }
       } else {
+        useArkPOSTagger = true;
         inputCount = 1;
       }
     } else {
+      useArkPOSTagger = true;
       numberOfThreads = 1;
       inputCount = 1;
     }
@@ -69,23 +84,44 @@ public class SVMBenchmark {
 
     final IdentityScoreClassifier isc = new IdentityScoreClassifier();
 
-    // Load Preprocessor
-    final Preprocessor preprocessor = Preprocessor.getInstance();
-
-    // Load POS Tagger
-    final POSTagger posTagger = POSTagger.getInstance();
-
-    // Load TF-IDF
+    // Load featured tweets
     List<FeaturedTweet> featuredTrainTweets = SerializationUtils
         .deserialize(dataset.getTrainDataSerializationFile());
-    TweetTfIdf tweetTfIdf = new TweetTfIdf(
-        FeaturedTweet.getTaggedTweets(featuredTrainTweets), TfType.RAW,
-        TfIdfNormalization.COS, true);
 
-    // Load Feature Vector Generator
-    System.out.println("Load CombinedFeatureVectorGenerator...");
-    final FeatureVectorGenerator fvg = new CombinedFeatureVectorGenerator(
-        tweetTfIdf);
+    // Load Preprocessor
+    final Preprocessor preprocessor = Preprocessor.getInstance();
+    final ArkPOSTagger arkPOSTagger;
+    final GatePOSTagger gatePOSTagger;
+    final FeatureVectorGenerator fvg;
+
+    if (useArkPOSTagger) {
+      // Load Ark POS Tagger
+      gatePOSTagger = null;
+      arkPOSTagger = ArkPOSTagger.getInstance();
+
+      // Load TF-IDF
+      TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
+          FeaturedTweet.getTaggedTokensFromTweets(featuredTrainTweets),
+          TfType.RAW, TfIdfNormalization.COS, true);
+
+      // Load Feature Vector Generator
+      System.out.println("Load CombinedFeatureVectorGenerator...");
+      fvg = new CombinedFeatureVectorGenerator(false, true, tweetTfIdf);
+
+    } else {
+      // Load Gate POS Tagger
+      arkPOSTagger = null;
+      gatePOSTagger = GatePOSTagger.getInstance();
+
+      // Load TF-IDF
+      TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(
+          FeaturedTweet.getTaggedWordsFromTweets(featuredTrainTweets),
+          TfType.RAW, TfIdfNormalization.COS, true);
+
+      // Load Feature Vector Generator
+      System.out.println("Load CombinedFeatureVectorGenerator...");
+      fvg = new CombinedFeatureVectorGenerator(true, true, tweetTfIdf);
+    }
 
     // Load SVM Model
     System.out.println("Loading SVM model...");
@@ -125,17 +161,33 @@ public class SVMBenchmark {
           List<List<String>> tokenizedTweets = Tokenizer
               .tokenizeTweets(subtestTweets);
 
-          // Preprocess
-          List<List<TaggedWord>> preprocessedTweets = preprocessor
-              .preprocessTweets(tokenizedTweets);
+          List<Map<Integer, Double>> featureVectors = null;
+          if (useArkPOSTagger) {
+            // Preprocess only
+            List<List<String>> preprocessedTweets = preprocessor
+                .preprocessTweets(tokenizedTweets);
 
-          // POS Tagging
-          List<List<TaggedWord>> taggedTweets = posTagger
-              .tagTweets(preprocessedTweets);
+            // Ark POS Tagging
+            List<List<TaggedToken>> taggedTweets = arkPOSTagger
+                .tagTweets(preprocessedTweets);
 
-          // Feature Vector Generation
-          List<Map<Integer, Double>> featureVectors = fvg
-              .generateFeatureVectors(taggedTweets);
+            // Feature Vector Generation
+            featureVectors = fvg
+                .generateFeatureVectorsFromTaggedTokens(taggedTweets);
+
+          } else {
+            // Preprocess and tag
+            List<List<TaggedWord>> preprocessedTweets = preprocessor
+                .preprocessAndTagTweets(tokenizedTweets);
+
+            // Gate POS Tagging
+            List<List<TaggedWord>> taggedTweets = gatePOSTagger
+                .tagTweets(preprocessedTweets);
+
+            // Feature Vector Generation
+            featureVectors = fvg
+                .generateFeatureVectorsFromTaggedWords(taggedTweets);
+          }
 
           for (Map<Integer, Double> featureVector : featureVectors) {
             double predictedClass = SVM.evaluate(featureVector, svmModel,
@@ -163,4 +215,5 @@ public class SVMBenchmark {
     executorService.shutdown();
     svm.EXEC_SERV.shutdown();
   }
+
 }

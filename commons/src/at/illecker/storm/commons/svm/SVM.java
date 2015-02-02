@@ -648,7 +648,6 @@ public class SVM {
             .preprocessAndTagTweets(tokenizedTweets);
 
         // Gate POS Tagging
-        gatePOSTagger = GatePOSTagger.getInstance();
         LOG.info("GATE POS Tagging of test tweets...");
         List<List<TaggedWord>> taggedTweets = gatePOSTagger
             .tagTweets(preprocessedTweets);
