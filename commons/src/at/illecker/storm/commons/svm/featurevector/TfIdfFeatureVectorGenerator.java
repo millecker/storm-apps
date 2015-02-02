@@ -69,13 +69,13 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
   @Override
   public Map<Integer, Double> generateFeatureVectorFromTaggedWords(
       List<TaggedWord> tweet) {
-    return generateFeatureVector(m_tweetTfIdf.tfIdfTaggedWord(tweet));
+    return generateFeatureVector(m_tweetTfIdf.tfIdfFromTaggedWords(tweet));
   }
 
   @Override
   public Map<Integer, Double> generateFeatureVectorFromTaggedTokens(
       List<TaggedToken> tweet) {
-    return generateFeatureVector(m_tweetTfIdf.tfIdfTaggedToken(tweet));
+    return generateFeatureVector(m_tweetTfIdf.tfIdfFromTaggedTokens(tweet));
   }
 
   public Map<Integer, Double> generateFeatureVector(Map<String, Double> tfIdf) {

@@ -81,13 +81,13 @@ public class TweetTfIdf {
     return m_termIds;
   }
 
-  public Map<String, Double> tfIdfTaggedWord(List<TaggedWord> tweet) {
-    return TfIdf.tfIdf(tfTaggedWord(tweet, m_tfType, m_usePOSTags),
+  public Map<String, Double> tfIdfFromTaggedWords(List<TaggedWord> tweet) {
+    return TfIdf.tfIdf(tfFromTaggedWords(tweet, m_tfType, m_usePOSTags),
         m_inverseDocFreq, m_tfIdfNormalization);
   }
 
-  public Map<String, Double> tfIdfTaggedToken(List<TaggedToken> tweet) {
-    return TfIdf.tfIdf(tfTaggedToken(tweet, m_tfType, m_usePOSTags),
+  public Map<String, Double> tfIdfFromTaggedTokens(List<TaggedToken> tweet) {
+    return TfIdf.tfIdf(tfFromTaggedTokens(tweet, m_tfType, m_usePOSTags),
         m_inverseDocFreq, m_tfIdfNormalization);
   }
 
@@ -152,7 +152,7 @@ public class TweetTfIdf {
       List<List<TaggedWord>> tweets, TfType type, boolean usePOSTags) {
     List<Map<String, Double>> termFreqs = new ArrayList<Map<String, Double>>();
     for (List<TaggedWord> tweet : tweets) {
-      termFreqs.add(tfTaggedWord(tweet, type, usePOSTags));
+      termFreqs.add(tfFromTaggedWords(tweet, type, usePOSTags));
     }
     return termFreqs;
   }
@@ -161,12 +161,12 @@ public class TweetTfIdf {
       List<List<TaggedToken>> tweets, TfType type, boolean usePOSTags) {
     List<Map<String, Double>> termFreqs = new ArrayList<Map<String, Double>>();
     for (List<TaggedToken> tweet : tweets) {
-      termFreqs.add(tfTaggedToken(tweet, type, usePOSTags));
+      termFreqs.add(tfFromTaggedTokens(tweet, type, usePOSTags));
     }
     return termFreqs;
   }
 
-  public static Map<String, Double> tfTaggedWord(List<TaggedWord> tweet,
+  public static Map<String, Double> tfFromTaggedWords(List<TaggedWord> tweet,
       TfType type, boolean usePOSTags) {
     Map<String, Double> termFreq = new LinkedHashMap<String, Double>();
     WordNet wordNet = WordNet.getInstance();
@@ -225,7 +225,7 @@ public class TweetTfIdf {
     return termFreq;
   }
 
-  public static Map<String, Double> tfTaggedToken(List<TaggedToken> tweet,
+  public static Map<String, Double> tfFromTaggedTokens(List<TaggedToken> tweet,
       TfType type, boolean usePOSTags) {
     Map<String, Double> termFreq = new LinkedHashMap<String, Double>();
     WordNet wordNet = WordNet.getInstance();
