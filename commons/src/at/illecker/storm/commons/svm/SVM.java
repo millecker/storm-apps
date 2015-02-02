@@ -43,7 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
-import at.illecker.storm.commons.postagger.POSTagger;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
+import at.illecker.storm.commons.postagger.GatePOSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.svm.featurevector.CombinedFeatureVectorGenerator;
 import at.illecker.storm.commons.svm.featurevector.FeatureVectorGenerator;
@@ -58,6 +59,7 @@ import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SVM {
@@ -456,14 +458,15 @@ public class SVM {
     // (In this set-up, precision, recall, and F1 are all the same.)
   }
 
-  public static void svm(Dataset dataset,
+  public static void svm(Dataset dataset, boolean useArkPOSTagger,
       Class<? extends FeatureVectorGenerator> featureVectorGenerator,
       int nFoldCrossValidation, boolean parameterSearch,
       boolean useSerialization) {
 
     FeatureVectorGenerator fvg = null;
     Preprocessor preprocessor = null;
-    POSTagger posTagger = null;
+    ArkPOSTagger arkPOSTagger = null;
+    GatePOSTagger gatePOSTagger = null;
 
     // Prepare Train tweets
     LOG.info("Prepare Train data...");
@@ -484,53 +487,105 @@ public class SVM {
       List<List<String>> tokenizedTweets = Tokenizer
           .tokenizeTweets(trainTweets);
 
-      // Preprocess
       preprocessor = Preprocessor.getInstance();
-      LOG.info("Preprocess train tweets...");
-      List<List<TaggedWord>> preprocessedTweets = preprocessor
-          .preprocessTweets(tokenizedTweets);
 
-      // POS Tagging
-      posTagger = POSTagger.getInstance();
-      LOG.info("POS Tagging of train tweets...");
-      List<List<TaggedWord>> taggedTweets = posTagger
-          .tagTweets(preprocessedTweets);
+      if (useArkPOSTagger) {
+        // Preprocess only
+        LOG.info("Preprocess train tweets...");
+        List<List<String>> preprocessedTweets = preprocessor
+            .preprocessTweets(tokenizedTweets);
 
-      // Create Feature Vector Generator
-      if (featureVectorGenerator.equals(SentimentFeatureVectorGenerator.class)) {
-        LOG.info("Load SentimentFeatureVectorGenerator...");
-        fvg = new SentimentFeatureVectorGenerator();
+        // Ark POS Tagging
+        arkPOSTagger = ArkPOSTagger.getInstance();
+        LOG.info("Ark POS Tagging of train tweets...");
+        List<List<TaggedToken>> taggedTweets = arkPOSTagger
+            .tagTweets(preprocessedTweets);
 
-      } else if (featureVectorGenerator
-          .equals(TfIdfFeatureVectorGenerator.class)) {
-        TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
-            TfIdfNormalization.COS, true);
-        LOG.info("Load TfIdfFeatureVectorGenerator...");
-        fvg = new TfIdfFeatureVectorGenerator(tweetTfIdf);
+        // Create Feature Vector Generator
+        if (featureVectorGenerator
+            .equals(SentimentFeatureVectorGenerator.class)) {
+          LOG.info("Load SentimentFeatureVectorGenerator...");
+          fvg = new SentimentFeatureVectorGenerator();
 
-      } else if (featureVectorGenerator
-          .equals(CombinedFeatureVectorGenerator.class)) {
-        TweetTfIdf tweetTfIdf = new TweetTfIdf(taggedTweets, TfType.RAW,
-            TfIdfNormalization.COS, true);
-        LOG.info("Load CombinedFeatureVectorGenerator...");
-        fvg = new CombinedFeatureVectorGenerator(tweetTfIdf);
+        } else if (featureVectorGenerator
+            .equals(TfIdfFeatureVectorGenerator.class)) {
+          TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
+              taggedTweets, TfType.RAW, TfIdfNormalization.COS, true);
+          LOG.info("Load TfIdfFeatureVectorGenerator...");
+          fvg = new TfIdfFeatureVectorGenerator(tweetTfIdf);
+
+        } else if (featureVectorGenerator
+            .equals(CombinedFeatureVectorGenerator.class)) {
+          TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
+              taggedTweets, TfType.RAW, TfIdfNormalization.COS, true);
+          LOG.info("Load CombinedFeatureVectorGenerator...");
+          fvg = new CombinedFeatureVectorGenerator(false, true, tweetTfIdf);
+
+        } else {
+          throw new UnsupportedOperationException("FeatureVectorGenerator '"
+              + featureVectorGenerator.getName() + "' is not supported!");
+        }
+
+        // Feature Vector Generation
+        LOG.info("Generate Feature Vectors for train tweets...");
+        featuredTrainTweets = new ArrayList<FeaturedTweet>();
+        for (int i = 0; i < taggedTweets.size(); i++) {
+          List<TaggedToken> taggedTweet = taggedTweets.get(i);
+          Map<Integer, Double> featureVector = fvg
+              .generateFeatureVectorFromTaggedTokens(taggedTweet);
+          featuredTrainTweets.add(FeaturedTweet.createFromTaggedTokens(
+              trainTweets.get(i), tokenizedTweets.get(i),
+              preprocessedTweets.get(i), taggedTweet, featureVector));
+        }
 
       } else {
-        throw new UnsupportedOperationException("FeatureVectorGenerator '"
-            + featureVectorGenerator.getName() + "' is not supported!");
-      }
+        // Preprocess and tag
+        LOG.info("Preprocess train tweets...");
+        List<List<TaggedWord>> preprocessedTweets = preprocessor
+            .preprocessAndTagTweets(tokenizedTweets);
 
-      // Feature Vector Generation
-      LOG.info("Generate Feature Vectors for train tweets...");
-      featuredTrainTweets = new ArrayList<FeaturedTweet>();
-      for (int i = 0; i < taggedTweets.size(); i++) {
-        List<TaggedWord> taggedTweet = taggedTweets.get(i);
-        Map<Integer, Double> featureVector = fvg
-            .generateFeatureVector(taggedTweet);
+        // Gate POS Tagging
+        gatePOSTagger = GatePOSTagger.getInstance();
+        LOG.info("GATE POS Tagging of train tweets...");
+        List<List<TaggedWord>> taggedTweets = gatePOSTagger
+            .tagTweets(preprocessedTweets);
 
-        featuredTrainTweets.add(new FeaturedTweet(trainTweets.get(i),
-            tokenizedTweets.get(i), preprocessedTweets.get(i), taggedTweet,
-            featureVector));
+        // Create Feature Vector Generator
+        if (featureVectorGenerator
+            .equals(SentimentFeatureVectorGenerator.class)) {
+          LOG.info("Load SentimentFeatureVectorGenerator...");
+          fvg = new SentimentFeatureVectorGenerator();
+
+        } else if (featureVectorGenerator
+            .equals(TfIdfFeatureVectorGenerator.class)) {
+          TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(
+              taggedTweets, TfType.RAW, TfIdfNormalization.COS, true);
+          LOG.info("Load TfIdfFeatureVectorGenerator...");
+          fvg = new TfIdfFeatureVectorGenerator(tweetTfIdf);
+
+        } else if (featureVectorGenerator
+            .equals(CombinedFeatureVectorGenerator.class)) {
+          TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(
+              taggedTweets, TfType.RAW, TfIdfNormalization.COS, true);
+          LOG.info("Load CombinedFeatureVectorGenerator...");
+          fvg = new CombinedFeatureVectorGenerator(true, true, tweetTfIdf);
+
+        } else {
+          throw new UnsupportedOperationException("FeatureVectorGenerator '"
+              + featureVectorGenerator.getName() + "' is not supported!");
+        }
+
+        // Feature Vector Generation
+        LOG.info("Generate Feature Vectors for train tweets...");
+        featuredTrainTweets = new ArrayList<FeaturedTweet>();
+        for (int i = 0; i < taggedTweets.size(); i++) {
+          List<TaggedWord> taggedTweet = taggedTweets.get(i);
+          Map<Integer, Double> featureVector = fvg
+              .generateFeatureVectorFromTaggedWords(taggedTweet);
+          featuredTrainTweets.add(FeaturedTweet.createFromTaggedWords(
+              trainTweets.get(i), tokenizedTweets.get(i),
+              preprocessedTweets.get(i), taggedTweet, featureVector));
+        }
       }
 
       // Serialize training data including feature vectors
@@ -563,29 +618,52 @@ public class SVM {
       LOG.info("Tokenize test tweets...");
       List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(testTweets);
 
-      // Preprocess
-      preprocessor = Preprocessor.getInstance();
-      LOG.info("Preprocess test tweets...");
-      List<List<TaggedWord>> preprocessedTweets = preprocessor
-          .preprocessTweets(tokenizedTweets);
+      if (useArkPOSTagger) {
+        // Preprocess only
+        LOG.info("Preprocess test tweets...");
+        List<List<String>> preprocessedTweets = preprocessor
+            .preprocessTweets(tokenizedTweets);
 
-      // POS Tagging
-      posTagger = POSTagger.getInstance();
-      LOG.info("POS Tagging of test tweets...");
-      List<List<TaggedWord>> taggedTweets = posTagger
-          .tagTweets(preprocessedTweets);
+        // Ark POS Tagging
+        LOG.info("Ark POS Tagging of test tweets...");
+        List<List<TaggedToken>> taggedTweets = arkPOSTagger
+            .tagTweets(preprocessedTweets);
 
-      // Feature Vector Generation
-      LOG.info("Generate Feature Vectors for test tweets...");
-      featuredTestTweets = new ArrayList<FeaturedTweet>();
-      for (int i = 0; i < taggedTweets.size(); i++) {
-        List<TaggedWord> taggedTweet = taggedTweets.get(i);
-        Map<Integer, Double> featureVector = fvg
-            .generateFeatureVector(taggedTweet);
+        // Feature Vector Generation
+        LOG.info("Generate Feature Vectors for test tweets...");
+        featuredTestTweets = new ArrayList<FeaturedTweet>();
+        for (int i = 0; i < taggedTweets.size(); i++) {
+          List<TaggedToken> taggedTweet = taggedTweets.get(i);
+          Map<Integer, Double> featureVector = fvg
+              .generateFeatureVectorFromTaggedTokens(taggedTweet);
+          featuredTestTweets.add(FeaturedTweet.createFromTaggedTokens(
+              testTweets.get(i), tokenizedTweets.get(i),
+              preprocessedTweets.get(i), taggedTweet, featureVector));
+        }
 
-        featuredTestTweets.add(new FeaturedTweet(testTweets.get(i),
-            tokenizedTweets.get(i), preprocessedTweets.get(i), taggedTweet,
-            featureVector));
+      } else {
+        // Preprocess and tag
+        LOG.info("Preprocess test tweets...");
+        List<List<TaggedWord>> preprocessedTweets = preprocessor
+            .preprocessAndTagTweets(tokenizedTweets);
+
+        // Gate POS Tagging
+        gatePOSTagger = GatePOSTagger.getInstance();
+        LOG.info("GATE POS Tagging of test tweets...");
+        List<List<TaggedWord>> taggedTweets = gatePOSTagger
+            .tagTweets(preprocessedTweets);
+
+        // Feature Vector Generation
+        LOG.info("Generate Feature Vectors for test tweets...");
+        featuredTestTweets = new ArrayList<FeaturedTweet>();
+        for (int i = 0; i < taggedTweets.size(); i++) {
+          List<TaggedWord> taggedTweet = taggedTweets.get(i);
+          Map<Integer, Double> featureVector = fvg
+              .generateFeatureVectorFromTaggedWords(taggedTweet);
+          featuredTestTweets.add(FeaturedTweet.createFromTaggedWords(
+              testTweets.get(i), tokenizedTweets.get(i),
+              preprocessedTweets.get(i), taggedTweet, featureVector));
+        }
       }
 
       // Serialize test data
@@ -703,17 +781,18 @@ public class SVM {
     int nFoldCrossValidation = 3;
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
+    boolean useArkPOSTagger = true;
     boolean parameterSearch = false;
     boolean useSerialization = false;
 
     if (featureVectorLevel == 0) {
-      SVM.svm(dataSet, SentimentFeatureVectorGenerator.class,
+      SVM.svm(dataSet, useArkPOSTagger, SentimentFeatureVectorGenerator.class,
           nFoldCrossValidation, parameterSearch, useSerialization);
     } else if (featureVectorLevel == 1) {
-      SVM.svm(dataSet, TfIdfFeatureVectorGenerator.class, nFoldCrossValidation,
-          parameterSearch, useSerialization);
+      SVM.svm(dataSet, useArkPOSTagger, TfIdfFeatureVectorGenerator.class,
+          nFoldCrossValidation, parameterSearch, useSerialization);
     } else {
-      SVM.svm(dataSet, CombinedFeatureVectorGenerator.class,
+      SVM.svm(dataSet, useArkPOSTagger, CombinedFeatureVectorGenerator.class,
           nFoldCrossValidation, parameterSearch, useSerialization);
     }
   }

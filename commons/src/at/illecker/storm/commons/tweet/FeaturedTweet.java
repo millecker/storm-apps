@@ -21,31 +21,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public final class FeaturedTweet implements Serializable {
-  private static final long serialVersionUID = -8375670095133979430L;
+  private static final long serialVersionUID = -2662190284006213666L;
   private final Tweet m_tweet;
   private final List<String> m_tokens;
-  private final List<TaggedWord> m_preprocessedTokens;
-  private final List<TaggedWord> m_taggedTokens;
+  private final List<String> m_preprocessedTokens;
+  private final List<TaggedWord> m_preprocessedTaggedTokens;
+  private final List<TaggedToken> m_arkTaggedTokens;
+  private final List<TaggedWord> m_gateTaggedTokens;
   private final Map<Integer, Double> m_featureVector; // dense vector
 
-  public FeaturedTweet(Long id, String text, Double score, List<String> tokens,
-      List<TaggedWord> preprocessedTokens, List<TaggedWord> taggedTokens,
+  private FeaturedTweet(Tweet tweet, List<String> tokens,
+      List<String> preprocessedTokens,
+      List<TaggedWord> preprocessedTaggedTokens,
+      List<TaggedToken> arkTaggedWords, List<TaggedWord> gateTaggedWords,
       Map<Integer, Double> featureVector) {
-    this(new Tweet(id, text, score), tokens, preprocessedTokens, taggedTokens,
-        featureVector);
-  }
-
-  public FeaturedTweet(Tweet tweet, List<String> tokens,
-      List<TaggedWord> preprocessedTokens, List<TaggedWord> taggedTokens,
-      Map<Integer, Double> featureVector) {
-    this.m_tweet = tweet;
-    this.m_tokens = tokens;
-    this.m_preprocessedTokens = preprocessedTokens;
-    this.m_taggedTokens = taggedTokens;
-    this.m_featureVector = featureVector;
+    m_tweet = tweet;
+    m_tokens = tokens;
+    m_preprocessedTokens = preprocessedTokens;
+    m_preprocessedTaggedTokens = preprocessedTaggedTokens;
+    m_arkTaggedTokens = arkTaggedWords;
+    m_gateTaggedTokens = gateTaggedWords;
+    m_featureVector = featureVector;
   }
 
   public Long getId() {
@@ -64,12 +64,20 @@ public final class FeaturedTweet implements Serializable {
     return m_tokens;
   }
 
-  public List<TaggedWord> getPreprocessedTokens() {
+  public List<String> getPreprocessedTokens() {
     return m_preprocessedTokens;
   }
 
-  public List<TaggedWord> getTaggedTokens() {
-    return m_taggedTokens;
+  public List<TaggedWord> getPreprocessedTaggedTokens() {
+    return m_preprocessedTaggedTokens;
+  }
+
+  public List<TaggedToken> getArkTaggedTokens() {
+    return m_arkTaggedTokens;
+  }
+
+  public List<TaggedWord> getGateTaggedTokens() {
+    return m_gateTaggedTokens;
   }
 
   public Map<Integer, Double> getFeatureVector() {
@@ -86,11 +94,49 @@ public final class FeaturedTweet implements Serializable {
     return m_tweet.toString();
   }
 
-  public static final List<List<TaggedWord>> getTaggedTweets(
+  public static FeaturedTweet createFromTaggedWords(Long id, String text,
+      Double score, List<String> tokens,
+      List<TaggedWord> preprocessedTaggedTokens, List<TaggedWord> taggedWords,
+      Map<Integer, Double> featureVector) {
+    return new FeaturedTweet(new Tweet(id, text, score), tokens, null,
+        preprocessedTaggedTokens, null, taggedWords, featureVector);
+  }
+
+  public static FeaturedTweet createFromTaggedWords(Tweet tweet,
+      List<String> tokens, List<TaggedWord> preprocessedTaggedTokens,
+      List<TaggedWord> taggedWords, Map<Integer, Double> featureVector) {
+    return new FeaturedTweet(tweet, tokens, null, preprocessedTaggedTokens,
+        null, taggedWords, featureVector);
+  }
+
+  public static FeaturedTweet createFromTaggedTokens(Long id, String text,
+      Double score, List<String> tokens, List<String> preprocessedTokens,
+      List<TaggedToken> taggedTokens, Map<Integer, Double> featureVector) {
+    return new FeaturedTweet(new Tweet(id, text, score), tokens,
+        preprocessedTokens, null, taggedTokens, null, featureVector);
+  }
+
+  public static FeaturedTweet createFromTaggedTokens(Tweet tweet,
+      List<String> tokens, List<String> preprocessedTokens,
+      List<TaggedToken> taggedTokens, Map<Integer, Double> featureVector) {
+    return new FeaturedTweet(tweet, tokens, preprocessedTokens, null,
+        taggedTokens, null, featureVector);
+  }
+
+  public static final List<List<TaggedWord>> getTaggedWordsFromTweets(
       List<FeaturedTweet> featuredTweets) {
     List<List<TaggedWord>> taggedTweets = new ArrayList<List<TaggedWord>>();
     for (FeaturedTweet tweet : featuredTweets) {
-      taggedTweets.add(tweet.getTaggedTokens());
+      taggedTweets.add(tweet.getGateTaggedTokens());
+    }
+    return taggedTweets;
+  }
+
+  public static final List<List<TaggedToken>> getTaggedTokensFromTweets(
+      List<FeaturedTweet> featuredTweets) {
+    List<List<TaggedToken>> taggedTweets = new ArrayList<List<TaggedToken>>();
+    for (FeaturedTweet tweet : featuredTweets) {
+      taggedTweets.add(tweet.getArkTaggedTokens());
     }
     return taggedTweets;
   }
