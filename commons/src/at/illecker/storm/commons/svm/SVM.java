@@ -119,7 +119,7 @@ public class SVM {
   }
 
   public static svm_problem generateProblem(List<FeaturedTweet> featuredTweets,
-      ScoreClassifier scoreClassifier) {
+      boolean useArkPOSTagger, ScoreClassifier scoreClassifier) {
     int dataCount = featuredTweets.size();
 
     svm_problem svmProb = new svm_problem();
@@ -129,8 +129,12 @@ public class SVM {
 
     int i = 0;
     for (FeaturedTweet tweet : featuredTweets) {
-
-      Map<Integer, Double> featureVector = tweet.getFeatureVector();
+      Map<Integer, Double> featureVector;
+      if (useArkPOSTagger) {
+        featureVector = tweet.getArkFeatureVector();
+      } else {
+        featureVector = tweet.getGateFeatureVector();
+      }
       // set feature nodes
       svmProb.x[i] = new svm_node[featureVector.size()];
       int j = 0;
@@ -677,7 +681,7 @@ public class SVM {
       svm_parameter svmParam = getDefaultParameter();
       LOG.info("Generate SVM problem...");
       svm_problem svmProb = generateProblem(featuredTrainTweets,
-          new IdentityScoreClassifier());
+          useArkPOSTagger, new IdentityScoreClassifier());
 
       // 1) coarse grained paramter search
       coarseGrainedParamterSearch(svmProb, svmParam);
@@ -713,7 +717,8 @@ public class SVM {
 
       if (svmModel == null) {
         LOG.info("Generate SVM problem...");
-        svm_problem svmProb = generateProblem(featuredTrainTweets, isc);
+        svm_problem svmProb = generateProblem(featuredTrainTweets,
+            useArkPOSTagger, isc);
 
         // save svm problem in libSVM format
         saveProblem(svmProb, dataset.getDatasetPath() + File.separator
@@ -752,8 +757,14 @@ public class SVM {
       long startTime = System.currentTimeMillis();
       for (FeaturedTweet tweet : featuredTestTweets) {
 
-        double predictedClass = evaluate(tweet.getFeatureVector(), svmModel,
-            totalClasses, isc);
+        Map<Integer, Double> featureVector;
+        if (useArkPOSTagger) {
+          featureVector = tweet.getArkFeatureVector();
+        } else {
+          featureVector = tweet.getGateFeatureVector();
+        }
+        double predictedClass = evaluate(featureVector, svmModel, totalClasses,
+            isc);
 
         int actualClass = isc.classfyScore(tweet.getScore());
         if (predictedClass == actualClass) {
