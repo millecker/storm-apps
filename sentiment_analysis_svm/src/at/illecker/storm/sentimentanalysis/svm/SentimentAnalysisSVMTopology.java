@@ -209,7 +209,7 @@ public class SentimentAnalysisSVMTopology {
               .get("apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism"));
       conf.put(
           SVMBolt.CONF_METRIC_LOGGING_INTERVALL,
-          Configuration
+          (Integer) Configuration
               .get("apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec"));
     }
 
