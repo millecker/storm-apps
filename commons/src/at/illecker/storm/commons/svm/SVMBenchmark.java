@@ -45,11 +45,14 @@ import cmu.arktweetnlp.Tagger.TaggedToken;
 import edu.stanford.nlp.ling.TaggedWord;
 
 public class SVMBenchmark {
+  // private static final Logger LOG =
+  // LoggerFactory.getLogger(SVMBenchmark.class);
 
   public static void main(String[] args) {
-    final boolean useArkPOSTagger;
-    final int numberOfThreads;
-    final int inputCount;
+    boolean useArkPOSTagger = true;
+    int numberOfThreads = 1;
+    int inputCount = 1;
+
     System.out.println("\nStarting SVM Benchmark...");
     if (args.length > 0) {
       numberOfThreads = Integer.parseInt(args[0]);
@@ -60,22 +63,14 @@ public class SVMBenchmark {
             .println("Using " + inputCount + " times the test dataset...");
         if (args.length > 2) {
           useArkPOSTagger = Boolean.parseBoolean(args[2]);
-          if (useArkPOSTagger) {
-            System.out.println("Using Ark POS Tagger...");
-          } else {
-            System.out.println("Using Gate POS Tagger...");
-          }
-        } else {
-          useArkPOSTagger = true;
         }
-      } else {
-        useArkPOSTagger = true;
-        inputCount = 1;
       }
+    }
+
+    if (useArkPOSTagger) {
+      System.out.println("Using Ark POS Tagger...");
     } else {
-      useArkPOSTagger = true;
-      numberOfThreads = 1;
-      inputCount = 1;
+      System.out.println("Using Gate POS Tagger...");
     }
 
     Dataset dataset = Configuration.getDataSetSemEval2013();
@@ -153,16 +148,15 @@ public class SVMBenchmark {
           : ((i + 1) * tweetsPerThread) - 1;
       // LOG.info("begin: " + begin + " end: " + end);
 
-      executorService.submit(new Runnable() {
-        public void run() {
-          List<Tweet> subtestTweets = testTweets.subList(begin, end);
+      if (useArkPOSTagger) {
+        executorService.submit(new Runnable() {
+          public void run() {
+            List<Tweet> subtestTweets = testTweets.subList(begin, end);
 
-          // Tokenize
-          List<List<String>> tokenizedTweets = Tokenizer
-              .tokenizeTweets(subtestTweets);
+            // Tokenize
+            List<List<String>> tokenizedTweets = Tokenizer
+                .tokenizeTweets(subtestTweets);
 
-          List<Map<Integer, Double>> featureVectors = null;
-          if (useArkPOSTagger) {
             // Preprocess only
             List<List<String>> preprocessedTweets = preprocessor
                 .preprocessTweets(tokenizedTweets);
@@ -172,10 +166,26 @@ public class SVMBenchmark {
                 .tagTweets(preprocessedTweets);
 
             // Feature Vector Generation
-            featureVectors = fvg
+            List<Map<Integer, Double>> featureVectors = fvg
                 .generateFeatureVectorsFromTaggedTokens(taggedTweets);
 
-          } else {
+            for (Map<Integer, Double> featureVector : featureVectors) {
+              double predictedClass = SVM.evaluate(featureVector, svmModel,
+                  totalClasses, isc);
+            }
+
+            latch.countDown();
+          }
+        });
+      } else {
+        executorService.submit(new Runnable() {
+          public void run() {
+            List<Tweet> subtestTweets = testTweets.subList(begin, end);
+
+            // Tokenize
+            List<List<String>> tokenizedTweets = Tokenizer
+                .tokenizeTweets(subtestTweets);
+
             // Preprocess and tag
             List<List<TaggedWord>> preprocessedTweets = preprocessor
                 .preprocessAndTagTweets(tokenizedTweets);
@@ -185,18 +195,18 @@ public class SVMBenchmark {
                 .tagTweets(preprocessedTweets);
 
             // Feature Vector Generation
-            featureVectors = fvg
+            List<Map<Integer, Double>> featureVectors = fvg
                 .generateFeatureVectorsFromTaggedWords(taggedTweets);
-          }
 
-          for (Map<Integer, Double> featureVector : featureVectors) {
-            double predictedClass = SVM.evaluate(featureVector, svmModel,
-                totalClasses, isc);
-          }
+            for (Map<Integer, Double> featureVector : featureVectors) {
+              double predictedClass = SVM.evaluate(featureVector, svmModel,
+                  totalClasses, isc);
+            }
 
-          latch.countDown();
-        }
-      });
+            latch.countDown();
+          }
+        });
+      }
     }
 
     try {
