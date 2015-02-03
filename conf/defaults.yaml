@@ -256,19 +256,19 @@ apps.sentiment.analysis.workers.childopts: "-Xmx16g"
 apps.sentiment.analysis.supervisor.childopts: "-Xmx2g"
 
 apps.sentiment.analysis.spout.parallelism: 1
-apps.sentiment.analysis.spout.max.pending: 1000
+apps.sentiment.analysis.spout.max.pending: 5000
 apps.sentiment.analysis.spout.startup.sleep.ms: 20000 # 20 sec
 apps.sentiment.analysis.spout.tuple.sleep.ms: null
 apps.sentiment.analysis.spout.tuple.sleep.ns: null
 apps.sentiment.analysis.spout.filter.language: "en"
 
-apps.sentiment.analysis.bolt.tokenizer.parallelism: 1
+apps.sentiment.analysis.bolt.tokenizer.parallelism: 2
 apps.sentiment.analysis.bolt.tokenizer.logging: false
 
-apps.sentiment.analysis.bolt.preprocessor.parallelism: 1
+apps.sentiment.analysis.bolt.preprocessor.parallelism: 2
 apps.sentiment.analysis.bolt.preprocessor.logging: false
 
-apps.sentiment.analysis.bolt.postagger.parallelism: 1
+apps.sentiment.analysis.bolt.postagger.parallelism: 2
 apps.sentiment.analysis.bolt.postagger.logging: false
 apps.sentiment.analysis.bolt.postagger.model: "resources/models/pos/ark.model.20120919.txt"
 
