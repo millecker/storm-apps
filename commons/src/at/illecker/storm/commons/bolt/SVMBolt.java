@@ -73,7 +73,7 @@ public class SVMBolt extends BaseRichBolt {
     if (config.get(CONF_METRIC_LOGGING_INTERVALL) != null) {
       m_countMetric = new CountMetric();
       context.registerMetric("tuple_count", m_countMetric,
-          (Integer) config.get(CONF_METRIC_LOGGING_INTERVALL));
+          ((Long) config.get(CONF_METRIC_LOGGING_INTERVALL)).intValue());
     }
 
     LOG.info("Loading SVM model...");
