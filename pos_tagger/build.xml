@@ -5,7 +5,7 @@
 	<property name="output.file" value="POSTagger" />
 	<property name="util.src.dir" value="../commons/src" />
 	<property name="libjars.gpu" value="" />
-	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar" />
+	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar,${lib}${file.separator}ark-tweet-nlp-0.3.2.jar,${lib}${file.separator}jackson-core-2.5.0.jar,${lib}${file.separator}BerkeleyParser-1.7.jar,${lib}${file.separator}twitter-text-1.11.0.jar" />
 	<property name="libfiles.cpu" value="conf/defaults.yaml,resources${file.separator}dictionaries,resources${file.separator}models" />
 	<property name="libjars.bench" value="" />
 	<property name="rootbeer.package.dir" value="" />

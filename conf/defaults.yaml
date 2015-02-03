@@ -239,10 +239,10 @@ apps.postagger.spout.filter.language: "en"
 apps.postagger.bolt.tokenizer.parallelism: 1
 apps.postagger.bolt.tokenizer.logging: false
 
-apps.postagger.bolt.preprocessor.parallelism: 1
+apps.postagger.bolt.preprocessor.parallelism: 2
 apps.postagger.bolt.preprocessor.logging: false
 
-apps.postagger.bolt.postagger.parallelism: 1
+apps.postagger.bolt.postagger.parallelism: 2
 apps.postagger.bolt.postagger.logging: true
 apps.postagger.bolt.postagger.model: "resources/models/pos/ark.model.20120919.txt"
 

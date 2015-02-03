@@ -48,6 +48,10 @@ public class ArkPOSTagger {
       String taggingModel = Configuration
           .get("global.resources.postagger.ark.model.path");
       LOG.info("Load ARK POS Tagger with model: " + taggingModel);
+      // TODO absolute path needed for resource
+      if (!taggingModel.startsWith("/")) {
+        taggingModel = "/" + taggingModel;
+      }
       m_model = Model.loadModelFromText(taggingModel);
       m_featureExtractor = new FeatureExtractor(m_model, false);
     } catch (IOException e) {
