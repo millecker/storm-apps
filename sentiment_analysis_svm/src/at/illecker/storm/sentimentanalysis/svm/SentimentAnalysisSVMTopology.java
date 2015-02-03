@@ -191,7 +191,7 @@ public class SentimentAnalysisSVMTopology {
     conf.put(SVMBolt.CONF_LOGGING, Configuration.get(
         "apps.sentiment.analysis.svm.bolt.svm.logging", false));
 
-    conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
+    // conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);
