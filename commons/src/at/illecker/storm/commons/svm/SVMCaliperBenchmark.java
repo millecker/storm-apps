@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
-import at.illecker.storm.commons.postagger.POSTagger;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.svm.featurevector.CombinedFeatureVectorGenerator;
 import at.illecker.storm.commons.svm.featurevector.FeatureVectorGenerator;
@@ -45,13 +45,12 @@ import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 
 import com.google.caliper.Benchmark;
 import com.google.caliper.Param;
 import com.google.caliper.api.Macrobenchmark;
 import com.google.caliper.runner.CaliperMain;
-
-import edu.stanford.nlp.ling.TaggedWord;
 
 public class SVMCaliperBenchmark extends Benchmark {
   private static final Logger LOG = LoggerFactory
@@ -63,7 +62,7 @@ public class SVMCaliperBenchmark extends Benchmark {
   private int inputCount = 1;
 
   private final Preprocessor m_preprocessor = Preprocessor.getInstance();
-  private final POSTagger m_posTagger = POSTagger.getInstance();
+  private final ArkPOSTagger m_arkPOSTagger = ArkPOSTagger.getInstance();
 
   private final Dataset m_dataset = Configuration.getDataSetSemEval2013();
   // classes 0 = positive, 1 = negative, 2 = neutral
@@ -75,11 +74,11 @@ public class SVMCaliperBenchmark extends Benchmark {
 
   private final List<FeaturedTweet> m_featuredTrainTweets = SerializationUtils
       .deserialize(m_dataset.getTrainDataSerializationFile());
-  private final TweetTfIdf m_tweetTfIdf = new TweetTfIdf(
-      FeaturedTweet.getTaggedTweets(m_featuredTrainTweets), TfType.RAW,
-      TfIdfNormalization.COS, true);
+  private final TweetTfIdf m_tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
+      FeaturedTweet.getTaggedTokensFromTweets(m_featuredTrainTweets),
+      TfType.RAW, TfIdfNormalization.COS, true);
   private final FeatureVectorGenerator m_fvg = new CombinedFeatureVectorGenerator(
-      m_tweetTfIdf);
+      false, true, m_tweetTfIdf);
 
   private ArrayList<Tweet> m_testTweets = null;
   private int m_totalTweets;
@@ -132,17 +131,17 @@ public class SVMCaliperBenchmark extends Benchmark {
             List<List<String>> tokenizedTweets = Tokenizer
                 .tokenizeTweets(subtestTweets);
 
-            // Preprocess
-            List<List<TaggedWord>> preprocessedTweets = m_preprocessor
+            // Preprocess only
+            List<List<String>> preprocessedTweets = m_preprocessor
                 .preprocessTweets(tokenizedTweets);
 
-            // POS Tagging
-            List<List<TaggedWord>> taggedTweets = m_posTagger
+            // Ark POS Tagging
+            List<List<TaggedToken>> taggedTweets = m_arkPOSTagger
                 .tagTweets(preprocessedTweets);
 
             // Feature Vector Generation
             List<Map<Integer, Double>> featureVectors = m_fvg
-                .generateFeatureVectors(taggedTweets);
+                .generateFeatureVectorsFromTaggedTokens(taggedTweets);
 
             for (Map<Integer, Double> featureVector : featureVectors) {
               double predictedClass = SVM.evaluate(featureVector, m_svmModel,
