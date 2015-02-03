@@ -27,16 +27,9 @@
 ##############################################################################
 
 apps.postagger.workers.num: 1
-apps.postagger.workers.childopts: "-Xmx16g"
-
-apps.postagger.supervisor.childopts: "-Xmx2g"
 
 apps.postagger.spout.parallelism: 1
 apps.postagger.spout.max.pending: 1000
-apps.postagger.spout.startup.sleep.ms: null
-apps.postagger.spout.tuple.sleep.ms: null
-apps.postagger.spout.tuple.sleep.ns: null
-apps.postagger.spout.filter.language: "en"
 
 apps.postagger.bolt.tokenizer.parallelism: 1
 apps.postagger.bolt.tokenizer.logging: false
@@ -52,16 +45,10 @@ apps.postagger.bolt.postagger.logging: true
 ##############################################################################
 
 apps.sentiment.analysis.workers.num: 1
-apps.sentiment.analysis.workers.childopts: "-Xmx16g"
-
-apps.sentiment.analysis.supervisor.childopts: "-Xmx2g"
 
 apps.sentiment.analysis.spout.parallelism: 1
-apps.sentiment.analysis.spout.max.pending: 5000
+apps.sentiment.analysis.spout.max.pending: 2000
 apps.sentiment.analysis.spout.startup.sleep.ms: 20000 # 20 sec
-apps.sentiment.analysis.spout.tuple.sleep.ms: null
-apps.sentiment.analysis.spout.tuple.sleep.ns: null
-apps.sentiment.analysis.spout.filter.language: "en"
 
 apps.sentiment.analysis.bolt.tokenizer.parallelism: 2
 apps.sentiment.analysis.bolt.tokenizer.logging: false
@@ -80,24 +67,18 @@ apps.sentiment.analysis.bolt.sentimentdetection.logging: true
 ##############################################################################
 
 apps.sentiment.analysis.svm.workers.num: 1
-apps.sentiment.analysis.svm.workers.childopts: "-Xmx16g"
-
-apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx2g"
 
 apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
 apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
 
 apps.sentiment.analysis.svm.spout.parallelism: 1
-apps.sentiment.analysis.svm.spout.max.pending: 5000
+apps.sentiment.analysis.svm.spout.max.pending: 2000
 apps.sentiment.analysis.svm.spout.startup.sleep.ms: 20000 # 20 sec
-apps.sentiment.analysis.svm.spout.tuple.sleep.ms: null
-apps.sentiment.analysis.svm.spout.tuple.sleep.ns: null # 250000 = 0.25 ms
-apps.sentiment.analysis.svm.spout.filter.language: "en"
 
-apps.sentiment.analysis.svm.bolt.tokenizer.parallelism: 4
+apps.sentiment.analysis.svm.bolt.tokenizer.parallelism: 1
 apps.sentiment.analysis.svm.bolt.tokenizer.logging: false
 
-apps.sentiment.analysis.svm.bolt.preprocessor.parallelism: 5
+apps.sentiment.analysis.svm.bolt.preprocessor.parallelism: 1
 apps.sentiment.analysis.svm.bolt.preprocessor.logging: false
 
 apps.sentiment.analysis.svm.bolt.postagger.parallelism: 1
@@ -106,6 +87,6 @@ apps.sentiment.analysis.svm.bolt.postagger.logging: false
 apps.sentiment.analysis.svm.bolt.featuregeneration.parallelism: 1
 apps.sentiment.analysis.svm.bolt.featuregeneration.logging: false
 
-apps.sentiment.analysis.svm.bolt.svm.parallelism: 2
-apps.sentiment.analysis.svm.bolt.svm.logging: true
+apps.sentiment.analysis.svm.bolt.svm.parallelism: 1
+apps.sentiment.analysis.svm.bolt.svm.logging: false
 
