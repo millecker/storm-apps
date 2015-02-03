@@ -29,6 +29,7 @@ import at.illecker.storm.commons.spout.DatasetSpout;
 import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
+import backtype.storm.metric.LoggingMetricsConsumer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 
@@ -197,10 +198,20 @@ public class SentimentAnalysisSVMTopology {
     // conf.put(Config.TOPOLOGY_EXECUTOR_RECEIVE_BUFFER_SIZE, 16384);
     // conf.put(Config.TOPOLOGY_EXECUTOR_SEND_BUFFER_SIZE, 16384);
 
-    // This will simply log all Metrics received into
-    // $STORM_HOME/logs/metrics.log on one or more worker nodes.
-    // conf.registerMetricsConsumer(LoggingMetricsConsumer.class,
-    // numberOfWorkers);
+    // LoggingMetricsConsumer of SVMBolt
+    if ((Configuration
+        .get("apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism") != null)
+        && (Configuration
+            .get("apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec") != null)) {
+      conf.registerMetricsConsumer(
+          LoggingMetricsConsumer.class,
+          (Integer) Configuration
+              .get("apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism"));
+      conf.put(
+          SVMBolt.CONF_METRIC_LOGGING_INTERVALL,
+          Configuration
+              .get("apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec"));
+    }
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());

@@ -284,6 +284,9 @@ apps.sentiment.analysis.svm.workers.childopts: "-Xmx16g"
 
 apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx2g"
 
+apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
+apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
+
 apps.sentiment.analysis.svm.spout.parallelism: 1
 apps.sentiment.analysis.svm.spout.max.pending: 5000
 apps.sentiment.analysis.svm.spout.startup.sleep.ms: 20000 # 20 sec

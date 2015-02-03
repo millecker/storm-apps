@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.svm.SVM;
 import at.illecker.storm.commons.util.io.SerializationUtils;
+import backtype.storm.metric.api.CountMetric;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -38,16 +39,17 @@ import backtype.storm.tuple.Tuple;
 public class SVMBolt extends BaseRichBolt {
   public static final String ID = "support-vector-maschine-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
+  public static final String CONF_METRIC_LOGGING_INTERVALL = ID
+      + ".metric.logging.intervall";
   private static final long serialVersionUID = -3235291265771813064L;
   private static final Logger LOG = LoggerFactory.getLogger(SVMBolt.class);
   private boolean m_logging = false;
   private Dataset m_dataset;
   private OutputCollector m_collector;
   private svm_model m_model;
-
   // Metrics
   // Note: these must be declared as transient since they are not Serializable
-  // transient CountMetric m_countMetric;
+  transient CountMetric m_countMetric = null;
 
   public SVMBolt(Dataset dataset) {
     this.m_dataset = dataset;
@@ -68,8 +70,11 @@ public class SVMBolt extends BaseRichBolt {
     }
 
     // Tuple counter metric
-    // m_countMetric = new CountMetric();
-    // context.registerMetric("tuple_count", m_countMetric, 10);
+    if (config.get(CONF_METRIC_LOGGING_INTERVALL) != null) {
+      m_countMetric = new CountMetric();
+      context.registerMetric("tuple_count", m_countMetric,
+          (Integer) config.get(CONF_METRIC_LOGGING_INTERVALL));
+    }
 
     LOG.info("Loading SVM model...");
     m_model = SerializationUtils.deserialize(m_dataset.getDatasetPath()
@@ -107,7 +112,9 @@ public class SVMBolt extends BaseRichBolt {
           + " predictedClass: " + predictedClass);
     }
 
-    // m_countMetric.incr();
+    if (m_countMetric != null) {
+      m_countMetric.incr();
+    }
     m_collector.ack(tuple);
   }
 
