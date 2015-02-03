@@ -66,6 +66,12 @@ public class Configuration {
         + "conf/configuration.yaml", false);
     if (customConfig != null) {
       conf.putAll(customConfig);
+    } else {
+      customConfig = readConfigFile(WORKING_DIR_PATH
+          + "../conf/configuration.yaml", false);
+      if (customConfig != null) {
+        conf.putAll(customConfig);
+      }
     }
     return conf;
   }
