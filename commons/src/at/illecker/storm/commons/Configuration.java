@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,9 +65,8 @@ public class Configuration {
         + "conf/configuration.yaml", false);
     if (customConfig != null) {
       conf.putAll(customConfig);
-    } else {
-      customConfig = readConfigFile(WORKING_DIR_PATH
-          + "../conf/configuration.yaml", false);
+    } else if (RUNNING_WITHIN_JAR) {
+      customConfig = readConfigFile("../conf/configuration.yaml", false);
       if (customConfig != null) {
         conf.putAll(customConfig);
       }
@@ -92,14 +90,10 @@ public class Configuration {
     } else if (mustExist) {
       LOG.error("Config file " + file + " was not found!");
     }
-    if (ret == null) {
-      if (mustExist) {
-        throw new RuntimeException("Config file " + file + " was not found!");
-      } else {
-        ret = new HashMap();
-      }
+    if ((ret == null) && (mustExist)) {
+      throw new RuntimeException("Config file " + file + " was not found!");
     }
-    return new HashMap(ret);
+    return ret;
   }
 
   public static <K, V> V get(K key) {
