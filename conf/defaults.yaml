@@ -47,7 +47,7 @@ global.resources.datasets.semeval:
         svm.gamma: null
         svm.class.weights: # http://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#f804
             0: 1.26
-            1: 2.95
+            1: 2.96
             2: 1.0
     "2013Mixed":
         path: "resources/datasets/SemEval2013_mixed"
