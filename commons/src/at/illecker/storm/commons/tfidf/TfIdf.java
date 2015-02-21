@@ -96,6 +96,7 @@ public class TfIdf {
             + "/" + documentFreq + ") + 1 = "
             + (Math.log(totalDocuments / documentFreq) + 1));
       }
+      // TODO log(N / df(t)) + 1
       idf.put(term, Math.log(totalDocuments / documentFreq) + 1);
     }
     return idf;
