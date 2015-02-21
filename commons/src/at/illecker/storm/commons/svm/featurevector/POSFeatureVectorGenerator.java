@@ -164,16 +164,16 @@ public class POSFeatureVectorGenerator extends FeatureVectorGenerator {
 
   private double[] countPOSTagsFromTaggedTokens(List<TaggedToken> taggedTokens,
       boolean normalize) {
-    // 10 = [NOUN, PRONOUN, PROPER_NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION,
-    // PUNCTUATION, HASHTAG, EMOTICON]
+    // 8 = [NOUN, VERB, ADJECTIVE, ADVERB, INTERJECTION, PUNCTUATION, HASHTAG,
+    // EMOTICON]
     double[] posTags = new double[] { 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d };
     int wordCount = 0;
     for (TaggedToken word : taggedTokens) {
       wordCount++;
       String arkTag = word.tag;
       // http://www.ark.cs.cmu.edu/TweetNLP/annot_guidelines.pdf
-      if (arkTag.equals("N") || arkTag.equals("O") || arkTag.equals("ˆ")
-          || arkTag.equals("Z")) {
+      if (arkTag.equals("N") || arkTag.equals("O") || arkTag.equals("Z")) {
+        // TODO || arkTag.equals("^")
         posTags[0]++;
       } else if (arkTag.equals("V") || arkTag.equals("T")) {
         posTags[1]++;
