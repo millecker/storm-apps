@@ -678,7 +678,7 @@ public class SVM {
 
     // Optional parameter search of C and gamma
     if (parameterSearch) {
-      svm_parameter svmParam = getDefaultParameter();
+      svm_parameter svmParam = dataset.getSVMParam();
       LOG.info("Generate SVM problem...");
       svm_problem svmProb = generateProblem(featuredTrainTweets,
           useArkPOSTagger, new IdentityScoreClassifier());
@@ -688,6 +688,7 @@ public class SVM {
 
       // 2) fine grained paramter search
       // C = 2^5, 2^6, ..., 2^13
+      /*
       double[] c = new double[9];
       for (int i = 0; i < 9; i++) {
         c[i] = Math.pow(2, 5 + i);
@@ -700,7 +701,7 @@ public class SVM {
 
       LOG.info("SVM paramterSearch...");
       paramterSearch(svmProb, svmParam, c, gamma);
-
+*/
     } else {
 
       int totalClasses = 3;
@@ -792,7 +793,7 @@ public class SVM {
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
     boolean useArkPOSTagger = true;
-    boolean parameterSearch = false;
+    boolean parameterSearch = true;
     boolean useSerialization = false;
 
     if (featureVectorLevel == 0) {
