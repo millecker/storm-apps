@@ -42,9 +42,9 @@ global.resources.datasets.semeval:
         positive.class.value: 0
         negative.class.value: 1
         neutral.class.value: 2
-        svm.kernel: 0 # Linear
-        svm.c: 0.5
-        svm.gamma: null
+        svm.kernel: 2 # RBF # 0 Linear
+        svm.c: 512.0 # 0.5
+        svm.gamma: 0.000488281 # null
         svm.class.weights: # http://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#f804
             0: 1.26
             1: 2.96
