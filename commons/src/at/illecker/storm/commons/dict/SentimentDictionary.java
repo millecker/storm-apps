@@ -194,6 +194,7 @@ public class SentimentDictionary {
 
           int key = wordSentiment.getKey();
           double sentimentScore = wordSentiment.getValue();
+          LOG.info("word: "+word.word()+" score: "+sentimentScore);
 
           SentimentResult sentimentResult = sentenceSentiments.get(key);
           if (sentimentResult == null) {
@@ -227,7 +228,7 @@ public class SentimentDictionary {
 
           int key = wordSentiment.getKey();
           double sentimentScore = wordSentiment.getValue();
-
+          LOG.info("word: "+word.token+" score: "+sentimentScore);
           SentimentResult sentimentResult = sentenceSentiments.get(key);
           if (sentimentResult == null) {
             sentimentResult = new SentimentResult();
