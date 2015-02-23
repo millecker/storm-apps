@@ -684,24 +684,24 @@ public class SVM {
           useArkPOSTagger, new IdentityScoreClassifier());
 
       // 1) coarse grained paramter search
-      coarseGrainedParamterSearch(svmProb, svmParam);
+      // coarseGrainedParamterSearch(svmProb, svmParam);
 
       // 2) fine grained paramter search
-      // C = 2^5, 2^6, ..., 2^13
-      /*
-      double[] c = new double[9];
-      for (int i = 0; i < 9; i++) {
-        c[i] = Math.pow(2, 5 + i);
+      // C = 2^6, ..., 2^12
+      double[] c = new double[7];
+      for (int i = 0; i < 7; i++) {
+        c[i] = Math.pow(2, 6 + i);
       }
-      // gamma = 2^−10, 2^−9, ..., 2^-3
-      double[] gamma = new double[8];
-      for (int j = 0; j < 8; j++) {
-        gamma[j] = Math.pow(2, -10 + j);
+      // gamma = 2^−14, 2^−14, ..., 2^-8
+      double[] gamma = new double[7];
+      for (int j = 0; j < 7; j++) {
+        gamma[j] = Math.pow(2, -14 + j);
       }
 
       LOG.info("SVM paramterSearch...");
+      LOG.info("Kernel: " + svmParam.kernel_type);
       paramterSearch(svmProb, svmParam, c, gamma);
-*/
+
     } else {
 
       int totalClasses = 3;
