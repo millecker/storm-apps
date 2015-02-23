@@ -793,7 +793,7 @@ public class SVM {
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
     boolean useArkPOSTagger = true;
-    boolean parameterSearch = true;
+    boolean parameterSearch = false;
     boolean useSerialization = false;
 
     if (featureVectorLevel == 0) {
