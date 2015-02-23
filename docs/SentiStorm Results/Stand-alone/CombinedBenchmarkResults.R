@@ -14,9 +14,9 @@ printTitle <- FALSE
 
 # font type and sizes
 fontType <- "LM Roman 10"
-legendFontSize <- 20
-axisTitleFontSize <- 22
-axisTicksFontSize <- 20
+legendFontSize <- 28
+axisTitleFontSize <- 28
+axisTicksFontSize <- 28
 axisTicksFontColor <- "black"
 
 # colors
