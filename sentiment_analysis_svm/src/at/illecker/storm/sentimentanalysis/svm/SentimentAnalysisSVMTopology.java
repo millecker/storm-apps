@@ -135,6 +135,7 @@ public class SentimentAnalysisSVMTopology {
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
+    /*
     builder.setBolt(
         POSTaggerBolt.ID,
         posTaggerBolt,
@@ -159,6 +160,7 @@ public class SentimentAnalysisSVMTopology {
         Configuration
             .get("apps.sentiment.analysis.svm.bolt.svm.parallelism", 1))
         .shuffleGrouping(FeatureGenerationBolt.ID);
+*/
 
     // Set topology config
     conf.setNumWorkers(Configuration.get(
