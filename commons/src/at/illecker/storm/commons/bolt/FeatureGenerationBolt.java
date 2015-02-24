@@ -68,16 +68,16 @@ public class FeatureGenerationBolt extends BaseRichBolt {
       m_logging = false;
     }
 
-    // TODO load CombinedFeatureVectorGenerator
+    // TODO use serialized CombinedFeatureVectorGenerator
     List<FeaturedTweet> featuredTrainTweets = SerializationUtils
         .deserialize(m_dataset.getTrainDataSerializationFile());
     if (featuredTrainTweets != null) {
       TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
           FeaturedTweet.getTaggedTokensFromTweets(featuredTrainTweets),
-          TfType.RAW, TfIdfNormalization.COS, true);
+          TfType.LOG, TfIdfNormalization.COS, true);
 
       LOG.info("Load CombinedFeatureVectorGenerator...");
-      m_fvg = new CombinedFeatureVectorGenerator(false, true, tweetTfIdf);
+      m_fvg = new CombinedFeatureVectorGenerator(true, true, tweetTfIdf);
 
     } else {
       LOG.error("TaggedTweets could not be found! File is missing: "

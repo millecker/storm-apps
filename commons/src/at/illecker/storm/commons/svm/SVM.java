@@ -563,14 +563,14 @@ public class SVM {
         } else if (featureVectorGenerator
             .equals(TfIdfFeatureVectorGenerator.class)) {
           TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(
-              taggedTweets, TfType.RAW, TfIdfNormalization.COS, true);
+              taggedTweets, TfType.LOG, TfIdfNormalization.COS, true);
           LOG.info("Load TfIdfFeatureVectorGenerator...");
           fvg = new TfIdfFeatureVectorGenerator(tweetTfIdf);
 
         } else if (featureVectorGenerator
             .equals(CombinedFeatureVectorGenerator.class)) {
           TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(
-              taggedTweets, TfType.RAW, TfIdfNormalization.COS, true);
+              taggedTweets, TfType.LOG, TfIdfNormalization.COS, true);
           LOG.info("Load CombinedFeatureVectorGenerator...");
           fvg = new CombinedFeatureVectorGenerator(true, true, tweetTfIdf);
 
