@@ -80,7 +80,7 @@ public class SentimentAnalysisTopology {
         conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, (Integer) Configuration
             .get("apps.sentiment.analysis.spout.tuple.sleep.ns"));
       }
-      spout = new DatasetSpout(Configuration.getDataSetSemEval2013());
+      spout = new DatasetSpout();
       spoutID = DatasetSpout.ID;
     } else {
       if (Configuration.get("apps.sentiment.analysis.spout.startup.sleep.ms") != null) {
