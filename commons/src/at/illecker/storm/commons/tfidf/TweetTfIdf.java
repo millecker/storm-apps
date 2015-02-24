@@ -377,10 +377,10 @@ public class TweetTfIdf {
 
       // Ark TF-IDF
       List<Map<String, Double>> termFreqs = TweetTfIdf.tfTaggedTokenTweets(
-          taggedTweets, TfType.RAW, usePOSTags);
+          taggedTweets, TfType.LOG, usePOSTags);
       Map<String, Double> inverseDocFreq = TweetTfIdf.idf(termFreqs);
       List<Map<String, Double>> tfIdf = TweetTfIdf.tfIdf(termFreqs,
-          inverseDocFreq, TfIdfNormalization.NONE);
+          inverseDocFreq, TfIdfNormalization.COS);
 
       LOG.info("Found " + inverseDocFreq.size() + " terms");
       print("Term Frequency", termFreqs, inverseDocFreq);
@@ -404,10 +404,10 @@ public class TweetTfIdf {
 
       // Gate TF-IDF
       List<Map<String, Double>> termFreqs = TweetTfIdf.tfTaggedWordTweets(
-          taggedTweets, TfType.RAW, usePOSTags);
+          taggedTweets, TfType.LOG, usePOSTags);
       Map<String, Double> inverseDocFreq = TweetTfIdf.idf(termFreqs);
       List<Map<String, Double>> tfIdf = TweetTfIdf.tfIdf(termFreqs,
-          inverseDocFreq, TfIdfNormalization.NONE);
+          inverseDocFreq, TfIdfNormalization.COS);
 
       LOG.info("Found " + inverseDocFreq.size() + " terms");
       print("Term Frequency", termFreqs, inverseDocFreq);
