@@ -26,5 +26,6 @@
 	<classpathentry kind="lib" path="lib/BerkeleyParser-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/twitter-text-1.11.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="lib/kryo-2.21.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
