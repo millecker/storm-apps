@@ -115,7 +115,8 @@ public class SentimentAnalysisSVMTopology {
     TopologyBuilder builder = new TopologyBuilder();
 
     // Set Spout
-    builder.setSpout(spoutID, spout);
+    builder.setSpout(spoutID, spout,
+        Configuration.get("apps.sentiment.analysis.svm.spout.parallelism", 1));
 
     // Set Spout --> TokenizerBolt
     builder.setBolt(
