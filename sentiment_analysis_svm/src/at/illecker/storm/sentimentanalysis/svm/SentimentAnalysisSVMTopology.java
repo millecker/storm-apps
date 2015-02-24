@@ -17,6 +17,7 @@
 package at.illecker.storm.sentimentanalysis.svm;
 
 import java.util.Arrays;
+import java.util.TreeMap;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
@@ -25,15 +26,17 @@ import at.illecker.storm.commons.bolt.POSTaggerBolt;
 import at.illecker.storm.commons.bolt.PreprocessorBolt;
 import at.illecker.storm.commons.bolt.SVMBolt;
 import at.illecker.storm.commons.bolt.TokenizerBolt;
+import at.illecker.storm.commons.kyro.TaggedTokenSerializer;
 import at.illecker.storm.commons.spout.DatasetSpout;
 import at.illecker.storm.commons.spout.TwitterStreamSpout;
-import at.illecker.storm.commons.util.io.TaggedTokenSerializer;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.metric.LoggingMetricsConsumer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
 import cmu.arktweetnlp.Tagger.TaggedToken;
+
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.TreeMapSerializer;
 
 public class SentimentAnalysisSVMTopology {
   public static final String TOPOLOGY_NAME = "sentiment-analysis-svm-topology";
@@ -195,6 +198,7 @@ public class SentimentAnalysisSVMTopology {
 
     conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
     conf.registerSerialization(TaggedToken.class, TaggedTokenSerializer.class);
+    conf.registerSerialization(TreeMap.class, TreeMapSerializer.class);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);

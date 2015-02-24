@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package at.illecker.storm.commons.util.io;
+package at.illecker.storm.commons.kyro;
 
 import cmu.arktweetnlp.Tagger.TaggedToken;
 
@@ -35,5 +35,4 @@ public class TaggedTokenSerializer extends Serializer<TaggedToken> {
     output.writeString(taggedToken.token);
     output.writeString(taggedToken.tag);
   }
-
 }
