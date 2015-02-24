@@ -135,14 +135,13 @@ public class SentimentAnalysisSVMTopology {
         .shuffleGrouping(TokenizerBolt.ID);
 
     // PreprocessorBolt --> POSTaggerBolt
-    /*
     builder.setBolt(
         POSTaggerBolt.ID,
         posTaggerBolt,
         Configuration.get(
             "apps.sentiment.analysis.svm.bolt.postagger.parallelism", 1))
         .shuffleGrouping(PreprocessorBolt.ID);
-
+    /*
     // POSTaggerBolt --> FeatureGenerationBolt
     builder
         .setBolt(
