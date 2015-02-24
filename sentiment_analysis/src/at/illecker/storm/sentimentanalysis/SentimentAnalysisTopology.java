@@ -17,18 +17,23 @@
 package at.illecker.storm.sentimentanalysis;
 
 import java.util.Arrays;
+import java.util.TreeMap;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.bolt.POSTaggerBolt;
 import at.illecker.storm.commons.bolt.PreprocessorBolt;
 import at.illecker.storm.commons.bolt.SentimentDetectionBolt;
 import at.illecker.storm.commons.bolt.TokenizerBolt;
+import at.illecker.storm.commons.kyro.TaggedTokenSerializer;
 import at.illecker.storm.commons.spout.DatasetSpout;
 import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
+import cmu.arktweetnlp.Tagger.TaggedToken;
+
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.TreeMapSerializer;
 
 public class SentimentAnalysisTopology {
   public static final String TOPOLOGY_NAME = "sentiment-analysis-topology";
@@ -168,6 +173,8 @@ public class SentimentAnalysisTopology {
         "apps.sentiment.analysis.bolt.sentimentdetection.logging", false));
 
     conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
+    conf.registerSerialization(TaggedToken.class, TaggedTokenSerializer.class);
+    conf.registerSerialization(TreeMap.class, TreeMapSerializer.class);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
