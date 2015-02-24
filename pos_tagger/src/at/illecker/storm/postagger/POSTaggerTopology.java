@@ -18,11 +18,17 @@ package at.illecker.storm.postagger;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.TreeMap;
+
+import cmu.arktweetnlp.Tagger.TaggedToken;
+
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.TreeMapSerializer;
 
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.bolt.POSTaggerBolt;
 import at.illecker.storm.commons.bolt.PreprocessorBolt;
 import at.illecker.storm.commons.bolt.TokenizerBolt;
+import at.illecker.storm.commons.kyro.TaggedTokenSerializer;
 import at.illecker.storm.commons.spout.TwitterFilesSpout;
 import at.illecker.storm.commons.spout.TwitterStreamSpout;
 import backtype.storm.Config;
@@ -160,6 +166,8 @@ public class POSTaggerTopology {
         Configuration.get("apps.postagger.bolt.postagger.model"));
 
     conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
+    conf.registerSerialization(TaggedToken.class, TaggedTokenSerializer.class);
+    conf.registerSerialization(TreeMap.class, TreeMapSerializer.class);
 
     StormSubmitter
         .submitTopology(TOPOLOGY_NAME, conf, builder.createTopology());
