@@ -19,6 +19,7 @@ package at.illecker.storm.commons.spout;
 import java.util.List;
 import java.util.Map;
 
+import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.tweet.Tweet;
 import at.illecker.storm.commons.util.TimeUtils;
@@ -42,10 +43,6 @@ public class DatasetSpout extends BaseRichSpout {
   private long m_tupleSleepMs = 0;
   private long m_tupleSleepNs = 0;
 
-  public DatasetSpout(Dataset dataset) {
-    m_dataset = dataset;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("id", "score", "text"));
@@ -54,6 +51,7 @@ public class DatasetSpout extends BaseRichSpout {
   public void open(Map config, TopologyContext context,
       SpoutOutputCollector collector) {
     this.m_collector = collector;
+    this.m_dataset = Configuration.getDataSetSemEval2013();
     this.m_tweets = m_dataset.getTestTweets();
 
     // Optional sleep between tuples emitting

@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 import at.illecker.storm.commons.Configuration;
-import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.bolt.FeatureGenerationBolt;
 import at.illecker.storm.commons.bolt.POSTaggerBolt;
 import at.illecker.storm.commons.bolt.PreprocessorBolt;
@@ -70,9 +69,6 @@ public class SentimentAnalysisSVMTopology {
       }
     }
 
-    // Dataset SemEval2013
-    Dataset dataset = Configuration.getDataSetSemEval2013();
-
     Config conf = new Config();
 
     // Create Spout
@@ -92,7 +88,7 @@ public class SentimentAnalysisSVMTopology {
         conf.put(DatasetSpout.CONF_TUPLE_SLEEP_NS, (Integer) Configuration
             .get("apps.sentiment.analysis.svm.spout.tuple.sleep.ns"));
       }
-      spout = new DatasetSpout(dataset);
+      spout = new DatasetSpout();
       spoutID = DatasetSpout.ID;
     } else {
       if (Configuration
@@ -112,9 +108,8 @@ public class SentimentAnalysisSVMTopology {
     TokenizerBolt tokenizerBolt = new TokenizerBolt();
     PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
     POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
-    FeatureGenerationBolt featureGenerationBolt = new FeatureGenerationBolt(
-        dataset);
-    SVMBolt svmBolt = new SVMBolt(dataset);
+    FeatureGenerationBolt featureGenerationBolt = new FeatureGenerationBolt();
+    SVMBolt svmBolt = new SVMBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.svm.featurevector.CombinedFeatureVectorGenerator;
 import at.illecker.storm.commons.svm.featurevector.FeatureVectorGenerator;
@@ -50,10 +51,6 @@ public class FeatureGenerationBolt extends BaseRichBolt {
   private OutputCollector m_collector;
   private FeatureVectorGenerator m_fvg = null;
 
-  public FeatureGenerationBolt(Dataset dataset) {
-    this.m_dataset = dataset;
-  }
-
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("id", "score", "text", "featureVector"));
@@ -62,6 +59,7 @@ public class FeatureGenerationBolt extends BaseRichBolt {
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
     this.m_collector = collector;
+    this.m_dataset = Configuration.getDataSetSemEval2013();
 
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
