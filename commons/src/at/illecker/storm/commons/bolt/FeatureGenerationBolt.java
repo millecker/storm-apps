@@ -77,7 +77,7 @@ public class FeatureGenerationBolt extends BaseRichBolt {
           TfType.LOG, TfIdfNormalization.COS, true);
 
       LOG.info("Load CombinedFeatureVectorGenerator...");
-      m_fvg = new CombinedFeatureVectorGenerator(true, true, tweetTfIdf);
+      m_fvg = new CombinedFeatureVectorGenerator(false, true, tweetTfIdf);
 
     } else {
       LOG.error("TaggedTweets could not be found! File is missing: "

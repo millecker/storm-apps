@@ -523,7 +523,7 @@ public class SVM {
           TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
               taggedTweets, TfType.LOG, TfIdfNormalization.COS, true);
           LOG.info("Load CombinedFeatureVectorGenerator...");
-          fvg = new CombinedFeatureVectorGenerator(true, true, tweetTfIdf);
+          fvg = new CombinedFeatureVectorGenerator(false, true, tweetTfIdf);
 
         } else {
           throw new UnsupportedOperationException("FeatureVectorGenerator '"
@@ -789,7 +789,7 @@ public class SVM {
   }
 
   public static void main(String[] args) {
-    int nFoldCrossValidation = 3;
+    int nFoldCrossValidation = 10;
     int featureVectorLevel = 2;
     Dataset dataSet = Configuration.getDataSetSemEval2013();
     boolean useArkPOSTagger = true;

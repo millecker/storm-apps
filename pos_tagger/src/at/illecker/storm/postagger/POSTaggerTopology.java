@@ -20,10 +20,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.TreeMap;
 
-import cmu.arktweetnlp.Tagger.TaggedToken;
-
-import com.esotericsoftware.kryo.serializers.DefaultSerializers.TreeMapSerializer;
-
 import at.illecker.storm.commons.Configuration;
 import at.illecker.storm.commons.bolt.POSTaggerBolt;
 import at.illecker.storm.commons.bolt.PreprocessorBolt;
@@ -35,6 +31,9 @@ import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
+import cmu.arktweetnlp.Tagger.TaggedToken;
+
+import com.esotericsoftware.kryo.serializers.DefaultSerializers.TreeMapSerializer;
 
 public class POSTaggerTopology {
   public static final String TOPOLOGY_NAME = "pos-tagger-topology";

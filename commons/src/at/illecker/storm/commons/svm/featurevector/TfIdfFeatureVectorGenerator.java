@@ -128,7 +128,7 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
 
       // Generate TfIdfFeatureVectorGenerator
       TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(taggedTweets,
-          TfType.RAW, TfIdfNormalization.COS, usePOSTags);
+          TfType.LOG, TfIdfNormalization.COS, usePOSTags);
       TfIdfFeatureVectorGenerator efvg = new TfIdfFeatureVectorGenerator(
           tweetTfIdf);
 
@@ -182,7 +182,7 @@ public class TfIdfFeatureVectorGenerator extends FeatureVectorGenerator {
 
       // Generate TfIdfFeatureVectorGenerator
       TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(taggedTweets,
-          TfType.RAW, TfIdfNormalization.COS, usePOSTags);
+          TfType.LOG, TfIdfNormalization.COS, usePOSTags);
       TfIdfFeatureVectorGenerator efvg = new TfIdfFeatureVectorGenerator(
           tweetTfIdf);
 
