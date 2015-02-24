@@ -1,0 +1,45 @@
+All Features without TF-IDF - 10-fold Cross Validation RBF C=2^9 and Gamma=2^-11
+
+
+
+Run n-fold cross validation...
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	2848	222	1165	4235
+Class:	1	298	849	659	1806
+Class:	2	1004	344	3993	5341
+total		4150	1415	5817
+
+Total: 11382
+Correct: 7690
+Accuracy: 0.6756281848532771
+Scores per class:
+Class: 0 Precision: 0.6862650602409639 Recall: 0.6724911452184179 F-Score: 0.6793082886106142
+Class: 1 Precision: 0.6 Recall: 0.4700996677740864 F-Score: 0.5271654765600745
+Class: 2 Precision: 0.6864363073749356 Recall: 0.7476128065905261 F-Score: 0.715719663022047
+F-Score weighted: 0.6790027962454579
+F-Score average(pos,neg): 0.6032368825853444
+Cross Validation finished after 816294 ms
+Cross Validation Accurancy: 0.6756281848532771
+
+
+Evaluate test tweets...
+Evaluate finished after 1784 ms
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	1003	202	367	1572
+Class:	1	54	442	105	601
+Class:	2	304	239	1097	1640
+total		1361	883	1569
+
+Total: 3813
+Correct: 2542
+Accuracy: 0.6666666666666666
+Scores per class:
+Class: 0 Precision: 0.7369581190301249 Recall: 0.6380407124681934 F-Score: 0.6839413569723831
+Class: 1 Precision: 0.5005662514156285 Recall: 0.7354409317803661 F-Score: 0.5956873315363881
+Class: 2 Precision: 0.6991714467813894 Recall: 0.6689024390243903 F-Score: 0.6837020878778436
+F-Score weighted: 0.6634053701721428
+F-Score average(pos,neg): 0.6398143442543855

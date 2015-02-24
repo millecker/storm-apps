@@ -1,0 +1,45 @@
+All Features without SentiStrengthEmotion - 10-fold Cross Validation RBF C=2^9 and Gamma=2^-11
+
+
+
+Run n-fold cross validation...
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	2933	214	1088	4235
+Class:	1	245	925	636	1806
+Class:	2	840	360	4141	5341
+total		4018	1499	5865
+
+Total: 11382
+Correct: 7999
+Accuracy: 0.7027763134774205
+Scores per class:
+Class: 0 Precision: 0.7299651567944251 Recall: 0.6925619834710743 F-Score: 0.7107718405428329
+Class: 1 Precision: 0.6170780520346898 Recall: 0.5121816168327796 F-Score: 0.5597579425113465
+Class: 2 Precision: 0.7060528559249787 Recall: 0.7753229732259876 F-Score: 0.7390683562377297
+F-Score weighted: 0.7054642699402474
+F-Score average(pos,neg): 0.6352648915270898
+Cross Validation finished after 943104 ms
+Cross Validation Accurancy: 0.7027763134774205
+
+
+Evaluate test tweets...
+Evaluate finished after 2589 ms
+
+Confusion Matrix:
+		0	1	2	total
+Class:	0	1035	151	386	1572
+Class:	1	59	407	135	601
+Class:	2	262	150	1228	1640
+total		1356	708	1749
+
+Total: 3813
+Correct: 2670
+Accuracy: 0.7002360346184107
+Scores per class:
+Class: 0 Precision: 0.7632743362831859 Recall: 0.6583969465648855 F-Score: 0.706967213114754
+Class: 1 Precision: 0.5748587570621468 Recall: 0.6772046589018302 F-Score: 0.6218487394957982
+Class: 2 Precision: 0.7021154945683248 Recall: 0.748780487804878 F-Score: 0.7246975508999706
+F-Score weighted: 0.6992951652427695
+F-Score average(pos,neg): 0.6644079763052761
