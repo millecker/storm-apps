@@ -27,11 +27,13 @@ import at.illecker.storm.commons.bolt.SVMBolt;
 import at.illecker.storm.commons.bolt.TokenizerBolt;
 import at.illecker.storm.commons.spout.DatasetSpout;
 import at.illecker.storm.commons.spout.TwitterStreamSpout;
+import at.illecker.storm.commons.util.io.TaggedTokenSerializer;
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.metric.LoggingMetricsConsumer;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.TopologyBuilder;
+import cmu.arktweetnlp.Tagger.TaggedToken;
 
 public class SentimentAnalysisSVMTopology {
   public static final String TOPOLOGY_NAME = "sentiment-analysis-svm-topology";
@@ -191,7 +193,8 @@ public class SentimentAnalysisSVMTopology {
     conf.put(SVMBolt.CONF_LOGGING, Configuration.get(
         "apps.sentiment.analysis.svm.bolt.svm.logging", false));
 
-    // conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
+    conf.put(Config.TOPOLOGY_FALL_BACK_ON_JAVA_SERIALIZATION, false);
+    conf.registerSerialization(TaggedToken.class, TaggedTokenSerializer.class);
 
     // conf.put(Config.TOPOLOGY_RECEIVER_BUFFER_SIZE, 8);
     // conf.put(Config.TOPOLOGY_TRANSFER_BUFFER_SIZE, 32);
