@@ -124,6 +124,18 @@ public final class Tweet implements Serializable {
         .add(new Tweet(
             10L,
             "\" &quot; @bbcburnsy : Loads from SB ; &quot;talks with Chester continue ; no deals 4 out of contract players ' til Jan ; Dev t Roth , Coops to Chest'ld #hcafc \""));
+
+    // thesis examples
+    tweets
+        .add(new Tweet(
+            11L,
+            "@user1 @user2 OMG I just watched Michael&#039;s comeback ! U remember him from the 90s ?? yaaaa \uD83D\uDE09 #michaelcomeback"));
+    tweets
+        .add(new Tweet(12L,
+            "@user1 @user2 OMG I just watched it again ! \uD83D\uDE09 #michaelcomeback"));
+    tweets.add(new Tweet(13L,
+        "@user3 I luv him too ! \uD83D\uDE09 #michaelcomeback"));
+
     return tweets;
   }
 
