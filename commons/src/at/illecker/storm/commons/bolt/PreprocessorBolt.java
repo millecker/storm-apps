@@ -96,7 +96,6 @@ public class PreprocessorBolt extends BaseRichBolt {
     // Emit new tuples
     this.m_collector
         .emit(tuple, new Values(tweetId, score, preprocessedTokens));
-    this.m_collector.ack(tuple);
   }
 
   private String preprocess(String token) {

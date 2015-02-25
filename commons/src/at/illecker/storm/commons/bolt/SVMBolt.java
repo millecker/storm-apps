@@ -113,7 +113,6 @@ public class SVMBolt extends BaseRichBolt {
     if (m_countMetric != null) {
       m_countMetric.incr();
     }
-    m_collector.ack(tuple);
   }
 
 }

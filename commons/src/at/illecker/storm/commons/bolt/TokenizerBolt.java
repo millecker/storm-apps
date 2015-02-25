@@ -91,7 +91,6 @@ public class TokenizerBolt extends BaseRichBolt {
 
     // Emit new tuples
     this.m_collector.emit(tuple, new Values(tweetId, score, tokens));
-    this.m_collector.ack(tuple);
   }
 
 }
