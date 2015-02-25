@@ -16,15 +16,13 @@
  */
 package at.illecker.storm.commons.bolt;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.commons.Configuration;
+import at.illecker.storm.commons.postagger.ArkPOSTagger;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -33,10 +31,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import cmu.arktweetnlp.Tagger.TaggedToken;
-import cmu.arktweetnlp.impl.Model;
-import cmu.arktweetnlp.impl.ModelSentence;
-import cmu.arktweetnlp.impl.Sentence;
-import cmu.arktweetnlp.impl.features.FeatureExtractor;
 
 public class POSTaggerBolt extends BaseRichBolt {
   public static final String ID = "pos-tagger-bolt";
@@ -48,8 +42,7 @@ public class POSTaggerBolt extends BaseRichBolt {
   private boolean m_logging = false;
   private OutputCollector m_collector;
 
-  private Model m_model;
-  private FeatureExtractor m_featureExtractor;
+  private ArkPOSTagger m_tagger;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
@@ -66,19 +59,7 @@ public class POSTaggerBolt extends BaseRichBolt {
       m_logging = false;
     }
     // Load ARK POS Tagger
-    try {
-      String taggingModel = Configuration
-          .get("global.resources.postagger.ark.model.path");
-      LOG.info("Load ARK POS Tagger with model: " + taggingModel);
-      // TODO absolute path needed for resource
-      if ((Configuration.RUNNING_WITHIN_JAR) && (!taggingModel.startsWith("/"))) {
-        taggingModel = "/" + taggingModel;
-      }
-      m_model = Model.loadModelFromText(taggingModel);
-      m_featureExtractor = new FeatureExtractor(m_model, false);
-    } catch (IOException e) {
-      LOG.error("IOException: " + e.getMessage());
-    }
+    m_tagger = ArkPOSTagger.getInstance();
   }
 
   public void execute(Tuple tuple) {
@@ -88,18 +69,7 @@ public class POSTaggerBolt extends BaseRichBolt {
         .getValueByField("preprocessedTokens");
 
     // POS Tagging
-    Sentence sentence = new Sentence();
-    sentence.tokens = preprocessedTokens;
-    ModelSentence ms = new ModelSentence(sentence.T());
-    m_featureExtractor.computeFeatures(sentence, ms);
-    m_model.greedyDecode(ms, false);
-
-    List<TaggedToken> taggedTokens = new ArrayList<TaggedToken>();
-    for (int t = 0; t < sentence.T(); t++) {
-      TaggedToken tt = new TaggedToken(preprocessedTokens.get(t),
-          m_model.labelVocab.name(ms.labels[t]));
-      taggedTokens.add(tt);
-    }
+    List<TaggedToken> taggedTokens = m_tagger.tag(preprocessedTokens);
 
     if (m_logging) {
       LOG.info("Tweet[" + tweetId + "]: " + taggedTokens);
