@@ -53,7 +53,7 @@ public class FeatureGenerationBolt extends BaseRichBolt {
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields("id", "score", "text", "featureVector"));
+    declarer.declare(new Fields("id", "score", "featureVector"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -88,7 +88,6 @@ public class FeatureGenerationBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Long tweetId = tuple.getLongByField("id");
     Double score = tuple.getDoubleByField("score");
-    String text = tuple.getStringByField("text");
     List<TaggedToken> taggedTokens = (List<TaggedToken>) tuple
         .getValueByField("taggedTokens");
 
@@ -97,13 +96,11 @@ public class FeatureGenerationBolt extends BaseRichBolt {
         .generateFeatureVectorFromTaggedTokens(taggedTokens);
 
     if (m_logging) {
-      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" FeatureVector: "
-          + featureVector);
+      LOG.info("Tweet[" + tweetId + "]: " + featureVector);
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple,
-        new Values(tweetId, score, text, featureVector));
+    this.m_collector.emit(tuple, new Values(tweetId, score, featureVector));
     this.m_collector.ack(tuple);
   }
 

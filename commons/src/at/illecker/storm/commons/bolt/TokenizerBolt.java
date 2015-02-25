@@ -16,13 +16,17 @@
  */
 package at.illecker.storm.commons.bolt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.illecker.storm.commons.tokenizer.Tokenizer;
+import at.illecker.storm.commons.util.HtmlUtils;
+import at.illecker.storm.commons.util.RegexUtils;
+import at.illecker.storm.commons.util.UnicodeUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -42,7 +46,7 @@ public class TokenizerBolt extends BaseRichBolt {
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields("id", "score", "text", "tokens"));
+    declarer.declare(new Fields("id", "score", "tokens"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -61,15 +65,32 @@ public class TokenizerBolt extends BaseRichBolt {
     Double score = tuple.getDoubleByField("score");
     String text = tuple.getStringByField("text");
 
-    // Tokenize
-    List<String> tokens = Tokenizer.tokenize(text);
+    // Step 1) Trim text
+    text = text.trim();
+
+    // Step 2) Replace Unicode symbols \u0000
+    if (UnicodeUtils.containsUnicode(text)) {
+      text = UnicodeUtils.replaceUnicodeSymbols(text);
+    }
+
+    // Step 3) Replace HTML symbols &#[0-9];
+    if (HtmlUtils.containsHtml(text)) {
+      text = HtmlUtils.replaceHtmlSymbols(text);
+    }
+
+    // Step 4) Tokenize
+    List<String> tokens = new ArrayList<String>();
+    Matcher m = RegexUtils.TOKENIZER_PATTERN.matcher(text);
+    while (m.find()) {
+      tokens.add(m.group());
+    }
 
     if (m_logging) {
       LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" Tokenized: " + tokens);
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(tweetId, score, text, tokens));
+    this.m_collector.emit(tuple, new Values(tweetId, score, tokens));
     this.m_collector.ack(tuple);
   }
 

@@ -89,7 +89,6 @@ public class SVMBolt extends BaseRichBolt {
   public void execute(Tuple tuple) {
     Long tweetId = tuple.getLongByField("id");
     Double score = tuple.getDoubleByField("score");
-    String text = tuple.getStringByField("text");
     Map<Integer, Double> featureVector = (Map<Integer, Double>) tuple
         .getValueByField("featureVector");
 
@@ -107,8 +106,8 @@ public class SVMBolt extends BaseRichBolt {
     double predictedClass = svm.svm_predict(m_model, testNodes);
 
     if (m_logging) {
-      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" score: " + score
-          + " predictedClass: " + predictedClass);
+      LOG.info("Tweet[" + tweetId + "]:  score: " + score + " predictedClass: "
+          + predictedClass);
     }
 
     if (m_countMetric != null) {
