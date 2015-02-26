@@ -23,16 +23,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.postagger.ArkPOSTagger;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import cmu.arktweetnlp.Tagger.TaggedToken;
 
-public class POSTaggerBolt extends BaseRichBolt {
+public class POSTaggerBolt extends BaseBasicBolt {
   public static final String ID = "pos-tagger-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
   public static final String CONF_MODEL = ID + ".model";
@@ -40,18 +40,17 @@ public class POSTaggerBolt extends BaseRichBolt {
   private static final Logger LOG = LoggerFactory
       .getLogger(POSTaggerBolt.class);
   private boolean m_logging = false;
-  private OutputCollector m_collector;
 
   private ArkPOSTagger m_tagger;
 
+  @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("taggedTokens"));
   }
 
-  public void prepare(Map config, TopologyContext context,
-      OutputCollector collector) {
-    this.m_collector = collector;
+  @Override
+  public void prepare(Map config, TopologyContext context) {
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
       m_logging = (Boolean) config.get(CONF_LOGGING);
@@ -62,7 +61,8 @@ public class POSTaggerBolt extends BaseRichBolt {
     m_tagger = ArkPOSTagger.getInstance();
   }
 
-  public void execute(Tuple tuple) {
+  @Override
+  public void execute(Tuple tuple, BasicOutputCollector collector) {
     List<String> preprocessedTokens = (List<String>) tuple
         .getValueByField("preprocessedTokens");
 
@@ -74,8 +74,7 @@ public class POSTaggerBolt extends BaseRichBolt {
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(taggedTokens));
-    this.m_collector.ack(tuple);
+    collector.emit(new Values(taggedTokens));
   }
 
 }
