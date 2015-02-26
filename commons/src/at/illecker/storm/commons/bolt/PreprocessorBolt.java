@@ -190,9 +190,14 @@ public class PreprocessorBolt extends BaseRichBolt {
           for (int i = 0; i < slangCorrection.length; i++) {
             preprocessedTokens.add(slangCorrection[i]);
           }
+          continue;
         }
       }
+
+      // default action add token
+      preprocessedTokens.add(token);
     }
+
     return preprocessedTokens;
   }
 
