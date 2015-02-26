@@ -280,7 +280,7 @@ apps.sentiment.analysis.bolt.sentimentdetection.logging: true
 ##############################################################################
 
 apps.sentiment.analysis.svm.workers.num: 1
-apps.sentiment.analysis.svm.workers.childopts: "-Xmx16g"
+apps.sentiment.analysis.svm.workers.childopts: "-Xmx4g"
 
 apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx2g"
 
@@ -288,7 +288,7 @@ apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
 apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
 
 apps.sentiment.analysis.svm.spout.parallelism: 1
-apps.sentiment.analysis.svm.spout.max.pending: 1000
+apps.sentiment.analysis.svm.spout.max.pending: 150
 apps.sentiment.analysis.svm.spout.startup.sleep.ms: 20000 # 20 sec
 apps.sentiment.analysis.svm.spout.tuple.sleep.ms: null
 apps.sentiment.analysis.svm.spout.tuple.sleep.ns: null # 250000 = 0.25 ms

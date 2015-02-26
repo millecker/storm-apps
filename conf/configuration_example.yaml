@@ -72,7 +72,7 @@ apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
 apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
 
 apps.sentiment.analysis.svm.spout.parallelism: 1
-apps.sentiment.analysis.svm.spout.max.pending: 2000
+apps.sentiment.analysis.svm.spout.max.pending: 150
 apps.sentiment.analysis.svm.spout.startup.sleep.ms: 20000 # 20 sec
 
 apps.sentiment.analysis.svm.bolt.tokenizer.parallelism: 1
