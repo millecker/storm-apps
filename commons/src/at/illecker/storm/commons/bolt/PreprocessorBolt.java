@@ -92,6 +92,8 @@ public class PreprocessorBolt extends BaseRichBolt {
       // identify token
       boolean tokenContainsPunctuation = StringUtils
           .consitsOfPunctuations(token);
+      boolean tokenConsistsOfUnderscores = StringUtils
+          .consitsOfUnderscores(token);
       boolean tokenIsEmoticon = StringUtils.isEmoticon(token);
       boolean tokenIsURL = StringUtils.isURL(token);
       boolean tokenIsNumeric = StringUtils.isNumeric(token);
@@ -108,13 +110,14 @@ public class PreprocessorBolt extends BaseRichBolt {
           }
           preprocessedTokens.add(reducedToken);
           continue;
-        } else if (tokenContainsPunctuation) {
-          // If token is no Emoticon then there is no further
-          // preprocessing for punctuations
-          preprocessedTokens.add(token);
-          continue;
         }
+      } else if ((tokenContainsPunctuation) || (tokenConsistsOfUnderscores)) {
+        // If token is no Emoticon then there is no further
+        // preprocessing for punctuations or underscores
+        preprocessedTokens.add(token);
+        continue;
       }
+
       // identify token further
       boolean tokenIsUser = StringUtils.isUser(token);
       boolean tokenIsHashTag = StringUtils.isHashTag(token);
@@ -199,10 +202,14 @@ public class PreprocessorBolt extends BaseRichBolt {
     // else if the word is not found reduce the repeating chars to one
 
     // collect matches for sub-token search
-    List<int[]> matches = new ArrayList<int[]>();
+    List<int[]> matches = null;
 
     Matcher m = RegexUtils.THREE_OR_MORE_REPEATING_CHARS_PATTERN.matcher(value);
     while (m.find()) {
+      if (matches == null) {
+        matches = new ArrayList<int[]>();
+      }
+
       int start = m.start();
       int end = m.end();
       // String c = m.group(1);
@@ -248,7 +255,7 @@ public class PreprocessorBolt extends BaseRichBolt {
 
     // no match have been found
     // reduce all repeating chars
-    if (!matches.isEmpty()) {
+    if (matches != null) {
       String reducedToken = m.replaceAll("$1");
       value = reducedToken;
     }
