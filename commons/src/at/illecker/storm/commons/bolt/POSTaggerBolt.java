@@ -46,7 +46,7 @@ public class POSTaggerBolt extends BaseRichBolt {
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields("id", "score", "taggedTokens"));
+    declarer.declare(new Fields("taggedTokens"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -63,8 +63,6 @@ public class POSTaggerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Long tweetId = tuple.getLongByField("id");
-    Double score = tuple.getDoubleByField("score");
     List<String> preprocessedTokens = (List<String>) tuple
         .getValueByField("preprocessedTokens");
 
@@ -72,11 +70,11 @@ public class POSTaggerBolt extends BaseRichBolt {
     List<TaggedToken> taggedTokens = m_tagger.tag(preprocessedTokens);
 
     if (m_logging) {
-      LOG.info("Tweet[" + tweetId + "]: " + taggedTokens);
+      LOG.info("Tweet: " + taggedTokens);
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(tweetId, score, taggedTokens));
+    this.m_collector.emit(tuple, new Values(taggedTokens));
   }
 
 }

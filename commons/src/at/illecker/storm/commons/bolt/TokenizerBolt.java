@@ -46,7 +46,7 @@ public class TokenizerBolt extends BaseRichBolt {
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
-    declarer.declare(new Fields("id", "score", "tokens"));
+    declarer.declare(new Fields("tokens"));
   }
 
   public void prepare(Map config, TopologyContext context,
@@ -61,8 +61,6 @@ public class TokenizerBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple tuple) {
-    Long tweetId = tuple.getLongByField("id");
-    Double score = tuple.getDoubleByField("score");
     String text = tuple.getStringByField("text");
 
     // Step 1) Trim text
@@ -86,11 +84,11 @@ public class TokenizerBolt extends BaseRichBolt {
     }
 
     if (m_logging) {
-      LOG.info("Tweet[" + tweetId + "]: \"" + text + "\" Tokenized: " + tokens);
+      LOG.info("Tweet: \"" + text + "\" Tokenized: " + tokens);
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(tweetId, score, tokens));
+    this.m_collector.emit(tuple, new Values(tokens));
   }
 
 }
