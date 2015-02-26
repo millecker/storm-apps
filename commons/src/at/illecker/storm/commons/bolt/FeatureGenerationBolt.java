@@ -31,16 +31,16 @@ import at.illecker.storm.commons.tfidf.TfType;
 import at.illecker.storm.commons.tfidf.TweetTfIdf;
 import at.illecker.storm.commons.tweet.FeaturedTweet;
 import at.illecker.storm.commons.util.io.SerializationUtils;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import cmu.arktweetnlp.Tagger.TaggedToken;
 
-public class FeatureGenerationBolt extends BaseRichBolt {
+public class FeatureGenerationBolt extends BaseBasicBolt {
   public static final String ID = "feature-generation-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
   private static final long serialVersionUID = 8704674836362723368L;
@@ -48,17 +48,16 @@ public class FeatureGenerationBolt extends BaseRichBolt {
       .getLogger(FeatureGenerationBolt.class);
   private boolean m_logging = false;
   private Dataset m_dataset;
-  private OutputCollector m_collector;
   private FeatureVectorGenerator m_fvg = null;
 
+  @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("featureVector"));
   }
 
-  public void prepare(Map config, TopologyContext context,
-      OutputCollector collector) {
-    this.m_collector = collector;
+  @Override
+  public void prepare(Map config, TopologyContext context) {
     this.m_dataset = Configuration.getDataSetSemEval2013();
 
     // Optional set logging
@@ -85,7 +84,8 @@ public class FeatureGenerationBolt extends BaseRichBolt {
     }
   }
 
-  public void execute(Tuple tuple) {
+  @Override
+  public void execute(Tuple tuple, BasicOutputCollector collector) {
     List<TaggedToken> taggedTokens = (List<TaggedToken>) tuple
         .getValueByField("taggedTokens");
 
@@ -98,8 +98,7 @@ public class FeatureGenerationBolt extends BaseRichBolt {
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(featureVector));
-    this.m_collector.ack(tuple);
+    collector.emit(new Values(featureVector));
   }
 
 }

@@ -31,13 +31,13 @@ import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.svm.SVM;
 import at.illecker.storm.commons.util.io.SerializationUtils;
 import backtype.storm.metric.api.CountMetric;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 
-public class SVMBolt extends BaseRichBolt {
+public class SVMBolt extends BaseBasicBolt {
   public static final String ID = "support-vector-maschine-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
   public static final String CONF_METRIC_LOGGING_INTERVALL = ID
@@ -45,22 +45,19 @@ public class SVMBolt extends BaseRichBolt {
   private static final long serialVersionUID = -3235291265771813064L;
   private static final Logger LOG = LoggerFactory.getLogger(SVMBolt.class);
   private boolean m_logging = false;
-  private Dataset m_dataset;
-  private OutputCollector m_collector;
+
   private svm_model m_model;
   // Metrics
   // Note: these must be declared as transient since they are not Serializable
   transient CountMetric m_countMetric = null;
 
+  @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // no output tuples
   }
 
-  public void prepare(Map config, TopologyContext context,
-      OutputCollector collector) {
-    this.m_collector = collector;
-    this.m_dataset = Configuration.getDataSetSemEval2013();
-
+  @Override
+  public void prepare(Map config, TopologyContext context) {
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
       m_logging = (Boolean) config.get(CONF_LOGGING);
@@ -76,17 +73,19 @@ public class SVMBolt extends BaseRichBolt {
     }
 
     LOG.info("Loading SVM model...");
-    m_model = SerializationUtils.deserialize(m_dataset.getDatasetPath()
+    Dataset dataset = Configuration.getDataSetSemEval2013();
+    m_model = SerializationUtils.deserialize(dataset.getDatasetPath()
         + File.separator + SVM.SVM_MODEL_FILE_SER);
 
     if (m_model == null) {
-      LOG.error("Could not load SVM model! File: " + m_dataset.getDatasetPath()
+      LOG.error("Could not load SVM model! File: " + dataset.getDatasetPath()
           + File.separator + SVM.SVM_MODEL_FILE_SER);
       throw new RuntimeException();
     }
   }
 
-  public void execute(Tuple tuple) {
+  @Override
+  public void execute(Tuple tuple, BasicOutputCollector collector) {
     Map<Integer, Double> featureVector = (Map<Integer, Double>) tuple
         .getValueByField("featureVector");
 
@@ -110,7 +109,6 @@ public class SVMBolt extends BaseRichBolt {
     if (m_countMetric != null) {
       m_countMetric.incr();
     }
-    this.m_collector.ack(tuple);
   }
 
 }
