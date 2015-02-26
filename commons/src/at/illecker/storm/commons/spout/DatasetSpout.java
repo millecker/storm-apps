@@ -39,7 +39,6 @@ public class DatasetSpout extends BaseRichSpout {
   private Dataset m_dataset;
   private SpoutOutputCollector m_collector;
   private List<Tweet> m_tweets;
-  private long m_messageId = 0;
   private int m_index = 0;
   private long m_tupleSleepMs = 0;
   private long m_tupleSleepNs = 0;
@@ -83,12 +82,11 @@ public class DatasetSpout extends BaseRichSpout {
     if (m_index >= m_tweets.size()) {
       m_index = 0;
     }
-    m_messageId++; // accept possible overflow
 
     // Emit tweet
     m_collector.emit(
         new Values(tweet.getId(), tweet.getScore(), tweet.getText()),
-        m_messageId);
+        tweet.getId());
 
     // Optional sleep
     if (m_tupleSleepMs != 0) {
