@@ -29,20 +29,20 @@ import at.illecker.storm.commons.util.RegexUtils;
 import at.illecker.storm.commons.util.UnicodeUtils;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class TokenizerBolt extends BaseRichBolt {
+public class TokenizerBolt extends BaseBasicBolt {
   public static final String ID = "tokenizer-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
   private static final long serialVersionUID = 7134328814020366549L;
   private static final Logger LOG = LoggerFactory
       .getLogger(TokenizerBolt.class);
   private boolean m_logging = false;
-  private OutputCollector m_collector;
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
@@ -51,7 +51,6 @@ public class TokenizerBolt extends BaseRichBolt {
 
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
-    this.m_collector = collector;
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
       m_logging = (Boolean) config.get(CONF_LOGGING);
@@ -60,7 +59,8 @@ public class TokenizerBolt extends BaseRichBolt {
     }
   }
 
-  public void execute(Tuple tuple) {
+  @Override
+  public void execute(Tuple tuple, BasicOutputCollector collector) {
     String text = tuple.getStringByField("text");
 
     // Step 1) Trim text
@@ -88,8 +88,7 @@ public class TokenizerBolt extends BaseRichBolt {
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(tokens));
-    this.m_collector.ack(tuple);
+    collector.emit(new Values(tokens));
   }
 
 }

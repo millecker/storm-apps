@@ -31,20 +31,20 @@ import at.illecker.storm.commons.util.StringUtils;
 import at.illecker.storm.commons.wordnet.WordNet;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-public class PreprocessorBolt extends BaseRichBolt {
+public class PreprocessorBolt extends BaseBasicBolt {
   public static final String ID = "preprocessor-bolt";
   public static final String CONF_LOGGING = ID + ".logging";
   private static final long serialVersionUID = -1623010654971791418L;
   private static final Logger LOG = LoggerFactory
       .getLogger(PreprocessorBolt.class);
   private boolean m_logging = false;
-  private OutputCollector m_collector;
 
   private WordNet m_wordnet;
   private SlangCorrection m_slangCorrection;
@@ -57,7 +57,6 @@ public class PreprocessorBolt extends BaseRichBolt {
 
   public void prepare(Map config, TopologyContext context,
       OutputCollector collector) {
-    this.m_collector = collector;
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
       m_logging = (Boolean) config.get(CONF_LOGGING);
@@ -72,7 +71,7 @@ public class PreprocessorBolt extends BaseRichBolt {
     m_firstNames = FirstNames.getInstance();
   }
 
-  public void execute(Tuple tuple) {
+  public void execute(Tuple tuple, BasicOutputCollector collector) {
     List<String> tokens = (List<String>) tuple.getValueByField("tokens");
 
     // Preprocess
@@ -83,8 +82,7 @@ public class PreprocessorBolt extends BaseRichBolt {
     }
 
     // Emit new tuples
-    this.m_collector.emit(tuple, new Values(preprocessedTokens));
-    this.m_collector.ack(tuple);
+    collector.emit(new Values(preprocessedTokens));
   }
 
   private List<String> preprocess(List<String> tokens) {
