@@ -29,7 +29,6 @@ import at.illecker.storm.commons.dict.SlangCorrection;
 import at.illecker.storm.commons.util.RegexUtils;
 import at.illecker.storm.commons.util.StringUtils;
 import at.illecker.storm.commons.wordnet.WordNet;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -50,13 +49,14 @@ public class PreprocessorBolt extends BaseBasicBolt {
   private SlangCorrection m_slangCorrection;
   private FirstNames m_firstNames;
 
+  @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("preprocessedTokens"));
   }
 
-  public void prepare(Map config, TopologyContext context,
-      OutputCollector collector) {
+  @Override
+  public void prepare(Map config, TopologyContext context) {
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
       m_logging = (Boolean) config.get(CONF_LOGGING);
@@ -71,6 +71,7 @@ public class PreprocessorBolt extends BaseBasicBolt {
     m_firstNames = FirstNames.getInstance();
   }
 
+  @Override
   public void execute(Tuple tuple, BasicOutputCollector collector) {
     List<String> tokens = (List<String>) tuple.getValueByField("tokens");
 

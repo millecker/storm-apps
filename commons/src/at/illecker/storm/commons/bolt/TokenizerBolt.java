@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import at.illecker.storm.commons.util.HtmlUtils;
 import at.illecker.storm.commons.util.RegexUtils;
 import at.illecker.storm.commons.util.UnicodeUtils;
-import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -44,13 +43,14 @@ public class TokenizerBolt extends BaseBasicBolt {
       .getLogger(TokenizerBolt.class);
   private boolean m_logging = false;
 
+  @Override
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     // key of output tuples
     declarer.declare(new Fields("tokens"));
   }
 
-  public void prepare(Map config, TopologyContext context,
-      OutputCollector collector) {
+  @Override
+  public void prepare(Map config, TopologyContext context) {
     // Optional set logging
     if (config.get(CONF_LOGGING) != null) {
       m_logging = (Boolean) config.get(CONF_LOGGING);
