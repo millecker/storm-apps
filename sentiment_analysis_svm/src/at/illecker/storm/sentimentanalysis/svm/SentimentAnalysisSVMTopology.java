@@ -107,9 +107,9 @@ public class SentimentAnalysisSVMTopology {
     // Create Bolts
     TokenizerBolt tokenizerBolt = new TokenizerBolt();
     PreprocessorBolt preprocessorBolt = new PreprocessorBolt();
-    // POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
-    // FeatureGenerationBolt featureGenerationBolt = new FeatureGenerationBolt();
-    // SVMBolt svmBolt = new SVMBolt();
+    POSTaggerBolt posTaggerBolt = new POSTaggerBolt();
+    FeatureGenerationBolt featureGenerationBolt = new FeatureGenerationBolt();
+    SVMBolt svmBolt = new SVMBolt();
 
     // Create Topology
     TopologyBuilder builder = new TopologyBuilder();
@@ -134,7 +134,6 @@ public class SentimentAnalysisSVMTopology {
             "apps.sentiment.analysis.svm.bolt.preprocessor.parallelism", 1))
         .shuffleGrouping(TokenizerBolt.ID);
 
-/*
     // PreprocessorBolt --> POSTaggerBolt
     builder.setBolt(
         POSTaggerBolt.ID,
@@ -160,8 +159,7 @@ public class SentimentAnalysisSVMTopology {
         Configuration
             .get("apps.sentiment.analysis.svm.bolt.svm.parallelism", 1))
         .shuffleGrouping(FeatureGenerationBolt.ID);
-*/
-    
+
     // Set topology config
     conf.setNumWorkers(Configuration.get(
         "apps.sentiment.analysis.svm.workers.num", 1));
