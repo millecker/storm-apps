@@ -84,6 +84,7 @@ public class PreprocessorBolt extends BaseRichBolt {
 
     // Emit new tuples
     this.m_collector.emit(tuple, new Values(preprocessedTokens));
+    this.m_collector.ack(tuple);
   }
 
   private List<String> preprocess(List<String> tokens) {

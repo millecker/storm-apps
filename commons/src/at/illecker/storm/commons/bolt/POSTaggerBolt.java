@@ -75,6 +75,7 @@ public class POSTaggerBolt extends BaseRichBolt {
 
     // Emit new tuples
     this.m_collector.emit(tuple, new Values(taggedTokens));
+    this.m_collector.ack(tuple);
   }
 
 }

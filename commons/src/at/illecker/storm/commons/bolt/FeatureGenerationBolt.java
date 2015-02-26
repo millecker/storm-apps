@@ -99,6 +99,7 @@ public class FeatureGenerationBolt extends BaseRichBolt {
 
     // Emit new tuples
     this.m_collector.emit(tuple, new Values(featureVector));
+    this.m_collector.ack(tuple);
   }
 
 }
