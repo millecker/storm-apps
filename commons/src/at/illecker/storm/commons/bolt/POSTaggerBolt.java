@@ -16,7 +16,6 @@
  */
 package at.illecker.storm.commons.bolt;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import at.illecker.storm.commons.Configuration;
+import at.illecker.storm.commons.util.io.SerializationUtils;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -65,19 +65,16 @@ public class POSTaggerBolt extends BaseBasicBolt {
       m_logging = false;
     }
     // Load ARK POS Tagger
-    try {
-      String taggingModel = Configuration
-          .get("global.resources.postagger.ark.model.path");
-      LOG.info("Load ARK POS Tagger with model: " + taggingModel);
-      // TODO absolute path needed for resource
-      if ((Configuration.RUNNING_WITHIN_JAR) && (!taggingModel.startsWith("/"))) {
-        taggingModel = "/" + taggingModel;
-      }
-      m_model = Model.loadModelFromText(taggingModel);
-      m_featureExtractor = new FeatureExtractor(m_model, false);
-    } catch (IOException e) {
-      LOG.error("IOException: " + e.getMessage());
+    String taggingModel = Configuration
+        .get("global.resources.postagger.ark.model.path");
+    LOG.info("Load ARK POS Tagger with model: " + taggingModel);
+    // TODO absolute path needed for resource
+    if ((Configuration.RUNNING_WITHIN_JAR) && (!taggingModel.startsWith("/"))) {
+      taggingModel = "/" + taggingModel;
     }
+    m_model = SerializationUtils.deserialize(taggingModel + "_model.ser");
+    m_featureExtractor = SerializationUtils.deserialize(taggingModel
+        + "_featureExtractor.ser");
   }
 
   @Override

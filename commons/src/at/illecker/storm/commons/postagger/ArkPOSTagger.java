@@ -16,6 +16,7 @@
  */
 package at.illecker.storm.commons.postagger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import at.illecker.storm.commons.Dataset;
 import at.illecker.storm.commons.preprocessor.Preprocessor;
 import at.illecker.storm.commons.tokenizer.Tokenizer;
 import at.illecker.storm.commons.tweet.Tweet;
+import at.illecker.storm.commons.util.io.SerializationUtils;
 import cmu.arktweetnlp.Tagger.TaggedToken;
 import cmu.arktweetnlp.impl.Model;
 import cmu.arktweetnlp.impl.ModelSentence;
@@ -39,20 +41,22 @@ public class ArkPOSTagger {
   private static final boolean LOGGING = Configuration.get(
       "commons.postagger.logging", false);
   private static final ArkPOSTagger INSTANCE = new ArkPOSTagger();
+  String m_taggingModel;
   private Model m_model;
   private FeatureExtractor m_featureExtractor;
 
   private ArkPOSTagger() {
     // Load ARK POS Tagger
     try {
-      String taggingModel = Configuration
+      m_taggingModel = Configuration
           .get("global.resources.postagger.ark.model.path");
-      LOG.info("Load ARK POS Tagger with model: " + taggingModel);
+      LOG.info("Load ARK POS Tagger with model: " + m_taggingModel);
       // TODO absolute path needed for resource
-      if ((Configuration.RUNNING_WITHIN_JAR) && (!taggingModel.startsWith("/"))) {
-        taggingModel = "/" + taggingModel;
+      if ((Configuration.RUNNING_WITHIN_JAR)
+          && (!m_taggingModel.startsWith("/"))) {
+        m_taggingModel = "/" + m_taggingModel;
       }
-      m_model = Model.loadModelFromText(taggingModel);
+      m_model = Model.loadModelFromText(m_taggingModel);
       m_featureExtractor = new FeatureExtractor(m_model, false);
     } catch (IOException e) {
       LOG.error("IOException: " + e.getMessage());
@@ -87,8 +91,18 @@ public class ArkPOSTagger {
     return taggedTokens;
   }
 
+  public void serializeModel() {
+    SerializationUtils.serialize(m_model, m_taggingModel + "_model.ser");
+  }
+
+  public void serializeFeatureExtractor() {
+    SerializationUtils.serialize(m_featureExtractor, m_taggingModel
+        + "_featureExtractor.ser");
+  }
+
   public static void main(String[] args) {
-    boolean extendedTest = true;
+    boolean extendedTest = false;
+    boolean useSerialization = true;
 
     // load tweets
     List<Tweet> tweets = null;
@@ -110,6 +124,11 @@ public class ArkPOSTagger {
 
     Preprocessor preprocessor = Preprocessor.getInstance();
     ArkPOSTagger posTagger = ArkPOSTagger.getInstance();
+
+    if (useSerialization) {
+      posTagger.serializeModel();
+      posTagger.serializeFeatureExtractor();
+    }
 
     // process tweets
     long startTime = System.currentTimeMillis();
