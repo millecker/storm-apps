@@ -5,7 +5,7 @@
 	<property name="output.file" value="SentimentAnalysisSVM" />
 	<property name="util.src.dir" value="../commons/src" />
 	<property name="libjars.gpu" value="" />
-	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar,${lib}${file.separator}ark-tweet-nlp-0.3.2.jar,${lib}${file.separator}jackson-core-2.5.0.jar,${lib}${file.separator}BerkeleyParser-1.7.jar,${lib}${file.separator}twitter-text-1.11.0.jar,${lib}${file.separator}libsvm-3.2-multithreaded.jar" />
+	<property name="libjars.cpu" value="${lib}${file.separator}commons-compress-1.9.jar,${lib}${file.separator}twitter4j-core-4.0.2.jar,${lib}${file.separator}twitter4j-stream-4.0.2.jar,${lib}${file.separator}edu.mit.jwi_2.3.3_jdk.jar,${lib}${file.separator}stanford-corenlp-3.4.1.jar,${lib}${file.separator}ark-tweet-nlp-0.3.2.jar,${lib}${file.separator}jackson-core-2.5.0.jar,${lib}${file.separator}BerkeleyParser-1.7.jar,${lib}${file.separator}twitter-text-1.11.0.jar,${lib}${file.separator}libsvm-3.2.jar" />
 	<property name="libfiles.cpu" value="conf/defaults.yaml,resources${file.separator}dictionaries,resources${file.separator}models,resources${file.separator}datasets${file.separator}SemEval2013" />
 	<property name="libjars.bench" value="${lib}${file.separator}caliper-1.0-beta-1-all.jar,${lib}${file.separator}slf4j-api-1.7.7.jar,${lib}${file.separator}slf4j-simple-1.7.7.jar,${lib}${file.separator}storm-core-0.9.3.jar" />
 	<property name="rootbeer.package.dir" value="" />

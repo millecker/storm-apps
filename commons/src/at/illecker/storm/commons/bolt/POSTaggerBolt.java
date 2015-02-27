@@ -67,12 +67,10 @@ public class POSTaggerBolt extends BaseBasicBolt {
     // Load ARK POS Tagger
     String taggingModel = Configuration
         .get("global.resources.postagger.ark.model.path");
-    LOG.info("Load ARK POS Tagger with model: " + taggingModel);
-    // TODO absolute path needed for resource
-    if ((Configuration.RUNNING_WITHIN_JAR) && (!taggingModel.startsWith("/"))) {
-      taggingModel = "/" + taggingModel;
-    }
+    LOG.info("Load ARK POS Tagger model: " + taggingModel + "_model.ser");
     m_model = SerializationUtils.deserialize(taggingModel + "_model.ser");
+    LOG.info("Load ARK POS Tagger featureExtractor : " + taggingModel
+        + "_featureExtractor.ser");
     m_featureExtractor = SerializationUtils.deserialize(taggingModel
         + "_featureExtractor.ser");
   }
