@@ -66,7 +66,12 @@ apps.sentiment.analysis.bolt.sentimentdetection.logging: true
 ### apps.sentiment.analysis.svm.* configs are for the Sentiment Analysis SVM application
 ##############################################################################
 
+# c3.8xlarge
+
 apps.sentiment.analysis.svm.workers.num: 1
+
+apps.sentiment.analysis.svm.workers.childopts: "-Xms16g -Xmx32g -XX:+UseG1GC"
+apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx8g -Xmx16g -XX:+UseG1GC"
 
 apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
 apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
@@ -81,12 +86,12 @@ apps.sentiment.analysis.svm.bolt.tokenizer.logging: false
 apps.sentiment.analysis.svm.bolt.preprocessor.parallelism: 1
 apps.sentiment.analysis.svm.bolt.preprocessor.logging: false
 
-apps.sentiment.analysis.svm.bolt.postagger.parallelism: 1
+apps.sentiment.analysis.svm.bolt.postagger.parallelism: 3
 apps.sentiment.analysis.svm.bolt.postagger.logging: false
 
-apps.sentiment.analysis.svm.bolt.featuregeneration.parallelism: 1
+apps.sentiment.analysis.svm.bolt.featuregeneration.parallelism: 2
 apps.sentiment.analysis.svm.bolt.featuregeneration.logging: false
 
-apps.sentiment.analysis.svm.bolt.svm.parallelism: 1
+apps.sentiment.analysis.svm.bolt.svm.parallelism: 2
 apps.sentiment.analysis.svm.bolt.svm.logging: false
 
