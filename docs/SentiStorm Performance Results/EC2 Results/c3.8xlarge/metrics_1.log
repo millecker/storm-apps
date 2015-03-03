@@ -1,0 +1,958 @@
+2015-03-03 22:12:02,722 13151    1425420722	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	0
+2015-03-03 22:12:02,723 13152    1425420722	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	0
+2015-03-03 22:12:02,725 13154    1425420722	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	0
+2015-03-03 22:12:12,735 23164    1425420732	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	12
+2015-03-03 22:12:12,741 23170    1425420732	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	13
+2015-03-03 22:12:12,755 23184    1425420732	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	14
+2015-03-03 22:12:22,746 33175    1425420742	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	9109
+2015-03-03 22:12:22,764 33193    1425420742	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	9112
+2015-03-03 22:12:22,764 33193    1425420742	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	9107
+2015-03-03 22:12:32,742 43171    1425420752	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10271
+2015-03-03 22:12:32,760 43189    1425420752	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10269
+2015-03-03 22:12:32,769 43198    1425420752	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10271
+2015-03-03 22:12:42,733 53162    1425420762	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10364
+2015-03-03 22:12:42,747 53176    1425420762	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10364
+2015-03-03 22:12:42,763 53192    1425420762	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10365
+2015-03-03 22:12:52,222 62651    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__ack-count            	{dataset-spout:default=119040}
+2015-03-03 22:12:52,222 62651    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__sendqueue            	{write_pos=238093, read_pos=238093, capacity=1024, population=0}
+2015-03-03 22:12:52,222 62651    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__receive              	{write_pos=55671, read_pos=55670, capacity=1024, population=1}
+2015-03-03 22:12:52,222 62651    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__process-latency      	{dataset-spout:default=0.19018817204301075}
+2015-03-03 22:12:52,222 62651    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__transfer-count       	{__ack_ack=119160, default=118940}
+2015-03-03 22:12:52,223 62652    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-latency      	{dataset-spout:default=0.18615591397849462}
+2015-03-03 22:12:52,223 62652    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__fail-count           	{}
+2015-03-03 22:12:52,223 62652    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__emit-count           	{__ack_ack=119160, default=118940}
+2015-03-03 22:12:52,223 62652    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-count        	{dataset-spout:default=119040}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__ack-count            	{}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/heap            	{unusedBytes=1455575792, usedBytes=1772465424, maxBytes=3817865216, initBytes=989385216, virtualFreeBytes=2045399792, committedBytes=3228041216}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__receive              	{write_pos=1, read_pos=0, capacity=1024, population=1}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__fail-count           	{}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-latency      	{}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	newWorkerEvent         	1
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__emit-count           	{}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-count        	{}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__sendqueue            	{write_pos=-1, read_pos=-1, capacity=1024, population=0}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/nonHeap         	{unusedBytes=36236784, usedBytes=37032464, maxBytes=224395264, initBytes=24576000, virtualFreeBytes=187362800, committedBytes=73269248}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	uptimeSecs             	63.848
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer             	{write_pos=821562, read_pos=821562, capacity=1024, population=0}
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	startTimeSecs          	1.425420708386E9
+2015-03-03 22:12:52,235 62664    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__process-latency      	{}
+2015-03-03 22:12:52,236 62665    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer-count       	{}
+2015-03-03 22:12:52,243 62672    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__ack-count            	{support-vector-maschine-bolt:__ack_ack=118400, feature-generation-bolt:__ack_ack=116860, tokenizer-bolt:__ack_ack=121320, dataset-spout:__ack_init=119560, pos-tagger-bolt:__ack_ack=119580, preprocessor-bolt:__ack_ack=118780}
+2015-03-03 22:12:52,243 62672    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__sendqueue            	{write_pos=118966, read_pos=118966, capacity=1024, population=0}
+2015-03-03 22:12:52,243 62672    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__receive              	{write_pos=649821, read_pos=649815, capacity=1024, population=6}
+2015-03-03 22:12:52,243 62672    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__process-latency      	{support-vector-maschine-bolt:__ack_ack=0.018074324324324324, feature-generation-bolt:__ack_ack=0.00462091391408523, tokenizer-bolt:__ack_ack=0.002637652489284537, dataset-spout:__ack_init=0.0026764804282368685, pos-tagger-bolt:__ack_ack=0.004515805318615153, preprocessor-bolt:__ack_ack=0.002862434753325476}
+2015-03-03 22:12:52,243 62672    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__transfer-count       	{}
+2015-03-03 22:12:52,244 62673    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-latency      	{support-vector-maschine-bolt:__ack_ack=0.02218570254724733, feature-generation-bolt:__ack_ack=0.006523921043827367, tokenizer-bolt:__ack_ack=0.007172131147540984, dataset-spout:__ack_init=0.004632693580410324, pos-tagger-bolt:__ack_ack=0.003895004233700254, preprocessor-bolt:__ack_ack=0.006830601092896175}
+2015-03-03 22:12:52,244 62673    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__fail-count           	{}
+2015-03-03 22:12:52,244 62673    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__emit-count           	{__ack_ack=118980}
+2015-03-03 22:12:52,244 62673    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-count        	{support-vector-maschine-bolt:__ack_ack=121700, feature-generation-bolt:__ack_ack=119560, tokenizer-bolt:__ack_ack=117120, dataset-spout:__ack_init=120880, pos-tagger-bolt:__ack_ack=118100, preprocessor-bolt:__ack_ack=117120}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=40180}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__sendqueue            	{write_pos=40185, read_pos=40185, capacity=1024, population=0}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__receive              	{write_pos=40146, read_pos=40109, capacity=1024, population=37}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=1.0029865604778496}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=40160, __metrics=20}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9950223992035838}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__emit-count           	{__ack_ack=40160, __metrics=20}
+2015-03-03 22:12:52,739 63168    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=40180}
+2015-03-03 22:12:52,742 63171    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10428
+2015-03-03 22:12:52,764 63193    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=40180}
+2015-03-03 22:12:52,764 63193    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__sendqueue            	{write_pos=40185, read_pos=40185, capacity=1024, population=0}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__receive              	{write_pos=40175, read_pos=40117, capacity=1024, population=58}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9696366351418616}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=40180, __metrics=20}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.982080637132902}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__emit-count           	{__ack_ack=40180, __metrics=20}
+2015-03-03 22:12:52,765 63194    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=40180}
+2015-03-03 22:12:52,766 63195    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10426
+2015-03-03 22:12:52,777 63206    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=40180}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__sendqueue            	{write_pos=40190, read_pos=40190, capacity=1024, population=0}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__receive              	{write_pos=40190, read_pos=40117, capacity=1024, population=73}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9800895968143355}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=40200}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9661523145843703}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__emit-count           	{__ack_ack=40200}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=40180}
+2015-03-03 22:12:52,778 63207    1425420772	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10429
+2015-03-03 22:12:54,501 64930    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:54,501 64930    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__sendqueue            	{write_pos=50425, read_pos=50425, capacity=1024, population=0}
+2015-03-03 22:12:54,501 64930    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__receive              	{write_pos=25102, read_pos=25099, capacity=1024, population=3}
+2015-03-03 22:12:54,501 64930    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.5313243457573356}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__transfer-count       	{__ack_ack=25280, default=25140}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5313243457573356}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__emit-count           	{__ack_ack=25280, default=25140}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=25200}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__sendqueue            	{write_pos=50425, read_pos=50425, capacity=1024, population=0}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__receive              	{write_pos=25096, read_pos=25092, capacity=1024, population=4}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.519047619047619}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__transfer-count       	{__ack_ack=25920, default=24500}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.513877874702617}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__emit-count           	{__ack_ack=25920, default=24500}
+2015-03-03 22:12:54,502 64931    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__sendqueue            	{write_pos=50423, read_pos=50423, capacity=1024, population=0}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__receive              	{write_pos=25101, read_pos=25095, capacity=1024, population=6}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.5043616177636796}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__transfer-count       	{__ack_ack=24360, default=26060}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.542857142857143}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__emit-count           	{__ack_ack=24360, default=26060}
+2015-03-03 22:12:54,505 64934    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=25200}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__sendqueue            	{write_pos=50457, read_pos=50457, capacity=1024, population=0}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__receive              	{write_pos=25121, read_pos=25116, capacity=1024, population=5}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.5114988104678826}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__transfer-count       	{__ack_ack=25380, default=25080}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.565768621236133}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__emit-count           	{__ack_ack=25380, default=25080}
+2015-03-03 22:12:54,529 64958    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=25240}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__sendqueue            	{write_pos=50453, read_pos=50453, capacity=1024, population=0}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__receive              	{write_pos=25122, read_pos=25096, capacity=1024, population=26}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.52101506740682}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__transfer-count       	{__ack_ack=25780, default=24680}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5757335448057097}
+2015-03-03 22:12:54,544 64973    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:12:54,545 64974    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__emit-count           	{__ack_ack=25780, default=24680}
+2015-03-03 22:12:54,545 64974    1425420774	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=25220}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__ack-count            	{tokenizer-bolt:default=135140}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__sendqueue            	{write_pos=270275, read_pos=270275, capacity=1024, population=0}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__receive              	{write_pos=133310, read_pos=133307, capacity=1024, population=3}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__process-latency      	{tokenizer-bolt:default=0.11321592422672784}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__transfer-count       	{__ack_ack=133360, default=136920}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-latency      	{tokenizer-bolt:default=0.11114399881604262}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__fail-count           	{}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__emit-count           	{__ack_ack=133360, default=136920}
+2015-03-03 22:12:57,402 67831    1425420777	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-count        	{tokenizer-bolt:default=135140}
+2015-03-03 22:12:59,509 69938    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=70900}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__sendqueue            	{write_pos=141801, read_pos=141801, capacity=1024, population=0}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__receive              	{write_pos=70881, read_pos=70873, capacity=1024, population=8}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.1788434414668547}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__transfer-count       	{__ack_ack=71400, default=70400}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.20366713681241186}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__emit-count           	{__ack_ack=71400, default=70400}
+2015-03-03 22:12:59,510 69939    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=70900}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=70900}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__sendqueue            	{write_pos=141801, read_pos=141801, capacity=1024, population=0}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__receive              	{write_pos=70877, read_pos=70867, capacity=1024, population=10}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.1918194640338505}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__transfer-count       	{__ack_ack=71820, default=69980}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.20197461212976023}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__emit-count           	{__ack_ack=71820, default=69980}
+2015-03-03 22:12:59,512 69941    1425420779	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=70900}
+2015-03-03 22:13:02,722 73151    1425420782	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10432
+2015-03-03 22:13:02,722 73151    1425420782	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10433
+2015-03-03 22:13:02,727 73156    1425420782	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10431
+2015-03-03 22:13:12,352 82781    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__ack-count            	{default=181800}
+2015-03-03 22:13:12,353 82782    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__sendqueue            	{write_pos=363849, read_pos=363849, capacity=1024, population=0}
+2015-03-03 22:13:12,353 82782    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__complete-latency     	{default=49.21100110011001}
+2015-03-03 22:13:12,353 82782    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__receive              	{write_pos=167646, read_pos=167642, capacity=1024, population=4}
+2015-03-03 22:13:12,353 82782    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__transfer-count       	{__ack_init=182360, default=181480}
+2015-03-03 22:13:12,353 82782    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__fail-count           	{}
+2015-03-03 22:13:12,353 82782    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__emit-count           	{__ack_init=182360, default=181480}
+2015-03-03 22:13:12,725 83154    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10386
+2015-03-03 22:13:12,754 83183    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10388
+2015-03-03 22:13:12,757 83186    1425420792	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10388
+2015-03-03 22:13:22,741 93170    1425420802	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10477
+2015-03-03 22:13:22,761 93190    1425420802	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10476
+2015-03-03 22:13:22,769 93198    1425420802	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10478
+2015-03-03 22:13:32,728 103157   1425420812	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10397
+2015-03-03 22:13:32,728 103157   1425420812	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10400
+2015-03-03 22:13:32,735 103164   1425420812	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10396
+2015-03-03 22:13:42,742 113171   1425420822	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10534
+2015-03-03 22:13:42,761 113190   1425420822	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10532
+2015-03-03 22:13:42,785 113214   1425420822	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10533
+2015-03-03 22:13:52,222 122651   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__ack-count            	{dataset-spout:default=188120}
+2015-03-03 22:13:52,222 122651   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__sendqueue            	{write_pos=614292, read_pos=614292, capacity=1024, population=0}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__receive              	{write_pos=139575, read_pos=139574, capacity=1024, population=1}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__process-latency      	{dataset-spout:default=0.18371252392090157}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__transfer-count       	{__ack_ack=187520, default=188680}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-latency      	{dataset-spout:default=0.17841573631047317}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__fail-count           	{}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__emit-count           	{__ack_ack=187520, default=188680}
+2015-03-03 22:13:52,223 122652   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-count        	{dataset-spout:default=188100}
+2015-03-03 22:13:52,235 122664   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__ack-count            	{}
+2015-03-03 22:13:52,235 122664   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSScavenge          	{count=155, timeMs=500}
+2015-03-03 22:13:52,235 122664   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/heap            	{unusedBytes=794579224, usedBytes=2433461992, maxBytes=3817865216, initBytes=989385216, virtualFreeBytes=1384403224, committedBytes=3228041216}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__receive              	{write_pos=2, read_pos=1, capacity=1024, population=1}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSMarkSweep         	{count=0, timeMs=0}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__fail-count           	{}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-latency      	{}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	newWorkerEvent         	0
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__emit-count           	{}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-count        	{}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__sendqueue            	{write_pos=0, read_pos=0, capacity=1024, population=0}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/nonHeap         	{unusedBytes=36420272, usedBytes=36980048, maxBytes=224395264, initBytes=24576000, virtualFreeBytes=187415216, committedBytes=73400320}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	uptimeSecs             	123.849
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer             	{write_pos=2088665, read_pos=2088665, capacity=1024, population=0}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	startTimeSecs          	1.425420708386E9
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__process-latency      	{}
+2015-03-03 22:13:52,236 122665   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer-count       	{}
+2015-03-03 22:13:52,244 122673   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__ack-count            	{support-vector-maschine-bolt:__ack_ack=187800, feature-generation-bolt:__ack_ack=185800, tokenizer-bolt:__ack_ack=185620, dataset-spout:__ack_init=187320, pos-tagger-bolt:__ack_ack=191420, preprocessor-bolt:__ack_ack=190600}
+2015-03-03 22:13:52,244 122673   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__sendqueue            	{write_pos=307066, read_pos=307066, capacity=1024, population=0}
+2015-03-03 22:13:52,244 122673   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__receive              	{write_pos=1675088, read_pos=1675081, capacity=1024, population=7}
+2015-03-03 22:13:52,245 122674   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__process-latency      	{support-vector-maschine-bolt:__ack_ack=0.014696485623003195, feature-generation-bolt:__ack_ack=0.0022604951560818085, tokenizer-bolt:__ack_ack=0.0010774701002047194, dataset-spout:__ack_init=0.0016015374759769379, pos-tagger-bolt:__ack_ack=0.0033434332880576743, preprocessor-bolt:__ack_ack=0.002308499475341028}
+2015-03-03 22:13:52,245 122674   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__transfer-count       	{}
+2015-03-03 22:13:52,245 122674   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-latency      	{support-vector-maschine-bolt:__ack_ack=0.015028045295798497, feature-generation-bolt:__ack_ack=0.00328215987294865, tokenizer-bolt:__ack_ack=0.0032947178233606123, dataset-spout:__ack_init=0.003691238736293562, pos-tagger-bolt:__ack_ack=0.005274818018778352, preprocessor-bolt:__ack_ack=0.003921153030945316}
+2015-03-03 22:13:52,245 122674   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__fail-count           	{}
+2015-03-03 22:13:52,245 122674   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__emit-count           	{__ack_ack=188100}
+2015-03-03 22:13:52,245 122674   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-count        	{support-vector-maschine-bolt:__ack_ack=188980, feature-generation-bolt:__ack_ack=188900, tokenizer-bolt:__ack_ack=188180, dataset-spout:__ack_init=184220, pos-tagger-bolt:__ack_ack=189580, preprocessor-bolt:__ack_ack=188720}
+2015-03-03 22:13:52,724 123153   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62720}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__sendqueue            	{write_pos=102895, read_pos=102895, capacity=1024, population=0}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__receive              	{write_pos=102783, read_pos=102773, capacity=1024, population=10}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9432397959183674}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62680, __metrics=0}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9393939393939394}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62680, __metrics=0}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62700}
+2015-03-03 22:13:52,725 123154   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10476
+2015-03-03 22:13:52,762 123191   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62700}
+2015-03-03 22:13:52,762 123191   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__sendqueue            	{write_pos=102901, read_pos=102901, capacity=1024, population=0}
+2015-03-03 22:13:52,762 123191   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__receive              	{write_pos=102819, read_pos=102750, capacity=1024, population=69}
+2015-03-03 22:13:52,762 123191   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9508771929824561}
+2015-03-03 22:13:52,763 123192   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62680, __metrics=20}
+2015-03-03 22:13:52,763 123192   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9384566326530612}
+2015-03-03 22:13:52,763 123192   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:13:52,763 123192   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62680, __metrics=20}
+2015-03-03 22:13:52,763 123192   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62720}
+2015-03-03 22:13:52,764 123193   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10478
+2015-03-03 22:13:52,792 123221   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62700}
+2015-03-03 22:13:52,792 123221   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__sendqueue            	{write_pos=102897, read_pos=102897, capacity=1024, population=0}
+2015-03-03 22:13:52,792 123221   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__receive              	{write_pos=102852, read_pos=102769, capacity=1024, population=83}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9451355661881977}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62720, __metrics=0}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.959170653907496}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62720, __metrics=0}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62700}
+2015-03-03 22:13:52,793 123222   1425420832	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10475
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37620}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__sendqueue            	{write_pos=125676, read_pos=125676, capacity=1024, population=0}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__receive              	{write_pos=62633, read_pos=62630, capacity=1024, population=3}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4912280701754386}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__transfer-count       	{__ack_ack=37260, default=38000}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.448990435706695}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__emit-count           	{__ack_ack=37260, default=38000}
+2015-03-03 22:13:54,501 124930   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37640}
+2015-03-03 22:13:54,512 124941   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37620}
+2015-03-03 22:13:54,512 124941   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__sendqueue            	{write_pos=125676, read_pos=125676, capacity=1024, population=0}
+2015-03-03 22:13:54,512 124941   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__receive              	{write_pos=62646, read_pos=62625, capacity=1024, population=21}
+2015-03-03 22:13:54,512 124941   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.467304625199362}
+2015-03-03 22:13:54,512 124941   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__transfer-count       	{__ack_ack=38000, default=37260}
+2015-03-03 22:13:54,513 124942   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4731525784157362}
+2015-03-03 22:13:54,513 124942   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:13:54,513 124942   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__emit-count           	{__ack_ack=38000, default=37260}
+2015-03-03 22:13:54,513 124942   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37620}
+2015-03-03 22:13:54,514 124943   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37640}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__sendqueue            	{write_pos=125676, read_pos=125676, capacity=1024, population=0}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__receive              	{write_pos=62647, read_pos=62633, capacity=1024, population=14}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.487778958554729}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__transfer-count       	{__ack_ack=36200, default=39060}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4944178628389155}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__emit-count           	{__ack_ack=36200, default=39060}
+2015-03-03 22:13:54,515 124944   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37620}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37640}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__sendqueue            	{write_pos=125712, read_pos=125712, capacity=1024, population=0}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__receive              	{write_pos=62665, read_pos=62653, capacity=1024, population=12}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4739638682252922}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__transfer-count       	{__ack_ack=38440, default=36820}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4962805526036131}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__emit-count           	{__ack_ack=38440, default=36820}
+2015-03-03 22:13:54,535 124964   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37640}
+2015-03-03 22:13:54,537 124966   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37640}
+2015-03-03 22:13:54,537 124966   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__sendqueue            	{write_pos=125718, read_pos=125718, capacity=1024, population=0}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__receive              	{write_pos=62664, read_pos=62653, capacity=1024, population=11}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4261424017003188}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__transfer-count       	{__ack_ack=36980, default=38280}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5023923444976077}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__emit-count           	{__ack_ack=36980, default=38280}
+2015-03-03 22:13:54,538 124967   1425420834	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37620}
+2015-03-03 22:13:57,399 127828   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__ack-count            	{tokenizer-bolt:default=188240}
+2015-03-03 22:13:57,399 127828   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__sendqueue            	{write_pos=646768, read_pos=646768, capacity=1024, population=0}
+2015-03-03 22:13:57,399 127828   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__receive              	{write_pos=319820, read_pos=319818, capacity=1024, population=2}
+2015-03-03 22:13:57,400 127829   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__process-latency      	{tokenizer-bolt:default=0.10050998725031875}
+2015-03-03 22:13:57,400 127829   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__transfer-count       	{__ack_ack=187120, default=189380}
+2015-03-03 22:13:57,400 127829   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-latency      	{tokenizer-bolt:default=0.10922226944326392}
+2015-03-03 22:13:57,400 127829   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__fail-count           	{}
+2015-03-03 22:13:57,400 127829   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__emit-count           	{__ack_ack=187120, default=189380}
+2015-03-03 22:13:57,400 127829   1425420837	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-count        	{tokenizer-bolt:default=188240}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=94080}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__sendqueue            	{write_pos=329964, read_pos=329964, capacity=1024, population=0}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__receive              	{write_pos=164916, read_pos=164915, capacity=1024, population=1}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.17453231292517007}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__transfer-count       	{__ack_ack=93300, default=94860}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.1881377551020408}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__emit-count           	{__ack_ack=93300, default=94860}
+2015-03-03 22:13:59,508 129937   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=94080}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=94080}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__sendqueue            	{write_pos=329962, read_pos=329962, capacity=1024, population=0}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__receive              	{write_pos=164937, read_pos=164921, capacity=1024, population=16}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.17665816326530612}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__transfer-count       	{__ack_ack=93220, default=94940}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.18048469387755103}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__emit-count           	{__ack_ack=93220, default=94940}
+2015-03-03 22:13:59,510 129939   1425420839	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=94080}
+2015-03-03 22:14:02,731 133160   1425420842	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10480
+2015-03-03 22:14:02,751 133180   1425420842	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10480
+2015-03-03 22:14:02,772 133201   1425420842	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10479
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__ack-count            	{default=188480}
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__sendqueue            	{write_pos=740790, read_pos=740790, capacity=1024, population=0}
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__complete-latency     	{default=47.91298811544991}
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__receive              	{write_pos=341298, read_pos=341294, capacity=1024, population=4}
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__transfer-count       	{__ack_init=186880, default=190080}
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__fail-count           	{}
+2015-03-03 22:14:12,353 142782   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__emit-count           	{__ack_init=186880, default=190080}
+2015-03-03 22:14:12,733 143162   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10458
+2015-03-03 22:14:12,746 143175   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10460
+2015-03-03 22:14:12,805 143234   1425420852	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10458
+2015-03-03 22:14:22,742 153171   1425420862	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10494
+2015-03-03 22:14:22,756 153185   1425420862	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10493
+2015-03-03 22:14:22,786 153215   1425420862	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10493
+2015-03-03 22:14:32,733 163162   1425420872	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10493
+2015-03-03 22:14:32,752 163181   1425420872	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10490
+2015-03-03 22:14:32,785 163214   1425420872	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10493
+2015-03-03 22:14:42,740 173169   1425420882	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10475
+2015-03-03 22:14:42,744 173173   1425420882	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10475
+2015-03-03 22:14:42,803 173232   1425420882	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10475
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__ack-count            	{dataset-spout:default=188340}
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__sendqueue            	{write_pos=991019, read_pos=991019, capacity=1024, population=0}
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__receive              	{write_pos=223466, read_pos=223465, capacity=1024, population=1}
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__process-latency      	{dataset-spout:default=0.1853031751088457}
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__transfer-count       	{__ack_ack=187160, default=189560}
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-latency      	{dataset-spout:default=0.17179868337226586}
+2015-03-03 22:14:52,223 182652   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__fail-count           	{}
+2015-03-03 22:14:52,224 182653   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__emit-count           	{__ack_ack=187160, default=189560}
+2015-03-03 22:14:52,224 182653   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-count        	{dataset-spout:default=188360}
+2015-03-03 22:14:52,234 182663   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__ack-count            	{}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSScavenge          	{count=156, timeMs=524}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/heap            	{unusedBytes=1334734464, usedBytes=1893306752, maxBytes=3817865216, initBytes=989385216, virtualFreeBytes=1924558464, committedBytes=3228041216}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__receive              	{write_pos=3, read_pos=2, capacity=1024, population=1}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSMarkSweep         	{count=0, timeMs=0}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__fail-count           	{}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-latency      	{}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	newWorkerEvent         	0
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__emit-count           	{}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-count        	{}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__sendqueue            	{write_pos=1, read_pos=1, capacity=1024, population=0}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/nonHeap         	{unusedBytes=36375320, usedBytes=37025000, maxBytes=224395264, initBytes=24576000, virtualFreeBytes=187370264, committedBytes=73400320}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	uptimeSecs             	183.848
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer             	{write_pos=3357531, read_pos=3357522, capacity=1024, population=9}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	startTimeSecs          	1.425420708386E9
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__process-latency      	{}
+2015-03-03 22:14:52,235 182664   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer-count       	{}
+2015-03-03 22:14:52,244 182673   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__ack-count            	{support-vector-maschine-bolt:__ack_ack=190100, feature-generation-bolt:__ack_ack=189080, tokenizer-bolt:__ack_ack=187840, dataset-spout:__ack_init=187940, pos-tagger-bolt:__ack_ack=187080, preprocessor-bolt:__ack_ack=188160}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__sendqueue            	{write_pos=495431, read_pos=495431, capacity=1024, population=0}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__receive              	{write_pos=2701630, read_pos=2701577, capacity=1024, population=53}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__process-latency      	{support-vector-maschine-bolt:__ack_ack=0.014623882167280378, feature-generation-bolt:__ack_ack=0.0016924053310767928, tokenizer-bolt:__ack_ack=0.0019165247018739352, dataset-spout:__ack_init=0.0017026710652335852, pos-tagger-bolt:__ack_ack=0.0029933718195424416, preprocessor-bolt:__ack_ack=0.002232142857142857}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__transfer-count       	{}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-latency      	{support-vector-maschine-bolt:__ack_ack=0.0193029490616622, feature-generation-bolt:__ack_ack=0.0032113037893384713, tokenizer-bolt:__ack_ack=0.0037642503764250376, dataset-spout:__ack_init=0.0035430534678977882, pos-tagger-bolt:__ack_ack=0.004970914859862507, preprocessor-bolt:__ack_ack=0.004603109656301146}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__fail-count           	{}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__emit-count           	{__ack_ack=188360}
+2015-03-03 22:14:52,245 182674   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-count        	{support-vector-maschine-bolt:__ack_ack=186500, feature-generation-bolt:__ack_ack=186840, tokenizer-bolt:__ack_ack=185960, dataset-spout:__ack_init=186280, pos-tagger-bolt:__ack_ack=189100, preprocessor-bolt:__ack_ack=195520}
+2015-03-03 22:14:52,726 183155   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62800}
+2015-03-03 22:14:52,726 183155   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__sendqueue            	{write_pos=165712, read_pos=165712, capacity=1024, population=0}
+2015-03-03 22:14:52,726 183155   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__receive              	{write_pos=165530, read_pos=165526, capacity=1024, population=4}
+2015-03-03 22:14:52,726 183155   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9614649681528662}
+2015-03-03 22:14:52,727 183156   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62800, __metrics=20}
+2015-03-03 22:14:52,727 183156   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9404458598726114}
+2015-03-03 22:14:52,727 183156   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:14:52,727 183156   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62800, __metrics=20}
+2015-03-03 22:14:52,727 183156   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62800}
+2015-03-03 22:14:52,730 183159   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10410
+2015-03-03 22:14:52,747 183176   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62780}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__sendqueue            	{write_pos=165705, read_pos=165705, capacity=1024, population=0}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__receive              	{write_pos=165562, read_pos=165495, capacity=1024, population=67}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9525326537113731}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62800, __metrics=20}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9465138490926457}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62800, __metrics=20}
+2015-03-03 22:14:52,748 183177   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62820}
+2015-03-03 22:14:52,754 183183   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10409
+2015-03-03 22:14:52,767 183196   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62800}
+2015-03-03 22:14:52,767 183196   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__sendqueue            	{write_pos=165707, read_pos=165707, capacity=1024, population=0}
+2015-03-03 22:14:52,767 183196   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__receive              	{write_pos=165589, read_pos=165516, capacity=1024, population=73}
+2015-03-03 22:14:52,767 183196   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9261146496815287}
+2015-03-03 22:14:52,767 183196   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62780, __metrics=20}
+2015-03-03 22:14:52,767 183196   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.938872970391595}
+2015-03-03 22:14:52,771 183200   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:14:52,771 183200   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62780, __metrics=20}
+2015-03-03 22:14:52,771 183200   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62820}
+2015-03-03 22:14:52,777 183206   1425420892	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10409
+2015-03-03 22:14:54,503 184932   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,503 184932   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__sendqueue            	{write_pos=201073, read_pos=201073, capacity=1024, population=0}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__receive              	{write_pos=100259, read_pos=100254, capacity=1024, population=5}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4620689655172414}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__transfer-count       	{__ack_ack=38220, default=37180}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.483819628647215}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__emit-count           	{__ack_ack=38220, default=37180}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__sendqueue            	{write_pos=201073, read_pos=201073, capacity=1024, population=0}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__receive              	{write_pos=100261, read_pos=100253, capacity=1024, population=8}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4705570291777188}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__transfer-count       	{__ack_ack=37580, default=37820}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5119363395225465}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__emit-count           	{__ack_ack=37580, default=37820}
+2015-03-03 22:14:54,504 184933   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__sendqueue            	{write_pos=201071, read_pos=201071, capacity=1024, population=0}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__receive              	{write_pos=100266, read_pos=100257, capacity=1024, population=9}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4397877984084881}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__transfer-count       	{__ack_ack=37980, default=37420}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4403183023872679}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__emit-count           	{__ack_ack=37980, default=37420}
+2015-03-03 22:14:54,512 184941   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,525 184954   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37680}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__sendqueue            	{write_pos=201097, read_pos=201097, capacity=1024, population=0}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__receive              	{write_pos=100278, read_pos=100276, capacity=1024, population=2}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4782377919320595}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__transfer-count       	{__ack_ack=36660, default=38720}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4856687898089171}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__emit-count           	{__ack_ack=36660, default=38720}
+2015-03-03 22:14:54,526 184955   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37680}
+2015-03-03 22:14:54,535 184964   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37700}
+2015-03-03 22:14:54,535 184964   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__sendqueue            	{write_pos=201099, read_pos=201099, capacity=1024, population=0}
+2015-03-03 22:14:54,535 184964   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__receive              	{write_pos=100280, read_pos=100268, capacity=1024, population=12}
+2015-03-03 22:14:54,536 184965   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4450928381962864}
+2015-03-03 22:14:54,536 184965   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__transfer-count       	{__ack_ack=37180, default=38200}
+2015-03-03 22:14:54,536 184965   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4601910828025477}
+2015-03-03 22:14:54,536 184965   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:14:54,536 184965   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__emit-count           	{__ack_ack=37180, default=38200}
+2015-03-03 22:14:54,536 184965   1425420894	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37680}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__ack-count            	{tokenizer-bolt:default=188500}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__sendqueue            	{write_pos=1023763, read_pos=1023763, capacity=1024, population=0}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__receive              	{write_pos=506843, read_pos=506842, capacity=1024, population=1}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__process-latency      	{tokenizer-bolt:default=0.10408488063660477}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__transfer-count       	{__ack_ack=188040, default=188940}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-latency      	{tokenizer-bolt:default=0.10503978779840849}
+2015-03-03 22:14:57,400 187829   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__fail-count           	{}
+2015-03-03 22:14:57,401 187830   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__emit-count           	{__ack_ack=188040, default=188940}
+2015-03-03 22:14:57,401 187830   1425420897	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-count        	{tokenizer-bolt:default=188500}
+2015-03-03 22:14:59,507 189936   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=94300}
+2015-03-03 22:14:59,507 189936   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__sendqueue            	{write_pos=518537, read_pos=518537, capacity=1024, population=0}
+2015-03-03 22:14:59,507 189936   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__receive              	{write_pos=259178, read_pos=259177, capacity=1024, population=1}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.184305408271474}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__transfer-count       	{__ack_ack=93160, default=95420}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.17815482502651114}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__emit-count           	{__ack_ack=93160, default=95420}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=94300}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=94280}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__sendqueue            	{write_pos=518535, read_pos=518535, capacity=1024, population=0}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__receive              	{write_pos=259167, read_pos=259163, capacity=1024, population=4}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.18137462876537971}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__transfer-count       	{__ack_ack=95180, default=93400}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.18816291896478574}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__emit-count           	{__ack_ack=95180, default=93400}
+2015-03-03 22:14:59,508 189937   1425420899	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=94280}
+2015-03-03 22:15:02,739 193168   1425420902	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10459
+2015-03-03 22:15:02,747 193176   1425420902	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10459
+2015-03-03 22:15:02,803 193232   1425420902	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10460
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__ack-count            	{default=188200}
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__sendqueue            	{write_pos=1117313, read_pos=1117313, capacity=1024, population=0}
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__complete-latency     	{default=48.31742826780021}
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__receive              	{write_pos=514818, read_pos=514811, capacity=1024, population=7}
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__transfer-count       	{__ack_init=189160, default=187360}
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__fail-count           	{}
+2015-03-03 22:15:12,352 202781   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__emit-count           	{__ack_init=189160, default=187360}
+2015-03-03 22:15:12,753 203182   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10448
+2015-03-03 22:15:12,755 203184   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10444
+2015-03-03 22:15:12,803 203232   1425420912	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10444
+2015-03-03 22:15:22,729 213158   1425420922	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10442
+2015-03-03 22:15:22,735 213164   1425420922	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10441
+2015-03-03 22:15:22,778 213207   1425420922	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10438
+2015-03-03 22:15:32,739 223168   1425420932	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10444
+2015-03-03 22:15:32,758 223187   1425420932	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10444
+2015-03-03 22:15:32,773 223202   1425420932	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10447
+2015-03-03 22:15:42,750 233179   1425420942	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10352
+2015-03-03 22:15:42,751 233180   1425420942	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10350
+2015-03-03 22:15:42,800 233229   1425420942	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10351
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__ack-count            	{dataset-spout:default=187840}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__sendqueue            	{write_pos=1366666, read_pos=1366666, capacity=1024, population=0}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__receive              	{write_pos=307197, read_pos=307196, capacity=1024, population=1}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__process-latency      	{dataset-spout:default=0.17781090289608179}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__transfer-count       	{__ack_ack=187860, default=187780}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-latency      	{dataset-spout:default=0.18068568994889267}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__fail-count           	{}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__emit-count           	{__ack_ack=187860, default=187780}
+2015-03-03 22:15:52,223 242652   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-count        	{dataset-spout:default=187840}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__ack-count            	{}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSScavenge          	{count=155, timeMs=527}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/heap            	{unusedBytes=1057550648, usedBytes=2170490568, maxBytes=3817865216, initBytes=989385216, virtualFreeBytes=1647374648, committedBytes=3228041216}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__receive              	{write_pos=4, read_pos=3, capacity=1024, population=1}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSMarkSweep         	{count=0, timeMs=0}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__fail-count           	{}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-latency      	{}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	newWorkerEvent         	0
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__emit-count           	{}
+2015-03-03 22:15:52,235 242664   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-count        	{}
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__sendqueue            	{write_pos=2, read_pos=2, capacity=1024, population=0}
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/nonHeap         	{unusedBytes=36338792, usedBytes=37061528, maxBytes=224395264, initBytes=24576000, virtualFreeBytes=187333736, committedBytes=73400320}
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	uptimeSecs             	243.849
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer             	{write_pos=4622739, read_pos=4622738, capacity=1024, population=1}
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	startTimeSecs          	1.425420708386E9
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__process-latency      	{}
+2015-03-03 22:15:52,236 242665   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer-count       	{}
+2015-03-03 22:15:52,244 242673   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__ack-count            	{support-vector-maschine-bolt:__ack_ack=185240, feature-generation-bolt:__ack_ack=188520, tokenizer-bolt:__ack_ack=188020, dataset-spout:__ack_init=188660, pos-tagger-bolt:__ack_ack=187520, preprocessor-bolt:__ack_ack=189040}
+2015-03-03 22:15:52,244 242673   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__sendqueue            	{write_pos=683277, read_pos=683277, capacity=1024, population=0}
+2015-03-03 22:15:52,244 242673   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__receive              	{write_pos=3725320, read_pos=3725317, capacity=1024, population=3}
+2015-03-03 22:15:52,245 242674   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__process-latency      	{support-vector-maschine-bolt:__ack_ack=0.013280069099546534, feature-generation-bolt:__ack_ack=0.001591343093570974, tokenizer-bolt:__ack_ack=0.0028720348899053294, dataset-spout:__ack_init=0.0022262270751616663, pos-tagger-bolt:__ack_ack=0.002453071672354949, preprocessor-bolt:__ack_ack=0.0015869657215404147}
+2015-03-03 22:15:52,245 242674   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__transfer-count       	{}
+2015-03-03 22:15:52,245 242674   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-latency      	{support-vector-maschine-bolt:__ack_ack=0.016633539073124804, feature-generation-bolt:__ack_ack=0.0033017360741293003, tokenizer-bolt:__ack_ack=0.0027864108884363948, dataset-spout:__ack_init=0.0036235745497175745, pos-tagger-bolt:__ack_ack=0.0030438091096858353, preprocessor-bolt:__ack_ack=0.002634629571082306}
+2015-03-03 22:15:52,245 242674   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__fail-count           	{}
+2015-03-03 22:15:52,245 242674   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__emit-count           	{__ack_ack=187840}
+2015-03-03 22:15:52,245 242674   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-count        	{support-vector-maschine-bolt:__ack_ack=191180, feature-generation-bolt:__ack_ack=187780, tokenizer-bolt:__ack_ack=186620, dataset-spout:__ack_init=187660, pos-tagger-bolt:__ack_ack=183980, preprocessor-bolt:__ack_ack=189780}
+2015-03-03 22:15:52,748 243177   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62620}
+2015-03-03 22:15:52,748 243177   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__sendqueue            	{write_pos=228330, read_pos=228330, capacity=1024, population=0}
+2015-03-03 22:15:52,748 243177   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__receive              	{write_pos=228132, read_pos=228086, capacity=1024, population=46}
+2015-03-03 22:15:52,749 243178   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9619929734908975}
+2015-03-03 22:15:52,749 243178   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62620, __metrics=20}
+2015-03-03 22:15:52,749 243178   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.950479233226837}
+2015-03-03 22:15:52,749 243178   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:15:52,749 243178   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62620, __metrics=20}
+2015-03-03 22:15:52,749 243178   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62600}
+2015-03-03 22:15:52,753 243182   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10476
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62640}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__sendqueue            	{write_pos=228335, read_pos=228335, capacity=1024, population=0}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__receive              	{write_pos=228123, read_pos=228073, capacity=1024, population=50}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9495530012771393}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62600, __metrics=20}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9425103800702651}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62600, __metrics=20}
+2015-03-03 22:15:52,756 243185   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62620}
+2015-03-03 22:15:52,759 243188   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62620}
+2015-03-03 22:15:52,759 243188   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__sendqueue            	{write_pos=228329, read_pos=228329, capacity=1024, population=0}
+2015-03-03 22:15:52,759 243188   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__receive              	{write_pos=228133, read_pos=228066, capacity=1024, population=67}
+2015-03-03 22:15:52,759 243188   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9354838709677419}
+2015-03-03 22:15:52,759 243188   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62640, __metrics=0}
+2015-03-03 22:15:52,760 243189   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9476038338658147}
+2015-03-03 22:15:52,760 243189   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:15:52,760 243189   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62640, __metrics=0}
+2015-03-03 22:15:52,760 243189   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62600}
+2015-03-03 22:15:52,761 243190   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10474
+2015-03-03 22:15:52,765 243194   1425420952	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10476
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37540}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__sendqueue            	{write_pos=276194, read_pos=276194, capacity=1024, population=0}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__receive              	{write_pos=137711, read_pos=137705, capacity=1024, population=6}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4645711241342567}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__transfer-count       	{__ack_ack=37700, default=37420}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.483493077742279}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__emit-count           	{__ack_ack=37700, default=37420}
+2015-03-03 22:15:54,502 244931   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37560}
+2015-03-03 22:15:54,503 244932   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37540}
+2015-03-03 22:15:54,503 244932   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__sendqueue            	{write_pos=276196, read_pos=276196, capacity=1024, population=0}
+2015-03-03 22:15:54,503 244932   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__receive              	{write_pos=137710, read_pos=137703, capacity=1024, population=7}
+2015-03-03 22:15:54,503 244932   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4571124134256792}
+2015-03-03 22:15:54,503 244932   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__transfer-count       	{__ack_ack=38080, default=37040}
+2015-03-03 22:15:54,504 244933   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4568690095846646}
+2015-03-03 22:15:54,504 244933   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:15:54,504 244933   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__emit-count           	{__ack_ack=38080, default=37040}
+2015-03-03 22:15:54,504 244933   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37560}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37560}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__sendqueue            	{write_pos=276196, read_pos=276196, capacity=1024, population=0}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__receive              	{write_pos=137714, read_pos=137700, capacity=1024, population=14}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4978700745473907}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__transfer-count       	{__ack_ack=37620, default=37500}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.505324813631523}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__emit-count           	{__ack_ack=37620, default=37500}
+2015-03-03 22:15:54,509 244938   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37560}
+2015-03-03 22:15:54,526 244955   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37560}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__sendqueue            	{write_pos=276222, read_pos=276222, capacity=1024, population=0}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__receive              	{write_pos=137724, read_pos=137721, capacity=1024, population=3}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4403620873269436}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__transfer-count       	{__ack_ack=37700, default=37420}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4858967535923364}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__emit-count           	{__ack_ack=37700, default=37420}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37580}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37560}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__sendqueue            	{write_pos=276224, read_pos=276224, capacity=1024, population=0}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__receive              	{write_pos=137709, read_pos=137708, capacity=1024, population=1}
+2015-03-03 22:15:54,527 244956   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4733759318423856}
+2015-03-03 22:15:54,528 244957   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__transfer-count       	{__ack_ack=36980, default=38140}
+2015-03-03 22:15:54,528 244957   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5045236828100053}
+2015-03-03 22:15:54,528 244957   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:15:54,528 244957   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__emit-count           	{__ack_ack=36980, default=38140}
+2015-03-03 22:15:54,528 244957   1425420954	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37580}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__ack-count            	{tokenizer-bolt:default=187680}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__sendqueue            	{write_pos=1399132, read_pos=1399132, capacity=1024, population=0}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__receive              	{write_pos=693113, read_pos=693112, capacity=1024, population=1}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__process-latency      	{tokenizer-bolt:default=0.10581841432225064}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__transfer-count       	{__ack_ack=188980, default=186400}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-latency      	{tokenizer-bolt:default=0.10953649440596697}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__fail-count           	{}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__emit-count           	{__ack_ack=188980, default=186400}
+2015-03-03 22:15:57,401 247830   1425420957	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-count        	{tokenizer-bolt:default=187700}
+2015-03-03 22:15:59,508 249937   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=93820}
+2015-03-03 22:15:59,508 249937   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__sendqueue            	{write_pos=706162, read_pos=706162, capacity=1024, population=0}
+2015-03-03 22:15:59,508 249937   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__receive              	{write_pos=352953, read_pos=352952, capacity=1024, population=1}
+2015-03-03 22:15:59,508 249937   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.17395011724578982}
+2015-03-03 22:15:59,508 249937   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__transfer-count       	{__ack_ack=93200, default=94440}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.17800042634832658}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__emit-count           	{__ack_ack=93200, default=94440}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=93820}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=93800}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__sendqueue            	{write_pos=706166, read_pos=706166, capacity=1024, population=0}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__receive              	{write_pos=352968, read_pos=352965, capacity=1024, population=3}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.17590618336886993}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__transfer-count       	{__ack_ack=93640, default=94000}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.1861407249466951}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__emit-count           	{__ack_ack=93640, default=94000}
+2015-03-03 22:15:59,509 249938   1425420959	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=93800}
+2015-03-03 22:16:02,742 253171   1425420962	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10396
+2015-03-03 22:16:02,761 253190   1425420962	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10394
+2015-03-03 22:16:02,792 253221   1425420962	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10396
+2015-03-03 22:16:12,352 262781   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__ack-count            	{default=187680}
+2015-03-03 22:16:12,352 262781   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__sendqueue            	{write_pos=1492608, read_pos=1492608, capacity=1024, population=0}
+2015-03-03 22:16:12,352 262781   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__complete-latency     	{default=47.478367433930096}
+2015-03-03 22:16:12,352 262781   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__receive              	{write_pos=687635, read_pos=687630, capacity=1024, population=5}
+2015-03-03 22:16:12,352 262781   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__transfer-count       	{__ack_init=187900, default=187380}
+2015-03-03 22:16:12,352 262781   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__fail-count           	{}
+2015-03-03 22:16:12,353 262782   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__emit-count           	{__ack_init=187900, default=187380}
+2015-03-03 22:16:12,743 263172   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10449
+2015-03-03 22:16:12,773 263202   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10449
+2015-03-03 22:16:12,781 263210   1425420972	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10448
+2015-03-03 22:16:22,742 273171   1425420982	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10447
+2015-03-03 22:16:22,749 273178   1425420982	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10449
+2015-03-03 22:16:22,776 273205   1425420982	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10446
+2015-03-03 22:16:32,735 283164   1425420992	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10494
+2015-03-03 22:16:32,759 283188   1425420992	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10494
+2015-03-03 22:16:32,772 283201   1425420992	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10492
+2015-03-03 22:16:42,727 293156   1425421002	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10424
+2015-03-03 22:16:42,749 293178   1425421002	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10423
+2015-03-03 22:16:42,795 293224   1425421002	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10426
+2015-03-03 22:16:52,223 302652   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__ack-count            	{dataset-spout:default=187820}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__sendqueue            	{write_pos=1742333, read_pos=1742333, capacity=1024, population=0}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__receive              	{write_pos=390855, read_pos=390854, capacity=1024, population=1}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__process-latency      	{dataset-spout:default=0.18240868917048236}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__transfer-count       	{__ack_ack=189380, default=186300}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-latency      	{dataset-spout:default=0.18632879045996592}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__fail-count           	{}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__emit-count           	{__ack_ack=189380, default=186300}
+2015-03-03 22:16:52,224 302653   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-count        	{dataset-spout:default=187840}
+2015-03-03 22:16:52,234 302663   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__ack-count            	{}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSScavenge          	{count=155, timeMs=538}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/heap            	{unusedBytes=789031392, usedBytes=2439009824, maxBytes=3817865216, initBytes=989385216, virtualFreeBytes=1378855392, committedBytes=3228041216}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__receive              	{write_pos=5, read_pos=4, capacity=1024, population=1}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSMarkSweep         	{count=0, timeMs=0}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__fail-count           	{}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-latency      	{}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	newWorkerEvent         	0
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__emit-count           	{}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-count        	{}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__sendqueue            	{write_pos=3, read_pos=3, capacity=1024, population=0}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/nonHeap         	{unusedBytes=36297656, usedBytes=37102664, maxBytes=224395264, initBytes=24576000, virtualFreeBytes=187292600, committedBytes=73400320}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	uptimeSecs             	303.848
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer             	{write_pos=5889045, read_pos=5889028, capacity=1024, population=17}
+2015-03-03 22:16:52,235 302664   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	startTimeSecs          	1.425420708386E9
+2015-03-03 22:16:52,236 302665   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__process-latency      	{}
+2015-03-03 22:16:52,236 302665   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer-count       	{}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__ack-count            	{support-vector-maschine-bolt:__ack_ack=189300, feature-generation-bolt:__ack_ack=189200, tokenizer-bolt:__ack_ack=188000, dataset-spout:__ack_init=188380, pos-tagger-bolt:__ack_ack=184200, preprocessor-bolt:__ack_ack=187760}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__sendqueue            	{write_pos=871092, read_pos=871092, capacity=1024, population=0}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__receive              	{write_pos=4748954, read_pos=4748944, capacity=1024, population=10}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__process-latency      	{support-vector-maschine-bolt:__ack_ack=0.014157422081352351, feature-generation-bolt:__ack_ack=0.002325581395348837, tokenizer-bolt:__ack_ack=0.0022340425531914895, dataset-spout:__ack_init=0.001698694128888417, pos-tagger-bolt:__ack_ack=0.002171552660152009, preprocessor-bolt:__ack_ack=0.0017043033659991478}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__transfer-count       	{}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-latency      	{support-vector-maschine-bolt:__ack_ack=0.016214497668503604, feature-generation-bolt:__ack_ack=0.004230118443316413, tokenizer-bolt:__ack_ack=0.005977158714910876, dataset-spout:__ack_init=0.0033233276157804458, pos-tagger-bolt:__ack_ack=0.003951724874506035, preprocessor-bolt:__ack_ack=0.004153354632587859}
+2015-03-03 22:16:52,245 302674   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__fail-count           	{}
+2015-03-03 22:16:52,246 302675   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__emit-count           	{__ack_ack=187820}
+2015-03-03 22:16:52,246 302675   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-count        	{support-vector-maschine-bolt:__ack_ack=188720, feature-generation-bolt:__ack_ack=189120, tokenizer-bolt:__ack_ack=187380, dataset-spout:__ack_init=186560, pos-tagger-bolt:__ack_ack=187260, preprocessor-bolt:__ack_ack=187800}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62600}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__sendqueue            	{write_pos=290931, read_pos=290931, capacity=1024, population=0}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__receive              	{write_pos=290649, read_pos=290617, capacity=1024, population=32}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9603833865814696}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62560, __metrics=20}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9527156549520767}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62560, __metrics=20}
+2015-03-03 22:16:52,741 303170   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62600}
+2015-03-03 22:16:52,744 303173   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10383
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62580}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__sendqueue            	{write_pos=290935, read_pos=290935, capacity=1024, population=0}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__receive              	{write_pos=290672, read_pos=290609, capacity=1024, population=63}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9402364972834771}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62600, __metrics=0}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9552572706935123}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62600, __metrics=0}
+2015-03-03 22:16:52,757 303186   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62580}
+2015-03-03 22:16:52,766 303195   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10389
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62600}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__sendqueue            	{write_pos=290930, read_pos=290930, capacity=1024, population=0}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__receive              	{write_pos=290716, read_pos=290584, capacity=1024, population=132}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9447284345047924}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62580, __metrics=0}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9584664536741214}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62580, __metrics=0}
+2015-03-03 22:16:52,789 303218   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62600}
+2015-03-03 22:16:52,792 303221   1425421012	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10382
+2015-03-03 22:16:54,498 304927   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37540}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__sendqueue            	{write_pos=351251, read_pos=351251, capacity=1024, population=0}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__receive              	{write_pos=175157, read_pos=175155, capacity=1024, population=2}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4587107085775173}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__transfer-count       	{__ack_ack=36760, default=38300}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.482409381663113}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__emit-count           	{__ack_ack=36760, default=38300}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__sendqueue            	{write_pos=351253, read_pos=351253, capacity=1024, population=0}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__receive              	{write_pos=175153, read_pos=175152, capacity=1024, population=1}
+2015-03-03 22:16:54,499 304928   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4962686567164178}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__transfer-count       	{__ack_ack=36940, default=38120}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4792110874200426}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__emit-count           	{__ack_ack=36940, default=38120}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37560}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__sendqueue            	{write_pos=351253, read_pos=351253, capacity=1024, population=0}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__receive              	{write_pos=175158, read_pos=175155, capacity=1024, population=3}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4728434504792332}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__transfer-count       	{__ack_ack=36520, default=38540}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5229211087420043}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__emit-count           	{__ack_ack=36520, default=38540}
+2015-03-03 22:16:54,500 304929   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__sendqueue            	{write_pos=351283, read_pos=351283, capacity=1024, population=0}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__receive              	{write_pos=175207, read_pos=175108, capacity=1024, population=99}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.486673773987207}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__transfer-count       	{__ack_ack=36760, default=38320}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.474946695095949}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__emit-count           	{__ack_ack=36760, default=38320}
+2015-03-03 22:16:54,623 305052   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:54,666 305095   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37540}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__sendqueue            	{write_pos=351281, read_pos=351281, capacity=1024, population=0}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__receive              	{write_pos=175233, read_pos=175130, capacity=1024, population=103}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4512519978689398}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__transfer-count       	{__ack_ack=37440, default=37620}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.5138592750533049}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__emit-count           	{__ack_ack=37440, default=37620}
+2015-03-03 22:16:54,667 305096   1425421014	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37520}
+2015-03-03 22:16:57,401 307830   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__ack-count            	{tokenizer-bolt:default=187620}
+2015-03-03 22:16:57,401 307830   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__sendqueue            	{write_pos=1774377, read_pos=1774377, capacity=1024, population=0}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__receive              	{write_pos=879366, read_pos=879365, capacity=1024, population=1}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__process-latency      	{tokenizer-bolt:default=0.10638524677539708}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__transfer-count       	{__ack_ack=188200, default=187040}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-latency      	{tokenizer-bolt:default=0.1055324592260953}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__fail-count           	{}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__emit-count           	{__ack_ack=188200, default=187040}
+2015-03-03 22:16:57,402 307831   1425421017	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-count        	{tokenizer-bolt:default=187620}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=93780}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__sendqueue            	{write_pos=893729, read_pos=893729, capacity=1024, population=0}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__receive              	{write_pos=446709, read_pos=446707, capacity=1024, population=2}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.18319471102580506}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__transfer-count       	{__ack_ack=93840, default=93700}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.18575389208786522}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__emit-count           	{__ack_ack=93840, default=93700}
+2015-03-03 22:16:59,509 309938   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=93780}
+2015-03-03 22:16:59,512 309941   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=93780}
+2015-03-03 22:16:59,512 309941   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__sendqueue            	{write_pos=893731, read_pos=893731, capacity=1024, population=0}
+2015-03-03 22:16:59,512 309941   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__receive              	{write_pos=446725, read_pos=446720, capacity=1024, population=5}
+2015-03-03 22:16:59,512 309941   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.18447430155683514}
+2015-03-03 22:16:59,512 309941   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__transfer-count       	{__ack_ack=94400, default=93160}
+2015-03-03 22:16:59,513 309942   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.1739872068230277}
+2015-03-03 22:16:59,513 309942   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:16:59,513 309942   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__emit-count           	{__ack_ack=94400, default=93160}
+2015-03-03 22:16:59,513 309942   1425421019	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=93800}
+2015-03-03 22:17:02,741 313170   1425421022	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10315
+2015-03-03 22:17:02,741 313170   1425421022	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10311
+2015-03-03 22:17:02,751 313180   1425421022	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10317
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__ack-count            	{default=187500}
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__sendqueue            	{write_pos=1867609, read_pos=1867609, capacity=1024, population=0}
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__complete-latency     	{default=48.171413333333334}
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__receive              	{write_pos=860441, read_pos=860440, capacity=1024, population=1}
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__transfer-count       	{__ack_init=185940, default=189060}
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__fail-count           	{}
+2015-03-03 22:17:12,353 322782   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__emit-count           	{__ack_init=185940, default=189060}
+2015-03-03 22:17:12,738 323167   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10425
+2015-03-03 22:17:12,762 323191   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10425
+2015-03-03 22:17:12,798 323227   1425421032	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10426
+2015-03-03 22:17:22,732 333161   1425421042	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10385
+2015-03-03 22:17:22,734 333163   1425421042	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10385
+2015-03-03 22:17:22,740 333169   1425421042	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10384
+2015-03-03 22:17:32,737 343166   1425421052	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10406
+2015-03-03 22:17:32,741 343170   1425421052	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10404
+2015-03-03 22:17:32,751 343180   1425421052	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10405
+2015-03-03 22:17:42,738 353167   1425421062	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10458
+2015-03-03 22:17:42,740 353169   1425421062	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10459
+2015-03-03 22:17:42,813 353242   1425421062	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10457
+2015-03-03 22:17:52,224 362653   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__ack-count            	{dataset-spout:default=187320}
+2015-03-03 22:17:52,224 362653   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__sendqueue            	{write_pos=2116932, read_pos=2116932, capacity=1024, population=0}
+2015-03-03 22:17:52,224 362653   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__receive              	{write_pos=474466, read_pos=474465, capacity=1024, population=1}
+2015-03-03 22:17:52,224 362653   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__process-latency      	{dataset-spout:default=0.17680973734785393}
+2015-03-03 22:17:52,224 362653   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__transfer-count       	{__ack_ack=186860, default=187720}
+2015-03-03 22:17:52,224 362653   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-latency      	{dataset-spout:default=0.17471166168304145}
+2015-03-03 22:17:52,225 362654   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__fail-count           	{}
+2015-03-03 22:17:52,225 362654   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__emit-count           	{__ack_ack=186860, default=187720}
+2015-03-03 22:17:52,225 362654   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 15:tokenizer-bolt	__execute-count        	{dataset-spout:default=187280}
+2015-03-03 22:17:52,236 362665   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__ack-count            	{}
+2015-03-03 22:17:52,236 362665   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSScavenge          	{count=155, timeMs=570}
+2015-03-03 22:17:52,236 362665   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/heap            	{unusedBytes=974972272, usedBytes=2253068944, maxBytes=3817865216, initBytes=989385216, virtualFreeBytes=1564796272, committedBytes=3228041216}
+2015-03-03 22:17:52,236 362665   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__receive              	{write_pos=6, read_pos=5, capacity=1024, population=1}
+2015-03-03 22:17:52,236 362665   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	GC/PSMarkSweep         	{count=0, timeMs=0}
+2015-03-03 22:17:52,236 362665   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__fail-count           	{}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-latency      	{}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	newWorkerEvent         	0
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__emit-count           	{}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__execute-count        	{}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__sendqueue            	{write_pos=4, read_pos=4, capacity=1024, population=0}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	memory/nonHeap         	{unusedBytes=36275480, usedBytes=37124840, maxBytes=224395264, initBytes=24576000, virtualFreeBytes=187270424, committedBytes=73400320}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	uptimeSecs             	363.85
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer             	{write_pos=7150407, read_pos=7150406, capacity=1024, population=1}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	startTimeSecs          	1.425420708386E9
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__process-latency      	{}
+2015-03-03 22:17:52,237 362666   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 -1:__system   	__transfer-count       	{}
+2015-03-03 22:17:52,244 362673   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__ack-count            	{support-vector-maschine-bolt:__ack_ack=187020, feature-generation-bolt:__ack_ack=187280, tokenizer-bolt:__ack_ack=184620, dataset-spout:__ack_init=187300, pos-tagger-bolt:__ack_ack=190560, preprocessor-bolt:__ack_ack=187020}
+2015-03-03 22:17:52,244 362673   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__sendqueue            	{write_pos=1058387, read_pos=1058387, capacity=1024, population=0}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__receive              	{write_pos=5769929, read_pos=5769924, capacity=1024, population=5}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__process-latency      	{support-vector-maschine-bolt:__ack_ack=0.014009196877339323, feature-generation-bolt:__ack_ack=0.002349423323366083, tokenizer-bolt:__ack_ack=0.0021666125013541327, dataset-spout:__ack_init=0.0014949279231179925, pos-tagger-bolt:__ack_ack=0.0025188916876574307, preprocessor-bolt:__ack_ack=0.0014971660784942786}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__transfer-count       	{}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-latency      	{support-vector-maschine-bolt:__ack_ack=0.020911360799001247, feature-generation-bolt:__ack_ack=0.003612874972629735, tokenizer-bolt:__ack_ack=0.003790340047649989, dataset-spout:__ack_init=0.002778074580617587, pos-tagger-bolt:__ack_ack=0.004874430433400445, preprocessor-bolt:__ack_ack=0.002974609582492298}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__fail-count           	{}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__emit-count           	{__ack_ack=187280}
+2015-03-03 22:17:52,245 362674   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	  1:__acker    	__execute-count        	{support-vector-maschine-bolt:__ack_ack=192240, feature-generation-bolt:__ack_ack=182680, tokenizer-bolt:__ack_ack=184680, dataset-spout:__ack_init=187180, pos-tagger-bolt:__ack_ack=188740, preprocessor-bolt:__ack_ack=188260}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62420}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__sendqueue            	{write_pos=353369, read_pos=353368, capacity=1024, population=1}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__receive              	{write_pos=353036, read_pos=352995, capacity=1024, population=41}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9580262736302467}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62420, __metrics=20}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9606021780909674}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62420, __metrics=20}
+2015-03-03 22:17:52,744 363173   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62440}
+2015-03-03 22:17:52,754 363183   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10452
+2015-03-03 22:17:52,758 363187   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62420}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__sendqueue            	{write_pos=353369, read_pos=353369, capacity=1024, population=0}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__receive              	{write_pos=353083, read_pos=353019, capacity=1024, population=64}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9404037167574495}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62420, __metrics=40}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9795003203074952}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62420, __metrics=40}
+2015-03-03 22:17:52,759 363188   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62440}
+2015-03-03 22:17:52,770 363199   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10452
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__ack-count            	{feature-generation-bolt:default=62440}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__sendqueue            	{write_pos=353377, read_pos=353377, capacity=1024, population=0}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__receive              	{write_pos=353069, read_pos=352981, capacity=1024, population=88}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__process-latency      	{feature-generation-bolt:default=0.9493914157591288}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__transfer-count       	{__ack_ack=62420, __metrics=20}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-latency      	{feature-generation-bolt:default=0.9394424863825697}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__fail-count           	{}
+2015-03-03 22:17:52,778 363207   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__emit-count           	{__ack_ack=62420, __metrics=20}
+2015-03-03 22:17:52,779 363208   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	__execute-count        	{feature-generation-bolt:default=62420}
+2015-03-03 22:17:52,789 363218   1425421072	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10454
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__sendqueue            	{write_pos=426262, read_pos=426262, capacity=1024, population=0}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__receive              	{write_pos=212579, read_pos=212574, capacity=1024, population=5}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4789333333333334}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__transfer-count       	{__ack_ack=38100, default=36900}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4549333333333334}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__emit-count           	{__ack_ack=38100, default=36900}
+2015-03-03 22:17:54,502 364931   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  6:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__sendqueue            	{write_pos=426260, read_pos=426260, capacity=1024, population=0}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__receive              	{write_pos=212574, read_pos=212568, capacity=1024, population=6}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.5210666666666666}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__transfer-count       	{__ack_ack=37240, default=37760}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4725333333333332}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__emit-count           	{__ack_ack=37240, default=37760}
+2015-03-03 22:17:54,503 364932   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  8:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__sendqueue            	{write_pos=426262, read_pos=426262, capacity=1024, population=0}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__receive              	{write_pos=212576, read_pos=212571, capacity=1024, population=5}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4730666666666667}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__transfer-count       	{__ack_ack=38060, default=36960}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4848}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__emit-count           	{__ack_ack=38060, default=36960}
+2015-03-03 22:17:54,504 364933   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  7:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,523 364952   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,523 364952   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__sendqueue            	{write_pos=426288, read_pos=426288, capacity=1024, population=0}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__receive              	{write_pos=212580, read_pos=212579, capacity=1024, population=1}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4949333333333332}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__transfer-count       	{__ack_ack=38140, default=36880}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4768}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__emit-count           	{__ack_ack=38140, default=36880}
+2015-03-03 22:17:54,524 364953   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	  9:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:54,529 364958   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__ack-count            	{preprocessor-bolt:default=37520}
+2015-03-03 22:17:54,529 364958   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__sendqueue            	{write_pos=426296, read_pos=426296, capacity=1024, population=0}
+2015-03-03 22:17:54,529 364958   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__receive              	{write_pos=212580, read_pos=212577, capacity=1024, population=3}
+2015-03-03 22:17:54,529 364958   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__process-latency      	{preprocessor-bolt:default=1.4898720682302773}
+2015-03-03 22:17:54,529 364958   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__transfer-count       	{__ack_ack=38600, default=36400}
+2015-03-03 22:17:54,530 364959   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-latency      	{preprocessor-bolt:default=1.4794666666666667}
+2015-03-03 22:17:54,530 364959   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__fail-count           	{}
+2015-03-03 22:17:54,530 364959   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__emit-count           	{__ack_ack=38600, default=36400}
+2015-03-03 22:17:54,530 364959   1425421074	ip-10-86-134-59.eu-west-1.compute.internal:6700	 10:pos-tagger-bolt	__execute-count        	{preprocessor-bolt:default=37500}
+2015-03-03 22:17:57,406 367835   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__ack-count            	{tokenizer-bolt:default=187520}
+2015-03-03 22:17:57,406 367835   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__sendqueue            	{write_pos=2149398, read_pos=2149398, capacity=1024, population=0}
+2015-03-03 22:17:57,406 367835   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__receive              	{write_pos=1065160, read_pos=1065147, capacity=1024, population=13}
+2015-03-03 22:17:57,406 367835   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__process-latency      	{tokenizer-bolt:default=0.1015358361774744}
+2015-03-03 22:17:57,407 367836   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__transfer-count       	{__ack_ack=186280, default=188740}
+2015-03-03 22:17:57,407 367836   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-latency      	{tokenizer-bolt:default=0.11072}
+2015-03-03 22:17:57,407 367836   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__fail-count           	{}
+2015-03-03 22:17:57,407 367836   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__emit-count           	{__ack_ack=186280, default=188740}
+2015-03-03 22:17:57,407 367836   1425421077	ip-10-86-134-59.eu-west-1.compute.internal:6700	 11:preprocessor-bolt	__execute-count        	{tokenizer-bolt:default=187500}
+2015-03-03 22:17:59,508 369937   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=93740}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__sendqueue            	{write_pos=1081168, read_pos=1081168, capacity=1024, population=0}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__receive              	{write_pos=540403, read_pos=540402, capacity=1024, population=1}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.1781523362491999}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__transfer-count       	{__ack_ack=93780, default=93640}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.17801494130202775}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__emit-count           	{__ack_ack=93780, default=93640}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  4:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=93700}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__ack-count            	{pos-tagger-bolt:default=93720}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__sendqueue            	{write_pos=1081168, read_pos=1081168, capacity=1024, population=0}
+2015-03-03 22:17:59,509 369938   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__receive              	{write_pos=540397, read_pos=540393, capacity=1024, population=4}
+2015-03-03 22:17:59,510 369939   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__process-latency      	{pos-tagger-bolt:default=0.176056338028169}
+2015-03-03 22:17:59,510 369939   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__transfer-count       	{__ack_ack=95880, default=91580}
+2015-03-03 22:17:59,510 369939   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-latency      	{pos-tagger-bolt:default=0.18523260776781902}
+2015-03-03 22:17:59,510 369939   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__fail-count           	{}
+2015-03-03 22:17:59,510 369939   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__emit-count           	{__ack_ack=95880, default=91580}
+2015-03-03 22:17:59,510 369939   1425421079	ip-10-86-134-59.eu-west-1.compute.internal:6700	  5:feature-generation-bolt	__execute-count        	{pos-tagger-bolt:default=93720}
+2015-03-03 22:18:02,756 373185   1425421082	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10372
+2015-03-03 22:18:02,757 373186   1425421082	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10369
+2015-03-03 22:18:02,787 373216   1425421082	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10372
+2015-03-03 22:18:12,353 382782   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__ack-count            	{default=187720}
+2015-03-03 22:18:12,353 382782   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__sendqueue            	{write_pos=2243124, read_pos=2243124, capacity=1024, population=0}
+2015-03-03 22:18:12,353 382782   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__complete-latency     	{default=47.71723844023013}
+2015-03-03 22:18:12,353 382782   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__receive              	{write_pos=1033431, read_pos=1033425, capacity=1024, population=6}
+2015-03-03 22:18:12,353 382782   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__transfer-count       	{__ack_init=187140, default=188380}
+2015-03-03 22:18:12,353 382782   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__fail-count           	{}
+2015-03-03 22:18:12,354 382783   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	  3:dataset-spout	__emit-count           	{__ack_init=187140, default=188380}
+2015-03-03 22:18:12,753 383182   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	 14:support-vector-maschine-bolt	tuple_count            	10522
+2015-03-03 22:18:12,754 383183   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	 12:support-vector-maschine-bolt	tuple_count            	10524
+2015-03-03 22:18:12,814 383243   1425421092	ip-10-86-134-59.eu-west-1.compute.internal:6700	 13:support-vector-maschine-bolt	tuple_count            	10521
