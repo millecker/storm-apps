@@ -79,7 +79,7 @@ apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
 
 apps.sentiment.analysis.svm.spout.parallelism: 1
 apps.sentiment.analysis.svm.spout.max.pending: 150
-apps.sentiment.analysis.svm.spout.startup.sleep.ms: 25000 # 25 sec
+apps.sentiment.analysis.svm.spout.startup.sleep.ms: 20000 # 20 sec
 
 apps.sentiment.analysis.svm.bolt.tokenizer.parallelism: 1
 apps.sentiment.analysis.svm.bolt.tokenizer.logging: false
@@ -87,7 +87,7 @@ apps.sentiment.analysis.svm.bolt.tokenizer.logging: false
 apps.sentiment.analysis.svm.bolt.preprocessor.parallelism: 1
 apps.sentiment.analysis.svm.bolt.preprocessor.logging: false
 
-apps.sentiment.analysis.svm.bolt.postagger.parallelism: 4
+apps.sentiment.analysis.svm.bolt.postagger.parallelism: 5
 apps.sentiment.analysis.svm.bolt.postagger.logging: false
 
 apps.sentiment.analysis.svm.bolt.featuregeneration.parallelism: 2
