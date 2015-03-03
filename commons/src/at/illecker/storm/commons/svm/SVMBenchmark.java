@@ -82,6 +82,9 @@ public class SVMBenchmark {
     // Load featured tweets
     List<FeaturedTweet> featuredTrainTweets = SerializationUtils
         .deserialize(dataset.getTrainDataSerializationFile());
+    if (featuredTrainTweets == null) {
+      featuredTrainTweets = generateFeaturedTweets(dataset);
+    }
 
     // Load Preprocessor
     final Preprocessor preprocessor = Preprocessor.getInstance();
@@ -97,7 +100,7 @@ public class SVMBenchmark {
       // Load TF-IDF
       TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedTokens(
           FeaturedTweet.getTaggedTokensFromTweets(featuredTrainTweets),
-          TfType.RAW, TfIdfNormalization.COS, true);
+          TfType.LOG, TfIdfNormalization.COS, true);
 
       // Load Feature Vector Generator
       System.out.println("Load CombinedFeatureVectorGenerator...");
@@ -111,7 +114,7 @@ public class SVMBenchmark {
       // Load TF-IDF
       TweetTfIdf tweetTfIdf = TweetTfIdf.createFromTaggedWords(
           FeaturedTweet.getTaggedWordsFromTweets(featuredTrainTweets),
-          TfType.RAW, TfIdfNormalization.COS, true);
+          TfType.LOG, TfIdfNormalization.COS, true);
 
       // Load Feature Vector Generator
       System.out.println("Load CombinedFeatureVectorGenerator...");
@@ -224,6 +227,70 @@ public class SVMBenchmark {
 
     executorService.shutdown();
     svm.EXEC_SERV.shutdown();
+  }
+
+  public static List<FeaturedTweet> generateFeaturedTweets(Dataset dataset) {
+    List<FeaturedTweet> featuredTrainTweets = new ArrayList<FeaturedTweet>();
+
+    // Read train tweets
+    List<Tweet> trainTweets = dataset.getTrainTweets(true);
+
+    // Tokenize
+    List<List<String>> tokenizedTweets = Tokenizer.tokenizeTweets(trainTweets);
+
+    // Preprocess only
+    Preprocessor preprocessor = Preprocessor.getInstance();
+    List<List<String>> preprocessedTweets = preprocessor
+        .preprocessTweets(tokenizedTweets);
+
+    // Preprocess and tag
+    List<List<TaggedWord>> preprocessedTaggedTweets = preprocessor
+        .preprocessAndTagTweets(tokenizedTweets);
+
+    // Ark POS Tagging
+    ArkPOSTagger arkPOSTagger = ArkPOSTagger.getInstance();
+    List<List<TaggedToken>> taggedTokens = arkPOSTagger
+        .tagTweets(preprocessedTweets);
+
+    // Gate POS Tagging
+    GatePOSTagger gatePOSTagger = GatePOSTagger.getInstance();
+    List<List<TaggedWord>> taggedWords = gatePOSTagger
+        .tagTweets(preprocessedTaggedTweets);
+
+    // Create ARK Feature Vector Generator
+    TweetTfIdf arkTweetTfIdf = TweetTfIdf.createFromTaggedTokens(taggedTokens,
+        TfType.LOG, TfIdfNormalization.COS, true);
+    FeatureVectorGenerator arkFeatureVectorGen = new CombinedFeatureVectorGenerator(
+        false, true, arkTweetTfIdf);
+
+    // Create GATE Feature Vector Generator
+    TweetTfIdf gateTweetTfIdf = TweetTfIdf.createFromTaggedWords(taggedWords,
+        TfType.LOG, TfIdfNormalization.COS, true);
+    FeatureVectorGenerator gateFeatureVectorGen = new CombinedFeatureVectorGenerator(
+        true, true, gateTweetTfIdf);
+
+    // Feature Vector Generation
+    for (int i = 0; i < trainTweets.size(); i++) {
+      List<TaggedToken> taggedToken = taggedTokens.get(i);
+      List<TaggedWord> taggedWord = taggedWords.get(i);
+
+      Map<Integer, Double> arkFeatureVector = arkFeatureVectorGen
+          .generateFeatureVectorFromTaggedTokens(taggedToken);
+
+      Map<Integer, Double> gateFeatureVector = gateFeatureVectorGen
+          .generateFeatureVectorFromTaggedWords(taggedWord);
+
+      featuredTrainTweets.add(FeaturedTweet.create(trainTweets.get(i),
+          tokenizedTweets.get(i), preprocessedTweets.get(i),
+          preprocessedTaggedTweets.get(i), taggedToken, taggedWord,
+          arkFeatureVector, gateFeatureVector));
+    }
+
+    // Serialize training data including feature vectors
+    SerializationUtils.serializeList(featuredTrainTweets,
+        dataset.getTrainDataSerializationFile());
+
+    return featuredTrainTweets;
   }
 
 }
