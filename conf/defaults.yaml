@@ -227,6 +227,7 @@ commons.featurevectorgenerator.tfidf.logging: false
 apps.postagger.workers.num: 1
 apps.postagger.workers.childopts: "-Xmx16g"
 
+# supervisor childopts are useless - use storm.yaml instead
 apps.postagger.supervisor.childopts: "-Xmx2g"
 
 apps.postagger.spout.parallelism: 1
@@ -253,6 +254,7 @@ apps.postagger.bolt.postagger.model: "resources/models/pos/ark.model.20120919.tx
 apps.sentiment.analysis.workers.num: 1
 apps.sentiment.analysis.workers.childopts: "-Xmx16g"
 
+# supervisor childopts are useless - use storm.yaml instead
 apps.sentiment.analysis.supervisor.childopts: "-Xmx2g"
 
 apps.sentiment.analysis.spout.parallelism: 1
@@ -282,7 +284,8 @@ apps.sentiment.analysis.bolt.sentimentdetection.logging: true
 apps.sentiment.analysis.svm.workers.num: 1
 apps.sentiment.analysis.svm.workers.childopts: "-Xmx4g"
 
-apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx2g"
+# supervisor childopts are useless - use storm.yaml instead
+apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx4g"
 
 apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
 apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10

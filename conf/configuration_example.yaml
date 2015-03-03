@@ -69,16 +69,17 @@ apps.sentiment.analysis.bolt.sentimentdetection.logging: true
 # c3.8xlarge
 
 apps.sentiment.analysis.svm.workers.num: 1
+apps.sentiment.analysis.svm.workers.childopts: "-Xmx4g"
 
-apps.sentiment.analysis.svm.workers.childopts: "-Xms16g -Xmx32g -XX:+UseG1GC"
-apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx8g -Xmx16g -XX:+UseG1GC"
+# supervisor childopts are useless - use storm.yaml instead
+apps.sentiment.analysis.svm.supervisor.childopts: "-Xmx4g"
 
 apps.sentiment.analysis.svm.metrics.logging.consumer.parallelism: 1
 apps.sentiment.analysis.svm.metrics.logging.consumer.intervall.sec: 10
 
 apps.sentiment.analysis.svm.spout.parallelism: 1
 apps.sentiment.analysis.svm.spout.max.pending: 150
-apps.sentiment.analysis.svm.spout.startup.sleep.ms: 20000 # 20 sec
+apps.sentiment.analysis.svm.spout.startup.sleep.ms: 25000 # 25 sec
 
 apps.sentiment.analysis.svm.bolt.tokenizer.parallelism: 1
 apps.sentiment.analysis.svm.bolt.tokenizer.logging: false
@@ -86,12 +87,12 @@ apps.sentiment.analysis.svm.bolt.tokenizer.logging: false
 apps.sentiment.analysis.svm.bolt.preprocessor.parallelism: 1
 apps.sentiment.analysis.svm.bolt.preprocessor.logging: false
 
-apps.sentiment.analysis.svm.bolt.postagger.parallelism: 3
+apps.sentiment.analysis.svm.bolt.postagger.parallelism: 4
 apps.sentiment.analysis.svm.bolt.postagger.logging: false
 
 apps.sentiment.analysis.svm.bolt.featuregeneration.parallelism: 2
 apps.sentiment.analysis.svm.bolt.featuregeneration.logging: false
 
-apps.sentiment.analysis.svm.bolt.svm.parallelism: 2
+apps.sentiment.analysis.svm.bolt.svm.parallelism: 3
 apps.sentiment.analysis.svm.bolt.svm.logging: false
 
