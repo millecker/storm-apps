@@ -44,7 +44,7 @@ public class StopWords {
       "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than",
       "too", "very", "s", "t", "can", "will", "just", "don", "should", "now" };
 
-  private static final Logger LOG = LoggerFactory.getLogger(NameEntities.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StopWords.class);
   private static final StopWords INSTANCE = new StopWords();
 
   private Set<String> m_stopwords = null;
